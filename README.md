@@ -57,9 +57,7 @@ public class Test2 : MonoBehaviour
 
 public struct ResPath
 {
-    public const string Player = "Prefabs/Player"; 
-    //备注：这是加载Resource文件下的路径
-    //Player预制的体真实路径是：Assets/Resources/Prefabs/Player
+    public const string Player = "Prefabs/Player"; //Player预制的体真实路径是：Assets/Resources/Prefabs/Player
 }
 
 public class Player
