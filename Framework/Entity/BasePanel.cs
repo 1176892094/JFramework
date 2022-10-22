@@ -8,7 +8,7 @@ namespace JYJFramework
         public virtual void Show() => gameObject.SetActive(true);
         public virtual void Hide() => gameObject.SetActive(false);
 
-        protected virtual void OnCloseButtonClick() => UIManager.Instance.HidePanel(path);
+        public virtual void OnCloseButtonClick() => UIManager.Instance.HidePanel(path);
 
         protected virtual void OnDestroy()
         {
