@@ -230,3 +230,49 @@ public struct ExcelPath
     public const string Inventory = "Assets/Editor/Inventory.xlsx";//一定要输入全路径
 }
 ```
+(8)LoadManager
+```csharp
+public class Test8: MonoBehaviour
+{
+    private void LoadScene()
+    {
+        LoadManager.LoadScene("SceneName");
+    }
+
+    private void LoadSceneAsync()
+    {
+        LoadManager.LoadSceneAsync("SceneName", () =>
+        {
+            //加载完成后事件
+        });
+    }
+}
+```
+(9)AwaitExtensions
+```csharp
+  private async void Start()
+    {
+        await new WaitForSeconds(1);//等待一秒
+        await new WaitForSecondsRealtime(1);//等待1秒，不受timeScale影响
+        await new WaitForUpdate();//在Update最后一帧执行
+        await new WaitForFixedUpdate();//在FixedUpdate最后一帧执行
+        await new WaitForEndOfFrame();//等待这一帧结束
+        await new WaitWhile(WaitTime);//等待WaitTime结果，不会挂起异步
+        await new WaitUntil(WaitTime);//等待WaitTime结果，false不会执行后面语句
+        await SceneManager.LoadSceneAsync("SceneName");
+        await Resources.LoadAsync("ResourcesName");
+        AsyncOperation asyncOperation = new AsyncOperation();
+        await asyncOperation;//等待异步操作
+        ResourceRequest request = new ResourceRequest();
+        await request;//等待资源请求
+        AssetBundleRequest bundleRequest = new AssetBundleRequest();
+        await bundleRequest;//等待AB包请求
+        AssetBundleCreateRequest bundleCreateRequest = new AssetBundleCreateRequest();
+        await bundleCreateRequest;//等待AB包创建请求
+    }
+    
+    private bool WaitTime()
+    {
+        return true;
+    }
+```
