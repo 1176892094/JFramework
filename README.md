@@ -114,7 +114,7 @@ public struct PoolPath
     public const string Bullet = "Bullet";//Bullet的真实路径是：Assets/Resources/Bullet
 }
 ```
-(5)AudioManager
+(5)AudioManager(使用前请在场景中挂在一个AudioManager的物体)
 ```csharp
 public class Test5 : MonoBehaviour
 {
