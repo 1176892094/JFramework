@@ -4,7 +4,8 @@
 打开Unity的Package Manager左上角“+”号使用URL方式导入：https://github.com/1176892094/JYJFramework.git
 
 2.使用
-EventManager
+
+(1)EventManager
 
 ```csharp
 public class Test: MonoBehaviour
