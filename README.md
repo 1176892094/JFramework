@@ -8,7 +8,7 @@
 (1)EventManager
 
 ```csharp
-public class Test : MonoBehaviour
+public class Test1 : MonoBehaviour
 {
     private void Awake()
     {
@@ -59,7 +59,7 @@ public struct ResPath
 {
     public const string Player = "Prefabs/Player"; 
     //备注：这是加载Resource文件下的路径
-    //Player的真实路径应该是Assets/Resources/Prefabs/Player
+    //Player预制的体真实路径是：Assets/Resources/Prefabs/Player
 }
 
 public class Player
