@@ -8,30 +8,30 @@
 (1)EventManager
 
 ```csharp
-public class Test: MonoBehaviour
+public class Test : MonoBehaviour
 {
     private void Awake()
     {
-        EventManager.AddEventListener(EventName.EventTrigger,EventTrigger);
+        EventManager.AddEventListener(EventName.EventTrigger, EventTrigger); //添加事件
     }
 
     private void Update()
     {
-        EventManager.OnEventTrigger(EventName.EventTrigger);
+        EventManager.OnEventTrigger(EventName.EventTrigger); //触发事件
     }
 
-    private void EventTrigger()
+    private void EventTrigger() //触发事件调用该方法
     {
-        
+        Debug.Log("触发事件!");
     }
 
     private void OnDestroy()
     {
-        EventManager.RemoveEventListener(EventName.EventTrigger,EventTrigger);
+        EventManager.RemoveEventListener(EventName.EventTrigger, EventTrigger); //移除事件
     }
 }
 
 public struct EventName
 {
-    public const string EventTrigger="EventTrigger";
+    public const string EventTrigger = "EventTrigger"; //建议定一个事件的常量
 }
