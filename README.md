@@ -145,3 +145,55 @@ public struct AudioPath
     public const string BTClick = "Audio/BTClick"; //BTClick的真实路径是：Assets/Resources/Audio/BTClick
 }
 ```
+(5)UIManager(请在包中找到Prefabs文件夹，将UIManager拖入场景中)
+```csharp
+public class Test7: MonoBehaviour
+{
+    private void ShowPanel()
+    {
+        UIManager.Instance.ShowPanel<LoginPanel>(UIPanelPath.LoginPanel); //加载LoginPanel(可以重复加载，但只有一个实例)
+        UIManager.Instance.ShowPanel<LoginPanel>(UIPanelPath.LoginPanel,UILayerType.Middle);//设置层级
+        UIManager.Instance.ShowPanel<LoginPanel>(UIPanelPath.LoginPanel,UILayerType.Middle, panel =>
+        {
+            panel.SetUseruame("JINYIJIE");//设置属性
+            panel.SetPassword("123456");//设置属性
+        });
+    }
+    
+    private void HidePanel()
+    {
+        UIManager.Instance.HidePanel(UIPanelPath.LoginPanel); //隐藏LoginPane
+    }
+
+    private void GetPanel()
+    {
+        LoginPanel panel = UIManager.Instance.GetPanel<LoginPanel>(UIPanelPath.LoginPanel);//得到面板
+        panel.SetUseruame("JINYIJIE");//设置属性
+        panel.SetPassword("123456");//设置属性
+    }
+
+    private void GetLayer()
+    {
+        UIManager.Instance.GetLayer(UILayerType.Bottom);//得到层级
+        Transform common = UIManager.Instance.GetLayer(UILayerType.Height);
+    }
+
+    private void Clear()
+    {
+        UIManager.Instance.Clear();//清除并销毁所有面板
+    }
+}
+
+public struct UIPanelPath
+{
+    public const string LoginPanel = "UI/LoginPanel";//LoginPanel的真实路径是：Assets/Resources/UI/LoginPanel
+}
+
+public class LoginPanel : BasePanel //需要管理的UI都要继承BasePanel
+{
+    private string username;
+    private string password;
+    public void SetUseruame(string username) => this.username = username;
+    public void SetPassword(string password) => this.password = password;
+}
+```
