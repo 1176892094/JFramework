@@ -7,18 +7,30 @@
 EventManager
 
 ```csharp
-public class Foo
+public class Test: MonoBehaviour
 {
-    ISomeService _service;
-
-    public Foo()
+    private void Awake()
     {
-        _service = new SomeService();
+        EventManager.AddEventListener(EventName.EventTrigger,EventTrigger);
     }
 
-    public void DoSomething()
+    private void Update()
     {
-        _service.PerformTask();
-       … 
+        EventManager.OnEventTrigger(EventName.EventTrigger);
     }
+
+    private void EventTrigger()
+    {
+        
+    }
+
+    private void OnDestroy()
+    {
+        EventManager.RemoveEventListener(EventName.EventTrigger,EventTrigger);
+    }
+}
+
+public struct EventName
+{
+    public const string EventTrigger="EventTrigger";
 }
