@@ -5,15 +5,14 @@ using Object = UnityEngine.Object;
 
 namespace JYJFramework
 {
-    public class AudioManager: SingletonMono<AudioManager>
+    public class AudioManager: MonoBehaviour
     {
         private static readonly List<AudioSource> soundList = new List<AudioSource>();
         private static AudioSource sound;
         private static GameObject source;
 
-        protected override void Awake()
+        protected void Awake()
         {
-            base.Awake();
             DontDestroyOnLoad(gameObject);
             sound = gameObject.AddComponent<AudioSource>();
         }

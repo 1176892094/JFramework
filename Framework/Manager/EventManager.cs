@@ -7,11 +7,23 @@ namespace JYJFramework
     {
         private static readonly Dictionary<string, IEventData> eventDict = new Dictionary<string, IEventData>();
 
+        public static void AddEventListener<T1, T2>(string type, Action<T1, T2> action)
+        {
+            if (eventDict.ContainsKey(type))
+            {
+                ((EventData<T1, T2>)eventDict[type]).actionList += action;
+            }
+            else
+            {
+                eventDict.Add(type, new EventData<T1, T2>(action));
+            }
+        }
+
         public static void AddEventListener<T>(string type, Action<T> action)
         {
             if (eventDict.ContainsKey(type))
             {
-                ((EventData<T>) eventDict[type]).actionList += action;
+                ((EventData<T>)eventDict[type]).actionList += action;
             }
             else
             {
@@ -23,7 +35,7 @@ namespace JYJFramework
         {
             if (eventDict.ContainsKey(type))
             {
-                ((EventData) eventDict[type]).actionList += action;
+                ((EventData)eventDict[type]).actionList += action;
             }
             else
             {
@@ -31,11 +43,19 @@ namespace JYJFramework
             }
         }
 
+        public static void RemoveEventListener<T1, T2>(string type, Action<T1, T2> action)
+        {
+            if (eventDict.ContainsKey(type))
+            {
+                ((EventData<T1, T2>)eventDict[type]).actionList -= action;
+            }
+        }
+
         public static void RemoveEventListener<T>(string type, Action<T> action)
         {
             if (eventDict.ContainsKey(type))
             {
-                ((EventData<T>) eventDict[type]).actionList -= action;
+                ((EventData<T>)eventDict[type]).actionList -= action;
             }
         }
 
@@ -43,7 +63,15 @@ namespace JYJFramework
         {
             if (eventDict.ContainsKey(type))
             {
-                ((EventData) eventDict[type]).actionList -= action;
+                ((EventData)eventDict[type]).actionList -= action;
+            }
+        }
+
+        public static void OnEventTrigger<T1, T2>(string type, T1 data1, T2 data2)
+        {
+            if (eventDict.ContainsKey(type))
+            {
+                ((EventData<T1, T2>)eventDict[type]).actionList?.Invoke(data1, data2);
             }
         }
 
@@ -51,7 +79,7 @@ namespace JYJFramework
         {
             if (eventDict.ContainsKey(type))
             {
-                ((EventData<T>) eventDict[type]).actionList?.Invoke(data);
+                ((EventData<T>)eventDict[type]).actionList?.Invoke(data);
             }
         }
 
@@ -59,9 +87,15 @@ namespace JYJFramework
         {
             if (eventDict.ContainsKey(type))
             {
-                ((EventData) eventDict[type]).actionList?.Invoke();
+                ((EventData)eventDict[type]).actionList?.Invoke();
             }
         }
+    }
+
+    public class EventData<T1, T2> : IEventData
+    {
+        public Action<T1, T2> actionList;
+        public EventData(Action<T1, T2> action) => actionList += action;
     }
 
     public class EventData<T> : IEventData
@@ -78,6 +112,5 @@ namespace JYJFramework
 
     public interface IEventData
     {
-
     }
 }

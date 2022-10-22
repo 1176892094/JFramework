@@ -14,7 +14,7 @@ namespace JYJFramework.Async
         }
     }
     
-    public abstract class WaitForUpdate : CustomYieldInstruction
+    public class WaitForUpdate : CustomYieldInstruction
     {
         public override bool keepWaiting => false;
     }

@@ -7,7 +7,7 @@ namespace JYJFramework
 {
     public static class ExcelManager
     {
-        public static void Writer(string excelPath, int sheetId, Action<ExcelPackage> callback)
+        public static void Writer(string excelPath, int sheetId, Action<ExcelWorksheet> callback)
         {
             FileInfo fileInfo = new FileInfo(excelPath);
             using ExcelPackage excelPackage = new ExcelPackage(fileInfo);
@@ -15,10 +15,14 @@ namespace JYJFramework
             {
                 if (excelPackage.Workbook.Worksheets.Count > sheetId)
                 {
-                    callback?.Invoke(excelPackage);
-                    excelPackage.Save();
-                    Debug.Log("写入成功！");
-                    return;
+                    ExcelWorksheet sheet = excelPackage.Workbook.Worksheets[sheetId];
+                    if (sheet != null)
+                    {
+                        callback?.Invoke(sheet);
+                        excelPackage.Save();
+                        Debug.Log("写入成功！");
+                        return;
+                    }
                 }
             }
 
