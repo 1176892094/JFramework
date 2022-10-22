@@ -197,7 +197,7 @@ public class LoginPanel : BasePanel //需要管理的UI都要继承BasePanel
     public void SetPassword(string password) => this.password = password;
 }
 ```
-(7)ExcelManager(请在包中找到Prefabs文件夹，将UIManager拖入场景中)
+(7)ExcelManager
 ```csharp
 public class Test8: MonoBehaviour
 {
