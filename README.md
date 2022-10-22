@@ -60,7 +60,7 @@ public struct ResPath
     public const string Player = "Prefabs/Player"; //Player预制的体真实路径是：Assets/Resources/Prefabs/Player
 }
 
-public class Player
+public class Player: MonoBehaviour
 {
 }
 ```
