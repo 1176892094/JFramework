@@ -132,7 +132,7 @@ public class Test5 : MonoBehaviour
         AudioManager.PlayAudio(AudioPath.BTClick); //播放该音效
         AudioManager.PlayAudio(AudioPath.BTClick, audio =>
         {
-            audioSource = audio; //获取该音效
+            audioSource = audio; //播放并获取该音效
         });
         AudioManager.StopAudio(audioSource); //停止该音效
         AudioManager.ChangeAudio(0); //改变游戏音效大小为0
