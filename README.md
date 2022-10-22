@@ -120,31 +120,22 @@ public class Test5 : MonoBehaviour
 {
     private AudioSource audioSource;
 
-    private void Update()
+    private void BGMusic()
     {
-        if (Input.GetKeyDown(KeyCode.A))
-        {
-            AudioManager.PlaySound(AudioPath.BGMusic);//播放背景音乐
-            AudioManager.StopSound();//停止背景音乐
-        }
+        AudioManager.PlaySound(AudioPath.BGMusic); //播放背景音乐
+        AudioManager.StopSound(); //停止背景音乐
+        AudioManager.ChangeSound(0); //改变背景音乐大小为0
+    }
 
-        if (Input.GetKeyDown(KeyCode.D))
+    private void GameAudio()
+    {
+        AudioManager.PlayAudio(AudioPath.BTClick); //播放该音效
+        AudioManager.PlayAudio(AudioPath.BTClick, audio =>
         {
-            if (audioSource == null)
-            {
-                AudioManager.PlayAudio(AudioPath.BTClick, audio => //播放该音效
-                {
-                    audioSource = audio;
-                });
-            }
-            else
-            {
-                AudioManager.StopAudio(audioSource); //停止该音效
-            }
-        }
-        
-        AudioManager.ChangeAudio(0);//改变游戏音量大小为0
-        AudioManager.ChangeSound(0);//改变背景音乐大小为0
+            audioSource = audio; //获取该音效
+        });
+        AudioManager.StopAudio(audioSource); //停止该音效
+        AudioManager.ChangeAudio(0); //改变游戏音效大小为0
     }
 }
 
