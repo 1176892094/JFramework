@@ -114,4 +114,43 @@ public struct PoolPath
     public const string Bullet = "Bullet";//Bullet的真实路径是：Assets/Resources/Bullet
 }
 ```
+(5)AudioManager
+```csharp
+public class Test5 : MonoBehaviour
+{
+    private AudioSource audioSource;
 
+    private void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.A))
+        {
+            AudioManager.PlaySound(AudioPath.BGMusic);//播放背景音乐
+            AudioManager.StopSound();//停止背景音乐
+        }
+
+        if (Input.GetKeyDown(KeyCode.D))
+        {
+            if (audioSource == null)
+            {
+                AudioManager.PlayAudio(AudioPath.BTClick, audio => //播放该音效
+                {
+                    audioSource = audio;
+                });
+            }
+            else
+            {
+                AudioManager.StopAudio(audioSource); //停止该音效
+            }
+        }
+        
+        AudioManager.ChangeAudio(0);//改变游戏音量大小为0
+        AudioManager.ChangeSound(0);//改变背景音乐大小为0
+    }
+}
+
+public struct AudioPath
+{
+    public const string BGMusic = "Audio/BGMusic"; //BGMusic的真实路径是：Assets/Resources/Audio/BGMusic
+    public const string BTClick = "Audio/BTClick"; //BTClick的真实路径是：Assets/Resources/Audio/BTClick
+}
+```
