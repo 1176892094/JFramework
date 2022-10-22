@@ -145,7 +145,7 @@ public struct AudioPath
     public const string BTClick = "Audio/BTClick"; //BTClick的真实路径是：Assets/Resources/Audio/BTClick
 }
 ```
-(5)UIManager(请在包中找到Prefabs文件夹，将UIManager拖入场景中)
+(6)UIManager(请在包中找到Prefabs文件夹，将UIManager拖入场景中)
 ```csharp
 public class Test7: MonoBehaviour
 {
@@ -195,5 +195,38 @@ public class LoginPanel : BasePanel //需要管理的UI都要继承BasePanel
     private string password;
     public void SetUseruame(string username) => this.username = username;
     public void SetPassword(string password) => this.password = password;
+}
+```
+(6)ExcelManager(请在包中找到Prefabs文件夹，将UIManager拖入场景中)
+```csharp
+public class Test8: MonoBehaviour
+{
+    private void WriteExcel()//修改Excel
+    {
+        ExcelManager.Writer(ExcelPath.Inventory,0, excel =>
+        {
+            excel.Cells[1, 1].Value = "123";//在第一张表中的A列1行写入123
+        });
+    }
+
+    private void ReadExcel()
+    {
+        ExcelWorksheet sheet = ExcelManager.Reader(ExcelPath.Inventory, 0);//获取Inventory中的第一张表
+    }
+
+    private void CreateSheet()
+    {
+        ExcelManager.Create(ExcelPath.Inventory,"Item");//在Inventory中创建Item表
+    }
+
+    private void DeleteExcel()
+    {
+        ExcelManager.Delete(ExcelPath.Inventory,"Item");//在Inventory中删除Item表
+    }
+}
+
+public struct ExcelPath
+{
+    public const string Inventory = "Assets/Editor/Inventory.xlsx";//一定要输入全路径
 }
 ```
