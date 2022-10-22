@@ -1,6 +1,6 @@
 namespace JYJFramework
 {
-    public class PlayerBaseData: BaseData
+    public class PlayerData: BaseData
     {
         public override void SaveData() => JsonManager.SaveJson(this, name,true);
 
