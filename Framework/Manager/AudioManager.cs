@@ -13,6 +13,7 @@ namespace JYJFramework
 
         protected void Awake()
         {
+            source = gameObject;
             DontDestroyOnLoad(gameObject);
             sound = gameObject.AddComponent<AudioSource>();
         }
@@ -63,11 +64,6 @@ namespace JYJFramework
 
         public static void PlayAudio(string path, Action<AudioSource> callback = null)
         {
-            if (source == null)
-            {
-                source = new GameObject("GameAudio");
-            }
-
             ResourceManager.LoadAsync<AudioClip>(path, clip =>
             {
                 AudioSource audio = source.AddComponent<AudioSource>();
