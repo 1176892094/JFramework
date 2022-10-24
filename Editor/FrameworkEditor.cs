@@ -6,7 +6,7 @@ using AssetDatabase = UnityEditor.AssetDatabase;
 using Debug = UnityEngine.Debug;
 using File = System.IO.File;
 
-namespace JYJFramework
+namespace JYJFramework.Editor
 {
     public class FrameworkEditor
     {
