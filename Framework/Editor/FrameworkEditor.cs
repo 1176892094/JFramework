@@ -1,7 +1,10 @@
+using System.Diagnostics;
 using System.IO;
 using UnityEditor;
 using UnityEngine;
 using AssetDatabase = UnityEditor.AssetDatabase;
+using Debug = UnityEngine.Debug;
+using File = System.IO.File;
 
 namespace JYJFramework
 {
@@ -10,19 +13,27 @@ namespace JYJFramework
         [MenuItem("Tools/JYJFramework/AssetsPath")]
         private static void AssetsPath()
         {
-            EditorUtility.OpenFolderPanel("JYJFramework", Application.dataPath,"");
+            Process.Start(Application.dataPath);
         }
 
         [MenuItem("Tools/JYJFramework/PersistentPath")]
         private static void PersistentDataPath()
         {
-            EditorUtility.OpenFolderPanel("JYJFramework", Application.persistentDataPath,"");
+            Process.Start(Application.persistentDataPath);
         }
         
         [MenuItem("Tools/JYJFramework/StreamingAssetsPath")]
         private static void StreamingAssetsPath()
         {
-            EditorUtility.OpenFolderPanel("JYJFramework", Application.streamingAssetsPath,"");
+            if (Directory.Exists(Application.streamingAssetsPath))
+            {
+                Process.Start(Application.streamingAssetsPath);
+            }
+            else
+            {
+                Directory.CreateDirectory(Application.dataPath + "/StreamingAssets");
+                Process.Start(Application.streamingAssetsPath);
+            }
         }
     }
 }
