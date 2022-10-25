@@ -10,19 +10,19 @@ namespace JYJFramework.Editor
 {
     public class FrameworkEditor
     {
-        [MenuItem("Tools/JYJFramework/AssetsPath")]
+        [MenuItem("Tools/Framework/AssetsPath")]
         private static void AssetsPath()
         {
             Process.Start(Application.dataPath);
         }
 
-        [MenuItem("Tools/JYJFramework/PersistentPath")]
+        [MenuItem("Tools/Framework/PersistentPath")]
         private static void PersistentDataPath()
         {
             Process.Start(Application.persistentDataPath);
         }
         
-        [MenuItem("Tools/JYJFramework/StreamingAssetsPath")]
+        [MenuItem("Tools/Framework/StreamingAssetsPath")]
         private static void StreamingAssetsPath()
         {
             if (Directory.Exists(Application.streamingAssetsPath))
