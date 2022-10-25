@@ -18,12 +18,12 @@ namespace JYJFramework
         private static IEnumerator LoadSceneCompleted(string name, Action action = null)
         {
             AsyncOperation asyncOperation = SceneManager.LoadSceneAsync(name);
+            if (asyncOperation == null) yield break;
             while (!asyncOperation.isDone)
             {
                 EventManager.OnEventTrigger("LoadSceneAsync", asyncOperation.progress);
                 yield return asyncOperation;
             }
-
             action?.Invoke();
         }
     }
