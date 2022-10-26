@@ -4,9 +4,13 @@
 
 打开Unity的Package Manager左上角“+”号使用URL方式导入：https://github.com/1176892094/JYJFramework.git
 
+2.开始
+
+在Package中找到JYJFramework文件夹里的StartScene，进行复制一份到场景中，以该场景为初始场景。
+
 备注：只有Unity2021.1以上的版本才能使用
 
-2.使用
+3.使用
 
 (1)EventManager
 
@@ -116,7 +120,7 @@ public struct PoolPath
     public const string Bullet = "Bullet";//Bullet的真实路径是：Assets/Resources/Bullet
 }
 ```
-(5)AudioManager(使用前请在场景中挂在一个AudioManager的物体)
+(5)AudioManager
 ```csharp
 public class Test5 : MonoBehaviour
 {
@@ -147,7 +151,7 @@ public struct AudioPath
     public const string BTClick = "Audio/BTClick"; //BTClick的真实路径是：Assets/Resources/Audio/BTClick
 }
 ```
-(6)UIManager(请在包中找到Prefabs文件夹，将UIManager拖入场景中)
+(6)UIManager
 ```csharp
 public class Test7: MonoBehaviour
 {
