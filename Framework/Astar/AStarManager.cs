@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace JYJFramework.Pathfinding
@@ -8,8 +9,8 @@ namespace JYJFramework.Pathfinding
         private int width;
         private int height;
         private AStarNode[,] nodes;
-        private List<AStarNode> openList;
-        private List<AStarNode> closeList;
+        private List<AStarNode> openList = new List<AStarNode>();
+        private List<AStarNode> closeList = new List<AStarNode>();
 
         public void InitScene(int width, int height)
         {
@@ -61,12 +62,11 @@ namespace JYJFramework.Pathfinding
 
                 if (openList.Count == 0)
                 {
-                    Debug.Log("死路");
+                    Debug.LogWarning("死路");
                     return null;
                 }
-
+                
                 openList.Sort(SortOpenList);
-                Debug.Log("****************");
                 foreach (var node in openList)
                 {
                     Debug.Log("点" + node.x + "," + node.y + ":g=" + node.g + "h=" + node.h + "f=" + node.f);
@@ -78,8 +78,7 @@ namespace JYJFramework.Pathfinding
 
                 if (originNode == targetNode)
                 {
-                    List<AStarNode> path = new List<AStarNode>();
-                    path.Add(targetNode);
+                    List<AStarNode> path = new List<AStarNode> { targetNode };
                     while (targetNode.father != null)
                     {
                         path.Add(targetNode.father);
@@ -98,13 +97,12 @@ namespace JYJFramework.Pathfinding
             if (a.f >= b.f) return 1;
             return -1;
         }
-
+        
         private void FindNearlyNodeToOpenList(int x, int y, float g, AStarNode father, AStarNode target)
         {
             if (x < 0 || x >= width || y < 0 || y >= height) return;
             AStarNode origin = nodes[x, y];
-            if (origin == null || origin.type == ANodeType.Stop || closeList.Contains(origin) ||
-                openList.Contains(origin)) return;
+            if (origin == null || origin.type == ANodeType.Stop || closeList.Contains(origin) || openList.Contains(origin)) return;
             origin.father = father;
             origin.g = father.g + g;
             origin.h = Mathf.Abs(target.x - origin.x) + Mathf.Abs(target.y - origin.y);
