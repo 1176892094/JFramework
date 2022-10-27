@@ -1,3 +1,4 @@
+#if UNITY_EDITOR
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -49,7 +50,6 @@ namespace JYJFramework.Editor
             rowItem.Dispose();
             rowItem.ID = selectionID;
             rowItem.rect = selectionRect;
-            rowItem.rowIndex = (int) (selectionRect.y / selectionRect.height);
             rowItem.gameObject = (GameObject)EditorUtility.InstanceIDToObject(rowItem.ID);
             if (rowItem.gameObject == null) return;
             Rect rect = new Rect(selectionRect) { x = 32, width = 16 };
@@ -238,7 +238,6 @@ namespace JYJFramework.Editor
         public Rect rect = Rect.zero;
         public Rect nameRect = Rect.zero;
         public GameObject gameObject;
-        public int rowIndex;
 
         public void Dispose()
         {
@@ -246,7 +245,7 @@ namespace JYJFramework.Editor
             gameObject = null;
             rect = Rect.zero;
             nameRect = Rect.zero;
-            rowIndex = 0;
         }
     }
 }
+#endif

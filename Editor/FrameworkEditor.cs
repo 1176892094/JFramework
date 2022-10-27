@@ -1,10 +1,8 @@
+#if UNITY_EDITOR
 using System.Diagnostics;
 using System.IO;
 using UnityEditor;
 using UnityEngine;
-using AssetDatabase = UnityEditor.AssetDatabase;
-using Debug = UnityEngine.Debug;
-using File = System.IO.File;
 
 namespace JYJFramework.Editor
 {
@@ -37,3 +35,4 @@ namespace JYJFramework.Editor
         }
     }
 }
+#endif
