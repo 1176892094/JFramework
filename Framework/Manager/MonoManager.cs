@@ -12,6 +12,7 @@ namespace JYJFramework
         {
             GameObject obj = new GameObject("MonoController");
             controller = obj.AddComponent<MonoController>();
+            obj.hideFlags = HideFlags.HideAndDontSave;
         }
 
         public void AddEventListener(Action action) => controller.AddEventListener(action);
