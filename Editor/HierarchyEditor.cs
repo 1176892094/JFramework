@@ -98,6 +98,7 @@ namespace JYJFramework.Editor
             for (int i = 0; i < length; ++i)
             {
                 Object component = components[i];
+                if (component == null) continue;
                 Type comType = component.GetType();
                 Rect rect = RectFromLeft(rowItem.nameRect, 12, ref afterName);
                 if (hasMaterial && i == length - rendererComponent.sharedMaterials.Length)
