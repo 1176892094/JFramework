@@ -8,6 +8,8 @@
 
 导入后找到Unity上方工具栏Tools，在Framework下点击Initialization完成初始配置。
 
+其中Resources/Setttings/JsonData用于配置JsonManager，Scenes/StartScene为基础场景。
+
 备注：只有Unity2021.1以上的版本才能正常使用，2021.1以下需要导入Newtonsoft包
 
 3.使用
