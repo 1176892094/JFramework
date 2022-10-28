@@ -6,7 +6,7 @@
 
 2.开始
 
-在Package中找到JYJFramework文件夹里的StartScene，进行复制一份到场景中，以该场景为初始场景。
+找到Unity上方工具栏Tools，下拉列表Initialization点击即可完成初始化
 
 备注：只有Unity2021.1以上的版本才能正常使用，2021.1以下需要导入Newtonsoft包
 
