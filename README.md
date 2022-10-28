@@ -6,7 +6,7 @@
 
 2.开始
 
-找到Unity上方工具栏Tools，下拉列表Initialization点击即可完成初始化
+导入后找到Unity上方工具栏Tools，在Framework下点击Initialization完成初始配置。
 
 备注：只有Unity2021.1以上的版本才能正常使用，2021.1以下需要导入Newtonsoft包
 
