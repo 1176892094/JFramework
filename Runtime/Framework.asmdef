@@ -1,9 +1,7 @@
 {
     "name": "JYJFramework",
     "rootNamespace": "",
-    "references": [
-        "GUID:f6f93123ca60e4838a2d4812dfaa2e90"
-    ],
+    "references": [],
     "includePlatforms": [],
     "excludePlatforms": [],
     "allowUnsafeCode": false,

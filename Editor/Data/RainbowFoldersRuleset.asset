@@ -98,7 +98,7 @@ MonoBehaviour:
     IsBackgroundRecursive: 0
     IsHidden: 0
   - Type: 0
-    Key: Icons
+    Key: Sprites
     Ordinal: 7
     Priority: 0
     IconType: 2190

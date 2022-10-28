@@ -4,7 +4,6 @@ using UnityEngine;
 
 namespace JYJFramework
 {
-    [CreateAssetMenu(fileName = "JsonData", menuName = "GameData/JsonData")]
     public class JsonData : BaseData
     {
         private readonly Dictionary<string, AesData> aesDict = new Dictionary<string, AesData>();

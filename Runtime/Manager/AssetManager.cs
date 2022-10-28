@@ -7,9 +7,9 @@ using Object = UnityEngine.Object;
 
 public static class AssetManager
 {
-    private static AssetBundle asset;
-    private static AssetBundleManifest manifest;
     private static readonly Dictionary<string, AssetBundle> assetDict = new Dictionary<string, AssetBundle>();
+    private static AssetBundleManifest manifest;
+    private static AssetBundle asset;
     private static string PathURL => Application.streamingAssetsPath + "/";
 
     private static string MainName
@@ -22,7 +22,6 @@ public static class AssetManager
             return "Android";
 #else
             return "PC";
-
 #endif
         }
     }
@@ -51,75 +50,6 @@ public static class AssetManager
             assetBundle = AssetBundle.LoadFromFile(PathURL + packageName);
             assetDict.Add(packageName, assetBundle);
         }
-    }
-    
-    private static async void LoadAssetAsync(string packageName)
-    {
-        await LoadAssetCompleted(packageName);
-    }
-    
-    private static IEnumerator LoadAssetCompleted(string packageName)
-    {
-        if (asset == null)
-        {
-            AssetBundleCreateRequest request = AssetBundle.LoadFromFileAsync(PathURL + MainName);
-            yield return request;
-            if (request == null) yield break;
-            if (request.assetBundle == null)
-            {
-                if (request.assetBundle == null)
-                {
-                    Debug.LogWarning(packageName + "未获取到！");
-                    yield break;
-                }
-            }
-
-            asset = request.assetBundle;
-            manifest = asset.LoadAsset<AssetBundleManifest>("AssetBundleManifest");
-        }
-
-        AssetBundle assetBundle;
-        string[] strArray = manifest.GetAllDependencies(packageName);
-        foreach (var package in strArray)
-        {
-            if (!assetDict.ContainsKey(package))
-            {
-                AssetBundleCreateRequest request = AssetBundle.LoadFromFileAsync(PathURL + package);
-                yield return request;
-                if (request == null) yield break;
-                if (request.assetBundle == null)
-                {
-                    if (request.assetBundle == null)
-                    {
-                        Debug.LogWarning(packageName + "未获取到！");
-                        yield break;
-                    }
-                }
-
-                assetBundle = request.assetBundle;
-                assetDict.Add(package, assetBundle);
-            }
-        }
-
-        if (!assetDict.ContainsKey(packageName))
-        {
-            AssetBundleCreateRequest request = AssetBundle.LoadFromFileAsync(PathURL + packageName);
-            yield return request;
-            if (request == null) yield break;
-            if (request.assetBundle == null)
-            {
-                if (request.assetBundle == null)
-                {
-                    Debug.LogWarning(packageName + "未获取到！");
-                    yield break;
-                }
-            }
-
-            assetBundle = request.assetBundle;
-            assetDict.Add(packageName, assetBundle);
-        }
-
-        yield return null;
     }
 
     public static Object Load(string packageName, string assetName, Type type)
@@ -155,8 +85,7 @@ public static class AssetManager
         await LoadCompleted(packageName, assetName, callback);
     }
 
-    private static IEnumerator LoadCompleted<T>(string packageName, string assetName, Action<T> callback)
-        where T : Object
+    private static IEnumerator LoadCompleted<T>(string packageName, string assetName, Action<T> callback) where T : Object
     {
         LoadAsset(packageName);
         AssetBundleRequest request = assetDict[packageName].LoadAssetAsync<T>(assetName);
