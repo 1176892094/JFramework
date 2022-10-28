@@ -7,7 +7,7 @@ namespace JYJFramework
 {
     public static class JsonManager
     {
-        private static readonly JsonData JsonData = ResourceManager.Load<JsonData>("Settings/Json/JsonData");
+        private static readonly JsonData JsonData = ResourceManager.Load<JsonData>("Settings/JsonData");
         
         public static void SaveJson(object obj, string fileName, bool AES = false)
         {
