@@ -17,9 +17,9 @@ public static class AssetManager
         get
         {
 #if UNITY_IOS
-            return "IOS"
+            return "IOS";
 #elif UNITY_ANDROID
-            return "Android"
+            return "Android";
 #else
             return "PC";
 
