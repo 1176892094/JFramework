@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.IO;
 using UnityEditor;
 using UnityEngine;
+using Debug = UnityEngine.Debug;
 using Directory = System.IO.Directory;
 
 namespace JYJFramework.Editor
@@ -90,6 +91,21 @@ namespace JYJFramework.Editor
             {
                 CreateJsonData();
             }
+
+            if (!File.Exists(Application.dataPath + "/Scenes/StartScene.unity"))
+            {
+                CreateScene();
+            }
+        }
+
+        private static void CreateScene()
+        {
+            SceneAsset scene = ResourceManager.Load<SceneAsset>("StartScene");
+            string origin = AssetDatabase.GetAssetOrScenePath(scene);
+            string target = Application.dataPath + "/Scenes/StartScene.unity";
+            File.Copy(origin,target,false);
+            AssetDatabase.SaveAssets();
+            AssetDatabase.Refresh();
         }
 
         private static void CreateJsonData()
