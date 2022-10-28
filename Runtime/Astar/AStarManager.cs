@@ -9,8 +9,8 @@ namespace JYJFramework.Pathfinding
         private int width;
         private int height;
         private AStarNode[,] nodes;
-        private List<AStarNode> openList = new List<AStarNode>();
-        private List<AStarNode> closeList = new List<AStarNode>();
+        private readonly List<AStarNode> openList = new List<AStarNode>();
+        private readonly List<AStarNode> closeList = new List<AStarNode>();
 
         public void InitScene(int width, int height)
         {

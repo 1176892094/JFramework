@@ -83,10 +83,10 @@ namespace JYJFramework.Editor
             }
             if (!Directory.Exists(Application.dataPath + "/Resources/Settings/Json"))
             {
-                Directory.CreateDirectory(Application.dataPath + "/Resources/JsonData");
+                Directory.CreateDirectory(Application.dataPath + "/Resources/Settings");
                 CreateJsonData();
             }
-            else if (!File.Exists(Application.dataPath + "Resources/JsonData/JsonData.asset"))
+            else if (!File.Exists(Application.dataPath + "Resources/Settings/JsonData.asset"))
             {
                 CreateJsonData();
             }
@@ -95,7 +95,7 @@ namespace JYJFramework.Editor
         private static void CreateJsonData()
         {
             JsonData jsonData = ScriptableObject.CreateInstance<JsonData>();
-            AssetDatabase.CreateAsset(jsonData,"Assets/Resources/JsonData/JsonData.asset");
+            AssetDatabase.CreateAsset(jsonData,"Assets/Resources/Settings/JsonData.asset");
             AssetDatabase.SaveAssets();
             AssetDatabase.Refresh();
             Selection.activeObject = jsonData;

@@ -215,14 +215,6 @@ namespace JYJFramework.Editor
             return rect;
         }
 
-        private Rect RectFromRight(Rect rect, float width, float usedWidth)
-        {
-            usedWidth += width;
-            rect.x = rect.x + rect.width - usedWidth;
-            rect.width = width;
-            return rect;
-        }
-
         private Texture2D GetTexture()
         {
             Texture2D pixelWhite = new Texture2D(1, 1, TextureFormat.RGBA32, false);
@@ -242,9 +234,9 @@ namespace JYJFramework.Editor
         public void Dispose()
         {
             ID = int.MinValue;
-            gameObject = null;
             rect = Rect.zero;
             nameRect = Rect.zero;
+            gameObject = null;
         }
     }
 }

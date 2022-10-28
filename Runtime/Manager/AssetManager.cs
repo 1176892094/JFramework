@@ -76,7 +76,13 @@ public static class AssetManager
         LoadAsset(packageName);
         AssetBundleRequest request = assetDict[packageName].LoadAssetAsync(assetName, type);
         yield return request;
-        if (request == null || request.asset == null) yield break;
+        if (request == null) yield break;
+        if (request.asset == null)
+        {
+            Debug.LogWarning(assetName + "未获取到！");
+            yield break;
+        }
+
         callback(request.asset is GameObject ? Object.Instantiate(request.asset) : request.asset);
     }
 

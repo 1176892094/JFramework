@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace JYJFramework
 {
-    public abstract class StateMachine : MonoBehaviour
+    public abstract class BaseState : MonoBehaviour
     {
         protected Dictionary<string, IState> stateDict = new Dictionary<string, IState>();
         protected IState state;
