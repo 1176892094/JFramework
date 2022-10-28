@@ -11,12 +11,7 @@ namespace JYJFramework
         public static T Load<T>(string name) where T : Object
         {
             T resource = Resources.Load<T>(name);
-            if (resource is GameObject)
-            {
-                return Object.Instantiate(resource);
-            }
-
-            return resource;
+            return resource is GameObject ? Object.Instantiate(resource) : resource;
         }
 
         public static async void LoadAsync<T>(string name, Action<T> callback) where T : Object
@@ -28,27 +23,20 @@ namespace JYJFramework
         {
             ResourceRequest request = Resources.LoadAsync<T>(name);
             yield return request;
+            if (request == null) yield break;
+            if (request.asset == null)
+            {
+                Debug.LogWarning(name + "未获取到！");
+                yield break;
+            }
+
             if (request.asset is GameObject)
             {
-                T obj = Object.Instantiate(request.asset) as T;
-                if (obj == null)
-                {
-                    Debug.LogWarning(name + "未获取到！");
-                    yield return null;
-                }
-                
-                callback(obj);
+                callback((T)Object.Instantiate(request.asset));
             }
             else
             {
-                T obj = request.asset as T;
-                if (obj == null)
-                {
-                    Debug.LogWarning(name + "未获取到！");
-                    yield return null;
-                }
-
-                callback(obj);
+                callback((T)request.asset);
             }
         }
     }
