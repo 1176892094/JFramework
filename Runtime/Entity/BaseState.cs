@@ -21,6 +21,7 @@ namespace JYJFramework
         public async void ChangeState(string type, float time)
         {
             await new WaitForSeconds(time);
+            if (this == null) return;
             ChangeState(type);
         }
     }

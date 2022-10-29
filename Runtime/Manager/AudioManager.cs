@@ -10,6 +10,8 @@ namespace JYJFramework
         private static readonly List<AudioSource> soundList = new List<AudioSource>();
         private static AudioSource sound;
         private static GameObject source;
+        private static float soundVolume;
+        private static float audioVolume;
 
         protected void Awake()
         {
@@ -41,6 +43,7 @@ namespace JYJFramework
         {
             ResourceManager.LoadAsync<AudioClip>(name, clip =>
             {
+                sound.volume = soundVolume;
                 sound.clip = clip;
                 sound.loop = true;
                 sound.Play();
@@ -49,7 +52,8 @@ namespace JYJFramework
 
         public static void ChangeSound(float value)
         {
-            sound.volume = value;
+            soundVolume = value;
+            sound.volume = soundVolume;
         }
 
         public static void PauseSound()
@@ -67,6 +71,7 @@ namespace JYJFramework
             ResourceManager.LoadAsync<AudioClip>(path, clip =>
             {
                 AudioSource audio = source.AddComponent<AudioSource>();
+                audio.volume = audioVolume;
                 audio.clip = clip;
                 audio.Play();
                 soundList.Add(audio);
@@ -76,9 +81,10 @@ namespace JYJFramework
 
         public static void ChangeAudio(float value)
         {
+            audioVolume = value;
             foreach (AudioSource audio in soundList)
             {
-                audio.volume = value;
+                audio.volume = audioVolume;
             }
         }
 
