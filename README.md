@@ -73,7 +73,7 @@ public class Player: MonoBehaviour
 {
 }
 ```
-(3)JsonManager（找到Unity上方Tools/Framework/persistentPath可查看存档数据）
+(3)JsonManager（找到Unity上方Tools/Framework/PersistentPath可查看存档数据）
 ```csharp
 public class Test3 : MonoBehaviour
 {
