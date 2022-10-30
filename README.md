@@ -213,7 +213,7 @@ public class Test8: MonoBehaviour
     {
         ExcelManager.Writer(ExcelPath.Inventory,"Item", excel =>
         {
-            excel.Cells[1, 1].Value = "123";//在第Item表中的A列1行写入123
+            excel.Cells[1, 1].Value = "123";//在Item表中的A列1行写入123
         });
     }
 
@@ -235,7 +235,7 @@ public class Test8: MonoBehaviour
 
 public struct ExcelPath
 {
-    public const string Inventory = "Assets/Editor/Inventory.xlsx";//一定要输入全路径
+    public const string Inventory = "Assets/Editor/Inventory";//要输入全路径，其中Inventory为Excel文件名称
 }
 ```
 (8)LoadManager
