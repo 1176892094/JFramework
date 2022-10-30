@@ -211,15 +211,15 @@ public class Test8: MonoBehaviour
 {
     private void WriteExcel()//修改Excel
     {
-        ExcelManager.Writer(ExcelPath.Inventory,0, excel =>
+        ExcelManager.Writer(ExcelPath.Inventory,"Item", excel =>
         {
-            excel.Cells[1, 1].Value = "123";//在第一张表中的A列1行写入123
+            excel.Cells[1, 1].Value = "123";//在第Item表中的A列1行写入123
         });
     }
 
     private void ReadExcel()
     {
-        ExcelWorksheet sheet = ExcelManager.Reader(ExcelPath.Inventory, 0);//获取Inventory中的第一张表
+        ExcelWorksheet sheet = ExcelManager.Reader(ExcelPath.Inventory, "Item");//获取Inventory中的Item表
     }
 
     private void CreateSheet()
