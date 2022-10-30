@@ -8,11 +8,13 @@ namespace JYJFramework
 {
     public static class ExcelManager
     {
+        private const string extra = ".xlsx";
+
         public static void Writer(string excelPath, string sheetName, Action<ExcelWorksheet> callback)
         {
-            FileInfo fileInfo = new FileInfo(excelPath);
+            FileInfo fileInfo = new FileInfo(excelPath + extra);
             using ExcelPackage excelPackage = new ExcelPackage(fileInfo);
-            if (!File.Exists(excelPath))
+            if (!File.Exists(excelPath + extra))
             {
                 Debug.LogWarning("路径中不存在Excel文件");
             }
@@ -27,7 +29,7 @@ namespace JYJFramework
                     ExcelWorksheet sheet = excelPackage.Workbook.Worksheets[sheetName];
                     callback?.Invoke(sheet);
                     excelPackage.Save();
-                    Debug.Log("写入成功！");
+                    Debug.Log("写入成功---" + sheet);
                     return;
                 }
             }
@@ -37,9 +39,9 @@ namespace JYJFramework
 
         public static ExcelWorksheet Reader(string excelPath, string sheetName)
         {
-            FileInfo fileInfo = new FileInfo(excelPath);
+            FileInfo fileInfo = new FileInfo(excelPath + extra);
             using ExcelPackage excelPackage = new ExcelPackage(fileInfo);
-            if (!File.Exists(excelPath))
+            if (!File.Exists(excelPath + extra))
             {
                 Debug.LogWarning("路径中不存在Excel文件");
             }
@@ -62,9 +64,9 @@ namespace JYJFramework
 
         public static void Create(string excelPath, string sheetName)
         {
-            FileInfo fileInfo = new FileInfo(excelPath);
+            FileInfo fileInfo = new FileInfo(excelPath + extra);
             using ExcelPackage excelPackage = new ExcelPackage(fileInfo);
-            if (!File.Exists(excelPath))
+            if (!File.Exists(excelPath + extra))
             {
                 ExcelWorksheet sheet = excelPackage.Workbook.Worksheets.Add(sheetName);
                 excelPackage.Save();
@@ -84,9 +86,9 @@ namespace JYJFramework
 
         public static void Delete(string excelPath, string sheetName)
         {
-            FileInfo fileInfo = new FileInfo(excelPath);
+            FileInfo fileInfo = new FileInfo(excelPath + extra);
             using ExcelPackage excelPackage = new ExcelPackage(fileInfo);
-            if (!File.Exists(excelPath))
+            if (!File.Exists(excelPath + extra))
             {
                 Debug.LogWarning("路径中不存在Excel文件");
             }
@@ -97,6 +99,7 @@ namespace JYJFramework
                     Debug.LogWarning("Excel中不存在表格---" + sheetName);
                     return;
                 }
+
                 if (excelPackage.Workbook.Worksheets.Count > 1)
                 {
                     excelPackage.Workbook.Worksheets.Delete(sheetName);
