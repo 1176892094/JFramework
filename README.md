@@ -73,11 +73,11 @@ public class Player: MonoBehaviour
 {
 }
 ```
-(3)JsonManager
+(3)JsonManager（找到Unity上方Tools/Framwork/persistentPath可查看存档数据）
 ```csharp
 public class Test3 : MonoBehaviour
 {
-    private void SaveAndLoad1()//点击Unity上方Tools的persistentPath可查看存档数据
+    private void SaveAndLoad1()
     {
         ScriptableObject playerData = ResourceManager.Load<ScriptableObject>(ResPath.PlayerData);
         JsonManager.SaveJson(playerData, "玩家数据"); //保存SO文件,名称为"玩家数据"
