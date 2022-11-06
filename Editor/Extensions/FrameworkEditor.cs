@@ -22,6 +22,7 @@ namespace JYJFramework.Editor
             private const string Textures = "/Resources/Textures";
             private const string Sprites = "/Resources/Sprites";
             private const string Prefabs = "/Resources/Prefabs";
+            private const string Flares = "/Resources/Flares";
             private const string Audio = "/Resources/Audio";
             private const string Data = "/Resources/Data";
             private const string Editor = "/Editor";
@@ -32,7 +33,6 @@ namespace JYJFramework.Editor
             private const string Scenes = "/Scenes";
             private const string Scripts = "/Scripts";
             private const string Shaders = "/Shaders";
-            private const string Flares = "/Flares";
             private const string Tilemaps = "/Tilemaps";
             private const string StreamingAssets = "/StreamingAssets";
 
