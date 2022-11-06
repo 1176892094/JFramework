@@ -1,3 +1,4 @@
+#if UNITY_EDITOR
 using System;
 using System.IO;
 using OfficeOpenXml;
@@ -113,3 +114,4 @@ namespace JYJFramework
         }
     }
 }
+#endif
