@@ -7,7 +7,7 @@ namespace JYJFramework
     public class JsonData : BaseData
     {
         private readonly Dictionary<string, AesData> aesDict = new Dictionary<string, AesData>();
-        [SerializeField] private List<AesData> aesList = new List<AesData>();
+        public List<AesData> aesList = new List<AesData>();
 
         public override void InitData()
         {
@@ -41,6 +41,7 @@ namespace JYJFramework
         {
             aesDict.Clear();
             aesList.Clear();
+            SaveData();
         }
     }
     
