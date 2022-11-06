@@ -12,7 +12,7 @@ namespace JYJFramework
         public static void SaveJson(object obj, string fileName, bool AES = false)
         {
             string filePath = Application.persistentDataPath + "/" + fileName + ".json";
-            string saveJson = JsonConvert.SerializeObject(obj);
+            string saveJson = obj is ScriptableObject ? JsonUtility.ToJson(obj) : JsonConvert.SerializeObject(obj);
             if (AES)
             {
                 using Aes aes = Aes.Create();
