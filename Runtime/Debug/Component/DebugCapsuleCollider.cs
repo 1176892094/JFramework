@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace JYJFramework
+namespace JYJFramework.Logger
 {
     [Debug(typeof(CapsuleCollider))]
     public class DebugCapsuleCollider : Debugger

@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace JYJFramework
+namespace JYJFramework.Logger
 {
     [Debug(typeof(CharacterController))]
     public class DebugCharacterController : Debugger

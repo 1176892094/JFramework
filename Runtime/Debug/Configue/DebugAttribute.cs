@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace JYJFramework
+namespace JYJFramework.Logger
 {
     [AttributeUsage(AttributeTargets.Class, Inherited = false)]
     public sealed class DebugAttribute : Attribute

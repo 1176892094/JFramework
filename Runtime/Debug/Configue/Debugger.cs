@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace JYJFramework
+namespace JYJFramework.Logger
 {
     public abstract class Debugger
     {

@@ -1,7 +1,7 @@
 ﻿using System;
 using UnityEngine;
 
-namespace JYJFramework
+namespace JYJFramework.Logger
 {
     public static class GUILayoutExtend
     {

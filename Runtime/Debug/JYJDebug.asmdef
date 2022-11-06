@@ -1,0 +1,16 @@
+{
+    "name": "JYJDebug",
+    "rootNamespace": "",
+    "references": [
+        "GUID:de36c2a8d511c4a52b411e7a6f340992"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

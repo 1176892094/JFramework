@@ -11,7 +11,7 @@ using System.Text;
 using System.Net;
 using JYJFramework;
 
-namespace JYJFramework
+namespace JYJFramework.Logger
 {
     public class DebugManager : SingletonMono<DebugManager>
     {
