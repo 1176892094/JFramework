@@ -20,9 +20,9 @@ namespace JFramework
             }
         }
 
-        public override void SaveData() => JsonManager.SaveJson(this, name);
+        public override void SaveData() => JsonManager.Save(this, name);
 
-        public override void LoadData() => JsonManager.LoadJson(this);
+        public override void LoadData() => JsonManager.Load(this);
 
         public AesData GetData(string id)
         {

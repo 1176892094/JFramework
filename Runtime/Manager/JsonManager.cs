@@ -21,7 +21,7 @@ namespace JFramework
             }
         }
 
-        public static void SaveJson(object obj, string fileName, bool AES = false)
+        public static void Save(object obj, string fileName, bool AES = false)
         {
             string filePath = Application.persistentDataPath + "/" + fileName + ".json";
             string saveJson = obj is ScriptableObject ? JsonUtility.ToJson(obj) : JsonConvert.SerializeObject(obj);
@@ -44,7 +44,7 @@ namespace JFramework
             }
         }
 
-        public static void LoadJson(ScriptableObject obj, bool AES = false)
+        public static void Load(ScriptableObject obj, bool AES = false)
         {
             string filePath = Application.streamingAssetsPath + "/" + obj.name + ".json";
             if (!File.Exists(filePath))
@@ -54,7 +54,7 @@ namespace JFramework
 
             if (!File.Exists(filePath))
             {
-                SaveJson(obj, obj.name);
+                Save(obj, obj.name);
                 return;
             }
 
@@ -79,7 +79,7 @@ namespace JFramework
             }
         }
 
-        public static T LoadJson<T>(string fileName) where T : new()
+        public static T Load<T>(string fileName) where T : new()
         {
             string filePath = Application.streamingAssetsPath + "/" + fileName + ".json";
             if (!File.Exists(filePath))
