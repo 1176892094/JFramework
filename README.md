@@ -2,7 +2,7 @@
 
 1.导入
 
-打开Unity的Package Manager左上角“+”号使用URL方式导入：https://github.com/1176892094/JYJFramework.git
+打开Unity的Package Manager左上角“+”号使用URL方式导入：https://github.com/1176892094/JFramework.git
 
 2.开始
 
@@ -106,14 +106,14 @@ public class Test4: MonoBehaviour
     private GameObject bullet;
     private async void Start()
     {
-        PoolManager.PopObject(PoolPath.Bullet, obj =>
+        PoolManager.Pop(PoolPath.Bullet, obj =>
         {
             bullet = obj;//从对象池中取出Bullet
             obj.transform.position = transform.position;//设置生成的子弹位置在自身位置
         });
 
         await new WaitForSeconds(5);//等待5秒
-        PoolManager.PushObject(bullet.name, bullet);//将物体放入对象池
+        PoolManager.Push(bullet.name, bullet);//将物体放入对象池
     }
 }
 
