@@ -1,4 +1,4 @@
-namespace JYJFramework
+namespace JFramework
 {
     public class PlayerData: BaseData
     {

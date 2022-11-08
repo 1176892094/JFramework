@@ -12,21 +12,21 @@ namespace JYJFramework.Logger
             target = Target as Transform;
         }
 
-        public override void OnDebuggerGUI()
+        public override void OnDebugGUI()
         {
             GUILayout.BeginHorizontal();
             GUILayout.Label("Position:", GUILayout.Width(130));
-            target.localPosition = GUILayoutExtend.Vector3Field(target.localPosition);
+            target.localPosition = GUIExtensions.Vector3Field(target.localPosition);
             GUILayout.EndHorizontal();
             
             GUILayout.BeginHorizontal();
             GUILayout.Label("Rotation:", GUILayout.Width(130));
-            target.localRotation = Quaternion.Euler(GUILayoutExtend.Vector3Field(target.localRotation.eulerAngles));
+            target.localRotation = Quaternion.Euler(GUIExtensions.Vector3Field(target.localRotation.eulerAngles));
             GUILayout.EndHorizontal();
 
             GUILayout.BeginHorizontal();
             GUILayout.Label("Scale:", GUILayout.Width(130));
-            target.localScale = GUILayoutExtend.Vector3Field(target.localScale);
+            target.localScale = GUIExtensions.Vector3Field(target.localScale);
             GUILayout.EndHorizontal();
         }
     }

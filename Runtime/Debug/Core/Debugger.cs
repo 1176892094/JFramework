@@ -6,6 +6,6 @@ namespace JYJFramework.Logger
     {
         public Component Target;
         public abstract void OnInit();
-        public abstract void OnDebuggerGUI();
+        public abstract void OnDebugGUI();
     }
 }

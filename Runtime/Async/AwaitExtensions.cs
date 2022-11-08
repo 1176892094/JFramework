@@ -10,7 +10,7 @@ using System.Threading;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
-namespace JYJFramework.Async
+namespace JFramework.Async
 {
     public static class AwaitExtensions
     {
@@ -111,7 +111,7 @@ namespace JYJFramework.Async
             }
             else
             {
-                UnitySynchronize.synchronizationContext.Post( obj => action(), null);
+                UnitySynchronize.synchronizationContext.Post( _ => action(), null);
             }
         }
 

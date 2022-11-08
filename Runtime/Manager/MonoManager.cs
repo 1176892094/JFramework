@@ -2,7 +2,7 @@ using System;
 using System.Collections;
 using UnityEngine;
 
-namespace JYJFramework
+namespace JFramework
 {
     public class MonoManager : Singleton<MonoManager>
     {

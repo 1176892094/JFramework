@@ -1,8 +1,8 @@
 using System.Collections.Generic;
-using JYJFramework.Async;
+using JFramework.Async;
 using UnityEngine;
 
-namespace JYJFramework
+namespace JFramework
 {
     public abstract class BaseState : MonoBehaviour
     {

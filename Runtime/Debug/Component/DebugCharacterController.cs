@@ -12,7 +12,7 @@ namespace JYJFramework.Logger
             target = Target as CharacterController;
         }
 
-        public override void OnDebuggerGUI()
+        public override void OnDebugGUI()
         {
             GUILayout.BeginHorizontal();
             GUI.contentColor = target.enabled ? Color.white : Color.gray;
@@ -22,17 +22,17 @@ namespace JYJFramework.Logger
 
             GUILayout.BeginHorizontal();
             GUILayout.Label("Center: ", GUILayout.Width(130));
-            target.center = GUILayoutExtend.Vector3Field(target.center);
+            target.center = GUIExtensions.Vector3Field(target.center);
             GUILayout.EndHorizontal();
 
             GUILayout.BeginHorizontal();
             GUILayout.Label("Height: ", GUILayout.Width(130));
-            target.height = GUILayoutExtend.FloatField(target.height);
+            target.height = GUIExtensions.FloatField(target.height);
             GUILayout.EndHorizontal();
 
             GUILayout.BeginHorizontal();
             GUILayout.Label("Radius: ", GUILayout.Width(130));
-            target.radius = GUILayoutExtend.FloatField(target.radius);
+            target.radius = GUIExtensions.FloatField(target.radius);
             GUILayout.EndHorizontal();
 
             GUILayout.BeginHorizontal();

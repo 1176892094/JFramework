@@ -8,7 +8,7 @@ using UnityEditor;
 using UnityEditor.IMGUI.Controls;
 using Object = UnityEngine.Object;
 
-namespace JYJFramework.Editor
+namespace JFramework.Editor
 {
     [InitializeOnLoad]
     public class HierarchyEditor

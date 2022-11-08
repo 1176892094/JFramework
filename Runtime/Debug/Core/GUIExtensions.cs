@@ -1,9 +1,8 @@
-﻿using System;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace JYJFramework.Logger
 {
-    public static class GUILayoutExtend
+    public static class GUIExtensions
     {
         public static Vector3 Vector3Field(Vector3 value)
         {

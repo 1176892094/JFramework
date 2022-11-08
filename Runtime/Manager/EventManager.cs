@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace JYJFramework
+namespace JFramework
 {
     public static class EventManager
     {

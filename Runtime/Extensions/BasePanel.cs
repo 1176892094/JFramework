@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace JYJFramework
+namespace JFramework
 {
     public class BasePanel : MonoBehaviour, IPanel
     {

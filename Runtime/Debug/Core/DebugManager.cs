@@ -2,58 +2,50 @@
 using System.Collections.Generic;
 using System;
 using UnityEngine.Profiling;
-using System.Collections;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Net.Mail;
-using System.Text;
-using System.Net;
-using JYJFramework;
+using JFramework.Async;
+using JYJFramework.Logger;
 
-namespace JYJFramework.Logger
+namespace JFramework.Logger
 {
     public class DebugManager : SingletonMono<DebugManager>
     {
+        private GUISkin controller;
         private DebugData debugData;
-        private bool AllowDebugging = true;
-        private GUISkin debugController;
-        private readonly float MinWidth = 180;
-        private readonly float MinHeight = 60;
-        private float MaxWidth;
-        private float MaxHeight;
-        
-        private DebugType debugType = DebugType.Console;
-        private Rect minWindowRect;
-        private Rect maxWindowRect;
-        //FPS
         private int curFPS;
-        private int maxFPS;
-        private int minFPS = 60;
-        private Color colorFPS = Color.white;
-        private float showFPSTime;
-        private bool expansion;
+        private bool isDebug;
+        private bool isExtend;
+        private float MinWidth;
+        private float MaxWidth;
+        private float MinHeight;
+        private float MaxHeight;
+        private float FPSTimer;
+        private Color colorFPS;
+        private DebugType debugType;
+        private Rect dragWindowRect;
         //Console
         private readonly List<LogData> logList = new List<LogData>();
         private int logIndex = -1;
         private int logInfo;
         private int logWarn;
         private int logError;
-        private int logException;
         private int logFatal;
+        private int logException;
         private bool showLogInfo = true;
         private bool showLogWarn = true;
         private bool showLogError = true;
-        private bool showLogException = true;
         private bool showLogFatal = true;
+        private bool showLogException = true;
         private Vector2 scrollLogView = Vector2.zero;
         private Vector2 scrollcurLogView = Vector2.zero;
         //Scene
         private List<Transform> objectList = new List<Transform>();
-        private int curObjectIndex = -1;
-        private float curObjectMemory;
+        private int objectIndex = -1;
+        private float objectMemory;
         private List<Component> objectComponents = new List<Component>();
-        private int curComponentIndex = -1;
+        private int componentIndex = -1;
         private readonly Dictionary<Type, Type> debugComponents = new Dictionary<Type, Type>();
         private readonly List<Type> addComponents = new List<Type>();
         private string objectFilter = "";
@@ -83,12 +75,15 @@ namespace JYJFramework.Logger
         protected override void Awake()
         {
             base.Awake();
+            isDebug = true;
+            MinWidth = 180;
+            MinHeight = 60;
+            colorFPS = Color.white;
             MaxWidth = Screen.width;
             MaxHeight = Screen.height;
-            minWindowRect = new Rect(0, 0, 200, 120);
-            maxWindowRect = new Rect(0, 0, MaxWidth, MaxHeight);
+            dragWindowRect = new Rect(0, 0, 200, 120);
             debugData = ResourceManager.Load<DebugData>("DebugData");
-            debugController = ResourceManager.Load<GUISkin>("DebugController");
+            controller = ResourceManager.Load<GUISkin>("DebugController");
             debugData.InitData();
             Application.logMessageReceived += LogMessageReceived;
         }
@@ -102,63 +97,52 @@ namespace JYJFramework.Logger
             foreach (Type type in types)
             {
                 if (type.BaseType != baseType) continue;
-                object[] attrs = type.GetCustomAttributes(typeof(DebugAttribute), true);
-                foreach (object attr in attrs)
+                object[] attributes = type.GetCustomAttributes(typeof(DebugAttribute), true);
+                foreach (object attribute in attributes)
                 {
-                    if (attr is DebugAttribute debugger)
+                    if (attribute is DebugAttribute debugger)
                     {
                         debugComponents.Add(debugger.InspectedType, type);
                     }
                 }
             }
         }
+
         private void Update()
         {
-            if (!AllowDebugging) return;
-            FPSUpdate();
+            if (!isDebug) return;
+            float time = Time.realtimeSinceStartup - FPSTimer;
+            if (time < 1) return;
+            curFPS = (int)(1.0f / Time.deltaTime);
+            FPSTimer = Time.realtimeSinceStartup;
         }
         private void OnGUI()
         {
-            if (!AllowDebugging) return;
-            GUI.skin = debugController;
-            if (expansion)
+            if (!isDebug) return;
+            GUI.skin = controller;
+            if (!isExtend)
             {
-                maxWindowRect = GUI.Window(0, maxWindowRect,ExpansionGUIWindow, debugData.GetData("Debugger"));
+                dragWindowRect = GUI.Window(0, dragWindowRect, ShrinkGUIWindow, debugData.GetData("Debugger"));
             }
             else
             {
-                minWindowRect = GUI.Window(0, minWindowRect, ShrinkGUIWindow, debugData.GetData("Debugger"));
+                GUI.Window(0, new Rect(0, 0, MaxWidth, MaxHeight), ExtendWindowGUI, debugData.GetData("Debugger"));
             }
         }
-
         private void OnDestroy() => Application.logMessageReceived -= LogMessageReceived;
 
         #endregion
 
         #region Additional Function
-
-        /// <summary>
-        /// 刷新FPS
-        /// </summary>
-        private void FPSUpdate()
-        {
-            float time = Time.realtimeSinceStartup - showFPSTime;
-            if (time < 1) return;
-            curFPS = (int)(1.0f / Time.deltaTime);
-            showFPSTime = Time.realtimeSinceStartup;
-            if (curFPS > maxFPS) maxFPS = curFPS;
-            if (curFPS < minFPS) minFPS = curFPS;
-        }
-
-        /// <summary>
-        /// 日志回调
-        /// </summary>
+        
         private void LogMessageReceived(string condition, string stackTrace, LogType type)
         {
-            LogData log = new LogData();
-            log.time = DateTime.Now.ToString("HH:mm:ss");
-            log.message = condition;
-            log.stackTrace = stackTrace;
+            LogData log = new LogData
+            {
+                dateTime = DateTime.Now.ToString("HH:mm:ss"),
+                message = condition,
+                stackTrace = stackTrace
+            };
             switch (type)
             {
                 case LogType.Assert:
@@ -182,30 +166,28 @@ namespace JYJFramework.Logger
                     logInfo += 1;
                     break;
             }
-            log.showName = "[" + log.time + "] [" + log.type + "] " + log.message;
+            log.showName = "[" + log.dateTime + "] [" + log.type + "] " + log.message;
             logList.Add(log);
-
-            if (logWarn > 0)
-            {
-                colorFPS = Color.yellow;
-            }
-            if (logException > 0)
-            {
-                colorFPS = Color.magenta;
-            }
-            if (logError > 0)
-            {
-                colorFPS = Color.red;
-            }
+            
             if (logFatal > 0)
             {
                 colorFPS = new Color(1f, 0.5f, 0);
             }
+            else if (logError > 0)
+            {
+                colorFPS = Color.red;
+            }
+            else if (logException > 0)
+            {
+                colorFPS = Color.magenta;
+            }
+            else if (logWarn > 0)
+            {
+                colorFPS = Color.yellow;
+            }
         }
-        /// <summary>
-        /// 屏幕截图
-        /// </summary>
-        private IEnumerator ScreenShot()
+
+        private async void ScreenShot()
         {
             string path = "";
 #if UNITY_EDITOR
@@ -213,47 +195,241 @@ namespace JYJFramework.Logger
 #endif
             if (path != "")
             {
-                AllowDebugging = false;
-                yield return new WaitForEndOfFrame();
+                isDebug = false;
+                await new WaitForEndOfFrame();
                 if (!Directory.Exists(path)) Directory.CreateDirectory(path);
                 Texture2D texture = new Texture2D(Screen.width, Screen.height, TextureFormat.RGB24, false);
                 texture.ReadPixels(new Rect(0, 0, Screen.width, Screen.height), 0, 0);
                 texture.Apply();
                 string title = DateTime.Now.ToString("yyyyMMddhhmmss") + ".png";
                 byte[] bytes = texture.EncodeToPNG();
-                File.WriteAllBytes(path + title, bytes);
-                AllowDebugging = true;
+                isDebug = true;
+                await File.WriteAllBytesAsync(path + title, bytes);
             }
             else
             {
                 Debug.LogWarning("当前平台不支持截屏！");
-                yield return 0;
             }
         }
-        /// <summary>
-        /// 刷新场景中所有物体
-        /// </summary>
-        private void RefreshSceneTransforms()
+
+        private void RefreshGameObject()
         {
             objectList.Clear();
             objectList = FindObjectsOfType<Transform>().ToList();
-            curObjectIndex = -1;
+            objectIndex = -1;
         }
-        /// <summary>
-        /// 刷新当前选择物体的所有组件
-        /// </summary>
-        private void RefreshTransformComponents()
+
+        private void RefreshComponent()
         {
             objectComponents.Clear();
-            if (curObjectIndex != -1 && curObjectIndex < objectList.Count)
+            if (objectIndex != -1 && objectIndex < objectList.Count)
             {
-                objectComponents = objectList[curObjectIndex].GetComponents<Component>().ToList();
+                objectComponents = objectList[objectIndex].GetComponents<Component>().ToList();
             }
-            curComponentIndex = -1;
+            componentIndex = -1;
             isAddComponent = false;
             curDebugger = null;
         }
-        
+
+        private void ShowGameObject()
+        {
+            GUI.contentColor = Color.white;
+            GUILayout.BeginVertical("Box", GUILayout.Width((MaxWidth - 25) / 2));
+            GUILayout.BeginHorizontal();
+            objectFilter = GUILayout.TextField(objectFilter,GUILayout.Height(MinHeight-10));
+            GUILayout.EndHorizontal();
+            //场景物体列表
+            scrollSceneView = GUILayout.BeginScrollView(scrollSceneView);
+            for (int i = 0; i < objectList.Count; i++)
+            {
+                if (!objectList[i] || !objectList[i].name.Contains(objectFilter)) continue;
+                if (objectList[i].gameObject.hideFlags == HideFlags.HideInHierarchy) continue;
+                GUILayout.BeginHorizontal();
+                GUI.contentColor = objectList[i].gameObject.activeSelf ? Color.cyan : Color.gray;
+                bool value = objectIndex == i;
+                if (GUILayout.Toggle(value, objectList[i].name,"Label") != value)
+                {
+                    if (objectIndex != i)
+                    {
+                        objectIndex = i;
+#if ENABLE_PROFILER
+                        objectMemory = Profiler.GetRuntimeMemorySizeLong(objectList[i].gameObject) / 1000f;
+#endif
+                        RefreshComponent();
+                    }
+                    else
+                    {
+                        objectIndex = -1;
+                        RefreshComponent();
+                    }
+                }
+                GUILayout.FlexibleSpace();
+                GUILayout.EndHorizontal();
+
+                //当前物体被选中
+                if (objectIndex == i)
+                {
+                    GUI.contentColor = objectList[i].gameObject.activeSelf ? Color.white : Color.gray;
+                    GUILayout.BeginVertical("Box");
+                    GUILayout.BeginHorizontal();
+                    GUILayout.Label("Tag: " + objectList[i].tag);
+                    GUILayout.EndHorizontal();
+                    GUILayout.BeginHorizontal();
+                    GUILayout.Label("Layer: " + LayerMask.LayerToName(objectList[i].gameObject.layer));
+                    GUILayout.EndHorizontal();
+#if ENABLE_PROFILER
+                    GUILayout.BeginHorizontal();
+                    GUILayout.Label("Memory" + ": " + objectMemory + "KB");
+                    GUILayout.EndHorizontal();
+#endif
+                    GUILayout.EndVertical();
+                }
+            }
+            GUILayout.EndScrollView();
+            GUILayout.EndVertical();
+        }
+
+        private void ShowComponent()
+        {
+            GUI.contentColor = Color.white;
+            GUILayout.BeginVertical("Box", GUILayout.Width((MaxWidth - 25) / 2));
+            //添加、删除组件
+            if (objectIndex != -1)
+            {
+                GUILayout.BeginHorizontal();
+                isAddComponent = GUILayout.Toggle(isAddComponent, debugData.GetData("Add Component"), "Button",GUILayout.Height(MinHeight-10));
+                if (componentIndex != -1 && componentIndex < objectComponents.Count)
+                {
+                    if (objectComponents[componentIndex])
+                    {
+                        if (GUILayout.Button(debugData.GetData("Delete Component"),GUILayout.Height(MinHeight-10)))
+                        {
+                            if (objectComponents[componentIndex] is DebugManager)
+                            {
+                                Debug.LogWarning("不能销毁组件 " + objectComponents[componentIndex].GetType().Name + " ！");
+                            }
+                            else
+                            {
+                                Destroy(objectComponents[componentIndex]);
+                                RefreshComponent();
+                                return;
+                            }
+                        }
+                    }
+                }
+                GUILayout.EndHorizontal();
+            }
+
+            //被选中物体的组件列表
+            scrollInspectorView = GUILayout.BeginScrollView(scrollInspectorView);
+            if (objectIndex != -1)
+            {
+                //添加组件状态
+                if (isAddComponent)
+                {
+                    GUILayout.BeginHorizontal();
+                    componentFilter = GUILayout.TextField(componentFilter, GUILayout.Height(MinHeight-10));
+                    if (GUILayout.Button(debugData.GetData("Search"),GUILayout.Height(MinHeight-10)))
+                    {
+                        addComponents.Clear();
+                        Type baseType = typeof(Component);
+                        Assembly[] assemblys = AppDomain.CurrentDomain.GetAssemblies();
+                        foreach (Assembly assembly in assemblys)
+                        {
+                            Type[] types = assembly.GetTypes();
+                            foreach (Type type in types)
+                            {
+                                if (type.IsSubclassOf(baseType)&&type.Name.Contains(componentFilter))
+                                {
+                                    string[] strArray = type.ToString().Split('.');
+                                    if (strArray[0] == "UnityEngine")
+                                    {
+                                        addComponents.Add(type);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    GUILayout.EndHorizontal();
+
+                    foreach (var addComponent in addComponents)
+                    {
+                        string fullName = addComponent.FullName;
+                        if (fullName != null)
+                        {
+                            string[] strArray = fullName.Split('.');
+                            if (GUILayout.Button(strArray[^1],GUILayout.Height(MinHeight-10)))
+                            {
+                                objectList[objectIndex].gameObject.AddComponent(addComponent);
+                                isAddComponent = false;
+                                RefreshComponent();
+                                return;
+                            }
+                        }
+                    }
+                }
+                //预览组件状态
+                else
+                {
+                    for (int i = 0; i < objectComponents.Count; i++)
+                    {
+                        if (objectComponents[i])
+                        {
+                            GUILayout.BeginHorizontal();
+                            GUI.contentColor = Color.cyan;
+                            bool value = componentIndex == i;
+                            if (GUILayout.Toggle(value, objectComponents[i].GetType().Name,"Label") != value)
+                            {
+                                if (componentIndex != i)
+                                {
+                                    componentIndex = i;
+                                    curDebugger = null;
+                                    Type type = objectComponents[i].GetType();
+                                    if (debugComponents.ContainsKey(type))
+                                    {
+                                        Type debuggerType = debugComponents[type];
+                                        curDebugger = Activator.CreateInstance(debuggerType) as Debugger;
+                                        if (curDebugger != null)
+                                        {
+                                            curDebugger.Target = objectComponents[i];
+                                            curDebugger.OnInit();
+                                        }
+                                    }
+                                }
+                                else
+                                {
+                                    componentIndex = -1;
+                                    curDebugger = null;
+                                }
+                            }
+                            GUILayout.FlexibleSpace();
+                            GUILayout.EndHorizontal();
+
+                            //当前组件被选中
+                            if (componentIndex == i)
+                            {
+                                GUI.contentColor = Color.white;
+                                GUILayout.BeginVertical("Box");
+
+                                if (curDebugger != null)
+                                {
+                                    curDebugger.OnDebugGUI();
+                                }
+                                else
+                                {
+                                    GUILayout.Label("No Debug GUI!");
+                                }
+
+                                GUILayout.EndVertical();
+                            }
+                        }
+                    }
+                }
+            }
+            GUILayout.EndScrollView();
+            GUILayout.EndVertical();
+        }
+
         #endregion
 
         #region GUI Function
@@ -261,84 +437,84 @@ namespace JYJFramework.Logger
         /// <summary>
         /// 展开的GUI窗口
         /// </summary>
-        private void ExpansionGUIWindow(int windowId)
+        private void ExtendWindowGUI(int windowId)
         {
             GUILayout.Space(20);
-            ExpansionTitleGUI();
+            ExtendTitleGUI();
             switch (debugType)
             {
                 case DebugType.Console:
-                    ExpansionConsoleGUI();
+                    ExtendConsoleGUI();
                     break;
                 case DebugType.Scene:
-                    ExpansionSceneGUI();
+                    ExtendSceneGUI();
                     break;
                 case DebugType.Memory:
-                    ExpansionMemoryGUI();
+                    ExtendMemoryGUI();
                     break;
                 case DebugType.DrawCall:
-                    ExpansionDrawCallGUI();
+                    ExtendDrawCallGUI();
                     break;
                 case DebugType.System:
-                    ExpansionSystemGUI();
+                    ExtendSystemGUI();
                     break;
                 case DebugType.Screen:
-                    ExpansionScreenGUI();
+                    ExtendScreenGUI();
                     break;
                 case DebugType.Time:
-                    ExpansionTimeGUI();
+                    ExtendTimeGUI();
                     break;
                 case DebugType.Environment:
-                    ExpansionEnvironmentGUI();
+                    ExtendEnvironmentGUI();
                     break;
             }
         }
-        private void ExpansionTitleGUI()
+        private void ExtendTitleGUI()
         {
             GUILayout.BeginHorizontal();
             GUI.contentColor = colorFPS;
             if (GUILayout.Button(debugData.GetData("FPS") + ": " + curFPS, GUILayout.Width(MinWidth),GUILayout.Height(MinHeight)))
             {
-                expansion = false;
+                isExtend = false;
             }
-            GUI.contentColor = (debugType == DebugType.Console ? Color.white : Color.gray);
+            GUI.contentColor = debugType == DebugType.Console ? Color.white : Color.gray;
             if (GUILayout.Button(debugData.GetData("Console"), GUILayout.Height(MinHeight)))
             {
                 debugType = DebugType.Console;
             }
-            GUI.contentColor = (debugType == DebugType.Scene ? Color.white : Color.gray);
+            GUI.contentColor = debugType == DebugType.Scene ? Color.white : Color.gray;
             if (GUILayout.Button(debugData.GetData("Scene"), GUILayout.Height(MinHeight)))
             {
                 debugType = DebugType.Scene;
-                RefreshSceneTransforms();
-                RefreshTransformComponents();
+                RefreshGameObject();
+                RefreshComponent();
             }
-            GUI.contentColor = (debugType == DebugType.Memory ? Color.white : Color.gray);
+            GUI.contentColor = debugType == DebugType.Memory ? Color.white : Color.gray;
             if (GUILayout.Button(debugData.GetData("Memory"), GUILayout.Height(MinHeight)))
             {
                 debugType = DebugType.Memory;
             }
-            GUI.contentColor = (debugType == DebugType.DrawCall ? Color.white : Color.gray);
+            GUI.contentColor = debugType == DebugType.DrawCall ? Color.white : Color.gray;
             if (GUILayout.Button(debugData.GetData("DrawCall"), GUILayout.Height(MinHeight)))
             {
                 debugType = DebugType.DrawCall;
             }
-            GUI.contentColor = (debugType == DebugType.System ? Color.white : Color.gray);
+            GUI.contentColor = debugType == DebugType.System ? Color.white : Color.gray;
             if (GUILayout.Button(debugData.GetData("System"), GUILayout.Height(MinHeight)))
             {
                 debugType = DebugType.System;
             }
-            GUI.contentColor = (debugType == DebugType.Screen ? Color.white : Color.gray);
+            GUI.contentColor = debugType == DebugType.Screen ? Color.white : Color.gray;
             if (GUILayout.Button(debugData.GetData("Screen"), GUILayout.Height(MinHeight)))
             {
                 debugType = DebugType.Screen;
             }
-            GUI.contentColor = (debugType == DebugType.Time ? Color.white : Color.gray);
+            GUI.contentColor = debugType == DebugType.Time ? Color.white : Color.gray;
             if (GUILayout.Button(debugData.GetData("Time"), GUILayout.Height(MinHeight)))
             {
                 debugType = DebugType.Time;
             }
-            GUI.contentColor = (debugType == DebugType.Environment ? Color.white : Color.gray);
+            GUI.contentColor = debugType == DebugType.Environment ? Color.white : Color.gray;
             if (GUILayout.Button(debugData.GetData("Environment"), GUILayout.Height(MinHeight)))
             {
                 debugType = DebugType.Environment;
@@ -346,42 +522,42 @@ namespace JYJFramework.Logger
             GUI.contentColor = Color.white;
             GUILayout.EndHorizontal();
         }
-        private void ExpansionConsoleGUI()
+        private void ExtendConsoleGUI()
         {
             GUILayout.BeginHorizontal();
             GUI.contentColor = Color.white;
             if (GUILayout.Button(debugData.GetData("Clear"), GUILayout.Height(MinHeight)))
             {
                 logList.Clear();
-                logFatal = 0;
+                logIndex = -1;
+                logInfo = 0;
                 logWarn = 0;
                 logError = 0;
+                logFatal = 0;
                 logException = 0;
-                logInfo = 0;
-                logIndex = -1;
                 colorFPS = Color.white;
             }
-            GUI.contentColor = (showLogInfo ? Color.white : Color.gray);
+            GUI.contentColor = showLogInfo ? Color.white : Color.gray;
             if (GUILayout.Button(debugData.GetData("Log") + " [" + logInfo + "]", GUILayout.Height(MinHeight)))
             {
                 showLogInfo = !showLogInfo;
             }
-            GUI.contentColor = (showLogWarn ? Color.white : Color.gray);
+            GUI.contentColor = showLogWarn ? Color.white : Color.gray;
             if (GUILayout.Button(debugData.GetData("Warning") + " [" + logWarn + "]",  GUILayout.Height(MinHeight)))
             {
                 showLogWarn = !showLogWarn;
             }
-            GUI.contentColor = (showLogException ? Color.white : Color.gray);
+            GUI.contentColor = showLogException ? Color.white : Color.gray;
             if (GUILayout.Button(debugData.GetData("Exception") + " [" + logException + "]",  GUILayout.Height(MinHeight)))
             {
                 showLogException = !showLogException;
             }
-            GUI.contentColor = (showLogError ? Color.white : Color.gray);
+            GUI.contentColor = showLogError ? Color.white : Color.gray;
             if (GUILayout.Button(debugData.GetData("Error") + " [" + logError + "]",  GUILayout.Height(MinHeight)))
             {
                 showLogError = !showLogError;
             }
-            GUI.contentColor = (showLogFatal ? Color.white : Color.gray);
+            GUI.contentColor = showLogFatal ? Color.white : Color.gray;
             if (GUILayout.Button(debugData.GetData("Fatal") + " [" + logFatal + "]" , GUILayout.Height(MinHeight)))
             {
                 showLogFatal = !showLogFatal;
@@ -439,239 +615,31 @@ namespace JYJFramework.Logger
             }
             GUILayout.EndScrollView();
         }
-        private void ExpansionSceneGUI()
+        private void ExtendSceneGUI()
         {
             GUILayout.BeginHorizontal();
             GUILayout.Label(debugData.GetData("GameObjects") + " [" +objectList.Count + "]",  "Button",GUILayout.Height(MinHeight));
             GUI.contentColor = Color.white;
             if (GUILayout.Button(debugData.GetData("Refresh"), GUILayout.Width((MaxWidth - 25) / 2),GUILayout.Height(MinHeight)))
             {
-                RefreshSceneTransforms();
-                RefreshTransformComponents();
+                RefreshGameObject();
+                RefreshComponent();
                 return;
             }
             GUI.enabled = true;
             GUILayout.EndHorizontal();
-            
-            #region 场景物体列表
             GUILayout.BeginHorizontal();
-            GUI.contentColor = Color.white;
-            GUILayout.BeginVertical("Box", GUILayout.Width((MaxWidth - 25) / 2));
-
-            GUILayout.BeginHorizontal();
-            objectFilter = GUILayout.TextField(objectFilter,GUILayout.Height(MinHeight-10));
-            GUILayout.EndHorizontal();
-
-            //场景物体列表
-            scrollSceneView = GUILayout.BeginScrollView(scrollSceneView);
-            for (int i = 0; i < objectList.Count; i++)
-            {
-                if (objectList[i] && objectList[i].name.Contains(objectFilter))
-                {
-                    if (objectList[i].gameObject.hideFlags == HideFlags.HideInHierarchy) continue;
-                    GUILayout.BeginHorizontal();
-                    GUI.contentColor = objectList[i].gameObject.activeSelf ? Color.cyan : Color.gray;
-                    bool value = curObjectIndex == i;
-                    if (GUILayout.Toggle(value, objectList[i].name,"Label") != value)
-                    {
-                        if (curObjectIndex != i)
-                        {
-                            curObjectIndex = i;
-#if ENABLE_PROFILER
-                            curObjectMemory = Profiler.GetRuntimeMemorySizeLong(objectList[i].gameObject) / 1000f;
-#endif
-                            RefreshTransformComponents();
-                        }
-                        else
-                        {
-                            curObjectIndex = -1;
-                            RefreshTransformComponents();
-                        }
-                    }
-                    GUILayout.FlexibleSpace();
-                    GUILayout.EndHorizontal();
-
-                    //当前物体被选中
-                    if (curObjectIndex == i)
-                    {
-                        GUI.contentColor = objectList[i].gameObject.activeSelf ? Color.white : Color.gray;
-                        GUILayout.BeginVertical("Box");
-                        GUILayout.BeginHorizontal();
-                        GUILayout.Label("Tag: " + objectList[i].tag);
-                        GUILayout.EndHorizontal();
-                        GUILayout.BeginHorizontal();
-                        GUILayout.Label("Layer: " + LayerMask.LayerToName(objectList[i].gameObject.layer));
-                        GUILayout.EndHorizontal();
-#if ENABLE_PROFILER
-                        GUILayout.BeginHorizontal();
-                        GUILayout.Label("Memory" + ": " + curObjectMemory + "KB");
-                        GUILayout.EndHorizontal();
-#endif
-                        GUILayout.EndVertical();
-                    }
-                }
-            }
-            GUILayout.EndScrollView();
-
-            GUILayout.EndVertical();
-            #endregion
-
-            #region 被选中物体的组件列表
-            GUI.contentColor = Color.white;
-            GUILayout.BeginVertical("Box", GUILayout.Width((MaxWidth - 25) / 2));
-
-            //添加、删除组件
-            if (curObjectIndex != -1)
-            {
-                GUILayout.BeginHorizontal();
-                isAddComponent = GUILayout.Toggle(isAddComponent, debugData.GetData("Add Component"), "Button",GUILayout.Height(MinHeight-10));
-                if (curComponentIndex != -1 && curComponentIndex < objectComponents.Count)
-                {
-                    if (objectComponents[curComponentIndex])
-                    {
-                        if (GUILayout.Button(debugData.GetData("Delete Component"),GUILayout.Height(MinHeight-10)))
-                        {
-                            if (objectComponents[curComponentIndex] is DebugManager)
-                            {
-                                Debug.LogWarning("不能销毁组件 " + objectComponents[curComponentIndex].GetType().Name + " ！");
-                            }
-                            else
-                            {
-                                Destroy(objectComponents[curComponentIndex]);
-                                RefreshTransformComponents();
-                                return;
-                            }
-                        }
-                    }
-                }
-                GUILayout.EndHorizontal();
-            }
-
-            //被选中物体的组件列表
-            scrollInspectorView = GUILayout.BeginScrollView(scrollInspectorView);
-            if (curObjectIndex != -1)
-            {
-                //添加组件状态
-                if (isAddComponent)
-                {
-                    GUILayout.BeginHorizontal();
-                    componentFilter = GUILayout.TextField(componentFilter, GUILayout.Height(MinHeight-10));
-                    if (GUILayout.Button(debugData.GetData("Search"),GUILayout.Height(MinHeight-10)))
-                    {
-                        addComponents.Clear();
-                        Type baseType = typeof(Component);
-                        Assembly[] assemblys = AppDomain.CurrentDomain.GetAssemblies();
-                        foreach (Assembly assembly in assemblys)
-                        {
-                            Type[] types = assembly.GetTypes();
-                            foreach (Type type in types)
-                            {
-                                if (type.IsSubclassOf(baseType))
-                                {
-                                    if (type.Name.Contains(componentFilter))
-                                    {
-                                        string[] strArray = type.ToString().Split('.');
-                                        if (strArray[0] == "UnityEngine")
-                                        {
-                                            addComponents.Add(type);
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                    GUILayout.EndHorizontal();
-
-                    foreach (var addComponent in addComponents)
-                    {
-                        string fullName = addComponent.FullName;
-                        if (fullName != null)
-                        {
-                            string[] strArray = fullName.Split('.');
-                            if (GUILayout.Button(strArray[^1],GUILayout.Height(MinHeight-10)))
-                            {
-                                objectList[curObjectIndex].gameObject.AddComponent(addComponent);
-                                isAddComponent = false;
-                                RefreshTransformComponents();
-                                return;
-                            }
-                        }
-                    }
-                }
-                //预览组件状态
-                else
-                {
-                    for (int i = 0; i < objectComponents.Count; i++)
-                    {
-                        if (objectComponents[i])
-                        {
-                            GUILayout.BeginHorizontal();
-                            GUI.contentColor = Color.cyan;
-                            bool value = curComponentIndex == i;
-                            if (GUILayout.Toggle(value, objectComponents[i].GetType().Name,"Label") != value)
-                            {
-                                if (curComponentIndex != i)
-                                {
-                                    curComponentIndex = i;
-                                    curDebugger = null;
-                                    Type type = objectComponents[i].GetType();
-                                    if (debugComponents.ContainsKey(type))
-                                    {
-                                        Type debuggerType = debugComponents[type];
-                                        curDebugger = Activator.CreateInstance(debuggerType) as Debugger;
-                                        if (curDebugger != null)
-                                        {
-                                            curDebugger.Target = objectComponents[i];
-                                            curDebugger.OnInit();
-                                        }
-                                    }
-                                }
-                                else
-                                {
-                                    curComponentIndex = -1;
-                                    curDebugger = null;
-                                }
-                            }
-                            GUILayout.FlexibleSpace();
-                            GUILayout.EndHorizontal();
-
-                            //当前组件被选中
-                            if (curComponentIndex == i)
-                            {
-                                GUI.contentColor = Color.white;
-                                GUILayout.BeginVertical("Box");
-
-                                if (curDebugger != null)
-                                {
-                                    curDebugger.OnDebuggerGUI();
-                                }
-                                else
-                                {
-                                    GUILayout.Label("No Debugger GUI!");
-                                }
-
-                                GUILayout.EndVertical();
-                            }
-                        }
-                    }
-                }
-            }
-            GUILayout.EndScrollView();
-
-            GUILayout.EndVertical();
-            #endregion
-
+            ShowGameObject();
+            ShowComponent();
             GUILayout.EndHorizontal();
         }
-        private void ExpansionMemoryGUI()
+        private void ExtendMemoryGUI()
         {
             GUILayout.BeginHorizontal();
             GUI.contentColor = Color.white;
             GUILayout.Label(debugData.GetData("Memory Information"), GUILayout.Height(MinHeight));
             GUILayout.EndHorizontal();
-
             GUILayout.BeginVertical("Box", GUILayout.Height(MaxHeight - 260));
-
             long memory = Profiler.GetTotalReservedMemoryLong() / 1000000;
             if (memory > maxTotalReservedMemory) maxTotalReservedMemory = memory;
             if (memory < minTotalReservedMemory) minTotalReservedMemory = memory;
@@ -715,13 +683,12 @@ namespace JYJFramework.Logger
             }
             GUILayout.EndHorizontal();
         }
-        private void ExpansionDrawCallGUI()
+        private void ExtendDrawCallGUI()
         {
             GUILayout.BeginHorizontal();
             GUI.contentColor = Color.white;
             GUILayout.Label(debugData.GetData("DrawCall Information"), GUILayout.Height(MinHeight));
             GUILayout.EndHorizontal();
-
             scrollDrawCallView = GUILayout.BeginScrollView(scrollDrawCallView, "Box");
 #if UNITY_EDITOR
             GUILayout.Label(debugData.GetData("DrawCalls") + ": " + UnityEditor.UnityStats.drawCalls);
@@ -751,13 +718,12 @@ namespace JYJFramework.Logger
 #endif
             GUILayout.EndScrollView();
         }
-        private void ExpansionSystemGUI()
+        private void ExtendSystemGUI()
         {
             GUILayout.BeginHorizontal();
             GUI.contentColor = Color.white;
             GUILayout.Label(debugData.GetData("System Information"), GUILayout.Height(MinHeight));
             GUILayout.EndHorizontal();
-
             scrollSystemView = GUILayout.BeginScrollView(scrollSystemView, "Box");
             GUILayout.Label(debugData.GetData("Operating System") + ": " + SystemInfo.operatingSystem);
             GUILayout.Label(debugData.GetData("System Memory") + ": " + SystemInfo.systemMemorySize + "MB");
@@ -775,7 +741,7 @@ namespace JYJFramework.Logger
             GUILayout.Label(debugData.GetData("Device Unique Identifier") + ": " + SystemInfo.deviceUniqueIdentifier);
             GUILayout.EndScrollView();
         }
-        private void ExpansionScreenGUI()
+        private void ExtendScreenGUI()
         {
             GUILayout.BeginHorizontal();
             GUI.contentColor = Color.white;
@@ -796,12 +762,11 @@ namespace JYJFramework.Logger
             }
             if (GUILayout.Button(debugData.GetData("Screen Capture"), GUILayout.Height(MinHeight)))
             {
-                StartCoroutine(ScreenShot());
+                ScreenShot();
             }
             GUILayout.EndHorizontal();
         }
-        
-        private void ExpansionTimeGUI()
+        private void ExtendTimeGUI()
         {
             GUILayout.BeginHorizontal();
             GUI.contentColor = Color.white;
@@ -845,7 +810,7 @@ namespace JYJFramework.Logger
             }
             GUILayout.EndHorizontal();
         }
-        private void ExpansionEnvironmentGUI()
+        private void ExtendEnvironmentGUI()
         {
             GUILayout.BeginHorizontal();
             GUI.contentColor = Color.white;
@@ -861,12 +826,18 @@ namespace JYJFramework.Logger
             GUILayout.Label(debugData.GetData("Unity Version") + ": " + Application.unityVersion);
             GUILayout.Label(debugData.GetData("Has Pro License") + ": " + Application.HasProLicense());
             string internetState = debugData.GetData("NotReachable");
-            if (Application.internetReachability == NetworkReachability.NotReachable)
-                internetState = debugData.GetData("NotReachable");
-            else if (Application.internetReachability == NetworkReachability.ReachableViaLocalAreaNetwork)
-                internetState = debugData.GetData("ReachableViaLocalAreaNetwork");
-            else if (Application.internetReachability == NetworkReachability.ReachableViaCarrierDataNetwork)
-                internetState = debugData.GetData("ReachableViaCarrierDataNetwork");
+            switch (Application.internetReachability)
+            {
+                case NetworkReachability.NotReachable:
+                    internetState = debugData.GetData("NotReachable");
+                    break;
+                case NetworkReachability.ReachableViaLocalAreaNetwork:
+                    internetState = debugData.GetData("ReachableViaLocalAreaNetwork");
+                    break;
+                case NetworkReachability.ReachableViaCarrierDataNetwork:
+                    internetState = debugData.GetData("ReachableViaCarrierDataNetwork");
+                    break;
+            }
             GUILayout.Label(debugData.GetData("Internet State") + ": " + internetState);
             GUILayout.EndVertical();
 
@@ -887,7 +858,7 @@ namespace JYJFramework.Logger
             GUILayout.Space(20);
             if (GUILayout.Button(debugData.GetData("FPS") + ": " + curFPS, GUILayout.Width(MinWidth), GUILayout.Height(MinHeight)))
             {
-                expansion = true;
+                isExtend = true;
             }
             GUI.contentColor = Color.white;
         }
@@ -896,22 +867,24 @@ namespace JYJFramework.Logger
     #region Additional Type
     public struct LogData
     {
-        public string time;
         public string type;
+        public string dateTime;
         public string message;
         public string stackTrace;
         public string showName;
     }
+
     public enum DebugType
     {
-        Console,
-        Scene,
-        Memory,
-        DrawCall,
-        System,
-        Screen,
-        Time,
-        Environment
+        Console = 0,
+        Scene = 1,
+        Memory = 2,
+        DrawCall = 3,
+        System = 4,
+        Screen = 5,
+        Time = 6,
+        Environment = 7
     }
+
     #endregion
 }

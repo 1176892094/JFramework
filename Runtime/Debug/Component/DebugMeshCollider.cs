@@ -12,7 +12,7 @@ namespace JYJFramework.Logger
             target = Target as MeshCollider;
         }
 
-        public override void OnDebuggerGUI()
+        public override void OnDebugGUI()
         {
             GUILayout.BeginHorizontal();
             GUI.contentColor = target.enabled ? Color.white : Color.gray;

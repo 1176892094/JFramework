@@ -3,7 +3,7 @@ using System.IO;
 using OfficeOpenXml;
 using UnityEngine;
 
-namespace JYJFramework
+namespace JFramework
 {
     public static class ExcelManager
     {

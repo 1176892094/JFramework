@@ -1,10 +1,10 @@
 using System;
 using System.Collections;
-using JYJFramework.Async;
+using JFramework.Async;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
-namespace JYJFramework
+namespace JFramework
 {
     public static class ResourceManager
     {

@@ -1,10 +1,10 @@
 using System;
 using System.Collections;
-using JYJFramework.Async;
+using JFramework.Async;
 using UnityEngine.SceneManagement;
 using AsyncOperation = UnityEngine.AsyncOperation;
 
-namespace JYJFramework
+namespace JFramework
 {
     public static class LoadManager
     {

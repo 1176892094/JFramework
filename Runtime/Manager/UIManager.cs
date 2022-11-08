@@ -3,7 +3,7 @@ using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.EventSystems;
 
-namespace JYJFramework
+namespace JFramework
 {
     public class UIManager : SingletonMono<UIManager>
     {
@@ -109,8 +109,7 @@ namespace JYJFramework
             panelDict.Clear();
         }
 
-        public static void AddEventListener(UIBehaviour control, EventTriggerType type,
-            UnityAction<BaseEventData> callback)
+        public static void AddEventListener(UIBehaviour control, EventTriggerType type, UnityAction<BaseEventData> callback)
         {
             EventTrigger trigger = control.GetComponent<EventTrigger>();
             if (trigger == null) trigger = control.gameObject.AddComponent<EventTrigger>();

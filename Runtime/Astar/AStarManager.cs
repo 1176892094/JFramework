@@ -1,8 +1,7 @@
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 
-namespace JYJFramework.Pathfinding
+namespace JFramework.Pathfinding
 {
     public class AStarManager : Singleton<AStarManager>
     {
@@ -12,7 +11,7 @@ namespace JYJFramework.Pathfinding
         private readonly List<AStarNode> openList = new List<AStarNode>();
         private readonly List<AStarNode> closeList = new List<AStarNode>();
 
-        public void InitScene(int width, int height)
+        public void InitMap(int width, int height)
         {
             this.width = width;
             this.height = height;
@@ -51,14 +50,14 @@ namespace JYJFramework.Pathfinding
 
             while (true)
             {
-                FindNearlyNodeToOpenList(originNode.x - 1, originNode.y - 1, 1.4f, originNode, targetNode);
-                FindNearlyNodeToOpenList(originNode.x, originNode.y - 1, 1, originNode, targetNode);
-                FindNearlyNodeToOpenList(originNode.x + 1, originNode.y - 1, 1.4f, originNode, targetNode);
-                FindNearlyNodeToOpenList(originNode.x - 1, originNode.y, 1, originNode, targetNode);
-                FindNearlyNodeToOpenList(originNode.x + 1, originNode.y, 1, originNode, targetNode);
-                FindNearlyNodeToOpenList(originNode.x - 1, originNode.y + 1, 1.4f, originNode, targetNode);
-                FindNearlyNodeToOpenList(originNode.x, originNode.y + 1, 1, originNode, targetNode);
-                FindNearlyNodeToOpenList(originNode.x + 1, originNode.y + 1, 1.4f, originNode, targetNode);
+                FindPoint(originNode.x - 1, originNode.y - 1, 1.4f, originNode, targetNode);
+                FindPoint(originNode.x, originNode.y - 1, 1, originNode, targetNode);
+                FindPoint(originNode.x + 1, originNode.y - 1, 1.4f, originNode, targetNode);
+                FindPoint(originNode.x - 1, originNode.y, 1, originNode, targetNode);
+                FindPoint(originNode.x + 1, originNode.y, 1, originNode, targetNode);
+                FindPoint(originNode.x - 1, originNode.y + 1, 1.4f, originNode, targetNode);
+                FindPoint(originNode.x, originNode.y + 1, 1, originNode, targetNode);
+                FindPoint(originNode.x + 1, originNode.y + 1, 1.4f, originNode, targetNode);
 
                 if (openList.Count == 0)
                 {
@@ -69,7 +68,7 @@ namespace JYJFramework.Pathfinding
                 openList.Sort(SortOpenList);
                 foreach (var node in openList)
                 {
-                    Debug.Log("点" + node.x + "," + node.y + ":g=" + node.g + "h=" + node.h + "f=" + node.f);
+                    Debug.Log("点" + node.x + "," + node.y + ":g=" + node.originDis + "h=" + node.targetDis + "f=" + node.totalDis);
                 }
 
                 closeList.Add(openList[0]);
@@ -94,19 +93,19 @@ namespace JYJFramework.Pathfinding
 
         private int SortOpenList(AStarNode a, AStarNode b)
         {
-            if (a.f >= b.f) return 1;
+            if (a.totalDis >= b.totalDis) return 1;
             return -1;
         }
         
-        private void FindNearlyNodeToOpenList(int x, int y, float g, AStarNode father, AStarNode target)
+        private void FindPoint(int x, int y, float totalDis, AStarNode father, AStarNode target)
         {
             if (x < 0 || x >= width || y < 0 || y >= height) return;
             AStarNode origin = nodes[x, y];
             if (origin == null || origin.type == ANodeType.Stop || closeList.Contains(origin) || openList.Contains(origin)) return;
             origin.father = father;
-            origin.g = father.g + g;
-            origin.h = Mathf.Abs(target.x - origin.x) + Mathf.Abs(target.y - origin.y);
-            origin.f = origin.g + origin.h;
+            origin.originDis = father.originDis + totalDis;
+            origin.targetDis = Mathf.Abs(target.x - origin.x) + Mathf.Abs(target.y - origin.y);
+            origin.totalDis = origin.originDis + origin.targetDis;
             openList.Add(origin);
         }
     }

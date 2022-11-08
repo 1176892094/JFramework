@@ -12,7 +12,7 @@ namespace JYJFramework.Logger
             target = Target as BoxCollider;
         }
 
-        public override void OnDebuggerGUI()
+        public override void OnDebugGUI()
         {
             GUILayout.BeginHorizontal();
             GUI.contentColor = target.enabled ? Color.white : Color.gray;
@@ -22,12 +22,12 @@ namespace JYJFramework.Logger
 
             GUILayout.BeginHorizontal();
             GUILayout.Label("Center: ", GUILayout.Width(130));
-            target.center = GUILayoutExtend.Vector3Field(target.center);
+            target.center = GUIExtensions.Vector3Field(target.center);
             GUILayout.EndHorizontal();
 
             GUILayout.BeginHorizontal();
             GUILayout.Label("Size: ", GUILayout.Width(130));
-            target.size = GUILayoutExtend.Vector3Field(target.size);
+            target.size = GUIExtensions.Vector3Field(target.size);
             GUILayout.EndHorizontal();
         }
     }

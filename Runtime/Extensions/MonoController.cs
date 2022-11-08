@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-namespace JYJFramework
+namespace JFramework
 {
     public class MonoController: MonoBehaviour
     {

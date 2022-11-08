@@ -1,9 +1,9 @@
 {
   "name": "com.jinyijie.core",
-  "displayName": "JYJFramework",
+  "displayName": "JFramework",
   "version": "1.0.0",
   "unity": "2021.1",
-  "description": "This is the JYJFramework package",
+  "description": "This is the JFramework package",
   "dependencies": {},
   "author": {
     "name": "Charlotte",

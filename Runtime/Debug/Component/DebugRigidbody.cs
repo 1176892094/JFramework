@@ -12,7 +12,7 @@ namespace JYJFramework.Logger
             target = Target as Rigidbody;
         }
 
-        public override void OnDebuggerGUI()
+        public override void OnDebugGUI()
         {
             GUILayout.BeginHorizontal();
             target.useGravity = GUILayout.Toggle(target.useGravity, "Use Gravity","Button");
@@ -21,7 +21,7 @@ namespace JYJFramework.Logger
 
             GUILayout.BeginHorizontal();
             GUILayout.Label("Velocity:", GUILayout.Width(130));
-            target.velocity = GUILayoutExtend.Vector3Field(target.velocity);
+            target.velocity = GUIExtensions.Vector3Field(target.velocity);
             GUILayout.EndHorizontal();
         }
     }

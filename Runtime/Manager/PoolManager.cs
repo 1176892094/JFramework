@@ -3,14 +3,14 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 
-namespace JYJFramework
+namespace JFramework
 {
     public static class PoolManager
     {
         private static readonly Dictionary<string, PoolData> poolDict = new Dictionary<string, PoolData>();
         private static GameObject poolManager;
 
-        public static void PopObject(string path, UnityAction<GameObject> callback)
+        public static void Pop(string path, UnityAction<GameObject> callback)
         {
             string[] strArray = path.Split('/');
             string name = strArray[^1];
@@ -41,7 +41,7 @@ namespace JYJFramework
             }
         }
 
-        public static void PushObject(string name, GameObject obj)
+        public static void Push(string name, GameObject obj)
         {
             if (poolManager == null)
             {

@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace JYJFramework
+namespace JFramework
 {
     public class JsonData : BaseData
     {

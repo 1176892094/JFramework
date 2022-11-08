@@ -1,7 +1,7 @@
 using System.Threading;
 using UnityEngine;
 
-namespace JYJFramework.Async
+namespace JFramework.Async
 {
     public static class UnitySynchronize
     {

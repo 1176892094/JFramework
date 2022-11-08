@@ -1,7 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using JYJFramework.Async;
+using JFramework.Async;
 using UnityEngine;
 using Object = UnityEngine.Object;
 

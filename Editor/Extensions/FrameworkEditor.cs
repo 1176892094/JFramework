@@ -6,7 +6,7 @@ using UnityEngine;
 using Debug = UnityEngine.Debug;
 using Directory = System.IO.Directory;
 
-namespace JYJFramework.Editor
+namespace JFramework.Editor
 {
     public class FrameworkEditor
     {

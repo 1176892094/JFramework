@@ -1,5 +1,5 @@
 {
-    "name": "JYJDebug",
+    "name": "JFramework.Editor",
     "rootNamespace": "",
     "references": [
         "GUID:de36c2a8d511c4a52b411e7a6f340992"

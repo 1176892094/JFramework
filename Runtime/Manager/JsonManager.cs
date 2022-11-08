@@ -3,12 +3,24 @@ using System.Security.Cryptography;
 using Newtonsoft.Json;
 using UnityEngine;
 
-namespace JYJFramework
+namespace JFramework
 {
     public static class JsonManager
     {
-        private static readonly JsonData JsonData = ResourceManager.Load<JsonData>("Settings/JsonData");
-        
+        private static JsonData jsonData;
+        public static JsonData JsonData
+        {
+            get
+            {
+                if (jsonData == null)
+                {
+                    jsonData = ResourceManager.Load<JsonData>("Settings/JsonData");
+                }
+
+                return jsonData;
+            }
+        }
+
         public static void SaveJson(object obj, string fileName, bool AES = false)
         {
             string filePath = Application.persistentDataPath + "/" + fileName + ".json";
@@ -50,7 +62,10 @@ namespace JYJFramework
             {
                 byte[] loadJson = File.ReadAllBytes(filePath);
                 JsonData.LoadData();
-                JsonData.InitData();
+                if (JsonData.GetData(obj.name) == null)
+                {
+                    JsonData.AddData(obj.name);
+                }
                 byte[] key = JsonData.GetData(obj.name).key;
                 byte[] iv = JsonData.GetData(obj.name).iv;
                 if (key == null || key.Length <= 0 || iv == null || iv.Length <= 0) return;
@@ -116,14 +131,6 @@ namespace JYJFramework
             using CryptoStream cryptoStream = new CryptoStream(memoryStream, cryptoTF, CryptoStreamMode.Read);
             using StreamReader streamReader = new StreamReader(cryptoStream);
             return streamReader.ReadToEnd();
-        }
-        
-        public static void Clear() => JsonData.Clear();
-
-        public static void Init()
-        {
-            JsonData.LoadData();
-            JsonData.InitData();
         }
     }
 }
