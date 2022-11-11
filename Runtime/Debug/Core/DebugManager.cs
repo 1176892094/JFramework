@@ -75,6 +75,7 @@ namespace JFramework.Logger
         protected override void Awake()
         {
             base.Awake();
+            DontDestroyOnLoad(gameObject);
             isDebug = true;
             MinWidth = 180;
             MinHeight = 60;

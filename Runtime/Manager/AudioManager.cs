@@ -10,8 +10,8 @@ namespace JFramework
         private static readonly List<AudioSource> soundList = new List<AudioSource>();
         private static AudioSource sound;
         private static GameObject source;
-        private static float soundVolume;
-        private static float audioVolume;
+        private static float soundVolume = 1;
+        private static float audioVolume = 1;
 
         protected void Awake()
         {
