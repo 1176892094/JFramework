@@ -265,7 +265,7 @@ public class Test9 : MonoBehaviour
     {
         timer = TimerManager.Instance.GetTimer(); //新建计时器
         timer.Open(0.3f, 10, StartAction, UpdateAction, CloseAction); //开启计时器，0.3秒计时一次，循环10次
-        timer.Open(5f, StartAction, UpdateAction, CloseAction);新建一个5秒的计时器
+        timer.Open(5f, StartAction, UpdateAction, CloseAction);//新建一个5秒的计时器
     }
 
     private void Update()
