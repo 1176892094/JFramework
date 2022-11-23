@@ -10,7 +10,7 @@
 
 其中Resources/Setttings/JsonData用于配置JsonManager，Scenes/StartScene为基础场景。
 
-备注：只有Unity2021.1以上的版本才能正常使用，2021.1以下需要导入Newtonsoft包
+备注：Json序列化依赖于NewtonsoftJson包
 
 3.使用
 
