@@ -14,7 +14,7 @@
 
 3.使用
 
-(1)EventManager
+(1)EventManager（事件管理类）
 
 ```csharp
 public class Test1 : MonoBehaviour
@@ -45,7 +45,7 @@ public struct EventName
     public const string EventTrigger = "EventTrigger"; //建议定一个事件的常量
 }
 ```
-(2)ResourcesManager
+(2)ResourcesManager（资源加载管理类）
 ```csharp
 public class Test2 : MonoBehaviour
 {
@@ -99,7 +99,7 @@ public class Test3 : MonoBehaviour
     }
 }
 ```
-(4)PoolManager
+(4)PoolManager(对象池工具)
 ```csharp
 public class Test4: MonoBehaviour
 {
@@ -122,7 +122,7 @@ public struct PoolPath
     public const string Bullet = "Bullet";//Bullet的真实路径是：Assets/Resources/Bullet
 }
 ```
-(5)AudioManager
+(5)AudioManager（游戏声音管理）
 ```csharp
 public class Test5 : MonoBehaviour
 {
@@ -153,7 +153,7 @@ public struct AudioPath
     public const string BTClick = "Audio/BTClick"; //BTClick的真实路径是：Assets/Resources/Audio/BTClick
 }
 ```
-(6)UIManager
+(6)UIManager（UI管理类）
 ```csharp
 public class Test7: MonoBehaviour
 {
@@ -205,7 +205,7 @@ public class LoginPanel : BasePanel //需要管理的UI都要继承BasePanel
     public void SetPassword(string password) => this.password = password;
 }
 ```
-(7)ExcelManager
+(7)ExcelManager(Excel读写工具)
 ```csharp
 public class Test8: MonoBehaviour
 {
@@ -238,7 +238,7 @@ public struct ExcelPath
     public const string Inventory = "Assets/Editor/Inventory";//要输入全路径，其中Inventory为Excel文件名称
 }
 ```
-(8)LoadManager
+(8)LoadManager(场景加载管理)
 ```csharp
 public class Test8: MonoBehaviour
 {
@@ -256,7 +256,31 @@ public class Test8: MonoBehaviour
     }
 }
 ```
-(9)AwaitExtensions
+(8)TimerManager(自定义计时器工具)
+```csharp
+public class Test9 : MonoBehaviour
+{
+    private Timer timer;
+    private void Start()
+    {
+        timer = TimerManager.Instance.GetTimer(); //新建计时器
+        timer.Open(0.3f, 10, StartAction, UpdateAction, CloseAction); //开启计时器
+    }
+
+    private void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.Q)) timer.Stop(); //暂停计时器
+        if (Input.GetKeyDown(KeyCode.E)) timer.Play(); //启动计时器
+    }
+
+    private void StartAction() => Debug.Log("Timer Start"); //计时器初始化
+
+    private void UpdateAction() => Debug.Log("Timer Update"); //计时器更新
+
+    private void CloseAction() => Debug.Log("Timer Close"); //计时器关闭
+}
+```
+(10)AwaitExtensions
 ```csharp
   private async void Start()
     {
