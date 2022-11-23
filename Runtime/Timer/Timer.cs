@@ -5,10 +5,10 @@ namespace JFramework
 {
     public class Timer
     {
-        private bool isStop;
-        private bool isRunning;
         private int curLoop;
         private int maxLoop;
+        private bool isStop;
+        private bool isRunning;
         private float curTime;
         private float stopTimer;
         private float interval;
@@ -16,25 +16,27 @@ namespace JFramework
         private Action OnUpdate;
         private Action OnClose;
 
-        public void Register(float interval, Action OnStart = null, Action OnUpdate = null, Action OnClose = null)
+        public void Open(float interval, Action OnStart = null, Action OnUpdate = null, Action OnClose = null)
         {
             maxLoop = 1;
             this.interval = interval;
             this.OnStart = OnStart;
             this.OnUpdate = OnUpdate;
             this.OnClose = OnClose;
+            Start();
         }
 
-        public void Register(float interval, int maxLoop, Action OnStart = null, Action OnUpdate = null, Action OnClose = null)
+        public void Open(float interval, int maxLoop, Action OnStart = null, Action OnUpdate = null, Action OnClose = null)
         {
             this.maxLoop = maxLoop;
             this.interval = interval;
             this.OnStart = OnStart;
             this.OnUpdate = OnUpdate;
             this.OnClose = OnClose;
+            Start();
         }
 
-        public void Start()
+        private void Start()
         {
             OnStart.Invoke();
             TimerManager.Instance.AddTimer(this);
