@@ -1,6 +1,6 @@
 namespace JFramework
 {
-    public interface IPanel
+    internal interface IPanel
     {
         void Show();
         void Hide();

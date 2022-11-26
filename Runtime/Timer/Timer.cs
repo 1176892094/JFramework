@@ -50,8 +50,9 @@ namespace JFramework
             if (!isRunning || Time.time <= curTime) return;
             curTime += interval;
             curLoop++;
+            if (curLoop == 1) return;
             OnUpdate.Invoke();
-            if (curLoop <= maxLoop - 1) return;
+            if (curLoop <= maxLoop) return;
             Close();
         }
 

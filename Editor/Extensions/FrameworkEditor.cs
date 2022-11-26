@@ -17,47 +17,43 @@ namespace JFramework.Editor
             private const string WebGL = "/Extensions/WebGL";
             private const string iOS = "/Extensions/iOS";
             private const string Mac = "/Extensions/Mac";
+            private const string Audios = "/Resources/Audios";
+            private const string Models = "/Resources/Models";
             private const string Physics = "/Resources/Physics";
-            private const string Meshes = "/Resources/Meshes";
-            private const string Textures = "/Resources/Textures";
-            private const string Sprites = "/Resources/Sprites";
             private const string Prefabs = "/Resources/Prefabs";
-            private const string Flares = "/Resources/Flares";
-            private const string Audio = "/Resources/Audio";
-            private const string Data = "/Resources/Data";
-            private const string Editor = "/Editor";
-            private const string Materials = "/Materials";
+            private const string Process = "/Resources/Process";
             private const string Animations = "/Animations";
-            private const string Settings = "/Settings";
-            private const string Plugins = "/Plugins";
+            private const string Materials = "/Materials";
             private const string Scenes = "/Scenes";
             private const string Scripts = "/Scripts";
+            private const string Settings = "/Settings";
+            private const string Plugins = "/Plugins";
             private const string Shaders = "/Shaders";
-            private const string Tilemaps = "/Tilemaps";
+            private const string Textures = "/Textures";
             private const string StreamingAssets = "/StreamingAssets";
+            private const string Tilemaps = "/Tilemaps";
 
             public static readonly string[] DirectoryArray = new[]
             {
-                Android, Windows, WebGL, iOS, Mac, Settings, 
-                Physics, Meshes, Textures, Sprites, Prefabs, 
-                Audio, Data, Editor, Materials, Animations, 
-                Plugins, Scenes, Scripts, Shaders, Flares, 
-                Tilemaps, StreamingAssets
+                Android, Windows, WebGL, iOS, Mac, Audios,
+                Settings, Physics, Models, Textures, Prefabs,
+                Materials, Animations, Plugins, Scenes, Scripts,
+                Shaders, Process, Tilemaps, StreamingAssets
             };
         }
-        
-        [MenuItem("Tools/Framework/AssetsPath")]
-        private static void AssetsPath()
+
+        [MenuItem("Tools/Framework/CurrentProjectPath")]
+        private static void ProjectFilePath()
         {
-            Process.Start(Application.dataPath);
+            Process.Start(System.Environment.CurrentDirectory);
         }
 
-        [MenuItem("Tools/Framework/PersistentPath")]
+        [MenuItem("Tools/Framework/PersistentDataPath")]
         private static void PersistentDataPath()
         {
             Process.Start(Application.persistentDataPath);
         }
-        
+
         [MenuItem("Tools/Framework/StreamingAssetsPath")]
         private static void StreamingAssetsPath()
         {
@@ -71,8 +67,8 @@ namespace JFramework.Editor
                 Process.Start(Application.streamingAssetsPath);
             }
         }
-        
-        [MenuItem("Tools/Framework/Initialization",false,11)]
+
+        [MenuItem("Tools/Framework/Initialization", false, 11)]
         private static void Initialization()
         {
             foreach (var directory in DirectoryType.DirectoryArray)
@@ -82,6 +78,7 @@ namespace JFramework.Editor
                     Directory.CreateDirectory(Application.dataPath + directory);
                 }
             }
+
             if (!Directory.Exists(Application.dataPath + "/Resources/Settings/Json"))
             {
                 Directory.CreateDirectory(Application.dataPath + "/Resources/Settings");
@@ -103,7 +100,7 @@ namespace JFramework.Editor
             SceneAsset scene = ResourceManager.Load<SceneAsset>("StartScene");
             string origin = AssetDatabase.GetAssetOrScenePath(scene);
             string target = Application.dataPath + "/Scenes/StartScene.unity";
-            File.Copy(origin,target,false);
+            File.Copy(origin, target, false);
             AssetDatabase.SaveAssets();
             AssetDatabase.Refresh();
         }
@@ -111,7 +108,7 @@ namespace JFramework.Editor
         private static void CreateJsonData()
         {
             JsonData jsonData = ScriptableObject.CreateInstance<JsonData>();
-            AssetDatabase.CreateAsset(jsonData,"Assets/Resources/Settings/JsonData.asset");
+            AssetDatabase.CreateAsset(jsonData, "Assets/Resources/Settings/JsonData.asset");
             AssetDatabase.SaveAssets();
             AssetDatabase.Refresh();
             Selection.activeObject = jsonData;

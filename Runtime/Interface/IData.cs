@@ -1,6 +1,6 @@
 namespace JFramework
 {
-    public interface IData
+    internal interface IData
     {
         void InitData();
         void SaveData();
