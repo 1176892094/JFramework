@@ -26,7 +26,7 @@ namespace JFramework
             if (request == null) yield break;
             if (request.asset == null)
             {
-                Debug.LogWarning(name + "未获取到！");
+                Logger.LogWarning(name + "未获取到！");
                 yield break;
             }
 

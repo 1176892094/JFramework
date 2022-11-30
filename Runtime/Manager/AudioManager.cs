@@ -94,7 +94,7 @@ namespace JFramework
             {
                 soundList.Remove(audio);
                 audio.Stop();
-                Object.Destroy(audio);
+                Destroy(audio);
             }
         }
     }

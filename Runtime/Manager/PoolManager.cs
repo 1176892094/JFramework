@@ -1,4 +1,3 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
@@ -52,7 +51,7 @@ namespace JFramework
             {
                 if (obj == null)
                 {
-                    Debug.LogWarning(name + "已被销毁,无法推入对象！");
+                    Logger.LogWarning(name + "已被销毁,无法推入对象！");
                     poolDict[name].Pop();
                     return;
                 }
@@ -66,7 +65,7 @@ namespace JFramework
         }
     }
 
-    public class PoolData
+    internal class PoolData
     {
         private readonly GameObject prefab;
         public readonly Stack<GameObject> poolList;

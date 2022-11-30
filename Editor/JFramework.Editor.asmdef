@@ -1,0 +1,19 @@
+{
+    "name": "JFramework.Editor",
+    "rootNamespace": "",
+    "references": [
+        "GUID:de36c2a8d511c4a52b411e7a6f340992",
+        "GUID:0c4826fbb0f1b460fb23e5bb56526a9c"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": false,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

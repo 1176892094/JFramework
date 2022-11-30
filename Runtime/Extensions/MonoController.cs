@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace JFramework
 {
-    public class MonoController: MonoBehaviour
+    internal class MonoController: MonoBehaviour
     {
         private event Action UpdateAction;
         private void Awake() => DontDestroyOnLoad(gameObject);

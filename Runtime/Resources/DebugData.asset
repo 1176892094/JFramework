@@ -12,6 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 24afef82fd5b1f343881daa96e5c828d, type: 3}
   m_Name: DebugData
   m_EditorClassIdentifier: 
+  isDebug: 1
+  MaxWidth: 2560
+  MaxHeight: 1440
   Language: 0
   textList:
   - ID: Debugger
@@ -278,3 +281,4 @@ MonoBehaviour:
   - ID: Send Debug Data
     english: Send Debug Data
     chinese: "\u53D1\u9001\u8C03\u8BD5\u6570\u636E"
+  screenPath: Assets/Screen/

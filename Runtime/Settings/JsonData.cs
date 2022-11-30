@@ -1,13 +1,40 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
+using UnityEditor;
 using UnityEngine;
 
 namespace JFramework
 {
-    public class JsonData : BaseData
+    internal class JsonData : BaseData
     {
         private readonly Dictionary<string, AesData> aesDict = new Dictionary<string, AesData>();
         public List<AesData> aesList = new List<AesData>();
+
+        private static JsonData instance;
+
+        public static JsonData Instance
+        {
+            get
+            {
+                if (instance != null) return instance;
+                instance = ResourceManager.Load<JsonData>("Settings/JsonData");
+                if (instance != null) return instance;
+                instance = CreateInstance<JsonData>();
+                instance.Clear();
+#if UNITY_EDITOR
+                string path = Application.dataPath + "/Resources/Settings";
+                if (!Directory.Exists(path))
+                {
+                    Directory.CreateDirectory(path);
+                    AssetDatabase.Refresh();
+                }
+
+                AssetDatabase.CreateAsset(instance, "Assets/Resources/Settings/JsonData.asset");
+#endif
+                return instance;
+            }
+        }
 
         public override void InitData()
         {
@@ -24,17 +51,36 @@ namespace JFramework
 
         public override void LoadData() => JsonManager.Load(this);
 
-        public AesData GetData(string id)
+
+        public void SetData(string id, byte[] key, byte[] iv)
         {
-            if (aesDict.ContainsKey(id)) return aesDict[id];
-            return null;
+            if (!aesDict.ContainsKey(id))
+            {
+                AesData data = new AesData() { ID = id };
+                aesDict.Add(id, data);
+                aesList.Add(data);
+            }
+            else
+            {
+                aesDict[id].key = key;
+                aesDict[id].iv = iv;
+            }
+
+            SaveData();
         }
 
-        public void AddData(string id)
+        public AesData GetData(string id)
         {
-            AesData data = new AesData() { ID = id };
-            aesDict.Add(id,data);
-            aesList.Add(data);
+            LoadData();
+            if (!aesDict.ContainsKey(id))
+            {
+                AesData data = new AesData() { ID = id };
+                aesDict.Add(id, data);
+                aesList.Add(data);
+                return data;
+            }
+
+            return aesDict[id];
         }
 
         public void Clear()
@@ -43,13 +89,13 @@ namespace JFramework
             aesList.Clear();
             SaveData();
         }
-    }
-    
-    [Serializable]
-    public class AesData
-    {
-        public string ID;
-        public byte[] key;
-        public byte[] iv;
+
+        [Serializable]
+        public class AesData
+        {
+            public string ID;
+            public byte[] key;
+            public byte[] iv;
+        }
     }
 }

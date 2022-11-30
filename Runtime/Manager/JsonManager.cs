@@ -7,20 +7,6 @@ namespace JFramework
 {
     public static class JsonManager
     {
-        private static JsonData jsonData;
-        public static JsonData JsonData
-        {
-            get
-            {
-                if (jsonData == null)
-                {
-                    jsonData = ResourceManager.Load<JsonData>("Settings/JsonData");
-                }
-
-                return jsonData;
-            }
-        }
-
         public static void Save(object obj, string fileName, bool AES = false)
         {
             string filePath = Application.persistentDataPath + "/" + fileName + ".json";
@@ -28,13 +14,7 @@ namespace JFramework
             if (AES)
             {
                 using Aes aes = Aes.Create();
-                if (JsonData.GetData(fileName) == null)
-                {
-                    JsonData.AddData(fileName);
-                }
-                JsonData.GetData(fileName).key = aes.Key;
-                JsonData.GetData(fileName).iv = aes.IV;
-                JsonData.SaveData();
+                JsonData.Instance.SetData(fileName, aes.Key, aes.IV);
                 byte[] data = Encrypt(saveJson, aes.Key, aes.IV);
                 File.WriteAllBytes(filePath, data);
             }
@@ -61,13 +41,9 @@ namespace JFramework
             if (AES)
             {
                 byte[] loadJson = File.ReadAllBytes(filePath);
-                JsonData.LoadData();
-                if (JsonData.GetData(obj.name) == null)
-                {
-                    JsonData.AddData(obj.name);
-                }
-                byte[] key = JsonData.GetData(obj.name).key;
-                byte[] iv = JsonData.GetData(obj.name).iv;
+                JsonData.AesData data = JsonData.Instance.GetData(obj.name);
+                byte[] key = data.key;
+                byte[] iv = data.iv;
                 if (key == null || key.Length <= 0 || iv == null || iv.Length <= 0) return;
                 string saveJson = Decrypt(loadJson, key, iv);
                 JsonUtility.FromJsonOverwrite(saveJson, obj);
@@ -77,6 +53,14 @@ namespace JFramework
                 string saveJson = File.ReadAllText(filePath);
                 JsonUtility.FromJsonOverwrite(saveJson, obj);
             }
+        }
+
+        public static void InitData() => JsonData.Instance.Clear();
+
+        public static void LoadData()
+        {
+            JsonData.Instance.LoadData();
+            JsonData.Instance.InitData();
         }
 
         public static T Load<T>(string fileName) where T : new()
@@ -97,10 +81,10 @@ namespace JFramework
         {
             if (targetStr.Length == 0)
             {
-                Debug.LogWarning("加密数据为空！");
+                Logger.LogWarning("加密数据为空！");
                 return null;
             }
-            
+
             using Aes aes = Aes.Create();
             aes.Key = key;
             aes.IV = iv;
@@ -114,15 +98,15 @@ namespace JFramework
 
             return memoryStream.ToArray();
         }
-        
+
         private static string Decrypt(byte[] targetByte, byte[] key, byte[] iv)
         {
             if (targetByte.Length == 0)
             {
-                Debug.LogWarning("解密数据为空！");
+                Logger.LogWarning("解密数据为空！");
                 return null;
             }
-            
+
             using Aes aes = Aes.Create();
             aes.Key = key;
             aes.IV = iv;

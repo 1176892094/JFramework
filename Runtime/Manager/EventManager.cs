@@ -90,27 +90,28 @@ namespace JFramework
                 ((EventData)eventDict[type]).actionList?.Invoke();
             }
         }
+        
     }
 
-    public class EventData<T1, T2> : IEventData
+    internal class EventData<T1, T2> : IEventData
     {
         public Action<T1, T2> actionList;
         public EventData(Action<T1, T2> action) => actionList += action;
     }
 
-    public class EventData<T> : IEventData
+    internal class EventData<T> : IEventData
     {
         public Action<T> actionList;
         public EventData(Action<T> action) => actionList += action;
     }
 
-    public class EventData : IEventData
+    internal class EventData : IEventData
     {
         public Action actionList;
         public EventData(Action action) => actionList += action;
     }
-
-    public interface IEventData
+    
+    internal interface IEventData
     {
     }
 }
