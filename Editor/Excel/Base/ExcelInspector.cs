@@ -33,23 +33,5 @@ namespace JFramework.Excel
 			}
 			GUILayout.EndHorizontal();
 		}
-		
-		[OnOpenAsset(10)]
-		private static bool OnOpenExcelFile(int instanceId, int line)
-		{
-			try
-			{
-				var asset = (ExcelSetting)EditorUtility.InstanceIDToObject(instanceId);
-				if (asset == null) return false;
-				ExcelEditor.OpenSettingsWindow();
-				return true;
-			}
-			catch (Exception e)
-			{
-				Logger.LogError(e.ToString());
-			}
-
-			return false;
-		}
 	}
 }
