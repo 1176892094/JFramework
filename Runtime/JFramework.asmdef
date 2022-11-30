@@ -1,9 +1,7 @@
 {
     "name": "JFramework",
     "rootNamespace": "",
-    "references": [
-        "GUID:81ec3aa29e7084cb68e65c8be34669ff"
-    ],
+    "references": [],
     "includePlatforms": [],
     "excludePlatforms": [],
     "allowUnsafeCode": false,
