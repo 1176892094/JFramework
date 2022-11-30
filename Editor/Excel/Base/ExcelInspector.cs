@@ -2,6 +2,7 @@
 using UnityEngine;
 using UnityEditor;
 using UnityEditor.Callbacks;
+using Logger = JFramework.Basic.Logger;
 
 namespace JFramework.Excel
 {

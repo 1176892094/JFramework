@@ -3,6 +3,7 @@ using System.IO;
 using UnityEditor;
 using UnityEditor.Callbacks;
 using UnityEngine;
+using Logger = JFramework.Basic.Logger;
 
 namespace JFramework.Excel
 {
@@ -85,22 +86,19 @@ namespace JFramework.Excel
             }
 
             GUILayout.BeginHorizontal();
-            if (GUILayout.Button(settings.Language == LanguageType.Chinese ? "重置全部" : "Reset All", ExcelStyle.Button,
-                    GUILayout.Height(20)))
+            if (GUILayout.Button(settings.Language == LanguageType.Chinese ? "重置全部" : "Reset All", ExcelStyle.Button, GUILayout.Height(20)))
             {
-                if (EditorUtility.DisplayDialog("EasyExcel", "Are you sure to reset ALL EasyExcel settings?", "Yes",
-                        "Cancel"))
+                if (EditorUtility.DisplayDialog("EasyExcel", "Are you sure to reset ALL EasyExcel settings?", "Yes", "Cancel"))
                 {
                     ExcelSetting.Instance.ResetData();
-                    EditorUtility.SetDirty(ExcelSetting.Instance);
+                    EditorUtility.SetDirty(settings);
                 }
             }
 
             GUILayout.EndHorizontal();
 
             GUILayout.BeginHorizontal();
-            var type = (LanguageType)ExcelStyle.EnumPopup(settings.Language, GUILayout.Height(20),
-                GUILayout.Width(200));
+            var type = (LanguageType)ExcelStyle.EnumPopup(settings.Language, GUILayout.Height(20), GUILayout.Width(200));
             if (settings != null && type != settings.Language)
             {
                 settings.Language = type;
@@ -109,54 +107,38 @@ namespace JFramework.Excel
             GUILayout.EndHorizontal();
 
             GUILayout.BeginHorizontal();
-            GUILayout.Label(settings.Language == LanguageType.Chinese ? "字段名称行" : "Row of Name", ExcelStyle.Label,
-                ExcelStyle.nameOptions);
-            settings.NameIndex =
-                EditorGUILayout.IntField(settings.NameIndex, ExcelStyle.TextField, ExcelStyle.valueOptions);
+            GUILayout.Label(settings.Language == LanguageType.Chinese ? "字段名称行" : "Row of Name", ExcelStyle.Label, ExcelStyle.nameOptions);
+            settings.NameIndex = EditorGUILayout.IntField(settings.NameIndex, ExcelStyle.TextField, ExcelStyle.valueOptions); 
             GUILayout.EndHorizontal();
 
             GUILayout.BeginHorizontal();
-            GUILayout.Label(settings.Language == LanguageType.Chinese ? "字段类型行" : "Row of Type", ExcelStyle.Label,
-                ExcelStyle.nameOptions);
-            settings.TypeIndex =
-                EditorGUILayout.IntField(settings.TypeIndex, ExcelStyle.TextField, ExcelStyle.valueOptions);
+            GUILayout.Label(settings.Language == LanguageType.Chinese ? "字段类型行" : "Row of Type", ExcelStyle.Label, ExcelStyle.nameOptions);
+            settings.TypeIndex = EditorGUILayout.IntField(settings.TypeIndex, ExcelStyle.TextField, ExcelStyle.valueOptions);
             GUILayout.EndHorizontal();
 
             GUILayout.BeginHorizontal();
-            GUILayout.Label(settings.Language == LanguageType.Chinese ? "数据开始行" : "Row of Data", ExcelStyle.Label,
-                ExcelStyle.nameOptions);
-            settings.DataIndex =
-                EditorGUILayout.IntField(settings.DataIndex, ExcelStyle.TextField, ExcelStyle.valueOptions);
+            GUILayout.Label(settings.Language == LanguageType.Chinese ? "数据开始行" : "Row of Data", ExcelStyle.Label, ExcelStyle.nameOptions);
+            settings.DataIndex = EditorGUILayout.IntField(settings.DataIndex, ExcelStyle.TextField, ExcelStyle.valueOptions);
             GUILayout.EndHorizontal();
 
             GUILayout.BeginHorizontal();
-            GUILayout.Label(settings.Language == LanguageType.Chinese ? "命名空间前缀" : "Name Space Prefix",
-                ExcelStyle.Label,
-                ExcelStyle.nameOptions);
-            settings.Namespace =
-                EditorGUILayout.TextField(settings.Namespace, ExcelStyle.TextField, ExcelStyle.valueOptions);
+            GUILayout.Label(settings.Language == LanguageType.Chinese ? "命名空间前缀" : "Name Space Prefix", ExcelStyle.Label, ExcelStyle.nameOptions);
+            settings.Namespace = EditorGUILayout.TextField(settings.Namespace, ExcelStyle.TextField, ExcelStyle.valueOptions);
             GUILayout.EndHorizontal();
 
             GUILayout.BeginHorizontal();
-            GUILayout.Label(settings.Language == LanguageType.Chinese ? "页数据类名后缀" : "SheetData Postfix",
-                ExcelStyle.Label,
-                ExcelStyle.nameOptions);
-            settings.TablePrefix =
-                EditorGUILayout.TextField(settings.TablePrefix, ExcelStyle.TextField, ExcelStyle.valueOptions);
+            GUILayout.Label(settings.Language == LanguageType.Chinese ? "页数据类名后缀" : "SheetData Postfix", ExcelStyle.Label, ExcelStyle.nameOptions);
+            settings.TablePrefix = EditorGUILayout.TextField(settings.TablePrefix, ExcelStyle.TextField, ExcelStyle.valueOptions);
             GUILayout.EndHorizontal();
 
             GUILayout.BeginHorizontal();
-            GUILayout.Label(settings.Language == LanguageType.Chinese ? "生成资源文件路径" : "AssetPath", ExcelStyle.Label,
-                ExcelStyle.nameOptions);
-            settings.AssetPath =
-                EditorGUILayout.TextField(settings.AssetPath, ExcelStyle.TextField, ExcelStyle.valueOptions);
+            GUILayout.Label(settings.Language == LanguageType.Chinese ? "生成资源文件路径" : "AssetPath", ExcelStyle.Label, ExcelStyle.nameOptions);
+            settings.AssetPath = EditorGUILayout.TextField(settings.AssetPath, ExcelStyle.TextField, ExcelStyle.valueOptions);
             GUILayout.EndHorizontal();
 
             GUILayout.BeginHorizontal();
-            GUILayout.Label(settings.Language == LanguageType.Chinese ? "生成C#文件路径" : "CSharpPath", ExcelStyle.Label,
-                ExcelStyle.nameOptions);
-            settings.ScriptPath =
-                EditorGUILayout.TextField(settings.ScriptPath, ExcelStyle.TextField, ExcelStyle.valueOptions);
+            GUILayout.Label(settings.Language == LanguageType.Chinese ? "生成C#文件路径" : "CSharpPath", ExcelStyle.Label, ExcelStyle.nameOptions);
+            settings.ScriptPath = EditorGUILayout.TextField(settings.ScriptPath, ExcelStyle.TextField, ExcelStyle.valueOptions);
             GUILayout.EndHorizontal();
         }
 
@@ -169,10 +151,9 @@ namespace JFramework.Excel
 
             if (ExcelSetting.Instance.ScriptPath.EndsWith("/") || ExcelSetting.Instance.ScriptPath.EndsWith("\\"))
             {
-                string csMeta =
-                    ExcelSetting.Instance.ScriptPath.Substring(0, ExcelSetting.Instance.ScriptPath.Length - 1) +
-                    ".meta";
-                if (!string.IsNullOrEmpty(csMeta) && File.Exists(csMeta)) File.Delete(csMeta);
+                int length = ExcelSetting.Instance.ScriptPath.Length - 1;
+                string meta = ExcelSetting.Instance.ScriptPath.Substring(0, length) + ".meta";
+                if (!string.IsNullOrEmpty(meta) && File.Exists(meta)) File.Delete(meta);
             }
         }
 
@@ -185,10 +166,9 @@ namespace JFramework.Excel
 
             if (ExcelSetting.Instance.AssetPath.EndsWith("/") || ExcelSetting.Instance.AssetPath.EndsWith("\\"))
             {
-                string soMeta =
-                    ExcelSetting.Instance.AssetPath.Substring(0, ExcelSetting.Instance.AssetPath.Length - 1) +
-                    ".meta";
-                if (!string.IsNullOrEmpty(soMeta) && File.Exists(soMeta)) File.Delete(soMeta);
+                int length = ExcelSetting.Instance.AssetPath.Length - 1;
+                string meta = ExcelSetting.Instance.AssetPath.Substring(0, length) + ".meta";
+                if (!string.IsNullOrEmpty(meta) && File.Exists(meta)) File.Delete(meta);
             }
         }
 

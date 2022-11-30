@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using JFramework.Async;
 using UnityEngine;
+using Logger = JFramework.Basic.Logger;
 using Object = UnityEngine.Object;
 
 namespace JFramework

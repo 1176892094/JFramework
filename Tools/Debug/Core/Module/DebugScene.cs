@@ -4,6 +4,7 @@ using System.Linq;
 using System.Reflection;
 using UnityEngine;
 using UnityEngine.Profiling;
+using Logger = JFramework.Basic.Logger;
 using Object = UnityEngine.Object;
 
 namespace JFramework.Debug

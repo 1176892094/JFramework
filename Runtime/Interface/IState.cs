@@ -1,4 +1,4 @@
-namespace JFramework
+namespace JFramework.Basic
 {
     public interface IState
     {
@@ -9,4 +9,3 @@ namespace JFramework
         void OnExit();
     }
 }
-

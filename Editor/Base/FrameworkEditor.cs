@@ -76,17 +76,7 @@ namespace JFramework.Editor
                     Directory.CreateDirectory(Application.dataPath + directory);
                 }
             }
-
-            // if (!Directory.Exists(Application.dataPath + "/Resources/Settings/Json"))
-            // {
-            //     Directory.CreateDirectory(Application.dataPath + "/Resources/Settings");
-            //     CreateJsonData();
-            // }
-            // else if (!File.Exists(Application.dataPath + "Resources/Settings/JsonData.asset"))
-            // {
-            //     CreateJsonData();
-            // }
-
+            
             if (!File.Exists(Application.dataPath + "/Scenes/StartScene.unity"))
             {
                 CreateScene();
@@ -102,14 +92,5 @@ namespace JFramework.Editor
             AssetDatabase.SaveAssets();
             AssetDatabase.Refresh();
         }
-
-        // private static void CreateJsonData()
-        // {
-        //     JsonData jsonData = ScriptableObject.CreateInstance<JsonData>();
-        //     AssetDatabase.CreateAsset(jsonData, "Assets/Resources/Settings/JsonData.asset");
-        //     AssetDatabase.SaveAssets();
-        //     AssetDatabase.Refresh();
-        //     Selection.activeObject = jsonData;
-        // }
     }
 }

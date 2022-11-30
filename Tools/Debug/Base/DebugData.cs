@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
-using Screen = UnityEngine.Device.Screen;
 
 namespace JFramework.Debug
 {

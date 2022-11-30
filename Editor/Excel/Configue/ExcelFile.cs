@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using JFramework.Basic;
 using OfficeOpenXml;
 
 namespace JFramework.Excel

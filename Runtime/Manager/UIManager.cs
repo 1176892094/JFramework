@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using JFramework.Basic;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.EventSystems;
@@ -105,7 +106,7 @@ namespace JFramework
                     Destroy(panelDict[path].gameObject);
                 }
             }
-            
+
             panelDict.Clear();
         }
 
@@ -125,5 +126,5 @@ public enum UILayerType
     Bottom = 0,
     Middle = 1,
     Height = 2,
-    Common =3,
+    Common = 3,
 }

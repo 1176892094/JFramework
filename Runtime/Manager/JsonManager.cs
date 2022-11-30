@@ -1,7 +1,9 @@
 using System.IO;
 using System.Security.Cryptography;
+using JFramework.Basic;
 using Newtonsoft.Json;
 using UnityEngine;
+using Logger = JFramework.Basic.Logger;
 
 namespace JFramework
 {

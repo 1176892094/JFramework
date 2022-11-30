@@ -1,5 +1,4 @@
-﻿using JFramework.Debug;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace JFramework.Debug
 {

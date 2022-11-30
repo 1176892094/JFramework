@@ -1,4 +1,5 @@
 using System;
+using JFramework.Basic;
 
 namespace JFramework.Excel
 {

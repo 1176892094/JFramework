@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using JFramework.Basic;
 
 namespace JFramework
 {

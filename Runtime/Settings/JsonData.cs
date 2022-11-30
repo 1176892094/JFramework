@@ -4,7 +4,7 @@ using System.IO;
 using UnityEditor;
 using UnityEngine;
 
-namespace JFramework
+namespace JFramework.Basic
 {
     internal class JsonData : BaseData
     {

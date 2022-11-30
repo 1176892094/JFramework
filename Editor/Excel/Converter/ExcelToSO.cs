@@ -4,6 +4,7 @@ using System.IO;
 using System.Reflection;
 using UnityEditor;
 using UnityEngine;
+using Logger = JFramework.Basic.Logger;
 
 namespace JFramework.Excel
 {

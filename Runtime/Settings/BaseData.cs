@@ -1,8 +1,8 @@
 using UnityEngine;
 
-namespace JFramework
+namespace JFramework.Basic
 {
-    public class BaseData : ScriptableObject, IData
+    public class BaseData : ScriptableObject
     {
         public virtual void InitData()
         {

@@ -102,9 +102,7 @@ namespace JFramework.Excel
     
     public enum LanguageType
     {
-        [Label("English")]
         English,
-        [Label("Chinese")]
         Chinese
     }
 }

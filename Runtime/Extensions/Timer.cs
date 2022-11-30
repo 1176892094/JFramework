@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-namespace JFramework
+namespace JFramework.Basic
 {
     public class Timer
     {

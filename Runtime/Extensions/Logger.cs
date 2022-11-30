@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace JFramework
+namespace JFramework.Basic
 {
     public static class Logger
     {

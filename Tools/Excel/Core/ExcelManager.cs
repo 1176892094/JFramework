@@ -2,12 +2,14 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using JFramework.Basic;
+using JFramework.Excel;
 using Sirenix.OdinInspector;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
 
-namespace JFramework.Excel
+namespace JFramework
 {
     using IntDataDict = Dictionary<int, ExcelData>;
     using StrDataDict = Dictionary<string, ExcelData>;

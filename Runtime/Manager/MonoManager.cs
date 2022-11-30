@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using JFramework.Basic;
 using UnityEngine;
 
 namespace JFramework

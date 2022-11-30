@@ -16,19 +16,19 @@ namespace JFramework.Async
             yield return instruction;
             awaiter.Complete(null);
         }
-        
+
         public static IEnumerator ReturnSelf<T>(CoroutineAwaiter<T> awaiter, T instruction)
         {
             yield return instruction;
             awaiter.Complete(instruction, null);
         }
-        
+
         public static IEnumerator ResourceRequest(CoroutineAwaiter<Object> awaiter, ResourceRequest instruction)
         {
             yield return instruction;
             awaiter.Complete(instruction.asset, null);
         }
-        
+
         public static IEnumerator AssetBundleRequest(CoroutineAwaiter<Object> awaiter, AssetBundleRequest instruction)
         {
             yield return instruction;
@@ -41,7 +41,7 @@ namespace JFramework.Async
             awaiter.Complete(instruction.assetBundle, null);
         }
     }
-    
+
     public class WaitForUpdate : CustomYieldInstruction
     {
         public override bool keepWaiting => false;

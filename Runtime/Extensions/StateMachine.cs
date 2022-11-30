@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using JFramework.Async;
 using UnityEngine;
 
-namespace JFramework
+namespace JFramework.Basic
 {
     public abstract class StateMachine : MonoBehaviour
     {

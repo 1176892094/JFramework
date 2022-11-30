@@ -1,6 +1,5 @@
-using UnityEngine;
 
-namespace JFramework.Common.Pathfinding
+namespace JFramework.Graph
 {
     public class AStarNode
     {

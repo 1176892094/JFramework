@@ -38,8 +38,7 @@ namespace JFramework.Excel
                 {
                     if (field.Name.Equals(array.GetValue(i).ToString()))
                     {
-                        var obj = field.GetCustomAttributes(typeof(LabelAttribute), true);
-                        if (obj.Length > 0) enumString[i] = ((LabelAttribute)obj[0]).label;
+                        enumString[i] = field.Name;
                     }
                 }
             }

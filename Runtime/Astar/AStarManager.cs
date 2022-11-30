@@ -1,7 +1,8 @@
 using System.Collections.Generic;
 using UnityEngine;
+using Logger = JFramework.Basic.Logger;
 
-namespace JFramework.Common.Pathfinding
+namespace JFramework.Graph
 {
     public class AStarManager : Singleton<AStarManager>
     {
