@@ -148,14 +148,14 @@ namespace JFramework.Excel
             GUILayout.EndHorizontal();
             
             GUILayout.BeginHorizontal();
-            if (GUILayout.Button(settings.Language == LanguageType.Chinese ? "导入" : "Import", ExcelStyle.Button, GUILayout.Height(30)))
-            {
-                ImportFolder();
-            }
-            
             if (GUILayout.Button(settings.Language == LanguageType.Chinese ? "删除" : "Delete", ExcelStyle.Button, GUILayout.Height(30)))
             {
                 DeleteFolder();
+            }
+            
+            if (GUILayout.Button(settings.Language == LanguageType.Chinese ? "导入" : "Import", ExcelStyle.Button, GUILayout.Height(30)))
+            {
+                ImportFolder();
             }
 
             GUILayout.EndHorizontal();
