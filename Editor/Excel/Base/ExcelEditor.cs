@@ -11,7 +11,7 @@ namespace JFramework.Excel
     {
         private ExcelSetting settings;
 
-        [MenuItem("Tools/JFramework/Excel Setting", false, 101)]
+        [MenuItem(@"Tools/JFramework/Excel Setting", false, 101)]
         public static void OpenSettingsWindow()
         {
             try
@@ -50,7 +50,7 @@ namespace JFramework.Excel
         }
 
         [MenuItem("Tools/JFramework/Excel Delete", false, 103)]
-        public static void Clean()
+        public static void DeleteFolder()
         {
             EditorPrefs.SetBool(ExcelConverter.csChangedKey, false);
             DeleteCSFolder();
@@ -86,27 +86,6 @@ namespace JFramework.Excel
             }
 
             GUILayout.BeginHorizontal();
-            if (GUILayout.Button(settings.Language == LanguageType.Chinese ? "重置全部" : "Reset All", ExcelStyle.Button, GUILayout.Height(20)))
-            {
-                if (EditorUtility.DisplayDialog("EasyExcel", "Are you sure to reset ALL EasyExcel settings?", "Yes", "Cancel"))
-                {
-                    ExcelSetting.Instance.ResetData();
-                    EditorUtility.SetDirty(settings);
-                }
-            }
-
-            GUILayout.EndHorizontal();
-
-            GUILayout.BeginHorizontal();
-            var type = (LanguageType)ExcelStyle.EnumPopup(settings.Language, GUILayout.Height(20), GUILayout.Width(200));
-            if (settings != null && type != settings.Language)
-            {
-                settings.Language = type;
-            }
-
-            GUILayout.EndHorizontal();
-
-            GUILayout.BeginHorizontal();
             GUILayout.Label(settings.Language == LanguageType.Chinese ? "字段名称行" : "Row of Name", ExcelStyle.Label, ExcelStyle.nameOptions);
             settings.NameIndex = EditorGUILayout.IntField(settings.NameIndex, ExcelStyle.TextField, ExcelStyle.valueOptions); 
             GUILayout.EndHorizontal();
@@ -130,15 +109,55 @@ namespace JFramework.Excel
             GUILayout.Label(settings.Language == LanguageType.Chinese ? "页数据类名后缀" : "SheetData Postfix", ExcelStyle.Label, ExcelStyle.nameOptions);
             settings.TablePrefix = EditorGUILayout.TextField(settings.TablePrefix, ExcelStyle.TextField, ExcelStyle.valueOptions);
             GUILayout.EndHorizontal();
+            
+            GUILayout.BeginHorizontal();
+            GUILayout.Label(settings.Language == LanguageType.Chinese ? "生成C#文件路径" : "CSharpPath", ExcelStyle.Label, ExcelStyle.nameOptions);
+            settings.ScriptPath = EditorGUILayout.TextField(settings.ScriptPath, ExcelStyle.TextField, ExcelStyle.valueOptions);
+            GUILayout.EndHorizontal();
 
             GUILayout.BeginHorizontal();
             GUILayout.Label(settings.Language == LanguageType.Chinese ? "生成资源文件路径" : "AssetPath", ExcelStyle.Label, ExcelStyle.nameOptions);
             settings.AssetPath = EditorGUILayout.TextField(settings.AssetPath, ExcelStyle.TextField, ExcelStyle.valueOptions);
             GUILayout.EndHorizontal();
 
+            GUILayout.Space(5);
             GUILayout.BeginHorizontal();
-            GUILayout.Label(settings.Language == LanguageType.Chinese ? "生成C#文件路径" : "CSharpPath", ExcelStyle.Label, ExcelStyle.nameOptions);
-            settings.ScriptPath = EditorGUILayout.TextField(settings.ScriptPath, ExcelStyle.TextField, ExcelStyle.valueOptions);
+            if (GUILayout.Button(settings.Language == LanguageType.Chinese ? "重置" : "Reset", ExcelStyle.Button, GUILayout.Height(20)))
+            {
+                if (EditorUtility.DisplayDialog("EasyExcel", "Are you sure to reset ALL EasyExcel settings?", "Yes", "Cancel"))
+                {
+                    ExcelSetting.Instance.ResetData();
+                    EditorUtility.SetDirty(settings);
+                }
+            }
+            
+            if (GUILayout.Button(settings.Language == LanguageType.Chinese ? "保存" : "Save", ExcelStyle.Button, GUILayout.Height(20)))
+            {
+                EditorUtility.SetDirty(settings);
+            }
+
+            GUILayout.EndHorizontal();
+
+            GUILayout.BeginHorizontal();
+            // var type = (LanguageType)ExcelStyle.EnumPopup(settings.Language, GUILayout.Height(20), GUILayout.Width(200));
+            // if (settings != null && type != settings.Language)
+            // {
+            //     settings.Language = type;
+            // }
+
+            GUILayout.EndHorizontal();
+            
+            GUILayout.BeginHorizontal();
+            if (GUILayout.Button(settings.Language == LanguageType.Chinese ? "导入" : "Import", ExcelStyle.Button, GUILayout.Height(30)))
+            {
+                ImportFolder();
+            }
+            
+            if (GUILayout.Button(settings.Language == LanguageType.Chinese ? "删除" : "Delete", ExcelStyle.Button, GUILayout.Height(30)))
+            {
+                DeleteFolder();
+            }
+
             GUILayout.EndHorizontal();
         }
 
