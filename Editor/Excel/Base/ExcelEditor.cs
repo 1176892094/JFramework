@@ -138,14 +138,14 @@ namespace JFramework.Excel
 
             GUILayout.EndHorizontal();
 
-            GUILayout.BeginHorizontal();
+            // GUILayout.BeginHorizontal();
             // var type = (LanguageType)ExcelStyle.EnumPopup(settings.Language, GUILayout.Height(20), GUILayout.Width(200));
             // if (settings != null && type != settings.Language)
             // {
             //     settings.Language = type;
             // }
-
-            GUILayout.EndHorizontal();
+            //
+            // GUILayout.EndHorizontal();
             
             GUILayout.BeginHorizontal();
             if (GUILayout.Button(settings.Language == LanguageType.Chinese ? "删除" : "Delete", ExcelStyle.Button, GUILayout.Height(30)))

@@ -135,8 +135,8 @@ namespace JFramework.Excel
 				var csFile = new StringBuilder(2048);
 				csFile.Append("using System;\n");
 				csFile.Append("using System.Collections.Generic;\n");
-				csFile.Append("using UnityEngine;\n\n");
-
+				csFile.Append("using UnityEngine;\n");
+				csFile.Append("using Logger = JFramework.Basic.Logger;\n\n");
 				csFile.AppendFormat("namespace {0}\n", ExcelSetting.Instance.Namespace);
 				csFile.Append("{\n");
 				csFile.Append("\t[Serializable]\n");
