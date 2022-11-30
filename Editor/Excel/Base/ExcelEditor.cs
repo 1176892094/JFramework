@@ -81,7 +81,7 @@ namespace JFramework.Excel
 
             if (settings == null)
             {
-                EditorGUILayout.HelpBox("Cannot find EasyExcel settings file", MessageType.Error);
+                EditorGUILayout.HelpBox("Cannot find JFramework ExcelTool settings file", MessageType.Error);
                 return;
             }
 
@@ -124,7 +124,7 @@ namespace JFramework.Excel
             GUILayout.BeginHorizontal();
             if (GUILayout.Button(settings.Language == LanguageType.Chinese ? "重置" : "Reset", ExcelStyle.Button, GUILayout.Height(20)))
             {
-                if (EditorUtility.DisplayDialog("EasyExcel", "Are you sure to reset ALL EasyExcel settings?", "Yes", "Cancel"))
+                if (EditorUtility.DisplayDialog("EasyExcel", "Are you sure to reset JFramework ExcelTool settings?", "Yes", "Cancel"))
                 {
                     ExcelSetting.Instance.ResetData();
                     EditorUtility.SetDirty(settings);
