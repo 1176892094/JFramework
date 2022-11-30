@@ -204,41 +204,8 @@ public class LoginPanel : BasePanel //需要管理的UI都要继承BasePanel
     public void SetUseruame(string username) => this.username = username;
     public void SetPassword(string password) => this.password = password;
 }
-```
-(7)ExcelManager(Excel读写工具)
-```csharp
-public class Test8: MonoBehaviour
-{
-    private void WriteExcel()//修改Excel
-    {
-        ExcelManager.Writer(ExcelPath.Inventory,"Item", excel =>
-        {
-            excel.Cells[1, 1].Value = "123";//在Item表中的A列1行写入123
-        });
-    }
 
-    private void ReadExcel()
-    {
-        ExcelWorksheet sheet = ExcelManager.Reader(ExcelPath.Inventory, "Item");//获取Inventory中的Item表
-    }
-
-    private void CreateSheet()
-    {
-        ExcelManager.Create(ExcelPath.Inventory,"Item");//在Inventory中创建Item表
-    }
-
-    private void DeleteExcel()
-    {
-        ExcelManager.Delete(ExcelPath.Inventory,"Item");//在Inventory中删除Item表
-    }
-}
-
-public struct ExcelPath
-{
-    public const string Inventory = "Assets/Editor/Inventory";//要输入全路径，其中Inventory为Excel文件名称
-}
-```
-(8)LoadManager(场景加载管理)
+(7)LoadManager(场景加载管理)
 ```csharp
 public class Test8: MonoBehaviour
 {
@@ -281,7 +248,7 @@ public class Test9 : MonoBehaviour
     private void CloseAction() => Debug.Log("Timer Close"); //计时器关闭
 }
 ```
-(10)AwaitExtensions
+(9)AwaitExtensions
 ```csharp
   private async void Start()
     {
