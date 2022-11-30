@@ -4,7 +4,6 @@ using System.Linq;
 using System.Reflection;
 using JFramework.Basic;
 using JFramework.Excel;
-using Sirenix.OdinInspector;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -16,7 +15,7 @@ namespace JFramework
 
     public class ExcelManager : SingletonMono<ExcelManager>
     {
-        [ShowInInspector]private readonly Dictionary<Type, IntDataDict> IntDataDict = new Dictionary<Type, IntDataDict>();
+        private readonly Dictionary<Type, IntDataDict> IntDataDict = new Dictionary<Type, IntDataDict>();
         private readonly Dictionary<Type, StrDataDict> StrDataDict = new Dictionary<Type, StrDataDict>();
         private ExcelLoader loader;
 
