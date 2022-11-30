@@ -101,22 +101,22 @@ namespace JFramework.Excel
             GUILayout.EndHorizontal();
 
             GUILayout.BeginHorizontal();
-            GUILayout.Label(settings.Language == LanguageType.Chinese ? "命名空间前缀" : "Name Space Prefix", ExcelStyle.Label, ExcelStyle.nameOptions);
+            GUILayout.Label(settings.Language == LanguageType.Chinese ? "命名空间" : "Name Space Prefix", ExcelStyle.Label, ExcelStyle.nameOptions);
             settings.Namespace = EditorGUILayout.TextField(settings.Namespace, ExcelStyle.TextField, ExcelStyle.valueOptions);
             GUILayout.EndHorizontal();
 
             GUILayout.BeginHorizontal();
-            GUILayout.Label(settings.Language == LanguageType.Chinese ? "页数据类名后缀" : "SheetData Postfix", ExcelStyle.Label, ExcelStyle.nameOptions);
+            GUILayout.Label(settings.Language == LanguageType.Chinese ? "文件后缀" : "SheetData Postfix", ExcelStyle.Label, ExcelStyle.nameOptions);
             settings.TablePrefix = EditorGUILayout.TextField(settings.TablePrefix, ExcelStyle.TextField, ExcelStyle.valueOptions);
             GUILayout.EndHorizontal();
             
             GUILayout.BeginHorizontal();
-            GUILayout.Label(settings.Language == LanguageType.Chinese ? "生成C#文件路径" : "CSharpPath", ExcelStyle.Label, ExcelStyle.nameOptions);
+            GUILayout.Label(settings.Language == LanguageType.Chinese ? "生成脚本路径" : "CSharpPath", ExcelStyle.Label, ExcelStyle.nameOptions);
             settings.ScriptPath = EditorGUILayout.TextField(settings.ScriptPath, ExcelStyle.TextField, ExcelStyle.valueOptions);
             GUILayout.EndHorizontal();
 
             GUILayout.BeginHorizontal();
-            GUILayout.Label(settings.Language == LanguageType.Chinese ? "生成资源文件路径" : "AssetPath", ExcelStyle.Label, ExcelStyle.nameOptions);
+            GUILayout.Label(settings.Language == LanguageType.Chinese ? "生成资源路径" : "AssetPath", ExcelStyle.Label, ExcelStyle.nameOptions);
             settings.AssetPath = EditorGUILayout.TextField(settings.AssetPath, ExcelStyle.TextField, ExcelStyle.valueOptions);
             GUILayout.EndHorizontal();
 
