@@ -5,6 +5,8 @@ using System.IO;
 using UnityEditor;
 #endif
 using UnityEngine;
+using JFramework.Basic;
+using Logger = JFramework.Basic.Logger;
 
 namespace JFramework.Debug
 {
