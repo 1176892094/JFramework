@@ -242,8 +242,20 @@ MonoBehaviour:
     IsBackgroundRecursive: 0
     IsHidden: 0
   - Type: 0
-    Key: Android
+    Key: Editor
     Ordinal: 19
+    Priority: 0
+    IconType: 2140
+    SmallIcon: {fileID: 0}
+    LargeIcon: {fileID: 0}
+    IsIconRecursive: 0
+    BackgroundType: 0
+    BackgroundTexture: {fileID: 0}
+    IsBackgroundRecursive: 0
+    IsHidden: 0
+  - Type: 0
+    Key: Android
+    Ordinal: 20
     Priority: 0
     IconType: 3000
     SmallIcon: {fileID: 0}
@@ -255,7 +267,7 @@ MonoBehaviour:
     IsHidden: 0
   - Type: 0
     Key: iOS
-    Ordinal: 20
+    Ordinal: 21
     Priority: 0
     IconType: 3010
     SmallIcon: {fileID: 0}
@@ -267,7 +279,7 @@ MonoBehaviour:
     IsHidden: 0
   - Type: 0
     Key: Windows
-    Ordinal: 21
+    Ordinal: 22
     Priority: 0
     IconType: 3040
     SmallIcon: {fileID: 0}
@@ -279,7 +291,7 @@ MonoBehaviour:
     IsHidden: 0
   - Type: 0
     Key: Mac
-    Ordinal: 22
+    Ordinal: 23
     Priority: 0
     IconType: 3020
     SmallIcon: {fileID: 0}
@@ -291,7 +303,7 @@ MonoBehaviour:
     IsHidden: 0
   - Type: 0
     Key: WebGL
-    Ordinal: 23
+    Ordinal: 24
     Priority: 0
     IconType: 3030
     SmallIcon: {fileID: 0}
