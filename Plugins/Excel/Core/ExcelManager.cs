@@ -46,7 +46,7 @@ namespace JFramework
                 LoadData(assembly, containerType);
             }
 
-            Logger.Log($"{IntDataDict.Count + StrDataDict.Count} tables loaded.");
+            Logger.Log($"A total of {IntDataDict.Count + StrDataDict.Count} are tables loaded.");
         }
 
         private void LoadData(Assembly assembly, Type dataCollectionType)
