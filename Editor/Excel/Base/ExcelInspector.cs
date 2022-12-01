@@ -12,11 +12,10 @@ namespace JFramework.Excel
 		public override void OnInspectorGUI()
 		{
 			ExcelStyle.Enable();
-
-			var prevGUIState = GUI.enabled;
+			
 			GUI.enabled = false;
 			base.OnInspectorGUI();
-			GUI.enabled = prevGUIState;
+			GUI.enabled = true;
 
 			GUILayout.BeginHorizontal();
 			if (GUILayout.Button("Open",  GUILayout.Height(20)))
@@ -32,6 +31,8 @@ namespace JFramework.Excel
 				}
 			}
 			GUILayout.EndHorizontal();
+			
+			GUIUtility.ExitGUI();
 		}
 	}
 }

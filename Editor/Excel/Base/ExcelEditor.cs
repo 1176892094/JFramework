@@ -23,7 +23,7 @@ namespace JFramework.Excel
                 }
 
                 Rect rect = new Rect(0, 0, 440, 320);
-                var window = GetWindowWithRect<ExcelEditor>(rect, true, "EasyExcel Settings", true);
+                var window = GetWindowWithRect<ExcelEditor>(rect, true, "ExcelTool Settings", true);
                 window.Show();
             }
             catch (Exception e)
