@@ -158,6 +158,10 @@ namespace JFramework.Excel
 					if (columnField == null)continue;
 					csFile.Append(columnField.GetFieldLine());
 				}
+				
+				csFile.AppendFormat("\n\t\tpublic {0}()\n",rowClassName);
+				csFile.Append("\t\t{\n");
+				csFile.Append("\t\t}\n");
 
 				csFile.Append("\n#if UNITY_EDITOR\n");
 				csFile.AppendFormat("\t\tpublic {0}(List<List<string>> sheet, int row, int column)\n", rowClassName);
