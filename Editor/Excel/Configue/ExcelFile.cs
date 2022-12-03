@@ -31,7 +31,7 @@ namespace JFramework.Excel
             {
                 if (!File.Exists(path))
                 {
-                    Logger.LogError("Missing ExcelFile:" + path);
+                    Logger.LogError("无法找到Excel文件:" + path);
                     return null;
                 }
 

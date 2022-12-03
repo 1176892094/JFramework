@@ -83,7 +83,7 @@ namespace JFramework.Excel
 				}
 				else
 				{
-					Logger.Log("没有改变的CS文件,开始创建资源.");
+					Logger.Log("没有改变的脚本文件,开始创建资源.");
 					ClearProgress();
 					string historyPath = EditorPrefs.GetString(excelPathKey);
 					if (!string.IsNullOrEmpty(historyPath))
@@ -114,7 +114,7 @@ namespace JFramework.Excel
 				if (sheet == null) continue;
 				if (!IsConvert(sheet))
 				{
-					Logger.Log($"跳过生成---{sheet.fileName}---{fileName}.");
+					Logger.Log($"{fileName}跳过生成表:{sheet.fileName}.");
 					continue;
 				}
 

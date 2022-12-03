@@ -14,7 +14,7 @@ namespace JFramework.Excel
 		public override string GetFieldLine()
 		{
 			var file = ExcelStringBuilder.Borrow();
-			if (isKeyField) file.Append("\t\t[ExcelKey]\n");
+			if (isKeyField) file.Append("\t\t[KeyValue]\n");
 			file.AppendFormat("\t\tpublic {0} {1};\n", fieldType, fieldName);
 			return ExcelStringBuilder.Return(file);
 		}

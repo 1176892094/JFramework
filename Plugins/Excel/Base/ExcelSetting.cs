@@ -9,9 +9,6 @@ namespace JFramework.Excel
 {
     public class ExcelSetting : ScriptableObject
     {
-        private const string ExcelData = "ExcelData";
-        private const string Extension = ".asset";
-        private const string ExcelPath = "Assets/Resources/Settings/" + ExcelData + Extension;
         public int NameIndex;
         public int TypeIndex;
         public int DataIndex;
@@ -20,7 +17,7 @@ namespace JFramework.Excel
         public string AssetPath;
         public string ScriptPath;
         public string TablePrefix;
-        public LanguageType Language = LanguageType.English;
+        public LanguageType Language;
 
         private static ExcelSetting instance;
 
@@ -29,7 +26,7 @@ namespace JFramework.Excel
             get
             {
                 if (instance != null) return instance;
-                instance = ResourceManager.Load<ExcelSetting>("Settings/" + ExcelData);
+                instance = ResourceManager.Load<ExcelSetting>("Settings/" + ExcelConfig.ExcelData);
                 if (instance != null) return instance;
                 instance = CreateInstance<ExcelSetting>();
                 instance.ResetData();
@@ -41,7 +38,7 @@ namespace JFramework.Excel
                     AssetDatabase.Refresh();
                 }
 
-                AssetDatabase.CreateAsset(instance, ExcelPath);
+                AssetDatabase.CreateAsset(instance, ExcelConfig.ExcelPath);
 #endif
                 return instance;
             }
@@ -53,9 +50,9 @@ namespace JFramework.Excel
             TypeIndex = 1;
             DataIndex = 2;
             Namespace = "JFramework.Excel";
-            AssetPath = "Assets/Resources/Settings/Excel/";
-            ScriptPath = "Assets/Scripts/Excel/";
             TablePrefix = "Table";
+            ScriptPath = "Assets/Scripts/Excel/";
+            AssetPath = "Assets/Resources/Settings/Excel/";
 #if UNITY_EDITOR
             EditorUtility.SetDirty(this);
 #endif
@@ -70,10 +67,10 @@ namespace JFramework.Excel
         {
             if (IsPrefix)
             {
-                return Path.GetFileNameWithoutExtension(fileName) + sheetName + TablePrefix + Extension;
+                return Path.GetFileNameWithoutExtension(fileName) + sheetName + TablePrefix + ExcelConfig.Extension;
             }
 
-            return sheetName + TablePrefix + Extension;
+            return sheetName + TablePrefix + ExcelConfig.Extension;
         }
         
         public string GetSheetClassName(string fileName, string sheetName)
@@ -99,10 +96,17 @@ namespace JFramework.Excel
             return string.IsNullOrEmpty(TablePrefix) ? lastPart : lastPart.Substring(0, lastPart.IndexOf(TablePrefix, StringComparison.Ordinal));
         }
     }
+
+    internal struct ExcelConfig
+    {
+        public const string ExcelData = "ExcelData";
+        public const string Extension = ".asset";
+        public const string ExcelPath = "Assets/Resources/Settings/" + ExcelData + Extension;
+    }
     
     public enum LanguageType
     {
-        English,
-        Chinese
+        Chinese,
+        English
     }
 }

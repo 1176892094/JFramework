@@ -18,12 +18,12 @@ namespace JFramework.Excel
             {
                 if (EditorApplication.isCompiling)
                 {
-                    Logger.Log("Waiting for Compiling completed.");
+                    Logger.Log("等待编译完成.");
                     return;
                 }
 
                 Rect rect = new Rect(0, 0, 440, 320);
-                var window = GetWindowWithRect<ExcelEditor>(rect, true, "ExcelTool Settings", true);
+                var window = GetWindowWithRect<ExcelEditor>(rect, true, "JFramework Tool", true);
                 window.Show();
             }
             catch (Exception e)

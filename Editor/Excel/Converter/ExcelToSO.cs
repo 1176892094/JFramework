@@ -83,8 +83,6 @@ namespace JFramework.Excel
 				var asset = ScriptableObject.CreateInstance(sheetClassName);
 				var container = asset as ExcelContainer;
 				if (container == null) return;
-				
-				container.ExcelFileName = fileName;
 				string className = ExcelSetting.Instance.GetClassName(sheetName, true);
 				Type dataType = Type.GetType(className);
 				if (dataType == null)
@@ -98,7 +96,7 @@ namespace JFramework.Excel
 				}
 				if (dataType == null)
 				{
-					Logger.LogError(className + " not exist !");
+					Logger.LogError($"不能转化该数据:{className}");
 					return;
 				}
 
@@ -123,7 +121,7 @@ namespace JFramework.Excel
 					var key = data.GetKeyFieldValue();
 					if (key == null)
 					{
-						Logger.LogError("Excel表中缺少主键:" + sheetName);
+						Logger.LogError($"Excel表中缺少主键:{sheetName}");
 						continue;
 					}
 

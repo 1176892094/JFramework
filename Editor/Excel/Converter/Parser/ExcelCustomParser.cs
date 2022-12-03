@@ -53,7 +53,7 @@ namespace JFramework.Excel
                 }
                 else
                 {
-                    Logger.LogError($"Type format error of Column {name}: {str}.");
+                    Logger.LogError($"列的格式设置错误{name}: {str}.");
                     break;
                 }
             }

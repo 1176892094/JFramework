@@ -32,7 +32,7 @@ namespace JFramework
 #if UNITY_EDITOR
             if (!ExcelSetting.Instance.AssetPath.Contains("/Resources"))
             {
-                EditorUtility.DisplayDialog("JFramework ExcelTool", "SO文件必须在Resources目录下", "OK");
+                EditorUtility.DisplayDialog("JFramework Tool", "SO文件必须在Resources目录下", "OK");
                 return;
             }
 #endif
@@ -46,27 +46,27 @@ namespace JFramework
                 LoadData(assembly, containerType);
             }
 
-            Logger.Log($"A total of {IntDataDict.Count + StrDataDict.Count} are tables loaded.");
+            Logger.Log($"ExcelManager加载{IntDataDict.Count + StrDataDict.Count}个数据");
         }
 
         private void LoadData(Assembly assembly, Type dataCollectionType)
         {
             try
             {
-                var sheetClassName = dataCollectionType.Name;
-                var collection = loader.Load(sheetClassName);
+                var tableName = dataCollectionType.Name;
+                var collection = loader.Load(tableName);
                 if (collection == null)
                 {
-                    Logger.LogError("ExcelDataManager: Load asset error, sheet name " + sheetClassName);
+                    Logger.LogError($"ExcelManager加载数据失败:{tableName}!");
                     return;
                 }
 
                 collection.InitData();
-                var rowDataType = GetClassType(assembly, collection.ExcelFileName, dataCollectionType);
+                var rowDataType = GetClassType(assembly, dataCollectionType);
                 var keyField = ExcelUtility.GetRowDataKeyField(rowDataType);
                 if (keyField == null)
                 {
-                    Logger.LogError("ExcelDataManager: Cannot find Key field in sheet " + sheetClassName);
+                    Logger.LogError($"ExcelManager没有找到主键:{tableName}!");
                     return;
                 }
 
@@ -97,7 +97,7 @@ namespace JFramework
                 }
                 else
                 {
-                    Logger.LogError($"Load {dataCollectionType.Name} failed. There is no valid Key field in ");
+                    Logger.LogError($"ExcelManager加载{dataCollectionType.Name}失败.这不是有效的主键!");
                 }
             }
             catch (Exception e)
@@ -170,7 +170,7 @@ namespace JFramework
             return data;
         }
         
-        private Type GetClassType(Assembly assembly, string excelFileName, Type sheetClassType)
+        private Type GetClassType(Assembly assembly, Type sheetClassType)
         {
             var sheetName = GetSheetName(sheetClassType);
             var type = assembly.GetType(ExcelSetting.Instance.GetClassName(sheetName, true));

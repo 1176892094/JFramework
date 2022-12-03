@@ -145,7 +145,7 @@ namespace JFramework.Debug
                         {
                             if (objectComponents[componentIndex] is DebugManager)
                             {
-                                Logger.LogWarning("不能销毁组件 " + objectComponents[componentIndex].GetType().Name + " ！");
+                                Logger.LogWarning($"不能销毁组件{objectComponents[componentIndex].GetType().Name}!");
                             }
                             else
                             {

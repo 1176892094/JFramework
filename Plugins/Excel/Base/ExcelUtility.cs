@@ -1,5 +1,4 @@
 ﻿using System;
-using System.IO;
 using System.Linq;
 using System.Reflection;
 
@@ -10,7 +9,7 @@ namespace JFramework.Excel
         public static FieldInfo GetRowDataKeyField(Type rowDataType)
         {
             var fields = rowDataType.GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
-            var keyField = (from fieldInfo in fields let attrs = fieldInfo.GetCustomAttributes(typeof(ExcelKeyAttribute), false)
+            var keyField = (from fieldInfo in fields let attrs = fieldInfo.GetCustomAttributes(typeof(KeyValueAttribute), false)
                 where attrs.Length > 0 select fieldInfo).FirstOrDefault();
             return keyField;
         }
@@ -29,7 +28,7 @@ namespace JFramework.Excel
         }
     }
     
-    public class ExcelKeyAttribute : Attribute
+    public class KeyValueAttribute : Attribute
     {
 		
     }

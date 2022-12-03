@@ -26,7 +26,6 @@ namespace JFramework.Excel
 
         public static object EnumPopup(Enum selected, params GUILayoutOption[] options)
         {
-            var index = 0;
             var array = Enum.GetValues(selected.GetType());
             var length = array.Length;
 
@@ -43,7 +42,7 @@ namespace JFramework.Excel
                 }
             }
 
-            index = EditorGUILayout.Popup(selected.GetHashCode(), enumString, options);
+            var index = EditorGUILayout.Popup(selected.GetHashCode(), enumString, options);
 
             return Enum.ToObject(selected.GetType(), index);
         }
