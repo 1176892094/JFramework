@@ -15,7 +15,7 @@ namespace JFramework.Editor
         private static HierarchyEditor instance;
         private float afterName;
         private Event currentEvent = Event.current;
-        private readonly ItemIcon icon = new ItemIcon();
+        private readonly HierarchyObject icon = new HierarchyObject();
         private readonly GUIContent tooltipContent = new GUIContent();
         private readonly Dictionary<int, Object> selectedComponents = new Dictionary<int, Object>();
         private Action<Rect, Object, int> DisplayObjectContextMenuDelegate;
@@ -29,6 +29,7 @@ namespace JFramework.Editor
         public HierarchyEditor()
         {
             InternalReflection();
+            EditorApplication.hierarchyWindowItemOnGUI -= HierarchyOnGUI;
             EditorApplication.hierarchyWindowItemOnGUI += HierarchyOnGUI;
         }
 
@@ -46,8 +47,7 @@ namespace JFramework.Editor
             icon.rect = selectionRect;
             icon.gameObject = (GameObject)EditorUtility.InstanceIDToObject(icon.ID);
             if (icon.gameObject == null) return;
-            Rect rect = new Rect(selectionRect) { x = 32, width = 16 };
-            icon.gameObject.SetActive(GUI.Toggle(rect, icon.gameObject.activeSelf, string.Empty));
+            icon.Enable();
             icon.nameRect = icon.rect;
             GUIStyle nameStyle = new GUIStyle(TreeView.DefaultStyles.label);
             icon.nameRect.width = nameStyle.CalcSize(new GUIContent(icon.gameObject.name)).x;
@@ -118,14 +118,6 @@ namespace JFramework.Editor
             if (currentEvent.type == EventType.Repaint)
             {
                 Texture image = EditorGUIUtility.ObjectContent(component, componentType).image;
-                if (selectedComponents.ContainsKey(comHash))
-                {
-                    Color guiColor = GUI.color;
-                    GUI.color = new Color(0, 1, 0, 0.2f);
-                    GUI.DrawTexture(rect, GetTexture(), ScaleMode.StretchToFill);
-                    GUI.color = guiColor;
-                }
-
                 string tooltip = isMaterial ? component.name : componentType.Name;
                 tooltipContent.tooltip = tooltip;
                 GUI.Box(rect, tooltipContent, GUIStyle.none);
@@ -138,63 +130,16 @@ namespace JFramework.Editor
                 {
                     if (currentEvent.button == 0)
                     {
-                        if (currentEvent.control)
-                        {
-                            if (!selectedComponents.ContainsKey(comHash))
-                            {
-                                selectedComponents.Add(comHash, component);
-                            }
-                            else
-                            {
-                                selectedComponents.Remove(comHash);
-                            }
-
-                            currentEvent.Use();
-                            return;
-                        }
-
                         selectedComponents.Clear();
                         selectedComponents.Add(comHash, component);
-                        currentEvent.Use();
-                        return;
-                    }
-
-                    if (currentEvent.button == 1)
-                    {
-                        if (currentEvent.control)
-                        {
-                            GenericMenu componentGenericMenu = new GenericMenu();
-                            componentGenericMenu.AddItem(new GUIContent("Remove All Component"), false, () =>
-                            {
-                                if (!selectedComponents.ContainsKey(comHash))
-                                    selectedComponents.Add(comHash, component);
-                                foreach (var selectedComponent in selectedComponents.ToList())
-                                {
-                                    if (selectedComponent.Value is Material) continue;
-                                    selectedComponents.Remove(selectedComponent.Key);
-                                    Undo.DestroyObjectImmediate(selectedComponent.Value);
-                                }
-
-                                selectedComponents.Clear();
-                            });
-                            componentGenericMenu.ShowAsContext();
-                        }
-                        else
-                        {
-                            DisplayObjectContextMenuDelegate(rect, component, 0);
-                        }
-
+                        DisplayObjectContextMenuDelegate(rect, component, 0);
                         currentEvent.Use();
                         return;
                     }
                 }
             }
 
-            if (selectedComponents.Count > 0 &&
-                currentEvent.type == EventType.MouseDown &&
-                currentEvent.button == 0 &&
-                !currentEvent.control &&
-                !rect.Contains(currentEvent.mousePosition))
+            if (selectedComponents.Count > 0 && currentEvent.type == EventType.MouseDown && currentEvent.button == 0 && !rect.Contains(currentEvent.mousePosition))
             {
                 selectedComponents.Clear();
             }
@@ -215,22 +160,6 @@ namespace JFramework.Editor
             pixelWhite.SetPixel(0, 0, Color.white);
             pixelWhite.Apply();
             return pixelWhite;
-        }
-    }
-
-    internal class ItemIcon
-    {
-        public int ID = int.MinValue;
-        public Rect rect = Rect.zero;
-        public Rect nameRect = Rect.zero;
-        public GameObject gameObject;
-
-        public void Dispose()
-        {
-            ID = int.MinValue;
-            rect = Rect.zero;
-            nameRect = Rect.zero;
-            gameObject = null;
         }
     }
 }
