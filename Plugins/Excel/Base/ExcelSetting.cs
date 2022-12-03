@@ -49,7 +49,7 @@ namespace JFramework.Excel
             NameIndex = 0;
             TypeIndex = 1;
             DataIndex = 2;
-            Namespace = "JFramework.Excel";
+            Namespace = "JFramework.Data";
             TablePrefix = "Table";
             ScriptPath = "Assets/Scripts/Excel/";
             AssetPath = "Assets/Resources/Settings/Excel/";
