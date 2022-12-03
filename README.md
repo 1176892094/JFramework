@@ -204,7 +204,7 @@ public class LoginPanel : BasePanel //需要管理的UI都要继承BasePanel
     public void SetUseruame(string username) => this.username = username;
     public void SetPassword(string password) => this.password = password;
 }
-
+```
 (7)LoadManager(场景加载管理)
 ```csharp
 public class Test8: MonoBehaviour
