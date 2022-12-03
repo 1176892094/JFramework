@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace JFramework.Debug
+namespace JFramework
 {
     [AttributeUsage(AttributeTargets.Class, Inherited = false)]
     internal class DebugAttribute : Attribute

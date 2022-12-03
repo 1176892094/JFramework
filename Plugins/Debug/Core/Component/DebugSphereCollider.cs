@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace JFramework.Debug
+namespace JFramework
 {
     [Debug(typeof(SphereCollider))]
     internal class DebugSphereCollider : DebugComponent

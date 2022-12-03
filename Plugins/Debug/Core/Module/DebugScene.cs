@@ -7,7 +7,7 @@ using UnityEngine.Profiling;
 using Logger = JFramework.Basic.Logger;
 using Object = UnityEngine.Object;
 
-namespace JFramework.Debug
+namespace JFramework
 {
     internal class DebugScene
     {

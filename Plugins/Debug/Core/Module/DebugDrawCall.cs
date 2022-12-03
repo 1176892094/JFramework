@@ -3,7 +3,7 @@ using UnityEditor;
 #endif
 using UnityEngine;
 
-namespace JFramework.Debug
+namespace JFramework
 {
     internal class DebugDrawCall
     {

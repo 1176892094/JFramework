@@ -3,89 +3,92 @@
     using UnityEngine;
     using UnityEngine.UIElements;
 
-    public abstract class InspectorEditor
+    namespace JFramework.Editor
     {
-        private double initTime;
-        private List<EditorWindow> failedWindows;
-
-        private static VisualElement GetMainContainer(EditorWindow w)
+        internal abstract class InspectorEditor
         {
-            return w != null ? GetVisualElement(w.rootVisualElement, "unity-inspector-main-container") : null;
-        }
+            private double initTime;
+            private List<EditorWindow> failedWindows;
 
-        private static VisualElement GetVisualElement(VisualElement element, string className)
-        {
-            for (int i = 0; i < element.childCount; i++)
+            private static VisualElement GetMainContainer(EditorWindow w)
             {
-                VisualElement ve = element[i];
-                if (ve.ClassListContains(className)) return ve;
-                ve = GetVisualElement(ve, className);
-                if (ve != null) return ve;
+                return w != null ? GetVisualElement(w.rootVisualElement, "unity-inspector-main-container") : null;
             }
 
-            return null;
-        }
-
-        protected void InitInspector()
-        {
-            failedWindows = new List<EditorWindow>();
-
-            Object[] windows = Resources.FindObjectsOfTypeAll(Reflection.Type);
-            foreach (var obj in windows)
+            private static VisualElement GetVisualElement(VisualElement element, string className)
             {
-                var window = (EditorWindow)obj;
-                if (window == null) continue;
-                if (!InjectBar(window))
+                for (int i = 0; i < element.childCount; i++)
                 {
-                    failedWindows.Add(window);
+                    VisualElement ve = element[i];
+                    if (ve.ClassListContains(className)) return ve;
+                    ve = GetVisualElement(ve, className);
+                    if (ve != null) return ve;
+                }
+
+                return null;
+            }
+
+            protected void InitInspector()
+            {
+                failedWindows = new List<EditorWindow>();
+
+                Object[] windows = Resources.FindObjectsOfTypeAll(Reflection.Type);
+                foreach (var obj in windows)
+                {
+                    var window = (EditorWindow)obj;
+                    if (window == null) continue;
+                    if (!InjectBar(window))
+                    {
+                        failedWindows.Add(window);
+                    }
+                }
+
+                if (failedWindows.Count > 0)
+                {
+                    initTime = EditorApplication.timeSinceStartup;
+                    EditorApplication.update += TryReinit;
                 }
             }
 
-            if (failedWindows.Count > 0)
+            private bool InjectBar(EditorWindow w)
             {
-                initTime = EditorApplication.timeSinceStartup;
-                EditorApplication.update += TryReinit;
+                VisualElement mainContainer = GetMainContainer(w);
+                if (mainContainer == null) return false;
+                if (mainContainer.childCount < 2) return false;
+                VisualElement editorsList = GetVisualElement(mainContainer, "unity-inspector-editors-list");
+                return OnInject(w, mainContainer, editorsList);
             }
-        }
 
-        private bool InjectBar(EditorWindow w)
-        {
-            VisualElement mainContainer = GetMainContainer(w);
-            if (mainContainer == null) return false;
-            if (mainContainer.childCount < 2) return false;
-            VisualElement editorsList = GetVisualElement(mainContainer, "unity-inspector-editors-list");
-            return OnInject(w, mainContainer, editorsList);
-        }
+            protected abstract bool OnInject(EditorWindow wnd, VisualElement mainContainer, VisualElement editorsList);
 
-        protected abstract bool OnInject(EditorWindow wnd, VisualElement mainContainer, VisualElement editorsList);
-
-        protected void OnMaximizedChanged(EditorWindow w)
-        {
-            Object[] windows = Resources.FindObjectsOfTypeAll(Reflection.Type);
-            foreach (var obj in windows)
+            protected void OnMaximizedChanged(EditorWindow w)
             {
-                var window = (EditorWindow)obj;
-                if (window != null) InjectBar(window);
+                Object[] windows = Resources.FindObjectsOfTypeAll(Reflection.Type);
+                foreach (var obj in windows)
+                {
+                    var window = (EditorWindow)obj;
+                    if (window != null) InjectBar(window);
+                }
             }
-        }
 
-        private void TryReinit()
-        {
-            if (EditorApplication.timeSinceStartup - initTime <= 0.5) return;
-            EditorApplication.update -= TryReinit;
-            if (failedWindows != null)
+            private void TryReinit()
             {
-                TryReinit(failedWindows);
-                failedWindows = null;
+                if (EditorApplication.timeSinceStartup - initTime <= 0.5) return;
+                EditorApplication.update -= TryReinit;
+                if (failedWindows != null)
+                {
+                    TryReinit(failedWindows);
+                    failedWindows = null;
+                }
             }
-        }
 
-        private void TryReinit(List<EditorWindow> windows)
-        {
-            foreach (EditorWindow window in windows)
+            private void TryReinit(List<EditorWindow> windows)
             {
-                if (window == null) continue;
-                InjectBar(window);
+                foreach (EditorWindow window in windows)
+                {
+                    if (window == null) continue;
+                    InjectBar(window);
+                }
             }
         }
     }

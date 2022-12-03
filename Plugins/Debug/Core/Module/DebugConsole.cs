@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace JFramework.Debug
+namespace JFramework
 {
     internal class DebugConsole
     {

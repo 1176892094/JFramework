@@ -8,7 +8,7 @@ using UnityEngine;
 using JFramework.Basic;
 using Logger = JFramework.Basic.Logger;
 
-namespace JFramework.Debug
+namespace JFramework
 {
     internal class DebugScreen
     {

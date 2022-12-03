@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace JFramework.Debug
+namespace JFramework
 {
     [Debug(typeof(RectTransform))]
     internal class DebugRectTransform : DebugComponent

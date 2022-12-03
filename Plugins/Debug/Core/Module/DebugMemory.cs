@@ -2,7 +2,7 @@ using System;
 using UnityEngine;
 using UnityEngine.Profiling;
 
-namespace JFramework.Debug
+namespace JFramework
 {
     internal class DebugMemory
     {

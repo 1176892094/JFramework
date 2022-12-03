@@ -4,9 +4,9 @@ using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-namespace InfinityCode.UltimateEditorEnhancer.InspectorTools
+namespace JFramework.Editor
 {
-    public class FrameworkInspector : InspectorEditor
+    internal class FrameworkInspector : InspectorEditor
     {
         private const string JFramework = "JFrameworkInspector";
         private const string MenuPath = "Tools/JFramework/";
