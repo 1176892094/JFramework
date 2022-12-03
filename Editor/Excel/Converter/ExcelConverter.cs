@@ -6,8 +6,8 @@ namespace JFramework.Excel
 {
     internal static partial class ExcelConverter
     {
-        public const string excelPathKey = "EasyExcelExcelPath";
-        public const string csChangedKey = "EasyExcelCSChanged";
+        public const string ExcelPathKey = "ExcelPath";
+        public const string ExcelDataKey = "ExcelData";
         private static bool isComplete;
 
         private static ExcelData GetSheetData(ExcelSheet sheet)

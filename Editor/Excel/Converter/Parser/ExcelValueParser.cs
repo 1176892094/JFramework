@@ -25,11 +25,11 @@ namespace JFramework.Excel
                 if (IsCustomDictionary(type))
                     return new ExcelCustomDict(id, name, type);
                 if (!string.IsNullOrEmpty(name) && !string.IsNullOrEmpty(type))
-                    Logger.LogError($"不能转换列: \"{name}\"   类型为: \"{type}\".");
+                    Debugger.LogError($"不能转换列: \"{name}\"   类型为: \"{type}\".");
             }
             catch (Exception e)
             {
-                Logger.LogError(e.ToString());
+                Debugger.LogError(e.ToString());
             }
 
             return null;
@@ -54,7 +54,7 @@ namespace JFramework.Excel
             string keyName = name.ToLower().Trim();
             if (!keyName.EndsWith(KeyValue)) return false;
             if (type.Equals("int") || type.Equals("string")) return true;
-            Logger.LogError($"主键只支持int和string两种类型!");
+            Debugger.LogError($"主键只支持int和string两种类型!");
             return false;
         }
 

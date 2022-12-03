@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace JFramework.Basic
 {
-    public static class Logger
+    public static class Debugger
     {
         public static void Log(string message)
         {

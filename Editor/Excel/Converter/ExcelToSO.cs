@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
+using JFramework.Basic;
 using UnityEditor;
 using UnityEngine;
-using Logger = JFramework.Basic.Logger;
 
 namespace JFramework.Excel
 {
@@ -41,13 +41,13 @@ namespace JFramework.Excel
 					count++;
 				}
 
-				Logger.Log($"资源生成成功,总计{count}个.");
+				Debugger.Log($"资源生成成功,总计{count}个.");
 				ClearProgress();
 				AssetDatabase.Refresh();
 			}
 			catch (Exception e)
 			{
-				Logger.LogError(e.ToString());
+				Debugger.LogError(e.ToString());
 				ClearProgress();
 				AssetDatabase.Refresh();
 			}
@@ -69,7 +69,7 @@ namespace JFramework.Excel
 			}
 			catch (Exception e)
 			{
-				Logger.LogError(e.ToString());
+				Debugger.LogError(e.ToString());
 				AssetDatabase.Refresh();
 			}
 		}
@@ -96,7 +96,7 @@ namespace JFramework.Excel
 				}
 				if (dataType == null)
 				{
-					Logger.LogError($"不能转化该数据:{className}");
+					Debugger.LogError($"不能转化该数据:{className}");
 					return;
 				}
 
@@ -121,7 +121,7 @@ namespace JFramework.Excel
 					var key = data.GetKeyFieldValue();
 					if (key == null)
 					{
-						Logger.LogError($"Excel表中缺少主键:{sheetName}");
+						Debugger.LogError($"Excel表中缺少主键:{sheetName}");
 						continue;
 					}
 
@@ -142,7 +142,7 @@ namespace JFramework.Excel
 			}
 			catch (Exception ex)
 			{
-				Logger.LogError(ex.ToString());
+				Debugger.LogError(ex.ToString());
 			}
 		}
 	}

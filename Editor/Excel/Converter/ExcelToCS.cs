@@ -70,7 +70,7 @@ namespace JFramework.Excel
 
 				if (csChanged)
 				{
-					EditorPrefs.SetBool(csChangedKey, true);
+					EditorPrefs.SetBool(ExcelDataKey, true);
 					string[] csFiles = Directory.GetFiles(tempPath);
 					foreach (var csFile in csFiles)
 					{
@@ -79,13 +79,13 @@ namespace JFramework.Excel
 					}
 
 					AssetDatabase.Refresh();
-					Logger.Log("脚本已生成,正在创建资源.");
+					Debugger.Log("脚本已生成,正在创建资源.");
 				}
 				else
 				{
-					Logger.Log("没有改变的脚本文件,开始创建资源.");
+					Debugger.Log("没有改变的脚本文件,开始创建资源.");
 					ClearProgress();
-					string historyPath = EditorPrefs.GetString(excelPathKey);
+					string historyPath = EditorPrefs.GetString(ExcelPathKey);
 					if (!string.IsNullOrEmpty(historyPath))
 					{
 						ConvertSOFiles(historyPath, Environment.CurrentDirectory + "/" + ExcelSetting.Instance.AssetPath);
@@ -96,8 +96,8 @@ namespace JFramework.Excel
 			}
 			catch (Exception e)
 			{
-				Logger.LogError(e.ToString());
-				EditorPrefs.SetBool(csChangedKey, false);
+				Debugger.LogError(e.ToString());
+				EditorPrefs.SetBool(ExcelDataKey, false);
 				ClearProgress();
 				AssetDatabase.Refresh();
 			}
@@ -114,7 +114,7 @@ namespace JFramework.Excel
 				if (sheet == null) continue;
 				if (!IsConvert(sheet))
 				{
-					Logger.Log($"{fileName}跳过生成表:{sheet.fileName}.");
+					Debugger.Log($"{fileName}跳过生成表:{sheet.fileName}.");
 					continue;
 				}
 
@@ -136,7 +136,8 @@ namespace JFramework.Excel
 				csFile.Append("using System;\n");
 				csFile.Append("using System.Collections.Generic;\n");
 				csFile.Append("using UnityEngine;\n");
-				csFile.Append("using Logger = JFramework.Basic.Logger;\n\n");
+				csFile.Append("using JFramework.Excel;\n");
+				csFile.Append("using JFramework.Basic;\n\n");
 				csFile.AppendFormat("namespace {0}\n", ExcelSetting.Instance.Namespace);
 				csFile.Append("{\n");
 				csFile.Append("\t[Serializable]\n");
@@ -219,7 +220,7 @@ namespace JFramework.Excel
 			}
 			catch (Exception ex)
 			{
-				Logger.LogError(ex.ToString());
+				Debugger.LogError(ex.ToString());
 			}
 
 			return "";

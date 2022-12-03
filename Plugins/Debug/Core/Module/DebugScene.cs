@@ -2,9 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using JFramework.Basic;
 using UnityEngine;
 using UnityEngine.Profiling;
-using Logger = JFramework.Basic.Logger;
 using Object = UnityEngine.Object;
 
 namespace JFramework
@@ -145,7 +145,7 @@ namespace JFramework
                         {
                             if (objectComponents[componentIndex] is DebugManager)
                             {
-                                Logger.LogWarning($"不能销毁组件{objectComponents[componentIndex].GetType().Name}!");
+                                Debugger.LogWarning($"不能销毁组件{objectComponents[componentIndex].GetType().Name}!");
                             }
                             else
                             {

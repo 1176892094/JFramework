@@ -21,7 +21,7 @@ namespace JFramework.Excel
             }
             catch (Exception e)
             {
-                Logger.LogError(e.ToString());
+                Debugger.LogError(e.ToString());
             }
         }
 
@@ -31,7 +31,7 @@ namespace JFramework.Excel
             {
                 if (!File.Exists(path))
                 {
-                    Logger.LogError("无法找到Excel文件:" + path);
+                    Debugger.LogError("无法找到Excel文件:" + path);
                     return null;
                 }
 
@@ -42,7 +42,7 @@ namespace JFramework.Excel
             }
             catch (Exception e)
             {
-                Logger.LogError(e.ToString());
+                Debugger.LogError(e.ToString());
             }
 
             return null;

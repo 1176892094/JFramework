@@ -1,9 +1,9 @@
 ﻿using System;
 using System.IO;
+using JFramework.Basic;
 using UnityEditor;
 using UnityEditor.Callbacks;
 using UnityEngine;
-using Logger = JFramework.Basic.Logger;
 
 namespace JFramework.Excel
 {
@@ -18,7 +18,7 @@ namespace JFramework.Excel
             {
                 if (EditorApplication.isCompiling)
                 {
-                    Logger.Log("等待编译完成.");
+                    Debugger.Log("等待编译完成.");
                     return;
                 }
 
@@ -28,14 +28,14 @@ namespace JFramework.Excel
             }
             catch (Exception e)
             {
-                Logger.LogError(e.ToString());
+                Debugger.LogError(e.ToString());
             }
         }
 
         [MenuItem("Tools/JFramework/Excel Writer", false, 102)]
         public static void ImportFolder()
         {
-            string loadPath = EditorPrefs.GetString(ExcelConverter.excelPathKey);
+            string loadPath = EditorPrefs.GetString(ExcelConverter.ExcelPathKey);
             if (string.IsNullOrEmpty(loadPath) || !Directory.Exists(loadPath))
             {
                 string prevPath = Environment.CurrentDirectory + "/Assets/EasyExcel/Example/ExcelFiles";
@@ -44,7 +44,7 @@ namespace JFramework.Excel
 
             string excelPath = EditorUtility.OpenFolderPanel(default, loadPath, "");
             if (string.IsNullOrEmpty(excelPath)) return;
-            EditorPrefs.SetString(ExcelConverter.excelPathKey, excelPath);
+            EditorPrefs.SetString(ExcelConverter.ExcelPathKey, excelPath);
             string csPath = Environment.CurrentDirectory + "/" + ExcelSetting.Instance.ScriptPath;
             ExcelConverter.ConvertCSFiles(excelPath, csPath);
         }
@@ -52,7 +52,7 @@ namespace JFramework.Excel
         [MenuItem("Tools/JFramework/Excel Delete", false, 103)]
         public static void DeleteFolder()
         {
-            EditorPrefs.SetBool(ExcelConverter.csChangedKey, false);
+            EditorPrefs.SetBool(ExcelConverter.ExcelDataKey, false);
             DeleteCSFolder();
             DeleteSOFolder();
             AssetDatabase.Refresh();
@@ -61,11 +61,11 @@ namespace JFramework.Excel
         [DidReloadScripts]
         private static void OnScriptsReloaded()
         {
-            if (!EditorPrefs.GetBool(ExcelConverter.csChangedKey, false)) return;
-            EditorPrefs.SetBool(ExcelConverter.csChangedKey, false);
-            string loadPath = EditorPrefs.GetString(ExcelConverter.excelPathKey);
+            if (!EditorPrefs.GetBool(ExcelConverter.ExcelDataKey, false)) return;
+            EditorPrefs.SetBool(ExcelConverter.ExcelDataKey, false);
+            string loadPath = EditorPrefs.GetString(ExcelConverter.ExcelPathKey);
             if (string.IsNullOrEmpty(loadPath)) return;
-            Logger.Log("脚本重新编译，开始生成资源.");
+            Debugger.Log("脚本重新编译，开始生成资源.");
             string soPath = Environment.CurrentDirectory + "/" + ExcelSetting.Instance.AssetPath;
             ExcelConverter.ConvertSOFiles(loadPath, soPath);
         }
@@ -159,6 +159,8 @@ namespace JFramework.Excel
             }
 
             GUILayout.EndHorizontal();
+            
+            GUIUtility.ExitGUI();
         }
 
         private static void DeleteCSFolder()

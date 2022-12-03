@@ -53,7 +53,7 @@ namespace JFramework.Excel
                 }
                 else
                 {
-                    Logger.LogError($"列的格式设置错误{name}: {str}.");
+                    Debugger.LogError($"列的格式设置错误{name}: {str}.");
                     break;
                 }
             }

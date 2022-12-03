@@ -3,7 +3,6 @@ using System.Security.Cryptography;
 using JFramework.Basic;
 using Newtonsoft.Json;
 using UnityEngine;
-using Logger = JFramework.Basic.Logger;
 
 namespace JFramework
 {
@@ -83,7 +82,7 @@ namespace JFramework
         {
             if (targetStr.Length == 0)
             {
-                Logger.LogWarning("加密数据为空！");
+                Debugger.LogWarning("加密数据为空！");
                 return null;
             }
 
@@ -105,7 +104,7 @@ namespace JFramework
         {
             if (targetByte.Length == 0)
             {
-                Logger.LogWarning("解密数据为空！");
+                Debugger.LogWarning("解密数据为空！");
                 return null;
             }
 
