@@ -1,4 +1,4 @@
-namespace JFramework
+namespace JFramework.Basic
 {
     public interface IData
     {
