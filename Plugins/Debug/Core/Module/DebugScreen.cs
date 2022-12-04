@@ -57,7 +57,7 @@ namespace JFramework
             await File.WriteAllBytesAsync(debugData.screenPath + title, bytes);
             AssetDatabase.Refresh();
 #else
-            Debugger.LogWarning("当前平台不支持截屏！");
+            Logger.LogWarning("当前平台不支持截屏！");
 #endif
         }
     }
