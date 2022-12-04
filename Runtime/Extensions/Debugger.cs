@@ -4,6 +4,8 @@ namespace JFramework.Basic
 {
     public static class Debugger
     {
+        public static LogLevel LogLevel = LogLevel.Lowest;
+        
         public static void Log(string message)
         {
             Debug.Log("[JFramework] " + message);
@@ -18,5 +20,18 @@ namespace JFramework.Basic
         {
             Debug.LogError("[JFramework] " + message);
         }
+    }
+
+    public enum LogLevel
+    {
+        Lowest,
+        Middle,
+        Height
+    }
+    
+    public enum LanguageType
+    {
+        Chinese,
+        English
     }
 }

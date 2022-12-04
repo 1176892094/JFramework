@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using JFramework.Basic;
 using UnityEngine;
 
 namespace JFramework
@@ -43,11 +44,5 @@ namespace JFramework
         {
             return type == LanguageType.Chinese ? chinese : english;
         }
-    }
-
-    internal enum LanguageType
-    {
-        Chinese,
-        English
     }
 }

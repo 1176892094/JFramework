@@ -46,7 +46,9 @@ namespace JFramework
 
             if (!File.Exists(filePath))
             {
+                Debugger.Log($"创建存储文件: {obj.name}");
                 Save(obj, obj.name);
+                Load(obj);
                 return;
             }
 

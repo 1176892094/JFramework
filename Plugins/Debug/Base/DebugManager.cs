@@ -1,4 +1,6 @@
-﻿using UnityEngine;
+﻿using System;
+using JFramework.Basic;
+using UnityEngine;
 
 namespace JFramework
 {
@@ -18,11 +20,17 @@ namespace JFramework
         private DebugScreen screen;
         private DebugTime time;
         private DebugEnvironment environment;
+        public LogLevel LogLevel;
 
-
-        protected void Awake()
+        private void Awake()
         {
             DontDestroyOnLoad(gameObject);
+            EventManager.AddListener(nameof(DebugManager), OnAwake);
+        } 
+
+        private void OnAwake()
+        {
+            Debugger.LogLevel = LogLevel;
             windowRect = new Rect(0, 0, 200, 120);
             debugData = ResourceManager.Load<DebugData>("DebugData");
             debugData.InitData();
@@ -38,11 +46,11 @@ namespace JFramework
             time = new DebugTime(debugData);
             environment = new DebugEnvironment(debugData);
             Application.logMessageReceived += console.LogMessageReceived;
+            scene.Start();
+            MonoManager.Instance.AddListener(OnUpdate);
         }
 
-        private void Start() => scene.Start();
-
-        private void Update()
+        private void OnUpdate()
         {
             if (!debugData.isDebug) return;
             float timer = Time.realtimeSinceStartup - gameTimer;
@@ -55,7 +63,7 @@ namespace JFramework
 
         private void OnGUI()
         {
-            if (!debugData.isDebug) return;
+            if (debugData == null || !debugData.isDebug) return;
             DebugStyle.Enable();
             if (isExtend)
             {
@@ -177,7 +185,11 @@ namespace JFramework
             GUILayout.EndHorizontal();
         }
 
-        private void OnDestroy() => Application.logMessageReceived -= console.LogMessageReceived;
+        private void OnDestroy()
+        {
+            Application.logMessageReceived -= console.LogMessageReceived;
+            MonoManager.Instance.RemoveListener(OnUpdate);
+        }
     }
 
     internal struct LogData

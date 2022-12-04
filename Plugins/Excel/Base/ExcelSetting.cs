@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using JFramework.Basic;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -102,11 +103,5 @@ namespace JFramework.Excel
         public const string ExcelData = "ExcelData";
         public const string Extension = ".asset";
         public const string ExcelPath = "Assets/Resources/Settings/" + ExcelData + Extension;
-    }
-    
-    public enum LanguageType
-    {
-        Chinese,
-        English
     }
 }
