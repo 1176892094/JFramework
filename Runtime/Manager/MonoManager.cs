@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using System.ComponentModel;
 using JFramework.Basic;
 using UnityEngine;
 
@@ -16,13 +17,23 @@ namespace JFramework
             obj.hideFlags = HideFlags.HideAndDontSave;
         }
 
-        public void AddEventListener(Action action) => controller.AddEventListener(action);
+        public void AddListener(Action action) => controller.AddListener(action);
 
-        public void RemoveEventListener(Action action) => controller.RemoveEventListener(action);
-        
+        public void RemoveListener(Action action) => controller.RemoveListener(action);
+
         public Coroutine StartCoroutine(IEnumerator coroutine)
         {
             return controller.StartCoroutine(coroutine);
+        }
+
+        public void StopCoroutine(IEnumerator coroutine)
+        {
+            controller.StopCoroutine(coroutine);
+        }
+
+        public void StopAllCoroutines()
+        {
+            controller.StopAllCoroutines();
         }
     }
 }

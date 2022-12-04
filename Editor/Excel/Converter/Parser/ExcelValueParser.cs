@@ -5,7 +5,7 @@ namespace JFramework.Excel
 {
     internal static class ExcelValueParser
     {
-        private const string KeyValue = ":key";
+
 
         public static ExcelBaseType Parse(int id, string name, string type)
         {
@@ -52,7 +52,7 @@ namespace JFramework.Excel
         public static bool IsKeyValue(string name, string type)
         {
             string keyName = name.ToLower().Trim();
-            if (!keyName.EndsWith(KeyValue)) return false;
+            if (!keyName.EndsWith(ExcelType.KeyValue)) return false;
             if (type.Equals("int") || type.Equals("string")) return true;
             Debugger.LogError($"主键只支持int和string两种类型!");
             return false;
@@ -129,6 +129,7 @@ namespace JFramework.Excel
     
     internal struct ExcelType
     {
+        public const string KeyValue = ":key";
         public const string Int = "int";
         public const string Bool = "bool";
         public const string Long = "long";

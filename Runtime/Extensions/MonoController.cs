@@ -9,8 +9,8 @@ namespace JFramework.Basic
         private void Awake() => DontDestroyOnLoad(gameObject);
         private void Update() => UpdateAction?.Invoke();
 
-        public void AddEventListener(Action action) => UpdateAction += action;
+        public void AddListener(Action action) => UpdateAction += action;
 
-        public void RemoveEventListener(Action action) => UpdateAction -= action;
+        public void RemoveListener(Action action) => UpdateAction -= action;
     }
 }

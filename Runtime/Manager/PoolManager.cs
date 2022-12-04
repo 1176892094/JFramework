@@ -41,8 +41,10 @@ namespace JFramework
             }
         }
 
-        public static void Push(string name, GameObject obj)
+        public static void Push(GameObject obj)
         {
+            if (obj == null) return;
+            string name = obj.name;
             if (poolManager == null)
             {
                 poolManager = new GameObject("PoolManager");

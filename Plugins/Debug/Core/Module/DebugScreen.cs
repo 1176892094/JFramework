@@ -1,6 +1,6 @@
 using System;
-using System.Collections;
 using System.IO;
+using JFramework.Async;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -36,17 +36,17 @@ namespace JFramework
 
             if (GUILayout.Button(debugData.GetData("Screen Capture"), DebugStyle.Button, DebugStyle.MinHeight))
             {
-                MonoManager.Instance.StartCoroutine(ScreenShot());
+                ScreenShot();
             }
 
             GUILayout.EndHorizontal();
         }
 
-        private IEnumerator ScreenShot()
+        private async void ScreenShot()
         {
 #if UNITY_EDITOR
             debugData.isDebug = false;
-            yield return new WaitForEndOfFrame();
+            await new WaitForEndOfFrame();
             if (!Directory.Exists(debugData.screenPath)) Directory.CreateDirectory(debugData.screenPath);
             Texture2D texture = new Texture2D(Screen.width, Screen.height, TextureFormat.RGB24, false);
             texture.ReadPixels(new Rect(0, 0, Screen.width, Screen.height), 0, 0);
@@ -54,12 +54,11 @@ namespace JFramework
             string title = DateTime.Now.ToString("yyyyMMddhhmmss") + ".png";
             byte[] bytes = texture.EncodeToPNG();
             debugData.isDebug = true;
-            File.WriteAllBytes(debugData.screenPath + title, bytes);
+            await File.WriteAllBytesAsync(debugData.screenPath + title, bytes);
             AssetDatabase.Refresh();
 #else
             Debugger.LogWarning("当前平台不支持截屏！");
 #endif
-            yield return null;
         }
     }
 }

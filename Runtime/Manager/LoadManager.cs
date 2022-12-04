@@ -21,7 +21,7 @@ namespace JFramework
             if (asyncOperation == null) yield break;
             while (!asyncOperation.isDone)
             {
-                EventManager.OnEventTrigger("LoadSceneAsync", asyncOperation.progress);
+                EventManager.OnTrigger("LoadSceneAsync", asyncOperation.progress);
                 yield return asyncOperation;
             }
             action?.Invoke();

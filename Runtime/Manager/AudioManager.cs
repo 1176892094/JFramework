@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
-using Object = UnityEngine.Object;
 
 namespace JFramework
 {
@@ -15,12 +14,12 @@ namespace JFramework
 
         protected void Awake()
         {
-            source = gameObject;
-            DontDestroyOnLoad(gameObject);
+            DontDestroyOnLoad(source = gameObject);
             sound = gameObject.AddComponent<AudioSource>();
+            MonoManager.Instance.AddListener(OnUpdate);
         }
 
-        private void Update()
+        private void OnUpdate()
         {
             for (int i = soundList.Count - 1; i >= 0; --i)
             {
@@ -96,6 +95,11 @@ namespace JFramework
                 audio.Stop();
                 Destroy(audio);
             }
+        }
+
+        private void OnDestroy()
+        {
+            MonoManager.Instance.RemoveListener(OnUpdate);
         }
     }
 }

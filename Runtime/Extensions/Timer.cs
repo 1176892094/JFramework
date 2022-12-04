@@ -77,6 +77,9 @@ namespace JFramework.Basic
             isRunning = false;
             TimerManager.Instance.RemoveTimer(this);
             OnClose.Invoke();
+            OnStart = null;
+            OnUpdate= null;
+            OnClose = null;
         }
     }
 }

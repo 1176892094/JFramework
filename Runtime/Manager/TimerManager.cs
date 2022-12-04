@@ -8,7 +8,7 @@ namespace JFramework
         private readonly Queue<Timer> timerQueue = new Queue<Timer>();
         private readonly LinkedList<Timer> timerList = new LinkedList<Timer>();
 
-        public TimerManager() => MonoManager.Instance.AddEventListener(Update);
+        public TimerManager() => MonoManager.Instance.AddListener(Update);
 
         private void Update()
         {

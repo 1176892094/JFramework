@@ -28,7 +28,7 @@ namespace JFramework.Editor
         {
             if (editorsList.parent[0].name == JFramework) editorsList.parent.RemoveAt(0);
             if (editorsList.childCount != 0 || float.IsNaN(editorsList.layout.width)) return false;
-            if (visualElement == null) visualElement = InitItems();
+            visualElement ??= InitItems();
             editorsList.parent.Insert(0, visualElement);
             return true;
         }

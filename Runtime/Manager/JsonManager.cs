@@ -8,6 +8,17 @@ namespace JFramework
 {
     public static class JsonManager
     {
+        public static void InitData()
+        {
+            JsonData.Instance.Clear();
+        }
+
+        public static void LoadData()
+        {
+            JsonData.Instance.LoadData();
+            JsonData.Instance.InitData();
+        }
+        
         public static void Save(object obj, string fileName, bool AES = false)
         {
             string filePath = Application.persistentDataPath + "/" + fileName + ".json";
@@ -54,14 +65,6 @@ namespace JFramework
                 string saveJson = File.ReadAllText(filePath);
                 JsonUtility.FromJsonOverwrite(saveJson, obj);
             }
-        }
-
-        public static void InitData() => JsonData.Instance.Clear();
-
-        public static void LoadData()
-        {
-            JsonData.Instance.LoadData();
-            JsonData.Instance.InitData();
         }
 
         public static T Load<T>(string fileName) where T : new()

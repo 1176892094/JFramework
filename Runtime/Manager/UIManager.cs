@@ -40,12 +40,14 @@ namespace JFramework
         {
             ResourceManager.LoadAsync<GameObject>(path, obj =>
             {
+                string[] strArray = path.Split('/');
                 Transform parent = GetLayer(layer);
                 obj.transform.SetParent(parent, false);
                 T panel = obj.GetComponent<T>();
                 callback?.Invoke(panel);
                 panel.path = path;
                 panel.Show();
+                panel.name = strArray[^1];
                 if (panelDict.ContainsKey(path))
                 {
                     HidePanel(path);
@@ -110,7 +112,7 @@ namespace JFramework
             panelDict.Clear();
         }
 
-        public static void AddEventListener(UIBehaviour control, EventTriggerType type, UnityAction<BaseEventData> callback)
+        public static void AddListener(UIBehaviour control, EventTriggerType type, UnityAction<BaseEventData> callback)
         {
             EventTrigger trigger = control.GetComponent<EventTrigger>();
             if (trigger == null) trigger = control.gameObject.AddComponent<EventTrigger>();

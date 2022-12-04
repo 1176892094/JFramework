@@ -1,15 +1,23 @@
+using System;
 using System.Collections.Generic;
 using JFramework.Async;
 using UnityEngine;
 
 namespace JFramework.Basic
 {
-    public abstract class StateMachine : MonoBehaviour
+    public class BaseStateMachine : MonoBehaviour
     {
         protected Dictionary<string, IState> stateDict = new Dictionary<string, IState>();
         protected IState state;
+        
+        protected virtual void Awake() => MonoManager.Instance.AddListener(OnUpdate);
 
-        protected virtual void Update() => state.OnUpdate();
+        [Obsolete("[JFramework] 请使用OnUpdate来代替Update管理生命周期", true)]
+        protected void Update() { }
+
+        protected virtual void OnDestroy() => MonoManager.Instance.RemoveListener(OnUpdate);
+        
+        protected virtual void OnUpdate() => state.OnUpdate();
 
         public void ChangeState(string type)
         {
