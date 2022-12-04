@@ -17,13 +17,11 @@ namespace JFramework
     {
         private readonly Dictionary<Type, IntDataDict> IntDataDict = new Dictionary<Type, IntDataDict>();
         private readonly Dictionary<Type, StrDataDict> StrDataDict = new Dictionary<Type, StrDataDict>();
-        private ExcelLoader loader;
 
         protected override void Awake()
         {
             base.Awake();
             DontDestroyOnLoad(gameObject);
-            loader = new ExcelLoader();
             InitData();
         }
 
@@ -46,7 +44,10 @@ namespace JFramework
                 LoadData(assembly, containerType);
             }
 
-            Debugger.Log($"ExcelManager加载{IntDataDict.Count + StrDataDict.Count}个数据");
+            if (Debugger.LogLevel == LogLevel.Middle)
+            {
+                Debugger.Log($"ExcelManager加载{IntDataDict.Count + StrDataDict.Count}个数据");
+            }
         }
 
         private void LoadData(Assembly assembly, Type dataCollectionType)
@@ -54,7 +55,7 @@ namespace JFramework
             try
             {
                 var tableName = dataCollectionType.Name;
-                var collection = loader.Load(tableName);
+                var collection = LoadContainer(tableName);
                 if (collection == null)
                 {
                     Debugger.LogError($"ExcelManager加载数据失败:{tableName}!");
@@ -180,6 +181,14 @@ namespace JFramework
         private string GetSheetName(Type sheetClassType)
         {
             return ExcelSetting.Instance.GetSheetName(sheetClassType);
+        }
+
+        private ExcelContainer LoadContainer(string name)
+        {
+            int index = ExcelSetting.Instance.AssetPath.IndexOf("Resources/", StringComparison.Ordinal);
+            string filePath = ExcelSetting.Instance.AssetPath.Substring(index + "Resources/".Length) + name;
+            ExcelContainer table = ResourceManager.Load<ExcelContainer>(filePath);
+            return table;
         }
     }
 }

@@ -25,11 +25,6 @@ namespace JFramework
         private void Awake()
         {
             DontDestroyOnLoad(gameObject);
-            EventManager.AddListener(nameof(DebugManager), OnAwake);
-        } 
-
-        private void OnAwake()
-        {
             Debugger.LogLevel = LogLevel;
             windowRect = new Rect(0, 0, 200, 120);
             debugData = ResourceManager.Load<DebugData>("DebugData");
@@ -48,6 +43,11 @@ namespace JFramework
             Application.logMessageReceived += console.LogMessageReceived;
             scene.Start();
             MonoManager.Instance.AddListener(OnUpdate);
+        } 
+
+        private void OnAwake()
+        {
+            
         }
 
         private void OnUpdate()
