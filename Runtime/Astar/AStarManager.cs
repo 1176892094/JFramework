@@ -1,9 +1,8 @@
 using System.Collections.Generic;
-using JFramework.Basic;
 using UnityEngine;
 using Logger = JFramework.Basic.Logger;
 
-namespace JFramework.Graph
+namespace JFramework.AStar
 {
     public class AStarManager : Singleton<AStarManager>
     {

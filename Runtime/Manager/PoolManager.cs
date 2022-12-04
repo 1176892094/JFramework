@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using JFramework.Basic;
 using UnityEngine;
 using UnityEngine.Events;
 using Logger = JFramework.Basic.Logger;

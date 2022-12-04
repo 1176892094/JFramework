@@ -1,5 +1,5 @@
 
-namespace JFramework.Graph
+namespace JFramework.AStar
 {
     public class AStarNode
     {

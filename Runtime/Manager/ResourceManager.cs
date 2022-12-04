@@ -1,7 +1,6 @@
 using System;
 using System.Collections;
 using JFramework.Async;
-using JFramework.Basic;
 using UnityEngine;
 using Logger = JFramework.Basic.Logger;
 using Object = UnityEngine.Object;
