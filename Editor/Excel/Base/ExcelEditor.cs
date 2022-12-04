@@ -4,6 +4,7 @@ using JFramework.Basic;
 using UnityEditor;
 using UnityEditor.Callbacks;
 using UnityEngine;
+using Logger = JFramework.Basic.Logger;
 
 namespace JFramework.Excel
 {
@@ -18,7 +19,7 @@ namespace JFramework.Excel
             {
                 if (EditorApplication.isCompiling)
                 {
-                    Debugger.Log("等待编译完成.");
+                    Logger.Log("等待编译完成.");
                     return;
                 }
 
@@ -28,7 +29,7 @@ namespace JFramework.Excel
             }
             catch (Exception e)
             {
-                Debugger.LogError(e.ToString());
+                Logger.LogError(e.ToString());
             }
         }
 
@@ -65,7 +66,7 @@ namespace JFramework.Excel
             EditorPrefs.SetBool(ExcelConverter.ExcelDataKey, false);
             string loadPath = EditorPrefs.GetString(ExcelConverter.ExcelPathKey);
             if (string.IsNullOrEmpty(loadPath)) return;
-            Debugger.Log("脚本重新编译，开始生成资源.");
+            Logger.Log("脚本重新编译，开始生成资源.");
             string soPath = Environment.CurrentDirectory + "/" + ExcelSetting.Instance.AssetPath;
             ExcelConverter.ConvertSOFiles(loadPath, soPath);
         }

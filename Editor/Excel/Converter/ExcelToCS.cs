@@ -79,11 +79,11 @@ namespace JFramework.Excel
 					}
 
 					AssetDatabase.Refresh();
-					Debugger.Log("脚本已生成,正在创建资源.");
+					Logger.Log("脚本已生成,正在创建资源.");
 				}
 				else
 				{
-					Debugger.Log("没有改变的脚本文件,开始创建资源.");
+					Logger.Log("没有改变的脚本文件,开始创建资源.");
 					ClearProgress();
 					string historyPath = EditorPrefs.GetString(ExcelPathKey);
 					if (!string.IsNullOrEmpty(historyPath))
@@ -96,7 +96,7 @@ namespace JFramework.Excel
 			}
 			catch (Exception e)
 			{
-				Debugger.LogError(e.ToString());
+				Logger.LogError(e.ToString());
 				EditorPrefs.SetBool(ExcelDataKey, false);
 				ClearProgress();
 				AssetDatabase.Refresh();
@@ -114,7 +114,7 @@ namespace JFramework.Excel
 				if (sheet == null) continue;
 				if (!IsConvert(sheet))
 				{
-					Debugger.Log($"{fileName}跳过生成表:{sheet.fileName}.");
+					Logger.Log($"{fileName}跳过生成表:{sheet.fileName}.");
 					continue;
 				}
 
@@ -220,7 +220,7 @@ namespace JFramework.Excel
 			}
 			catch (Exception ex)
 			{
-				Debugger.LogError(ex.ToString());
+				Logger.LogError(ex.ToString());
 			}
 
 			return "";

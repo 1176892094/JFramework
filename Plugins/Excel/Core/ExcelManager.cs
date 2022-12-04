@@ -44,7 +44,7 @@ namespace JFramework
                 LoadData(assembly, containerType);
             }
 
-            Debugger.Log($"ExcelManager加载{IntDataDict.Count + StrDataDict.Count}个数据");
+            Logger.Log($"ExcelManager加载{IntDataDict.Count + StrDataDict.Count}个数据");
         }
 
         private void LoadData(Assembly assembly, Type dataCollectionType)
@@ -55,7 +55,7 @@ namespace JFramework
                 var collection = LoadContainer(tableName);
                 if (collection == null)
                 {
-                    Debugger.LogError($"ExcelManager加载数据失败:{tableName}!");
+                    Logger.LogError($"ExcelManager加载数据失败:{tableName}!");
                     return;
                 }
 
@@ -64,7 +64,7 @@ namespace JFramework
                 var keyField = ExcelUtility.GetRowDataKeyField(rowDataType);
                 if (keyField == null)
                 {
-                    Debugger.LogError($"ExcelManager没有找到主键:{tableName}!");
+                    Logger.LogError($"ExcelManager没有找到主键:{tableName}!");
                     return;
                 }
 
@@ -95,12 +95,12 @@ namespace JFramework
                 }
                 else
                 {
-                    Debugger.LogError($"ExcelManager加载{dataCollectionType.Name}失败.这不是有效的主键!");
+                    Logger.LogError($"ExcelManager加载{dataCollectionType.Name}失败.这不是有效的主键!");
                 }
             }
             catch (Exception e)
             {
-                Debugger.LogError(e.ToString());
+                Logger.LogError(e.ToString());
             }
         }
 

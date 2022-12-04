@@ -3,15 +3,13 @@ using UnityEngine;
 
 namespace JFramework.Basic
 {
-    public abstract class BasePanel : MonoBehaviour, IPanel
+    public abstract class BaseBehaviour : MonoBehaviour
     {
-        public string path;
-
         protected virtual void Awake()
         {
-            if (Debugger.LogLevel == LogLevel.Middle)
+            if (Logger.LogLevel == LogLevel.Middle)
             {
-                Debugger.Log(gameObject.name + "添加OnUpdate监听");
+                Logger.Log(gameObject.name + "添加OnUpdate监听");
             }
 
             MonoManager.Instance.AddListener(OnUpdate);
@@ -24,18 +22,14 @@ namespace JFramework.Basic
 
         protected virtual void OnDestroy()
         {
-            if (Debugger.LogLevel == LogLevel.Middle)
+            if (Logger.LogLevel == LogLevel.Middle)
             {
-                Debugger.Log(gameObject.name + "移除OnUpdate监听");
+                Logger.Log(gameObject.name + "移除OnUpdate监听");
             }
 
             MonoManager.Instance.RemoveListener(OnUpdate);
         }
 
         protected abstract void OnUpdate();
-
-        public abstract void Show();
-
-        public abstract void Hide();
     }
 }

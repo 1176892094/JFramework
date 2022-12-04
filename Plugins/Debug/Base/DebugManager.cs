@@ -1,6 +1,7 @@
 ﻿using System;
 using JFramework.Basic;
 using UnityEngine;
+using Logger = JFramework.Basic.Logger;
 
 namespace JFramework
 {
@@ -25,7 +26,7 @@ namespace JFramework
         private void Awake()
         {
             DontDestroyOnLoad(gameObject);
-            Debugger.LogLevel = LogLevel;
+            Logger.LogLevel = LogLevel;
             windowRect = new Rect(0, 0, 200, 120);
             debugData = ResourceManager.Load<DebugData>("DebugData");
             debugData.InitData();

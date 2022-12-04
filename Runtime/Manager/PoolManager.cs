@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using JFramework.Basic;
 using UnityEngine;
 using UnityEngine.Events;
+using Logger = JFramework.Basic.Logger;
 
 namespace JFramework
 {
@@ -54,7 +55,7 @@ namespace JFramework
             {
                 if (obj == null)
                 {
-                    Debugger.LogWarning(name + "已被销毁,无法推入对象！");
+                    Logger.LogWarning(name + "已被销毁,无法推入对象！");
                     poolDict[name].Pop();
                     return;
                 }

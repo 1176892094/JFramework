@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using JFramework.Basic;
 using UnityEngine;
+using Logger = JFramework.Basic.Logger;
 
 namespace JFramework.Graph
 {
@@ -32,7 +33,7 @@ namespace JFramework.Graph
             if (origin.x < 0 || origin.x >= width || origin.y < 0 || origin.y >= height ||
                 target.x < 0 || target.x >= width || target.y < 0 || target.y >= height)
             {
-                Debugger.LogWarning("开始或结束点在地图格子范围外!");
+                Logger.LogWarning("开始或结束点在地图格子范围外!");
                 return null;
             }
 
@@ -40,7 +41,7 @@ namespace JFramework.Graph
             AStarNode targetNode = nodes[(int)target.x, (int)target.y];
             if (originNode.type == ANodeType.Stop || targetNode.type == ANodeType.Stop)
             {
-                Debugger.LogWarning("开始或结束点被阻挡！");
+                Logger.LogWarning("开始或结束点被阻挡！");
                 return null;
             }
 
@@ -62,14 +63,14 @@ namespace JFramework.Graph
 
                 if (openList.Count == 0)
                 {
-                    Debugger.LogWarning("死路");
+                    Logger.LogWarning("死路");
                     return null;
                 }
                 
                 openList.Sort(SortOpenList);
                 foreach (var node in openList)
                 {
-                    Debugger.Log("点" + node.x + "," + node.y + ":g=" + node.originDis + "h=" + node.targetDis + "f=" + node.totalDis);
+                    Logger.Log("点" + node.x + "," + node.y + ":g=" + node.originDis + "h=" + node.targetDis + "f=" + node.totalDis);
                 }
 
                 closeList.Add(openList[0]);

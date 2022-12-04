@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace JFramework.Basic
 {
-    public static class Debugger
+    public static class Logger
     {
         public static LogLevel LogLevel = LogLevel.Lowest;
         

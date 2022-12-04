@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using JFramework.Async;
 using JFramework.Basic;
 using UnityEngine;
+using Logger = JFramework.Basic.Logger;
 using Object = UnityEngine.Object;
 
 namespace JFramework
@@ -83,7 +84,7 @@ namespace JFramework
             if (request == null) yield break;
             if (request.asset == null)
             {
-                Debugger.LogWarning(assetName + "未获取到！");
+                Logger.LogWarning(assetName + "未获取到！");
                 yield break;
             }
 
@@ -104,7 +105,7 @@ namespace JFramework
             if (request == null) yield break;
             if (request.asset == null)
             {
-                Debugger.LogWarning(assetName + "未获取到！");
+                Logger.LogWarning(assetName + "未获取到！");
                 yield break;
             }
 
