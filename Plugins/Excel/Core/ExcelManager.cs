@@ -44,10 +44,7 @@ namespace JFramework
                 LoadData(assembly, containerType);
             }
 
-            if (Debugger.LogLevel == LogLevel.Middle)
-            {
-                Debugger.Log($"ExcelManager加载{IntDataDict.Count + StrDataDict.Count}个数据");
-            }
+            Debugger.Log($"ExcelManager加载{IntDataDict.Count + StrDataDict.Count}个数据");
         }
 
         private void LoadData(Assembly assembly, Type dataCollectionType)

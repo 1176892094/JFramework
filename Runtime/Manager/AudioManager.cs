@@ -97,9 +97,6 @@ namespace JFramework
             }
         }
 
-        private void OnDestroy()
-        {
-            MonoManager.Instance.RemoveListener(OnUpdate);
-        }
+        private void OnDestroy() => MonoManager.Instance.RemoveListener(OnUpdate);
     }
 }
