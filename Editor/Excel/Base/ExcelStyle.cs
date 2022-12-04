@@ -16,7 +16,7 @@ namespace JFramework.Excel
         public static void Enable()
         {
             if (Skin != null) return;
-            Skin = Resources.Load<GUISkin>("JFramworkGUI");
+            Skin = ResourceManager.Load<GUISkin>("JFramworkGUI");
             Label = new GUIStyle(EditorStyles.label);
             Button = new GUIStyle(EditorStyles.miniButton);
             TextField = new GUIStyle(EditorStyles.textField);
