@@ -43,11 +43,6 @@ namespace JFramework
             Application.logMessageReceived += console.LogMessageReceived;
             scene.Start();
             MonoManager.Instance.AddListener(OnUpdate);
-        } 
-
-        private void OnAwake()
-        {
-            
         }
 
         private void OnUpdate()

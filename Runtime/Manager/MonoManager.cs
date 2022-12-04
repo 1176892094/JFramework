@@ -26,14 +26,8 @@ namespace JFramework
             return controller.StartCoroutine(coroutine);
         }
 
-        public void StopCoroutine(IEnumerator coroutine)
-        {
-            controller.StopCoroutine(coroutine);
-        }
+        public void StopCoroutine(IEnumerator coroutine) => controller.StopCoroutine(coroutine);
 
-        public void StopAllCoroutines()
-        {
-            controller.StopAllCoroutines();
-        }
+        public void StopAllCoroutines() => controller.StopAllCoroutines();
     }
 }
