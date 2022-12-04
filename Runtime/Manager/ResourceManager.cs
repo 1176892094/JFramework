@@ -1,6 +1,5 @@
 using System;
 using System.Collections;
-using JFramework.Async;
 using UnityEngine;
 using Logger = JFramework.Basic.Logger;
 using Object = UnityEngine.Object;
@@ -15,9 +14,9 @@ namespace JFramework
             return resource is GameObject ? Object.Instantiate(resource) : resource;
         }
 
-        public static async void LoadAsync<T>(string name, Action<T> callback) where T : Object
+        public static void LoadAsync<T>(string name, Action<T> callback) where T : Object
         {
-            await LoadCompleted(name, callback);
+            MonoManager.Instance.StartCoroutine(LoadCompleted(name, callback));
         }
 
         private static IEnumerator LoadCompleted<T>(string name, Action<T> callback) where T : Object

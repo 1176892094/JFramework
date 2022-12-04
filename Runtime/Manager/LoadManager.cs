@@ -1,6 +1,5 @@
 using System;
 using System.Collections;
-using JFramework.Async;
 using UnityEngine.SceneManagement;
 using AsyncOperation = UnityEngine.AsyncOperation;
 
@@ -10,9 +9,9 @@ namespace JFramework
     {
         public static void LoadScene(string name) => SceneManager.LoadScene(name);
 
-        public static async void LoadSceneAsync(string name, Action action = null)
+        public static void LoadSceneAsync(string name, Action action = null)
         {
-            await LoadSceneCompleted(name, action);
+            MonoManager.Instance.StartCoroutine(LoadSceneCompleted(name, action));
         }
 
         private static IEnumerator LoadSceneCompleted(string name, Action action = null)

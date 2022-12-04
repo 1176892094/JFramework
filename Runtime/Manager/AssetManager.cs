@@ -1,7 +1,6 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using JFramework.Async;
 using UnityEngine;
 using Logger = JFramework.Basic.Logger;
 using Object = UnityEngine.Object;
@@ -69,9 +68,9 @@ namespace JFramework
             return obj is GameObject ? Object.Instantiate(obj) : obj;
         }
 
-        public static async void LoadAsync(string packageName, string assetName, Type type, Action<Object> callback)
+        public static void LoadAsync(string packageName, string assetName, Type type, Action<Object> callback)
         {
-            await LoadCompleted(packageName, assetName, type, callback);
+            MonoManager.Instance.StartCoroutine(LoadCompleted(packageName, assetName, type, callback));
         }
 
         private static IEnumerator LoadCompleted(string packageName, string assetName, Type type,
@@ -90,9 +89,9 @@ namespace JFramework
             callback(request.asset is GameObject ? Object.Instantiate(request.asset) : request.asset);
         }
 
-        public static async void LoadAsync<T>(string packageName, string assetName, Action<T> callback) where T : Object
+        public static void LoadAsync<T>(string packageName, string assetName, Action<T> callback) where T : Object
         {
-            await LoadCompleted(packageName, assetName, callback);
+            MonoManager.Instance.StartCoroutine(LoadCompleted(packageName, assetName, callback));
         }
 
         private static IEnumerator LoadCompleted<T>(string packageName, string assetName, Action<T> callback)

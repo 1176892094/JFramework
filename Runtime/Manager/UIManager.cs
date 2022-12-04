@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using JFramework.Basic;
 using UnityEngine;
@@ -8,7 +9,7 @@ namespace JFramework
 {
     public class UIManager : SingletonMono<UIManager>
     {
-        private readonly Dictionary<string, BasePanel> panelDict = new Dictionary<string, BasePanel>();
+        private readonly Dictionary<string, IPanel> panelDict = new Dictionary<string, IPanel>();
         private Transform bottom;
         private Transform middle;
         private Transform height;
@@ -24,7 +25,7 @@ namespace JFramework
             common = transform.Find("Canvas/Common");
         }
 
-        public void ShowPanel<T>(string path, UILayerType layer = UILayerType.Bottom, UnityAction<T> callback = null) where T : BasePanel
+        public void ShowPanel<T>(string path, UILayerType layer = UILayerType.Bottom, Action<T> callback = null) where T : IPanel
         {
             if (!panelDict.ContainsKey(path))
             {
@@ -36,18 +37,16 @@ namespace JFramework
             panelDict[path].Show();
         }
 
-        private void LoadPanel<T>(string path, UILayerType layer, UnityAction<T> callback) where T : BasePanel
+        private void LoadPanel<T>(string path, UILayerType layer, Action<T> callback) where T : IPanel
         {
             ResourceManager.LoadAsync<GameObject>(path, obj =>
             {
-                string[] strArray = path.Split('/');
                 Transform parent = GetLayer(layer);
                 obj.transform.SetParent(parent, false);
                 T panel = obj.GetComponent<T>();
                 callback?.Invoke(panel);
-                panel.path = path;
+                panel.Path = path;
                 panel.Show();
-                panel.name = strArray[^1];
                 if (panelDict.ContainsKey(path))
                 {
                     HidePanel(path);
@@ -57,14 +56,15 @@ namespace JFramework
             });
         }
 
-        public void HidePanel(string path)
+        public void HidePanel(string path, bool destroy = true)
         {
             if (panelDict.ContainsKey(path))
             {
                 if (panelDict[path] != null)
                 {
                     panelDict[path].Hide();
-                    Destroy(panelDict[path].gameObject);
+                    if (!destroy) return;
+                    Destroy(((BasePanel)panelDict[path]).gameObject);
                 }
 
                 panelDict.Remove(path);
@@ -105,7 +105,7 @@ namespace JFramework
             {
                 if (panelDict[path] != null)
                 {
-                    Destroy(panelDict[path].gameObject);
+                    Destroy(((BasePanel)panelDict[path]).gameObject);
                 }
             }
 

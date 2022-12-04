@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace JFramework.Basic
 {
-    public class BaseData : ScriptableObject
+    public class BaseData : ScriptableObject, IData
     {
         public virtual void InitData()
         {
