@@ -6,23 +6,23 @@ using UnityEngine.UIElements;
 
 namespace JFramework.Editor
 {
-    internal class FrameworkInspector : InspectorEditor
+    internal class FrameworkTool : InspectorEditor
     {
         private const string JFramework = "JFrameworkInspector";
         private const string MenuPath = "Tools/JFramework/";
 
-        private static FrameworkInspector instance;
+        private static FrameworkTool instance;
         private static VisualElement visualElement;
 
-        private FrameworkInspector()
+        private FrameworkTool()
         {
             EditorApplication.delayCall += InitInspector;
-            WindowManager.OnMaximizedChanged += OnMaximizedChanged;
+            InspectorObject.OnMaximizedChanged += OnMaximizedChanged;
             Selection.selectionChanged += InitInspector;
         }
 
         [InitializeOnLoadMethod]
-        private static void Init() => instance = new FrameworkInspector();
+        private static void Init() => instance = new FrameworkTool();
 
         protected override bool OnInject(EditorWindow wnd, VisualElement mainContainer, VisualElement editorsList)
         {

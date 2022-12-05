@@ -15,10 +15,14 @@ namespace JFramework
         private Transform height;
         private Transform common;
 
-        protected override void Awake()
+        private void Awake()
         {
-            base.Awake();
             DontDestroyOnLoad(gameObject);
+            EventManager.AddListener("UIManager", Register);
+        }
+
+        private void Register()
+        {
             bottom = transform.Find("Canvas/Bottom");
             middle = transform.Find("Canvas/Middle");
             height = transform.Find("Canvas/Height");
@@ -119,6 +123,11 @@ namespace JFramework
             EventTrigger.Entry entry = new EventTrigger.Entry { eventID = type };
             entry.callback.AddListener(callback);
             trigger.triggers.Add(entry);
+        }
+
+        private void OnDestroy()
+        {
+            EventManager.RemoveListener("UIManager", Register);
         }
     }
 }

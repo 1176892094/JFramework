@@ -73,8 +73,7 @@ namespace JFramework
             MonoManager.Instance.StartCoroutine(LoadCompleted(packageName, assetName, type, callback));
         }
 
-        private static IEnumerator LoadCompleted(string packageName, string assetName, Type type,
-            Action<Object> callback)
+        private static IEnumerator LoadCompleted(string packageName, string assetName, Type type, Action<Object> callback)
         {
             LoadAsset(packageName);
             AssetBundleRequest request = assetDict[packageName].LoadAssetAsync(assetName, type);
@@ -94,8 +93,7 @@ namespace JFramework
             MonoManager.Instance.StartCoroutine(LoadCompleted(packageName, assetName, callback));
         }
 
-        private static IEnumerator LoadCompleted<T>(string packageName, string assetName, Action<T> callback)
-            where T : Object
+        private static IEnumerator LoadCompleted<T>(string packageName, string assetName, Action<T> callback) where T : Object
         {
             LoadAsset(packageName);
             AssetBundleRequest request = assetDict[packageName].LoadAssetAsync<T>(assetName);

@@ -5,14 +5,14 @@ using UnityEditor;
 namespace JFramework.Editor
 {
     [InitializeOnLoad]
-    internal static class WindowManager
+    internal static class InspectorObject
     {
         public static Action<EditorWindow> OnMaximizedChanged;
 
         private static EditorWindow focusedWindow;
         private static bool isMaximized;
 
-        static WindowManager()
+        static InspectorObject()
         {
             EditorApplication.update += Update;
             focusedWindow = EditorWindow.focusedWindow;

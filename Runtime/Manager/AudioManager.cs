@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace JFramework
 {
-    public class AudioManager: MonoBehaviour
+    public class AudioManager : MonoBehaviour
     {
         private static readonly List<AudioSource> soundList = new List<AudioSource>();
         private static AudioSource sound;
@@ -12,9 +12,15 @@ namespace JFramework
         private static float soundVolume = 1;
         private static float audioVolume = 1;
 
-        protected void Awake()
+        private void Awake()
         {
-            DontDestroyOnLoad(source = gameObject);
+            DontDestroyOnLoad(gameObject);
+            EventManager.AddListener("AudioManager", Register);
+        }
+
+        private void Register()
+        {
+            source = gameObject;
             sound = gameObject.AddComponent<AudioSource>();
             MonoManager.Instance.AddListener(OnUpdate);
         }
@@ -97,6 +103,10 @@ namespace JFramework
             }
         }
 
-        private void OnDestroy() => MonoManager.Instance.RemoveListener(OnUpdate);
+        private void OnDestroy()
+        {
+            MonoManager.Instance.RemoveListener(OnUpdate);
+            EventManager.RemoveListener("AudioManager", Register);
+        }
     }
 }
