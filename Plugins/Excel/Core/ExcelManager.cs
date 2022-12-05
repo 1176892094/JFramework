@@ -18,14 +18,13 @@ namespace JFramework
         private readonly Dictionary<Type, IntDataDict> IntDataDict = new Dictionary<Type, IntDataDict>();
         private readonly Dictionary<Type, StrDataDict> StrDataDict = new Dictionary<Type, StrDataDict>();
 
-        protected override void Awake()
+        private void Awake()
         {
-            base.Awake();
             DontDestroyOnLoad(gameObject);
-            InitData();
+            EventManager.AddListener("ExcelManager", Register);
         }
 
-        private void InitData()
+        private void Register()
         {
 #if UNITY_EDITOR
             if (!ExcelSetting.Instance.AssetPath.Contains("/Resources"))
@@ -47,11 +46,11 @@ namespace JFramework
             Logger.Log($"ExcelManager加载{IntDataDict.Count + StrDataDict.Count}个数据");
         }
 
-        private void LoadData(Assembly assembly, Type dataCollectionType)
+        private void LoadData(Assembly assembly, Type collectionType)
         {
             try
             {
-                var tableName = dataCollectionType.Name;
+                var tableName = collectionType.Name;
                 var collection = LoadContainer(tableName);
                 if (collection == null)
                 {
@@ -60,8 +59,8 @@ namespace JFramework
                 }
 
                 collection.InitData();
-                var rowDataType = GetClassType(assembly, dataCollectionType);
-                var keyField = ExcelUtility.GetRowDataKeyField(rowDataType);
+                var type = GetClassType(assembly, collectionType);
+                var keyField = ExcelUtility.GetRowDataKeyField(type);
                 if (keyField == null)
                 {
                     Logger.LogError($"ExcelManager没有找到主键:{tableName}!");
@@ -79,7 +78,7 @@ namespace JFramework
                         dataDict.Add(key, data);
                     }
 
-                    IntDataDict.Add(rowDataType, dataDict);
+                    IntDataDict.Add(type, dataDict);
                 }
                 else if (keyType == typeof(string))
                 {
@@ -91,11 +90,11 @@ namespace JFramework
                         dataDict.Add(key, data);
                     }
 
-                    StrDataDict.Add(rowDataType, dataDict);
+                    StrDataDict.Add(type, dataDict);
                 }
                 else
                 {
-                    Logger.LogError($"ExcelManager加载{dataCollectionType.Name}失败.这不是有效的主键!");
+                    Logger.LogError($"ExcelManager加载{collectionType.Name}失败.这不是有效的主键!");
                 }
             }
             catch (Exception e)
@@ -182,9 +181,9 @@ namespace JFramework
 
         private ExcelContainer LoadContainer(string name)
         {
-            int index = ExcelSetting.Instance.AssetPath.IndexOf("Resources/", StringComparison.Ordinal);
-            string filePath = ExcelSetting.Instance.AssetPath.Substring(index + "Resources/".Length) + name;
-            ExcelContainer table = ResourceManager.Load<ExcelContainer>(filePath);
+            var index = ExcelSetting.Instance.AssetPath.IndexOf("Resources/", StringComparison.Ordinal);
+            var filePath = ExcelSetting.Instance.AssetPath.Substring(index + "Resources/".Length) + name;
+            var table = ResourceManager.Load<ExcelContainer>(filePath);
             return table;
         }
     }

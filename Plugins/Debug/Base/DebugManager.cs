@@ -1,11 +1,10 @@
-﻿using System;
-using JFramework.Basic;
+﻿using JFramework.Basic;
 using UnityEngine;
 using Logger = JFramework.Basic.Logger;
 
 namespace JFramework
 {
-    internal class DebugManager : MonoBehaviour
+    internal class DebugManager : SingletonMono<DebugManager>
     {
         private DebugData debugData;
         private int FPS;
@@ -26,6 +25,11 @@ namespace JFramework
         private void Awake()
         {
             DontDestroyOnLoad(gameObject);
+            EventManager.AddListener("DebugManager", Register);
+        }
+
+        private void Register()
+        {
             Logger.LogLevel = LogLevel;
             windowRect = new Rect(0, 0, 200, 120);
             debugData = ResourceManager.Load<DebugData>("DebugData");
@@ -33,13 +37,13 @@ namespace JFramework
             debugData.isDebug = true;
             debugData.MaxWidth = Screen.width;
             debugData.MaxHeight = Screen.height;
-            console = new DebugConsole(debugData);
+            time = new DebugTime(debugData);
             scene = new DebugScene(debugData);
             memory = new DebugMemory(debugData);
-            drawCall = new DebugDrawCall(debugData);
             system = new DebugSystem(debugData);
             screen = new DebugScreen(debugData);
-            time = new DebugTime(debugData);
+            console = new DebugConsole(debugData);
+            drawCall = new DebugDrawCall(debugData);
             environment = new DebugEnvironment(debugData);
             Application.logMessageReceived += console.LogMessageReceived;
             scene.Start();
@@ -185,6 +189,7 @@ namespace JFramework
         {
             Application.logMessageReceived -= console.LogMessageReceived;
             MonoManager.Instance.RemoveListener(OnUpdate);
+            EventManager.RemoveListener("DebugManager", Register);
         }
     }
 

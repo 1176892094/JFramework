@@ -1,20 +1,17 @@
+using System;
 using UnityEngine;
 
 public class SingletonMono<T> : MonoBehaviour where T : SingletonMono<T>
 {
     private static T instance;
 
-    public static T Instance => instance;
-
-    protected virtual void Awake()
+    public static T Instance
     {
-        if (instance == null)
+        get
         {
-            instance = (T) this;
-        }
-        else
-        {
-            Destroy(gameObject);
+            if (instance != null) return instance;
+            instance = (T)FindObjectOfType(typeof(T));
+            return instance;
         }
     }
 }
