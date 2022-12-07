@@ -1,7 +1,8 @@
 using System;
+using JFramework.Basic;
 using UnityEngine;
 
-public class SingletonMono<T> : MonoBehaviour where T : SingletonMono<T>
+public class SingletonMono<T> : BaseBehaviour where T : SingletonMono<T>
 {
     private static T instance;
 
@@ -13,5 +14,10 @@ public class SingletonMono<T> : MonoBehaviour where T : SingletonMono<T>
             instance = (T)FindObjectOfType(typeof(T));
             return instance;
         }
+    }
+
+    protected override void OnUpdate()
+    {
+        
     }
 }
