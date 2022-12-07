@@ -241,7 +241,7 @@ public class Test9 : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.E)) timer.Play(); //启动计时器
     }
 
-    private void FinishAction() => Debug.Log("Timer Update"); //计时器更新
+    private void FinishAction() => Debug.Log("Timer Finish"); //计时器更新
 }
 ```
 (9)AwaitExtensions
