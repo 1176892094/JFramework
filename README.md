@@ -230,7 +230,7 @@ public class Test9 : MonoBehaviour
     private Timer timer;
     private void Start()
     {
-        timer = TimerManager.Instance.GetTimer(); //新建计时器
+        timer = TimerManager.Instance.Get(); //新建计时器
         timer.Open(0.3f, 10, FinishAction); //开启计时器，0.3秒计时一次，循环10次
         timer.Open(5f, FinishAction);//新建一个5秒的计时器
     }
