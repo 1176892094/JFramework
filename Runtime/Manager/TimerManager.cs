@@ -18,15 +18,15 @@ namespace JFramework
             }
         }
 
-        public void AddTimer(Timer timer) => timerList.AddLast(timer);
+        public void Add(Timer timer) => timerList.AddLast(timer);
 
-        public void RemoveTimer(Timer timer)
+        public void Remove(Timer timer)
         {
             timerList.Remove(timer);
             timerQueue.Enqueue(timer);
         }
 
-        public Timer GetTimer()
+        public Timer Get()
         {
             return timerQueue.Count > 0 ? timerQueue.Dequeue() : new Timer();
         }

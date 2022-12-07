@@ -35,7 +35,7 @@ namespace JFramework.Basic
             curLoop = -1;
             isRunning = true;
             curTime = Time.time;
-            TimerManager.Instance.AddTimer(this);
+            TimerManager.Instance.Add(this);
         }
 
         public void Update()
@@ -67,7 +67,7 @@ namespace JFramework.Basic
 
         public void Close()
         {
-            TimerManager.Instance.RemoveTimer(this);
+            TimerManager.Instance.Remove(this);
             isRunning = false;
             OnFinished = null;
         }
