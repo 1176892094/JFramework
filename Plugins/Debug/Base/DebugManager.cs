@@ -4,14 +4,14 @@ using Logger = JFramework.Basic.Logger;
 
 namespace JFramework
 {
-    internal class DebugManager : SingletonMono<DebugManager>
+    internal class DebugManager : BaseManager<DebugManager>
     {
-        private DebugData debugData;
         private int FPS;
         private bool isExtend;
         private float gameTimer;
         private Rect windowRect;
         private DebugType debugType;
+        private DebugSetting setting;
         private DebugConsole console;
         private DebugScene scene;
         private DebugMemory memory;
@@ -22,37 +22,28 @@ namespace JFramework
         private DebugEnvironment environment;
         public LogLevel LogLevel;
 
-        private void Awake()
+        protected override void Awake()
         {
-            DontDestroyOnLoad(gameObject);
-            EventManager.AddListener("DebugManager", Register);
-        }
-
-        private void Register()
-        {
+            base.Awake();
             Logger.LogLevel = LogLevel;
             windowRect = new Rect(0, 0, 200, 120);
-            debugData = ResourceManager.Load<DebugData>("DebugData");
-            debugData.InitData();
-            debugData.isDebug = true;
-            debugData.MaxWidth = Screen.width;
-            debugData.MaxHeight = Screen.height;
-            time = new DebugTime(debugData);
-            scene = new DebugScene(debugData);
-            memory = new DebugMemory(debugData);
-            system = new DebugSystem(debugData);
-            screen = new DebugScreen(debugData);
-            console = new DebugConsole(debugData);
-            drawCall = new DebugDrawCall(debugData);
-            environment = new DebugEnvironment(debugData);
+            setting = ResourceManager.Load<DebugSetting>("DebugSetting");
+            setting.InitData();
+            time = new DebugTime(setting);
+            scene = new DebugScene(setting);
+            memory = new DebugMemory(setting);
+            system = new DebugSystem(setting);
+            screen = new DebugScreen(setting);
+            console = new DebugConsole(setting);
+            drawCall = new DebugDrawCall(setting);
+            environment = new DebugEnvironment(setting);
             Application.logMessageReceived += console.LogMessageReceived;
-            scene.Start();
-            MonoManager.Instance.AddListener(OnUpdate);
+            scene.InitComponent();
         }
 
-        private void OnUpdate()
+        protected override void OnUpdate()
         {
-            if (!debugData.isDebug) return;
+            if (!setting.IsDebug) return;
             float timer = Time.realtimeSinceStartup - gameTimer;
             if (timer >= 1)
             {
@@ -63,16 +54,16 @@ namespace JFramework
 
         private void OnGUI()
         {
-            if (debugData == null || !debugData.isDebug) return;
+            if (setting == null || !setting.IsDebug) return;
             DebugStyle.Enable();
             if (isExtend)
             {
-                Rect localRect = new Rect(0, 0, debugData.MaxWidth, debugData.MaxHeight);
-                GUI.Window(0, localRect, MaxWindowGUI, debugData.GetData("Debugger"), DebugStyle.Window);
+                Rect localRect = new Rect(0, 0, setting.MaxWidth, setting.MaxHeight);
+                GUI.Window(0, localRect, MaxWindowGUI, setting.GetData("Debugger"), DebugStyle.Window);
             }
             else
             {
-                windowRect = GUI.Window(0, windowRect, MinGUIWindow, debugData.GetData("Debugger"), DebugStyle.Window);
+                windowRect = GUI.Window(0, windowRect, MinGUIWindow, setting.GetData("Debugger"), DebugStyle.Window);
             }
         }
 
@@ -81,7 +72,7 @@ namespace JFramework
             GUI.DragWindow(new Rect(0, 0, 10000, 40));
             GUI.contentColor = console.colorFPS;
             GUILayout.Space(20);
-            if (GUILayout.Button(debugData.GetData("FPS") + ": " + FPS, DebugStyle.Button, DebugStyle.MinGUIWindow))
+            if (GUILayout.Button(setting.GetData("FPS") + ": " + FPS, DebugStyle.Button, DebugStyle.MinGUIWindow))
             {
                 isExtend = true;
             }
@@ -126,19 +117,19 @@ namespace JFramework
         {
             GUILayout.BeginHorizontal();
             GUI.contentColor = console.colorFPS;
-            if (GUILayout.Button(debugData.GetData("FPS") + ": " + FPS,DebugStyle.Button, DebugStyle.MinGUIWindow))
+            if (GUILayout.Button(setting.GetData("FPS") + ": " + FPS,DebugStyle.Button, DebugStyle.MinGUIWindow))
             {
                 isExtend = false;
             }
 
             GUI.contentColor = debugType == DebugType.Console ? Color.white : Color.gray;
-            if (GUILayout.Button(debugData.GetData("Console"),DebugStyle.Button,  DebugStyle.MinHeight))
+            if (GUILayout.Button(setting.GetData("Console"),DebugStyle.Button,  DebugStyle.MinHeight))
             {
                 debugType = DebugType.Console;
             }
 
             GUI.contentColor = debugType == DebugType.Scene ? Color.white : Color.gray;
-            if (GUILayout.Button(debugData.GetData("Scene"), DebugStyle.Button,  DebugStyle.MinHeight))
+            if (GUILayout.Button(setting.GetData("Scene"), DebugStyle.Button,  DebugStyle.MinHeight))
             {
                 debugType = DebugType.Scene;
                 scene.RefreshGameObject();
@@ -146,37 +137,37 @@ namespace JFramework
             }
 
             GUI.contentColor = debugType == DebugType.Memory ? Color.white : Color.gray;
-            if (GUILayout.Button(debugData.GetData("Memory"), DebugStyle.Button,  DebugStyle.MinHeight))
+            if (GUILayout.Button(setting.GetData("Memory"), DebugStyle.Button,  DebugStyle.MinHeight))
             {
                 debugType = DebugType.Memory;
             }
 
             GUI.contentColor = debugType == DebugType.DrawCall ? Color.white : Color.gray;
-            if (GUILayout.Button(debugData.GetData("DrawCall"), DebugStyle.Button,  DebugStyle.MinHeight))
+            if (GUILayout.Button(setting.GetData("DrawCall"), DebugStyle.Button,  DebugStyle.MinHeight))
             {
                 debugType = DebugType.DrawCall;
             }
 
             GUI.contentColor = debugType == DebugType.System ? Color.white : Color.gray;
-            if (GUILayout.Button(debugData.GetData("System"), DebugStyle.Button,  DebugStyle.MinHeight))
+            if (GUILayout.Button(setting.GetData("System"), DebugStyle.Button,  DebugStyle.MinHeight))
             {
                 debugType = DebugType.System;
             }
 
             GUI.contentColor = debugType == DebugType.Screen ? Color.white : Color.gray;
-            if (GUILayout.Button(debugData.GetData("Screen"), DebugStyle.Button,  DebugStyle.MinHeight))
+            if (GUILayout.Button(setting.GetData("Screen"), DebugStyle.Button,  DebugStyle.MinHeight))
             {
                 debugType = DebugType.Screen;
             }
 
             GUI.contentColor = debugType == DebugType.Time ? Color.white : Color.gray;
-            if (GUILayout.Button(debugData.GetData("Time"), DebugStyle.Button,  DebugStyle.MinHeight))
+            if (GUILayout.Button(setting.GetData("Time"), DebugStyle.Button,  DebugStyle.MinHeight))
             {
                 debugType = DebugType.Time;
             }
 
             GUI.contentColor = debugType == DebugType.Environment ? Color.white : Color.gray;
-            if (GUILayout.Button(debugData.GetData("Environment"), DebugStyle.Button, DebugStyle.MinHeight))
+            if (GUILayout.Button(setting.GetData("Environment"), DebugStyle.Button, DebugStyle.MinHeight))
             {
                 debugType = DebugType.Environment;
             }
@@ -185,11 +176,10 @@ namespace JFramework
             GUILayout.EndHorizontal();
         }
 
-        private void OnDestroy()
+        protected override void OnDestroy()
         {
+            base.OnDestroy();
             Application.logMessageReceived -= console.LogMessageReceived;
-            MonoManager.Instance.RemoveListener(OnUpdate);
-            EventManager.RemoveListener("DebugManager", Register);
         }
     }
 

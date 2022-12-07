@@ -5,12 +5,12 @@ using Logger = JFramework.Basic.Logger;
 
 namespace JFramework
 {
-    public static class PoolManager
+    public class PoolManager: Singleton<PoolManager>
     {
-        private static readonly Dictionary<string, PoolData> poolDict = new Dictionary<string, PoolData>();
-        private static GameObject poolManager;
+        private readonly Dictionary<string, PoolData> poolDict = new Dictionary<string, PoolData>();
+        private GameObject poolManager;
 
-        public static void Pop(string path, UnityAction<GameObject> callback)
+        public void Pop(string path, UnityAction<GameObject> callback)
         {
             string[] strArray = path.Split('/');
             string name = strArray[^1];
@@ -41,7 +41,7 @@ namespace JFramework
             }
         }
 
-        public static void Push(GameObject obj)
+        public void Push(GameObject obj)
         {
             if (obj == null) return;
             string name = obj.name;

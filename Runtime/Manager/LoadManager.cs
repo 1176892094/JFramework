@@ -5,24 +5,25 @@ using AsyncOperation = UnityEngine.AsyncOperation;
 
 namespace JFramework
 {
-    public static class LoadManager
+    public class LoadManager : Singleton<LoadManager>
     {
-        public static void LoadScene(string name) => SceneManager.LoadScene(name);
+        public void LoadScene(string name) => SceneManager.LoadScene(name);
 
-        public static void LoadSceneAsync(string name, Action action = null)
+        public void LoadSceneAsync(string name, Action action = null)
         {
             MonoManager.Instance.StartCoroutine(LoadSceneCompleted(name, action));
         }
 
-        private static IEnumerator LoadSceneCompleted(string name, Action action = null)
+        private IEnumerator LoadSceneCompleted(string name, Action action = null)
         {
             AsyncOperation asyncOperation = SceneManager.LoadSceneAsync(name);
             if (asyncOperation == null) yield break;
             while (!asyncOperation.isDone)
             {
-                EventManager.OnTrigger("LoadSceneAsync", asyncOperation.progress);
+                EventManager.Instance.Send("LoadSceneAsync", asyncOperation.progress);
                 yield return asyncOperation;
             }
+
             action?.Invoke();
         }
     }

@@ -1,96 +1,170 @@
-using System.Diagnostics;
-using System.IO;
+using System.Globalization;
 using UnityEditor;
+using UnityEditor.UIElements;
 using UnityEngine;
-using Directory = System.IO.Directory;
+using UnityEngine.UIElements;
 
 namespace JFramework.Editor
 {
-    internal static class FrameworkEditor
+    internal class FrameworkEditor : InspectorEditor
     {
-        private struct DirectoryType
-        {
-            private const string Android = "/Extensions/Android";
-            private const string Windows = "/Extensions/Windows";
-            private const string WebGL = "/Extensions/WebGL";
-            private const string iOS = "/Extensions/iOS";
-            private const string Mac = "/Extensions/Mac";
-            private const string Audios = "/Resources/Audios";
-            private const string Models = "/Resources/Models";
-            private const string Physics = "/Resources/Physics";
-            private const string Prefabs = "/Resources/Prefabs";
-            private const string Process = "/Resources/Process";
-            private const string Animations = "/Animations";
-            private const string Materials = "/Materials";
-            private const string Scenes = "/Scenes";
-            private const string Scripts = "/Scripts";
-            private const string Settings = "/Settings";
-            private const string Plugins = "/Plugins";
-            private const string Shaders = "/Shaders";
-            private const string Textures = "/Textures";
-            private const string StreamingAssets = "/StreamingAssets";
-            private const string Tilemaps = "/Tilemaps";
+        private const string JFramework = "JFrameworkInspector";
+        private const string MenuPath = "Tools/JFramework/";
 
-            public static readonly string[] DirectoryArray = new[]
-            {
-                Android, Windows, WebGL, iOS, Mac, Audios,
-                Settings, Physics, Models, Textures, Prefabs,
-                Materials, Animations, Plugins, Scenes, Scripts,
-                Shaders, Process, Tilemaps, StreamingAssets
-            };
+        private static FrameworkEditor instance;
+        private static VisualElement visualElement;
+
+        private FrameworkEditor()
+        {
+            EditorApplication.delayCall += InitInspector;
+            InspectorObject.OnMaximizedChanged += OnMaximizedChanged;
+            Selection.selectionChanged += InitInspector;
         }
 
-        [MenuItem("Tools/JFramework/CurrentProjectPath")]
-        private static void ProjectFilePath()
-        {
-            Process.Start(System.Environment.CurrentDirectory);
-        }
+        [InitializeOnLoadMethod]
+        private static void Init() => instance = new FrameworkEditor();
 
-        [MenuItem("Tools/JFramework/PersistentDataPath")]
-        private static void PersistentDataPath()
+        protected override bool OnInject(EditorWindow wnd, VisualElement mainContainer, VisualElement editorsList)
         {
-            Process.Start(Application.persistentDataPath);
+            if (editorsList.parent[0].name == JFramework) editorsList.parent.RemoveAt(0);
+            if (editorsList.childCount != 0 || float.IsNaN(editorsList.layout.width)) return false;
+            visualElement ??= InitItems();
+            editorsList.parent.Insert(0, visualElement);
+            return true;
         }
-
-        [MenuItem("Tools/JFramework/StreamingAssetsPath")]
-        private static void StreamingAssetsPath()
+        
+        private VisualElement InitItems()
         {
-            if (Directory.Exists(Application.streamingAssetsPath))
-            {
-                Process.Start(Application.streamingAssetsPath);
-            }
-            else
-            {
-                Directory.CreateDirectory(Application.dataPath + "/StreamingAssets");
-                Process.Start(Application.streamingAssetsPath);
-            }
-        }
+            VisualElement element = new VisualElement { name = JFramework };
 
-        [MenuItem("Tools/JFramework/Initialization", false, 11)]
-        private static void Initialization()
-        {
-            foreach (var directory in DirectoryType.DirectoryArray)
+            Label box = new Label("JFramework Tools")
             {
-                if (!Directory.Exists(directory))
+                style =
                 {
-                    Directory.CreateDirectory(Application.dataPath + directory);
+                    backgroundColor = Color.gray * 0.7f,
+                    fontSize = 15,
+                    height = 25,
+                    unityTextAlign = TextAnchor.MiddleCenter
+                }
+            };
+
+            element.Add(box);
+            InitItems(element);
+            InitSettings(element);
+            InitWindows(element);
+            return element;
+        }
+        
+        private void InitSettings(VisualElement parent)
+        {
+            CreateLabel(parent, "Settings");
+            VisualElement container = CreateContainer(parent);
+            CreateButton(container, "Edit/Project Settings...", "Project Settings");
+#if UNITY_EDITOR_OSX
+            CreateButton(container, "Unity/Preferences...", "Preferences");
+#elif UNITY_EDITOR
+            CreateButton(container, "Edit/Preferences...", "Preferences");
+#endif
+        }
+        
+        private static void CreateLabel(VisualElement parent, string text)
+        {
+            Label label = new Label(text)
+            {
+                style =
+                {
+                    fontSize = 12,
+                    marginTop = 5,
+                    marginLeft = 3,
+                    marginRight = 3,
+                    paddingLeft = 5
+                }
+            };
+            parent.Add(label);
+        }
+
+        private static void CreateButton(VisualElement parent, string submenu, string text)
+        {
+            ToolbarButton button = new ToolbarButton(() => EditorApplication.ExecuteMenuItem(submenu))
+            {
+                text = text,
+                style =
+                {
+                    left = 0,
+                    unityTextAlign = TextAnchor.MiddleCenter,
+                    borderLeftWidth = 0,
+                    borderRightWidth = 0
+                }
+            };
+            parent.Add(button);
+        }
+
+        private VisualElement CreateContainer(VisualElement parent)
+        {
+            VisualElement el = new VisualElement();
+            el.style.borderBottomWidth = el.style.borderTopWidth = el.style.borderLeftWidth = el.style.borderRightWidth = 1;
+            el.style.borderBottomColor = el.style.borderTopColor = el.style.borderLeftColor = el.style.borderRightColor = Color.gray;
+            el.style.marginLeft = 3;
+            el.style.marginRight = 5;
+            parent.Add(el);
+            return el;
+        }
+        
+        private void InitItems(VisualElement parent)
+        {
+            CreateLabel(parent, "JFramework");
+            VisualElement container = CreateContainer(parent);
+            CreateButton(container, MenuPath + "JFramework Init", "JFramework Init");
+            CreateButton(container, MenuPath + "Excel Setting", "Excel Setting");
+            CreateButton(container, MenuPath + "Excel Writer", "Excel Writer");
+            CreateButton(container, MenuPath + "Excel Delete", "Excel Delete");
+            CreateButton(container, MenuPath + "CurrentProjectPath", "CurrentProjectPath");
+            CreateButton(container, MenuPath + "PersistentDataPath", "PersistentDataPath");
+            CreateButton(container, MenuPath + "StreamingAssetsPath", "StreamingAssetsPath");
+        }
+
+        private void InitWindows(VisualElement parent)
+        {
+            CreateLabel(parent, "Packages");
+            VisualElement container = CreateContainer(parent);
+
+            CreateButton(container, "Assets/Import Package/Custom Package...", "Import Custom Package");
+
+            bool skip = true;
+            string groupName = "";
+
+            foreach (string submenu in Unsupported.GetSubmenus("Window"))
+            {
+                TextInfo textInfo = CultureInfo.InvariantCulture.TextInfo;
+                string upper = textInfo.ToUpper(submenu);
+                if (skip)
+                {
+                    if (upper == "WINDOW/PACKAGE MANAGER")
+                    {
+                        skip = false;
+                    }
+                    else continue;
+                }
+
+                string[] parts = submenu.Split('/');
+                string firstPart = parts[1];
+
+                if (parts.Length == 2)
+                {
+                    CreateButton(container, submenu, firstPart);
+                }
+                else if (parts.Length == 3)
+                {
+                    if (groupName != firstPart)
+                    {
+                        CreateLabel(parent, firstPart);
+                        container = CreateContainer(parent);
+                        groupName = firstPart;
+                    }
+
+                    CreateButton(container, submenu, parts[2]);
                 }
             }
-            
-            if (!File.Exists(Application.dataPath + "/Scenes/StartScene.unity"))
-            {
-                CreateScene();
-            }
-        }
-
-        private static void CreateScene()
-        {
-            SceneAsset scene = ResourceManager.Load<SceneAsset>("StartScene");
-            string origin = AssetDatabase.GetAssetOrScenePath(scene);
-            string target = Application.dataPath + "/Scenes/StartScene.unity";
-            File.Copy(origin, target, false);
-            AssetDatabase.SaveAssets();
-            AssetDatabase.Refresh();
         }
     }
 }

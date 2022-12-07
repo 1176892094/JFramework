@@ -7,14 +7,14 @@ using Object = UnityEngine.Object;
 
 namespace JFramework
 {
-    public static class AssetManager
+    public class AssetManager: Singleton<AssetManager>
     {
-        private static readonly Dictionary<string, AssetBundle> assetDict = new Dictionary<string, AssetBundle>();
-        private static AssetBundleManifest manifest;
-        private static AssetBundle asset;
-        private static string PathURL => Application.streamingAssetsPath + "/";
+        private readonly Dictionary<string, AssetBundle> assetDict = new Dictionary<string, AssetBundle>();
+        private AssetBundleManifest manifest;
+        private AssetBundle asset;
+        private string PathURL => Application.streamingAssetsPath + "/";
 
-        private static string MainName
+        private string MainName
         {
             get
             {
@@ -28,7 +28,7 @@ namespace JFramework
             }
         }
 
-        private static void LoadAsset(string packageName)
+        private void LoadAsset(string packageName)
         {
             if (asset == null)
             {
@@ -54,26 +54,26 @@ namespace JFramework
             }
         }
 
-        public static Object Load(string packageName, string assetName, Type type)
+        public Object Load(string packageName, string assetName, Type type)
         {
             LoadAsset(packageName);
             Object obj = assetDict[packageName].LoadAsset(assetName, type);
             return obj is GameObject ? Object.Instantiate(obj) : obj;
         }
 
-        public static T Load<T>(string packageName, string assetName) where T : Object
+        public T Load<T>(string packageName, string assetName) where T : Object
         {
             LoadAsset(packageName);
             T obj = assetDict[packageName].LoadAsset<T>(assetName);
             return obj is GameObject ? Object.Instantiate(obj) : obj;
         }
 
-        public static void LoadAsync(string packageName, string assetName, Type type, Action<Object> callback)
+        public void LoadAsync(string packageName, string assetName, Type type, Action<Object> callback)
         {
             MonoManager.Instance.StartCoroutine(LoadCompleted(packageName, assetName, type, callback));
         }
 
-        private static IEnumerator LoadCompleted(string packageName, string assetName, Type type, Action<Object> callback)
+        private IEnumerator LoadCompleted(string packageName, string assetName, Type type, Action<Object> callback)
         {
             LoadAsset(packageName);
             AssetBundleRequest request = assetDict[packageName].LoadAssetAsync(assetName, type);
@@ -88,12 +88,12 @@ namespace JFramework
             callback(request.asset is GameObject ? Object.Instantiate(request.asset) : request.asset);
         }
 
-        public static void LoadAsync<T>(string packageName, string assetName, Action<T> callback) where T : Object
+        public void LoadAsync<T>(string packageName, string assetName, Action<T> callback) where T : Object
         {
             MonoManager.Instance.StartCoroutine(LoadCompleted(packageName, assetName, callback));
         }
 
-        private static IEnumerator LoadCompleted<T>(string packageName, string assetName, Action<T> callback) where T : Object
+        private IEnumerator LoadCompleted<T>(string packageName, string assetName, Action<T> callback) where T : Object
         {
             LoadAsset(packageName);
             AssetBundleRequest request = assetDict[packageName].LoadAssetAsync<T>(assetName);
@@ -115,7 +115,7 @@ namespace JFramework
             }
         }
 
-        public static void UnLoad(string name)
+        public void UnLoad(string name)
         {
             if (assetDict.ContainsKey(name))
             {
@@ -124,7 +124,7 @@ namespace JFramework
             }
         }
 
-        public static void Clear()
+        public void Clear()
         {
             AssetBundle.UnloadAllAssetBundles(false);
             assetDict.Clear();

@@ -7,7 +7,7 @@ using UnityEngine.EventSystems;
 
 namespace JFramework
 {
-    public class UIManager : SingletonMono<UIManager>
+    public class UIManager : BaseManager<UIManager>
     {
         private readonly Dictionary<string, IPanel> panelDict = new Dictionary<string, IPanel>();
         private Transform bottom;
@@ -15,14 +15,9 @@ namespace JFramework
         private Transform height;
         private Transform common;
 
-        private void Awake()
+        protected override void Awake()
         {
-            DontDestroyOnLoad(gameObject);
-            EventManager.AddListener("UIManager", Register);
-        }
-
-        private void Register()
-        {
+            base.Awake();
             bottom = transform.Find("Canvas/Bottom");
             middle = transform.Find("Canvas/Middle");
             height = transform.Find("Canvas/Height");
@@ -116,18 +111,13 @@ namespace JFramework
             panelDict.Clear();
         }
 
-        public static void AddListener(UIBehaviour control, EventTriggerType type, UnityAction<BaseEventData> callback)
+        public void Listen(UIBehaviour control, EventTriggerType type, UnityAction<BaseEventData> callback)
         {
             EventTrigger trigger = control.GetComponent<EventTrigger>();
             if (trigger == null) trigger = control.gameObject.AddComponent<EventTrigger>();
             EventTrigger.Entry entry = new EventTrigger.Entry { eventID = type };
             entry.callback.AddListener(callback);
             trigger.triggers.Add(entry);
-        }
-
-        private void OnDestroy()
-        {
-            EventManager.RemoveListener("UIManager", Register);
         }
     }
 }

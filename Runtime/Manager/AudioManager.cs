@@ -1,31 +1,27 @@
 using System;
 using System.Collections.Generic;
+using JFramework.Basic;
 using UnityEngine;
 
 namespace JFramework
 {
-    public class AudioManager : MonoBehaviour
+    public class AudioManager : BaseManager<AudioManager>
     {
-        private static readonly List<AudioSource> soundList = new List<AudioSource>();
-        private static AudioSource sound;
-        private static GameObject source;
-        private static float soundVolume = 1;
-        private static float audioVolume = 1;
+        private readonly List<AudioSource> soundList = new List<AudioSource>();
+        private AudioSource sound;
+        private GameObject source;
+        private float soundVolume = 1;
+        private float audioVolume = 1;
 
-        private void Awake()
+        protected override void Awake()
         {
-            DontDestroyOnLoad(gameObject);
-            EventManager.AddListener("AudioManager", Register);
-        }
-
-        private void Register()
-        {
+            base.Awake();
             source = gameObject;
             sound = gameObject.AddComponent<AudioSource>();
-            MonoManager.Instance.AddListener(OnUpdate);
+            MonoManager.Instance.Listen(OnUpdate);
         }
 
-        private void OnUpdate()
+        protected override void OnUpdate()
         {
             for (int i = soundList.Count - 1; i >= 0; --i)
             {
@@ -44,7 +40,7 @@ namespace JFramework
             }
         }
 
-        public static void PlaySound(string name)
+        public void PlaySound(string name)
         {
             ResourceManager.LoadAsync<AudioClip>(name, clip =>
             {
@@ -55,45 +51,45 @@ namespace JFramework
             });
         }
 
-        public static void ChangeSound(float value)
+        public void ChangeSound(float value)
         {
             soundVolume = value;
             sound.volume = soundVolume;
         }
 
-        public static void PauseSound()
+        public void PauseSound()
         {
             sound.Pause();
         }
 
-        public static void StopSound()
+        public void StopSound()
         {
             sound.Stop();
         }
 
-        public static void PlayAudio(string path, Action<AudioSource> callback = null)
+        public void PlayAudio(string path, Action<AudioSource> callback = null)
         {
             ResourceManager.LoadAsync<AudioClip>(path, clip =>
             {
-                AudioSource audio = source.AddComponent<AudioSource>();
-                audio.volume = audioVolume;
-                audio.clip = clip;
-                audio.Play();
-                soundList.Add(audio);
-                callback?.Invoke(audio);
+                AudioSource local = source.AddComponent<AudioSource>();
+                local.volume = audioVolume;
+                local.clip = clip;
+                local.Play();
+                soundList.Add(local);
+                callback?.Invoke(local);
             });
         }
 
-        public static void ChangeAudio(float value)
+        public void ChangeAudio(float value)
         {
             audioVolume = value;
-            foreach (AudioSource audio in soundList)
+            foreach (AudioSource local in soundList)
             {
-                audio.volume = audioVolume;
+                local.volume = audioVolume;
             }
         }
 
-        public static void StopAudio(AudioSource audio)
+        public void StopAudio(AudioSource audio)
         {
             if (soundList.Contains(audio))
             {
@@ -101,12 +97,6 @@ namespace JFramework
                 audio.Stop();
                 Destroy(audio);
             }
-        }
-
-        private void OnDestroy()
-        {
-            MonoManager.Instance.RemoveListener(OnUpdate);
-            EventManager.RemoveListener("AudioManager", Register);
         }
     }
 }

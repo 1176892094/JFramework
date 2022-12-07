@@ -12,7 +12,7 @@ namespace JFramework.Excel
     {
         private ExcelSetting settings;
 
-        [MenuItem(@"Tools/JFramework/Excel Setting", false, 101)]
+        [MenuItem("Tools/JFramework/Excel Setting", false, 101)]
         public static void OpenSettingsWindow()
         {
             try

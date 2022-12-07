@@ -13,94 +13,87 @@ namespace JFramework
     using IntDataDict = Dictionary<int, ExcelData>;
     using StrDataDict = Dictionary<string, ExcelData>;
 
-    public class ExcelManager : SingletonMono<ExcelManager>
+    public class ExcelManager : Singleton<ExcelManager>
     {
         private readonly Dictionary<Type, IntDataDict> IntDataDict = new Dictionary<Type, IntDataDict>();
         private readonly Dictionary<Type, StrDataDict> StrDataDict = new Dictionary<Type, StrDataDict>();
 
-        private void Awake()
-        {
-            DontDestroyOnLoad(gameObject);
-            EventManager.AddListener("ExcelManager", Register);
-        }
-
-        private void Register()
+        public void LoadData()
         {
 #if UNITY_EDITOR
             if (!ExcelSetting.Instance.AssetPath.Contains("/Resources"))
             {
-                EditorUtility.DisplayDialog("JFramework Tool", "SO文件必须在Resources目录下", "OK");
+                EditorUtility.DisplayDialog("JFramework Tool", "ExcelSetting文件必须在Resources目录下", "OK");
                 return;
             }
 #endif
             IntDataDict.Clear();
             StrDataDict.Clear();
 
-            var assembly = ExcelUtility.GetSourceAssembly();
+            var assembly = ExcelExtend.GetSourceAssembly();
             var types = assembly.GetTypes().Where(type => type.IsSubclassOf(typeof(ExcelContainer)));
-            foreach (var containerType in types)
+            foreach (var type in types)
             {
-                LoadData(assembly, containerType);
+                try
+                {
+                    var tableName = type.Name;
+                    var index = ExcelSetting.Instance.AssetPath.IndexOf("Resources/", StringComparison.Ordinal);
+                    var filePath = ExcelSetting.Instance.AssetPath.Substring(index + "Resources/".Length) + tableName;
+                    ResourceManager.LoadAsync<ExcelContainer>(filePath,container =>
+                    {
+                        if (container == null)
+                        {
+                            Logger.LogError($"ExcelManager加载数据失败:{tableName}!");
+                            return;
+                        }
+
+                        container.InitData();
+                        var classType = GetClassType(assembly, type);
+                        var keyField = ExcelExtend.GetDataKeyField(classType);
+                        if (keyField == null)
+                        {
+                            Logger.LogError($"ExcelManager没有找到主键:{tableName}!");
+                            return;
+                        }
+
+                        var keyType = keyField.FieldType;
+                        if (keyType == typeof(int))
+                        {
+                            var dataDict = new IntDataDict();
+                            for (var i = 0; i < container.GetCount(); ++i)
+                            {
+                                var data = container.GetData(i);
+                                int key = (int)keyField.GetValue(data);
+                                dataDict.Add(key, data);
+                            }
+
+                            IntDataDict.Add(classType, dataDict);
+                        }
+                        else if (keyType == typeof(string))
+                        {
+                            var dataDict = new StrDataDict();
+                            for (var i = 0; i < container.GetCount(); ++i)
+                            {
+                                var data = container.GetData(i);
+                                string key = (string)keyField.GetValue(data);
+                                dataDict.Add(key, data);
+                            }
+
+                            StrDataDict.Add(classType, dataDict);
+                        }
+                        else
+                        {
+                            Logger.LogError($"ExcelManager加载{type.Name}失败.这不是有效的主键!");
+                        }
+                    });
+                }
+                catch (Exception e)
+                {
+                    Logger.LogError(e.ToString());
+                }
             }
 
             Logger.Log($"ExcelManager加载{IntDataDict.Count + StrDataDict.Count}个数据");
-        }
-
-        private void LoadData(Assembly assembly, Type collectionType)
-        {
-            try
-            {
-                var tableName = collectionType.Name;
-                var collection = LoadContainer(tableName);
-                if (collection == null)
-                {
-                    Logger.LogError($"ExcelManager加载数据失败:{tableName}!");
-                    return;
-                }
-
-                collection.InitData();
-                var type = GetClassType(assembly, collectionType);
-                var keyField = ExcelUtility.GetRowDataKeyField(type);
-                if (keyField == null)
-                {
-                    Logger.LogError($"ExcelManager没有找到主键:{tableName}!");
-                    return;
-                }
-
-                var keyType = keyField.FieldType;
-                if (keyType == typeof(int))
-                {
-                    var dataDict = new IntDataDict();
-                    for (var i = 0; i < collection.GetCount(); ++i)
-                    {
-                        var data = collection.GetData(i);
-                        int key = (int)keyField.GetValue(data);
-                        dataDict.Add(key, data);
-                    }
-
-                    IntDataDict.Add(type, dataDict);
-                }
-                else if (keyType == typeof(string))
-                {
-                    var dataDict = new StrDataDict();
-                    for (var i = 0; i < collection.GetCount(); ++i)
-                    {
-                        var data = collection.GetData(i);
-                        string key = (string)keyField.GetValue(data);
-                        dataDict.Add(key, data);
-                    }
-
-                    StrDataDict.Add(type, dataDict);
-                }
-                else
-                {
-                    Logger.LogError($"ExcelManager加载{collectionType.Name}失败.这不是有效的主键!");
-                }
-            }
-            catch (Exception e)
-            {
-                Logger.LogError(e.ToString());
-            }
         }
 
         public T Get<T>(int key) where T : ExcelData
@@ -150,7 +143,7 @@ namespace JFramework
             if (dictStr != null) return dictStr.Values.ToList();
             return null;
         }
-        
+
         private ExcelData Get(int key, Type type)
         {
             IntDataDict.TryGetValue(type, out IntDataDict soDic);
@@ -166,7 +159,7 @@ namespace JFramework
             soDic.TryGetValue(key, out ExcelData data);
             return data;
         }
-        
+
         private Type GetClassType(Assembly assembly, Type sheetClassType)
         {
             var sheetName = GetSheetName(sheetClassType);
@@ -177,14 +170,6 @@ namespace JFramework
         private string GetSheetName(Type sheetClassType)
         {
             return ExcelSetting.Instance.GetSheetName(sheetClassType);
-        }
-
-        private ExcelContainer LoadContainer(string name)
-        {
-            var index = ExcelSetting.Instance.AssetPath.IndexOf("Resources/", StringComparison.Ordinal);
-            var filePath = ExcelSetting.Instance.AssetPath.Substring(index + "Resources/".Length) + name;
-            var table = ResourceManager.Load<ExcelContainer>(filePath);
-            return table;
         }
     }
 }

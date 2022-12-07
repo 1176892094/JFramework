@@ -100,7 +100,7 @@ namespace JFramework.Excel
 
     internal struct ExcelConfig
     {
-        public const string ExcelData = "ExcelData";
+        public const string ExcelData = "ExcelSetting";
         public const string Extension = ".asset";
         public const string ExcelPath = "Assets/Resources/Settings/" + ExcelData + Extension;
     }

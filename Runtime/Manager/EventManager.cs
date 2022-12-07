@@ -3,27 +3,71 @@ using System.Collections.Generic;
 
 namespace JFramework
 {
-    public static class EventManager
+    public class EventManager : Singleton<EventManager>
     {
-        private static readonly Dictionary<string, IEventData> eventDict = new Dictionary<string, IEventData>();
+        private readonly Dictionary<string, IEventData> eventDict = new Dictionary<string, IEventData>();
 
-        public static void AddListener<T1, T2>(string type, Action<T1, T2> action)
+        public void Listen<T, K, S>(string type, Action<T, K, S> action)
         {
             if (eventDict.ContainsKey(type))
             {
-                ((EventData<T1, T2>)eventDict[type]).actionList += action;
+                ((EventData<T, K, S>)eventDict[type]).action += action;
             }
             else
             {
-                eventDict.Add(type, new EventData<T1, T2>(action));
+                eventDict.Add(type, new EventData<T, K, S>(action));
             }
         }
 
-        public static void AddListener<T>(string type, Action<T> action)
+        public void Remove<T, K, S>(string type, Action<T, K, S> action)
         {
             if (eventDict.ContainsKey(type))
             {
-                ((EventData<T>)eventDict[type]).actionList += action;
+                ((EventData<T, K, S>)eventDict[type]).action -= action;
+            }
+        }
+
+        public void Send<T, K, S>(string type, T t, K k, S s)
+        {
+            if (eventDict.ContainsKey(type))
+            {
+                ((EventData<T, K, S>)eventDict[type]).action?.Invoke(t, k, s);
+            }
+        }
+
+        public void Listen<T, K>(string type, Action<T, K> action)
+        {
+            if (eventDict.ContainsKey(type))
+            {
+                ((EventData<T, K>)eventDict[type]).action += action;
+            }
+            else
+            {
+                eventDict.Add(type, new EventData<T, K>(action));
+            }
+        }
+
+        public void Remove<T, K>(string type, Action<T, K> action)
+        {
+            if (eventDict.ContainsKey(type))
+            {
+                ((EventData<T, K>)eventDict[type]).action -= action;
+            }
+        }
+
+        public void Send<T, K>(string type, T t, K k)
+        {
+            if (eventDict.ContainsKey(type))
+            {
+                ((EventData<T, K>)eventDict[type]).action?.Invoke(t, k);
+            }
+        }
+
+        public void Listen<T>(string type, Action<T> action)
+        {
+            if (eventDict.ContainsKey(type))
+            {
+                ((EventData<T>)eventDict[type]).action += action;
             }
             else
             {
@@ -31,11 +75,27 @@ namespace JFramework
             }
         }
 
-        public static void AddListener(string type, Action action)
+        public void Remove<T>(string type, Action<T> action)
         {
             if (eventDict.ContainsKey(type))
             {
-                ((EventData)eventDict[type]).actionList += action;
+                ((EventData<T>)eventDict[type]).action -= action;
+            }
+        }
+
+        public void Send<T>(string type, T t)
+        {
+            if (eventDict.ContainsKey(type))
+            {
+                ((EventData<T>)eventDict[type]).action?.Invoke(t);
+            }
+        }
+        
+        public void Listen(string type, Action action)
+        {
+            if (eventDict.ContainsKey(type))
+            {
+                ((EventData)eventDict[type]).action += action;
             }
             else
             {
@@ -43,74 +103,47 @@ namespace JFramework
             }
         }
 
-        public static void RemoveListener<T1, T2>(string type, Action<T1, T2> action)
+        public void Remove(string type, Action action)
         {
             if (eventDict.ContainsKey(type))
             {
-                ((EventData<T1, T2>)eventDict[type]).actionList -= action;
+                ((EventData)eventDict[type]).action -= action;
             }
         }
 
-        public static void RemoveListener<T>(string type, Action<T> action)
+        public void Send(string type)
         {
             if (eventDict.ContainsKey(type))
             {
-                ((EventData<T>)eventDict[type]).actionList -= action;
+                ((EventData)eventDict[type]).action?.Invoke();
             }
         }
-
-        public static void RemoveListener(string type, Action action)
-        {
-            if (eventDict.ContainsKey(type))
-            {
-                ((EventData)eventDict[type]).actionList -= action;
-            }
-        }
-
-        public static void OnTrigger<T1, T2>(string type, T1 data1, T2 data2)
-        {
-            if (eventDict.ContainsKey(type))
-            {
-                ((EventData<T1, T2>)eventDict[type]).actionList?.Invoke(data1, data2);
-            }
-        }
-
-        public static void OnTrigger<T>(string type, T data)
-        {
-            if (eventDict.ContainsKey(type))
-            {
-                ((EventData<T>)eventDict[type]).actionList?.Invoke(data);
-            }
-        }
-
-        public static void OnTrigger(string type)
-        {
-            if (eventDict.ContainsKey(type))
-            {
-                ((EventData)eventDict[type]).actionList?.Invoke();
-            }
-        }
-        
     }
 
-    internal class EventData<T1, T2> : IEventData
+    internal class EventData<T, K, S> : IEventData
     {
-        public Action<T1, T2> actionList;
-        public EventData(Action<T1, T2> action) => actionList += action;
+        public Action<T, K, S> action;
+        public EventData(Action<T, K, S> action) => this.action += action;
+    }
+
+    internal class EventData<T, K> : IEventData
+    {
+        public Action<T, K> action;
+        public EventData(Action<T, K> action) => this.action += action;
     }
 
     internal class EventData<T> : IEventData
     {
-        public Action<T> actionList;
-        public EventData(Action<T> action) => actionList += action;
+        public Action<T> action;
+        public EventData(Action<T> action) => this.action += action;
     }
 
     internal class EventData : IEventData
     {
-        public Action actionList;
-        public EventData(Action action) => actionList += action;
+        public Action action;
+        public EventData(Action action) => this.action += action;
     }
-    
+
     internal interface IEventData
     {
     }

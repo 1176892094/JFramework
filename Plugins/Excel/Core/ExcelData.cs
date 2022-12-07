@@ -8,7 +8,7 @@ namespace JFramework.Excel
 	{
 		public object GetKeyFieldValue()
 		{
-			FieldInfo keyField = ExcelUtility.GetRowDataKeyField(GetType());
+			FieldInfo keyField = ExcelExtend.GetDataKeyField(GetType());
 			return keyField == null ? null : keyField.GetValue(this);
 		}
 

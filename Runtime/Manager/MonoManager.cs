@@ -1,6 +1,5 @@
 using System;
 using System.Collections;
-using JFramework.Basic;
 using UnityEngine;
 
 namespace JFramework
@@ -16,9 +15,9 @@ namespace JFramework
             obj.hideFlags = HideFlags.HideAndDontSave;
         }
 
-        public void AddListener(Action action) => controller.AddListener(action);
+        public void Listen(Action action) => controller.Listen(action);
 
-        public void RemoveListener(Action action) => controller.RemoveListener(action);
+        public void Remove(Action action) => controller.Remove(action);
 
         public Coroutine StartCoroutine(IEnumerator coroutine)
         {
@@ -27,6 +26,15 @@ namespace JFramework
 
         public void StopCoroutine(IEnumerator coroutine) => controller.StopCoroutine(coroutine);
 
-        public void StopAllCoroutines() => controller.StopAllCoroutines();
+        public void StopCoroutines() => controller.StopAllCoroutines();
+    }
+    
+    internal class MonoController : MonoBehaviour
+    {
+        private event Action UpdateAction;
+        private void Awake() => DontDestroyOnLoad(gameObject);
+        private void Update() => UpdateAction?.Invoke();
+        public void Listen(Action action) => UpdateAction += action;
+        public void Remove(Action action) => UpdateAction -= action;
     }
 }

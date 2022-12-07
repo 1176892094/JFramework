@@ -1,7 +1,10 @@
+using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Security.Cryptography;
 using JFramework.Basic;
 using Newtonsoft.Json;
+using UnityEditor;
 using UnityEngine;
 using Logger = JFramework.Basic.Logger;
 
@@ -11,15 +14,15 @@ namespace JFramework
     {
         public static void InitData()
         {
-            JsonData.Instance.Clear();
+            JsonSetting.Instance.Clear();
         }
 
         public static void LoadData()
         {
-            JsonData.Instance.LoadData();
-            JsonData.Instance.InitData();
+            JsonSetting.Instance.LoadData();
+            JsonSetting.Instance.InitData();
         }
-        
+
         public static void Save(object obj, string fileName, bool AES = false)
         {
             string filePath = Application.persistentDataPath + "/" + fileName + ".json";
@@ -27,7 +30,7 @@ namespace JFramework
             if (AES)
             {
                 using Aes aes = Aes.Create();
-                JsonData.Instance.SetData(fileName, aes.Key, aes.IV);
+                JsonSetting.Instance.SetData(fileName, aes.Key, aes.IV);
                 byte[] data = Encrypt(saveJson, aes.Key, aes.IV);
                 File.WriteAllBytes(filePath, data);
             }
@@ -56,7 +59,7 @@ namespace JFramework
             if (AES)
             {
                 byte[] loadJson = File.ReadAllBytes(filePath);
-                JsonData.AesData data = JsonData.Instance.GetData(obj.name);
+                JsonSetting.AesData data = JsonSetting.Instance.GetData(obj.name);
                 byte[] key = data.key;
                 byte[] iv = data.iv;
                 if (key == null || key.Length <= 0 || iv == null || iv.Length <= 0) return;
@@ -70,7 +73,7 @@ namespace JFramework
             }
         }
 
-        public static T Load<T>(string fileName) where T : new()
+        public static T Load<T>(string fileName, bool AES = false) where T : new()
         {
             string filePath = Application.streamingAssetsPath + "/" + fileName + ".json";
             if (!File.Exists(filePath))
@@ -79,9 +82,27 @@ namespace JFramework
             }
 
             if (!File.Exists(filePath)) return new T();
-            string saveJson = File.ReadAllText(filePath);
-            T data = JsonConvert.DeserializeObject<T>(saveJson);
-            return data;
+            if (AES)
+            {
+                byte[] loadJson = File.ReadAllBytes(filePath);
+                JsonSetting.AesData aes = JsonSetting.Instance.GetData(fileName);
+                byte[] key = aes.key;
+                byte[] iv = aes.iv;
+                if (key == null || key.Length <= 0 || iv == null || iv.Length <= 0)
+                {
+                    return new T();
+                }
+
+                string saveJson = Decrypt(loadJson, key, iv);
+                T data = JsonConvert.DeserializeObject<T>(saveJson);
+                return data;
+            }
+            else
+            {
+                string saveJson = File.ReadAllText(filePath);
+                T data = JsonConvert.DeserializeObject<T>(saveJson);
+                return data;
+            }
         }
 
         private static byte[] Encrypt(string targetStr, byte[] key, byte[] iv)
