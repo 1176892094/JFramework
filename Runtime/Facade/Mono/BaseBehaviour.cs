@@ -7,9 +7,9 @@ namespace JFramework.Basic
     {
         protected virtual void Awake()
         {
-            if (Logger.LogLevel == LogLevel.Middle)
+            if (Logger.LogLevel != LogLevel.Lowest)
             {
-                Logger.Log(gameObject.name + "添加OnUpdate监听");
+                Logger.Log(gameObject.name + "添加OnUpdate侦听");
                 EventManager.Instance.Send("AddUpdate",gameObject.name);
             }
 
@@ -25,13 +25,12 @@ namespace JFramework.Basic
         
         protected virtual void OnDestroy()
         {
-            if (Logger.LogLevel == LogLevel.Middle)
+            MonoManager.Instance.Remove(OnUpdate);
+            if (Logger.LogLevel != LogLevel.Lowest)
             {
-                Logger.Log(gameObject.name + "移除OnUpdate监听");
+                Logger.Log(gameObject.name + "移除OnUpdate侦听");
                 EventManager.Instance.Send("RemoveUpdate",gameObject.name);
             }
-
-            MonoManager.Instance.Remove(OnUpdate);
         }
     }
 }

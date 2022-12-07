@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using JFramework.Basic;
 
 namespace JFramework
 {
@@ -17,6 +18,10 @@ namespace JFramework
             {
                 eventDict.Add(type, new EventData<T, K, S>(action));
             }
+            if (Logger.LogLevel == LogLevel.Height)
+            {
+                Logger.Log($"EventManager侦听{type}事件");
+            }
         }
 
         public void Remove<T, K, S>(string type, Action<T, K, S> action)
@@ -25,6 +30,10 @@ namespace JFramework
             {
                 ((EventData<T, K, S>)eventDict[type]).action -= action;
             }
+            if (Logger.LogLevel == LogLevel.Height)
+            {
+                Logger.Log($"EventManager移除{type}事件");
+            }
         }
 
         public void Send<T, K, S>(string type, T t, K k, S s)
@@ -32,6 +41,10 @@ namespace JFramework
             if (eventDict.ContainsKey(type))
             {
                 ((EventData<T, K, S>)eventDict[type]).action?.Invoke(t, k, s);
+            }
+            if (Logger.LogLevel == LogLevel.Height)
+            {
+                Logger.Log($"EventManager发送{type}事件");
             }
         }
 
@@ -45,6 +58,10 @@ namespace JFramework
             {
                 eventDict.Add(type, new EventData<T, K>(action));
             }
+            if (Logger.LogLevel == LogLevel.Height)
+            {
+                Logger.Log($"EventManager侦听{type}事件");
+            }
         }
 
         public void Remove<T, K>(string type, Action<T, K> action)
@@ -53,6 +70,10 @@ namespace JFramework
             {
                 ((EventData<T, K>)eventDict[type]).action -= action;
             }
+            if (Logger.LogLevel == LogLevel.Height)
+            {
+                Logger.Log($"EventManager移除{type}事件");
+            }
         }
 
         public void Send<T, K>(string type, T t, K k)
@@ -60,6 +81,10 @@ namespace JFramework
             if (eventDict.ContainsKey(type))
             {
                 ((EventData<T, K>)eventDict[type]).action?.Invoke(t, k);
+            }
+            if (Logger.LogLevel == LogLevel.Height)
+            {
+                Logger.Log($"EventManager发送{type}事件");
             }
         }
 
@@ -73,6 +98,10 @@ namespace JFramework
             {
                 eventDict.Add(type, new EventData<T>(action));
             }
+            if (Logger.LogLevel == LogLevel.Height)
+            {
+                Logger.Log($"EventManager侦听{type}事件");
+            }
         }
 
         public void Remove<T>(string type, Action<T> action)
@@ -81,6 +110,10 @@ namespace JFramework
             {
                 ((EventData<T>)eventDict[type]).action -= action;
             }
+            if (Logger.LogLevel == LogLevel.Height)
+            {
+                Logger.Log($"EventManager移除{type}事件");
+            }
         }
 
         public void Send<T>(string type, T t)
@@ -88,6 +121,10 @@ namespace JFramework
             if (eventDict.ContainsKey(type))
             {
                 ((EventData<T>)eventDict[type]).action?.Invoke(t);
+            }
+            if (Logger.LogLevel == LogLevel.Height)
+            {
+                Logger.Log($"EventManager发送{type}事件");
             }
         }
         
@@ -101,6 +138,10 @@ namespace JFramework
             {
                 eventDict.Add(type, new EventData(action));
             }
+            if (Logger.LogLevel == LogLevel.Height)
+            {
+                Logger.Log($"EventManager侦听{type}事件");
+            }
         }
 
         public void Remove(string type, Action action)
@@ -109,6 +150,10 @@ namespace JFramework
             {
                 ((EventData)eventDict[type]).action -= action;
             }
+            if (Logger.LogLevel == LogLevel.Height)
+            {
+                Logger.Log($"EventManager移除{type}事件");
+            }
         }
 
         public void Send(string type)
@@ -116,6 +161,10 @@ namespace JFramework
             if (eventDict.ContainsKey(type))
             {
                 ((EventData)eventDict[type]).action?.Invoke();
+            }
+            if (Logger.LogLevel == LogLevel.Height)
+            {
+                Logger.Log($"EventManager发送{type}事件");
             }
         }
     }
