@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace JFramework
+namespace JFramework.Basic
 {
     public class BaseContainer
     {

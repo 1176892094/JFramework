@@ -1,4 +1,5 @@
-﻿using JFramework.Basic;
+﻿using System.Collections.Generic;
+using JFramework.Basic;
 using UnityEngine;
 using Logger = JFramework.Basic.Logger;
 
@@ -20,10 +21,13 @@ namespace JFramework
         private DebugScreen screen;
         private DebugTime time;
         private DebugEnvironment environment;
-        public LogLevel LogLevel;
+        [SerializeField] private LogLevel LogLevel;
+        [SerializeField] private List<string> updateList;
 
         protected override void Awake()
         {
+            EventManager.Instance.Listen<string>("AddUpdate",name=>updateList.Add(name));
+            EventManager.Instance.Listen<string>("RemoveUpdate",name=>updateList.Remove(name));
             base.Awake();
             Logger.LogLevel = LogLevel;
             windowRect = new Rect(0, 0, 200, 120);
@@ -179,6 +183,8 @@ namespace JFramework
         protected override void OnDestroy()
         {
             base.OnDestroy();
+            EventManager.Instance.Remove<string>("AddUpdate",name=>updateList.Add(name));
+            EventManager.Instance.Remove<string>("RemoveUpdate",name=>updateList.Remove(name));
             Application.logMessageReceived -= console.LogMessageReceived;
         }
     }

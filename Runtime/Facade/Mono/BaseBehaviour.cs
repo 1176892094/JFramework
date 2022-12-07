@@ -10,6 +10,7 @@ namespace JFramework.Basic
             if (Logger.LogLevel == LogLevel.Middle)
             {
                 Logger.Log(gameObject.name + "添加OnUpdate监听");
+                EventManager.Instance.Send("AddUpdate",gameObject.name);
             }
 
             MonoManager.Instance.Listen(OnUpdate);
@@ -27,6 +28,7 @@ namespace JFramework.Basic
             if (Logger.LogLevel == LogLevel.Middle)
             {
                 Logger.Log(gameObject.name + "移除OnUpdate监听");
+                EventManager.Instance.Send("RemoveUpdate",gameObject.name);
             }
 
             MonoManager.Instance.Remove(OnUpdate);

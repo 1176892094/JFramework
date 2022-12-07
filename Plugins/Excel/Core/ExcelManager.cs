@@ -93,7 +93,7 @@ namespace JFramework
                 }
             }
 
-            Logger.Log($"ExcelManager加载{IntDataDict.Count + StrDataDict.Count}个数据");
+            Logger.Log($"ExcelManager加载资源完成!");
         }
 
         public T Get<T>(int key) where T : ExcelData
