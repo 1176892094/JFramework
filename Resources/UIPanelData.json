@@ -1,0 +1,222 @@
+{
+  "GamePanel": {
+    "Name": "GamePanel",
+    "Path": "LoginScene/GamePanel",
+    "Layer": 0
+  },
+  "LoginPanel": {
+    "Name": "LoginPanel",
+    "Path": "LoginScene/LoginPanel",
+    "Layer": 0
+  },
+  "TitlePanel": {
+    "Name": "TitlePanel",
+    "Path": "LoginScene/TitlePanel",
+    "Layer": 0
+  },
+  "StartPanel": {
+    "Name": "StartPanel",
+    "Path": "LoginScene/StartPanel",
+    "Layer": 0
+  },
+  "ClearPanel": {
+    "Name": "ClearPanel",
+    "Path": "LoginScene/ClearPanel",
+    "Layer": 0
+  },
+  "MultiPanel": {
+    "Name": "MultiPanel",
+    "Path": "LoginScene/MultiPanel",
+    "Layer": 0
+  },
+  "RolePanel": {
+    "Name": "RolePanel",
+    "Path": "LoginScene/RolePanel",
+    "Layer": 0
+  },
+  "ServerPanel": {
+    "Name": "ServerPanel",
+    "Path": "LoginScene/ServerPanel",
+    "Layer": 0
+  },
+  "JoinPanel": {
+    "Name": "JoinPanel",
+    "Path": "LoginScene/JoinPanel",
+    "Layer": 0
+  },
+  "SetPanel": {
+    "Name": "SetPanel",
+    "Path": "LoginScene/SetPanel",
+    "Layer": 0
+  },
+  "LoadPanel": {
+    "Name": "LoadPanel",
+    "Path": "LoginScene/LoadPanel",
+    "Layer": 3
+  },
+  "JoystickPanel": {
+    "Name": "JoystickPanel",
+    "Path": "JoystickPanel",
+    "Layer": 0
+  },
+  "OperatorPanel": {
+    "Name": "OperatorPanel",
+    "Path": "OperatorPanel",
+    "Layer": 0
+  },
+  "ToolPanel": {
+    "Name": "ToolPanel",
+    "Path": "ToolPanel",
+    "Layer": 0
+  },
+  "HeadPanel": {
+    "Name": "HeadPanel",
+    "Path": "HeadPanel",
+    "Layer": 0
+  },
+  "PropPanel": {
+    "Name": "PropPanel",
+    "Path": "PropPanel",
+    "Layer": 0
+  },
+  "HomePanel": {
+    "Name": "HomePanel",
+    "Path": "HomePanel",
+    "Layer": 0
+  },
+  "ChatPanel": {
+    "Name": "ChatPanel",
+    "Path": "ChatPanel",
+    "Layer": 0
+  },
+  "TaskPanel": {
+    "Name": "TaskPanel",
+    "Path": "TaskPanel",
+    "Layer": 0
+  },
+  "BuffPanel": {
+    "Name": "BuffPanel",
+    "Path": "BuffPanel",
+    "Layer": 0
+  },
+  "TransferPanel": {
+    "Name": "TransferPanel",
+    "Path": "TransferPanel",
+    "Layer": 0
+  },
+  "InfoPanel": {
+    "Name": "InfoPanel",
+    "Path": "InfoPanel",
+    "Layer": 0
+  },
+  "DialogPanel": {
+    "Name": "DialogPanel",
+    "Path": "DialogPanel",
+    "Layer": 0
+  },
+  "DeathPanel": {
+    "Name": "DeathPanel",
+    "Path": "DeathPanel",
+    "Layer": 0
+  },
+  "ItemPanel": {
+    "Name": "ItemPanel",
+    "Path": "ItemPanel",
+    "Layer": 0
+  },
+  "EquipPanel": {
+    "Name": "EquipPanel",
+    "Path": "EquipPanel",
+    "Layer": 0
+  },
+  "ShopPanel": {
+    "Name": "ShopPanel",
+    "Path": "ShopPanel",
+    "Layer": 0
+  },
+  "StorePanel": {
+    "Name": "StorePanel",
+    "Path": "StorePanel",
+    "Layer": 0
+  },
+  "RollPanel": {
+    "Name": "RollPanel",
+    "Path": "RollPanel",
+    "Layer": 0
+  },
+  "SynthPanel": {
+    "Name": "SynthPanel",
+    "Path": "SynthPanel",
+    "Layer": 0
+  },
+  "DungeonPanel": {
+    "Name": "DungeonPanel",
+    "Path": "DungeonPanel",
+    "Layer": 0
+  },
+  "DirecitonPanel": {
+    "Name": "DirecitonPanel",
+    "Path": "DirecitonPanel",
+    "Layer": 0
+  },
+  "LevelPopup": {
+    "Name": "LevelPopup",
+    "Path": "LevelPopup",
+    "Layer": 1
+  },
+  "ItemPopup": {
+    "Name": "ItemPopup",
+    "Path": "ItemPopup",
+    "Layer": 1
+  },
+  "EquipPopup": {
+    "Name": "EquipPopup",
+    "Path": "EquipPopup",
+    "Layer": 1
+  },
+  "ShopPopup": {
+    "Name": "ShopPopup",
+    "Path": "ShopPopup",
+    "Layer": 1
+  },
+  "PropPopup": {
+    "Name": "PropPopup",
+    "Path": "PropPopup",
+    "Layer": 1
+  },
+  "StorePopup": {
+    "Name": "StorePopup",
+    "Path": "StorePopup",
+    "Layer": 1
+  },
+  "SynthPopup": {
+    "Name": "SynthPopup",
+    "Path": "SynthPopup",
+    "Layer": 1
+  },
+  "ThrowPopup": {
+    "Name": "ThrowPopup",
+    "Path": "ThrowPopup",
+    "Layer": 1
+  },
+  "BuffPopup": {
+    "Name": "BuffPopup",
+    "Path": "BuffPopup",
+    "Layer": 1
+  },
+  "TaskPopup": {
+    "Name": "TaskPopup",
+    "Path": "TaskPopup",
+    "Layer": 1
+  },
+  "StoryPanel": {
+    "Name": "StoryPanel",
+    "Path": "StoryPanel",
+    "Layer": 2
+  },
+  "DialogPanelStory": {
+    "Name": "DialogPanelStory",
+    "Path": "DialogPanelStory",
+    "Layer": 0
+  }
+}

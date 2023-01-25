@@ -2,17 +2,43 @@
 
 1.导入
 
-打开Unity的Package Manager左上角“+”号使用URL方式导入：https://github.com/1176892094/JFramework.git
+(1)克隆下来拖进项目进行导入(需要添加AddressableAsset和NewtonsoftJson包)
+
+(2)打开Unity的Package Manager左上角“+”号使用URL方式导入
+
+URL：https://github.com/1176892094/JFramework.git
 
 2.开始
 
-导入后找到Unity上方工具栏Tools，在Framework下点击Initialization完成初始配置。
+ExcelToAsset使用：
 
-其中Resources/Setttings/JsonData用于配置JsonManager，Scenes/StartScene为基础场景。
+(1)在上方工具栏找到Tools/JFramework/ExcelToAsset
 
-备注：Json序列化依赖于NewtonsoftJson包
+(2)或者在JFrameworkInspector中找到ExcelToAsset
 
-3.使用
+(3)找到存放Excel的文件夹，点击确定即可转化成ScriptableObject
+
+(4)配合AddressableAsset工具使用
+
+Addressable使用：
+
+(1)第一次请在上方工具栏找到Window/AssetManagement/Addressable/Groups创建组
+
+(2)在JFrameworkInspector中找到JFrameworkEditor并点击
+
+(3)或者按F1呼出快捷菜单，点击Addressable资源生成
+
+(4)在Addressables Groups面板中可查看资源生成的情况
+
+3.注意
+
+(1)所有的Entity都会被加入到GlobalManager的生命周期中
+
+(2)为了更好的管理，请使用Entity来代替MonoBehaviour
+
+(2)请使用OnUpdate来代替Update
+
+4.使用
 
 (1)EventManager（事件管理类）
 
@@ -45,19 +71,13 @@ public struct EventName
     public const string EventTrigger = "EventTrigger"; //建议定一个事件的常量
 }
 ```
-(2)ResourcesManager（资源加载管理类）
+(2)AssetManager（资源加载管理类）
 ```csharp
 public class Test2 : MonoBehaviour
 {
-    private void LoadAsset() //同步加载
-    {
-        GameObject obj = ResourceManager.Load<GameObject>(ResPath.Player);
-        Player player = obj.GetComponent<Player>();
-    }
-
     private void LoadAssetAsync() //异步加载
     {
-        ResourceManager.LoadAsync<GameObject>(ResPath.Player, obj =>
+        AssetManager.Instance.LoadAsync<GameObject>(ResPath.Player, obj =>
         {
             Player player = obj.GetComponent<Player>();
         });
@@ -66,36 +86,36 @@ public class Test2 : MonoBehaviour
 
 public struct ResPath
 {
-    public const string Player = "Prefabs/Player"; //Player预制的体真实路径是：Assets/Resources/Prefabs/Player
+    public const string Player = "Prefabs/Player"; //Player预制的体真实路径是：Assets/AddressableResources/Prefabs/Player
 }
 
 public class Player: MonoBehaviour
 {
 }
 ```
-(3)JsonManager（找到Unity上方Tools/Framework/PersistentPath可查看存档数据）
+(3)JsonManager（找到Unity上方Tools/JFramework/PersistentPath可查看存档数据）
 ```csharp
 public class Test3 : MonoBehaviour
 {
     private void SaveAndLoad1()
     {
         ScriptableObject playerData = ResourceManager.Load<ScriptableObject>(ResPath.PlayerData);
-        JsonManager.Save(playerData, "玩家数据"); //保存SO文件,名称为"玩家数据"
-        JsonManager.Load(playerData); //读取该SO文件
+        JsonManager.Instance.Save(playerData, "玩家数据"); //保存SO文件,名称为"玩家数据"
+        JsonManager.Instance.Load(playerData); //读取该SO文件
     }
 
     private void SaveAndLoad2()
     {
         ScriptableObject playerData = ResourceManager.Load<ScriptableObject>(ResPath.PlayerData);
-        JsonManager.Save(playerData, "玩家数据", true); //储存数据并加密
-        JsonManager.Load(playerData, true); //解析加密数据并读取
+        JsonManager.Instance.Save(playerData, "玩家数据", true); //储存数据并加密
+        JsonManager.Instance.Load(playerData, true); //解析加密数据并读取
     }
 
     private void SaveAndLoad3()
     {
         List<string> playerNameList = new List<string>();
-        JsonManager.Save(playerNameList, "strList"); //储存playerNameList
-        playerNameList = JsonManager.Load<List<string>>("strList"); //读取playerNameList
+        JsonManager.Instance.Save(playerNameList, "strList"); //储存playerNameList
+        playerNameList = JsonManager.Instance.Load<List<string>>("strList"); //读取playerNameList
     }
 }
 ```
@@ -132,7 +152,7 @@ public class Test5 : MonoBehaviour
     {
         AudioManager.Instance.PlaySound(AudioPath.BGMusic); //播放背景音乐
         AudioManager.Instance.StopSound(); //停止背景音乐
-        AudioManager.Instance.ChangeSound(0); //改变背景音乐大小为0
+        AudioManager.Instance.SetSound(0); //改变背景音乐大小为0
     }
 
     private void GameAudio()
@@ -143,7 +163,7 @@ public class Test5 : MonoBehaviour
             audioSource = audio; //播放并获取该音效
         });
         AudioManager.Instance.StopAudio(audioSource); //停止该音效
-        AudioManager.Instance.ChangeAudio(0); //改变游戏音效大小为0
+        AudioManager.Instance.SetAudio(0); //改变游戏音效大小为0
     }
 }
 
@@ -159,9 +179,9 @@ public class Test7: MonoBehaviour
 {
     private void ShowPanel()
     {
-        UIManager.Instance.ShowPanel<LoginPanel>(UIPanelPath.LoginPanel); //加载LoginPanel(可以重复加载，但只有一个实例)
-        UIManager.Instance.ShowPanel<LoginPanel>(UIPanelPath.LoginPanel,UILayerType.Middle);//设置层级
-        UIManager.Instance.ShowPanel<LoginPanel>(UIPanelPath.LoginPanel,UILayerType.Middle, panel =>
+        UIManager.Instance.ShowPanel<LoginPanel>(); //加载LoginPanel(可以重复加载，但只有一个实例)
+        UIManager.Instance.ShowPanel<LoginPanel>();//设置层级
+        UIManager.Instance.ShowPanel<LoginPanel>(panel =>
         {
             panel.SetUseruame("JINYIJIE");//设置属性
             panel.SetPassword("123456");//设置属性
@@ -170,13 +190,13 @@ public class Test7: MonoBehaviour
     
     private void HidePanel()
     {
-        UIManager.Instance.HidePanel(UIPanelPath.LoginPanel); //隐藏LoginPane
+        UIManager.Instance.HidePanel<LoginPanel>(); //隐藏LoginPane
     }
 
     private void GetPanel()
     {
-        LoginPanel panel = UIManager.Instance.GetPanel<LoginPanel>(UIPanelPath.LoginPanel);//得到面板
-        panel.SetUseruame("JINYIJIE");//设置属性
+        LoginPanel panel = UIManager.Instance.GetPanel<LoginPanel>();//得到面板
+        panel.SetUsername("JINYIJIE");//设置属性
         panel.SetPassword("123456");//设置属性
     }
 
@@ -197,29 +217,47 @@ public struct UIPanelPath
     public const string LoginPanel = "UI/LoginPanel";//LoginPanel的真实路径是：Assets/Resources/UI/LoginPanel
 }
 
-public class LoginPanel : BasePanel //需要管理的UI都要继承BasePanel
+public class LoginPanel : UIPanel //需要管理的UI都要继承BasePanel
 {
     private string username;
     private string password;
-    public void SetUseruame(string username) => this.username = username;
+    public void SetUsername(string username) => this.username = username;
     public void SetPassword(string password) => this.password = password;
 }
 ```
-(7)LoadManager(场景加载管理)
+(7)SceneManager(场景加载管理)
 ```csharp
-public class Test8: MonoBehaviour
+public class Test8 : MonoBehaviour
 {
+    private float progress; //场景加载进度[0,1]之间
+
+    private void Awake()
+    {
+        EventManager.Instance.Listen("LoadSceneAsync", LoadSceneAsync); //侦听场景异步加载进度
+    }
+
     private void LoadScene()
     {
-        LoadManager.Instance.LoadScene("SceneName");
+        SceneManager.Instance.Load("SceneName");
     }
 
     private void LoadSceneAsync()
     {
-        LoadManager.Instance.LoadSceneAsync("SceneName", () =>
+        SceneManager.Instance.LoadAsync("SceneName", () =>
         {
-            //加载完成后事件
+            //异步加载完成后执行
         });
+    }
+
+    private void LoadSceneAsync(params object[] args) //获取异步加载进度
+    {
+        progress = (float)args[0]; //获取当前加载进度
+        Debug.Log(progress);
+    }
+
+    private void OnDestroy()
+    {
+        EventManager.Instance.Remove("LoadSceneAsync", LoadSceneAsync); //移除场景异步加载进度
     }
 }
 ```
@@ -227,24 +265,138 @@ public class Test8: MonoBehaviour
 ```csharp
 public class Test9 : MonoBehaviour
 {
-    private Timer timer;
+    private TimeTick timer;
+
     private void Start()
     {
-        timer = TimerManager.Instance.Get(); //新建计时器
-        timer.Open(0.3f, 10, FinishAction); //开启计时器，0.3秒计时一次，循环10次
-        timer.Open(5f, FinishAction);//新建一个5秒的计时器
+        timer = TimeManager.Instance.Listen(5, () =>
+        {
+            Debug.Log("不循环/间隔5秒的计时器完成");
+        });
+
+        TimeManager.Instance.Listen(5, () =>
+        {
+            Debug.Log("不循环/间隔5秒的不受TimeScale影响的计时器完成");
+        }).Unscale();
+
+        int count = 0;
+        TimeManager.Instance.Listen(1, () =>
+        {
+            Debug.Log("循环5次/间隔1秒的计时器完成");
+        }).Unscale().SetLoop(5, () =>
+        {
+            count++;
+            Debug.Log("第" + count + "次循环完成");
+        });
+        
+        TimeManager.Instance.Listen(10, () =>
+        {
+            Debug.Log("设置计时器随物体销毁而停止");
+        }).SetTarget(gameObject);
     }
 
     private void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Q)) timer.Stop(); //暂停计时器
-        if (Input.GetKeyDown(KeyCode.E)) timer.Play(); //启动计时器
+        if (Input.GetKeyDown(KeyCode.Q)) timer.Stop();  //启动计时器，从剩余时间开始
+        if (Input.GetKeyDown(KeyCode.E)) timer.Play();  //暂停计时器，从当前时间停止
     }
-
-    private void FinishAction() => Debug.Log("Timer Finish"); //计时器更新
 }
 ```
-(9)AwaitExtensions
+(9)StateMachine(有限状态机)
+```csharp
+    public class Enemy : Machine //敌人继承状态机
+    {
+        public Animator an; //敌人动画组件
+
+        protected override void Awake()
+        {
+            base.Awake();
+            ListenState("Idle", new EnemyIdle()); //状态机增加Idle状态
+            ListenState("Walk", new EnemyWalk()); //状态机增加Walk状态
+        }
+    }
+
+    public class EnemyIdle : State<Enemy> //设置状态的所有者
+    {
+        protected override void OnInit(Enemy owner)
+        {
+            base.OnInit(owner); //父类初始化状态
+            //自定义初始化
+        }
+
+        protected override void OnEnter()
+        {
+            owner.an.SetBool("Idle",true); //播放Idle动画
+            owner.ChangeState("Walk",3); //3秒切换到Walk动画
+        }
+
+        protected override void OnUpdate() //状态更新
+        {
+        }
+
+        protected override void OnExit()
+        {
+            owner.an.SetBool("Idle",false); //停止Idle动画
+        }
+    }
+
+    public class EnemyWalk : State<Enemy> //设置状态的所有者
+    {
+        protected override void OnEnter()
+        {
+            owner.an.SetBool("Walk",true); //播放Walk动画
+            owner.ChangeState("Idle",3); //3秒切换到Idle动画
+        }
+
+        protected override void OnUpdate()
+        {
+           
+        }
+
+        protected override void OnExit()
+        {
+            owner.an.SetBool("Walk",false); //停止Walk动画
+        }
+    }
+```
+(12)Entity/Controller(EC实体控制器分离)
+```csharp
+    public class Player : Entity //玩家继承实体
+    {
+        public BuffController buffCtrl; //效果控制器
+        public SkillController skillCtrl; //技能控制器
+        public AttributeController attrCtrl; //属性控制器
+
+        protected override void Awake()
+        {
+            base.Awake();
+            skillCtrl = ScriptableObject.CreateInstance<SkillController>();
+            buffCtrl = ScriptableObject.CreateInstance<BuffController>();
+            attrCtrl = ScriptableObject.CreateInstance<AttributeController>();
+            skillCtrl.Get<IController>().OnInit(this);
+            attrCtrl.Get<IController>().OnInit(this);
+            buffCtrl.Get<IController>().OnInit(this);
+        }
+    }
+
+    public class SkillController : Controller<Player> //技能控制器(ScriptableObject)
+    {
+        private AttributeController attrCtrl => owner.attrCtrl;
+    }
+
+    public class AttributeController : Controller<Player> //属性控制器(ScriptableObject)
+    {
+        private SkillController skillCtrl => owner.skillCtrl;
+    }
+
+    public class BuffController : Controller<Player> //效果控制器(ScriptableObject)
+    {
+        private AttributeController attrCtrl => owner.attrCtrl;
+        private SkillController skillCtrl => owner.skillCtrl;
+    }
+```
+
+(11)AwaitExtensions(异步拓展)
 ```csharp
   private async void Start()
     {

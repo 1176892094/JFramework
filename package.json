@@ -4,7 +4,10 @@
   "version": "1.0.0",
   "unity": "2021.1",
   "description": "This is the JFramework package",
-  "dependencies": {},
+  "dependencies": {
+    "com.unity.addressables": "1.19.19",
+    "com.unity.nuget.newtonsoft-json": "3.0.2"
+  },
   "author": {
     "name": "Charlotte",
     "email": "1176892094@qq..com",
