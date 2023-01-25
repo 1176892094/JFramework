@@ -359,7 +359,7 @@ public class Test9 : MonoBehaviour
         }
     }
 ```
-(12)Entity/Controller(EC实体控制器分离)
+(10)Entity/Controller(EC实体控制器分离)
 ```csharp
     public class Player : Entity //玩家继承实体
     {
