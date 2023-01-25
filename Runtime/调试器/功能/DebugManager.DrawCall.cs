@@ -43,7 +43,7 @@ namespace JFramework.Core
                 GUILayout.Label(DebugConst.Vertices + ": " + UnityStats.vertices, DebugData.Label);
             }
 #else
-            GUILayout.Label("只有在编辑器模式下才能显示DrawCall！",DebugStyle.Label);
+            GUILayout.Label("只有在编辑器模式下才能显示DrawCall！",DebugData.Label);
 #endif
             GUILayout.EndScrollView();
         }
