@@ -10,6 +10,14 @@ URL：https://github.com/1176892094/JFramework.git
 
 2.开始
 
+GlobalManager使用：
+
+(1)GlobalManager负责所有管理的初始化
+
+(2)预制体在框架中的Resources文件夹中
+
+(3)将预制体拖入场景即可
+
 ExcelToAsset使用：
 
 (1)在上方工具栏找到Tools/JFramework/ExcelToAsset
