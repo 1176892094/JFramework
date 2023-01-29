@@ -1,7 +1,7 @@
 {
   "GamePanel": {
-    "Name": "GamePanel",
-    "Path": "LoginScene/GamePanel",
+    "Name": "CameraPanel",
+    "Path": "LoginScene/CameraPanel",
     "Layer": 0
   },
   "LoginPanel": {
@@ -80,83 +80,83 @@
     "Layer": 0
   },
   "HomePanel": {
-    "Name": "HomePanel",
-    "Path": "HomePanel",
+    "Name": "GamePanel/HomePanel",
+    "Path": "GamePanel/HomePanel",
     "Layer": 0
   },
   "ChatPanel": {
-    "Name": "ChatPanel",
-    "Path": "ChatPanel",
+    "Name": "GamePanel/ChatPanel",
+    "Path": "GamePanel/ChatPanel",
     "Layer": 0
   },
   "TaskPanel": {
-    "Name": "TaskPanel",
-    "Path": "TaskPanel",
+    "Name": "GamePanel/TaskPanel",
+    "Path": "GamePanel/TaskPanel",
     "Layer": 0
   },
   "BuffPanel": {
-    "Name": "BuffPanel",
-    "Path": "BuffPanel",
+    "Name": "GamePanel/BuffPanel",
+    "Path": "GamePanel/BuffPanel",
     "Layer": 0
   },
   "TransferPanel": {
-    "Name": "TransferPanel",
-    "Path": "TransferPanel",
+    "Name": "GamePanel/TransferPanel",
+    "Path": "GamePanel/TransferPanel",
     "Layer": 0
   },
   "InfoPanel": {
-    "Name": "InfoPanel",
-    "Path": "InfoPanel",
+    "Name": "GamePanel/InfoPanel",
+    "Path": "GamePanel/InfoPanel",
     "Layer": 0
   },
   "DialogPanel": {
-    "Name": "DialogPanel",
-    "Path": "DialogPanel",
+    "Name": "GamePanel/DialogPanel",
+    "Path": "GamePanel/DialogPanel",
     "Layer": 0
   },
   "DeathPanel": {
-    "Name": "DeathPanel",
-    "Path": "DeathPanel",
+    "Name": "GamePanel/DeathPanel",
+    "Path": "GamePanel/DeathPanel",
     "Layer": 0
   },
   "ItemPanel": {
-    "Name": "ItemPanel",
-    "Path": "ItemPanel",
+    "Name": "GamePanel/ItemPanel",
+    "Path": "GamePanel/ItemPanel",
     "Layer": 0
   },
   "EquipPanel": {
-    "Name": "EquipPanel",
-    "Path": "EquipPanel",
+    "Name": "GamePanel/EquipPanel",
+    "Path": "GamePanel/EquipPanel",
     "Layer": 0
   },
   "ShopPanel": {
-    "Name": "ShopPanel",
-    "Path": "ShopPanel",
+    "Name": "GamePanel/ShopPanel",
+    "Path": "GamePanel/ShopPanel",
     "Layer": 0
   },
   "StorePanel": {
-    "Name": "StorePanel",
-    "Path": "StorePanel",
+    "Name": "GamePanel/StorePanel",
+    "Path": "GamePanel/StorePanel",
     "Layer": 0
   },
   "RollPanel": {
-    "Name": "RollPanel",
-    "Path": "RollPanel",
+    "Name": "GamePanel/RollPanel",
+    "Path": "GamePanel/RollPanel",
     "Layer": 0
   },
   "SynthPanel": {
-    "Name": "SynthPanel",
-    "Path": "SynthPanel",
+    "Name": "GamePanel/SynthPanel",
+    "Path": "GamePanel/SynthPanel",
     "Layer": 0
   },
   "DungeonPanel": {
-    "Name": "DungeonPanel",
-    "Path": "DungeonPanel",
+    "Name": "GamePanel/DungeonPanel",
+    "Path": "GamePanel/DungeonPanel",
     "Layer": 0
   },
-  "DirecitonPanel": {
-    "Name": "DirecitonPanel",
-    "Path": "DirecitonPanel",
+  "DirectionPanel": {
+    "Name": "GamePanel/DirectionPanel",
+    "Path": "GamePanel/DirectionPanel",
     "Layer": 0
   },
   "LevelPopup": {

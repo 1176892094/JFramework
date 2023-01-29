@@ -74,7 +74,7 @@ namespace JFramework
         /// <summary>
         /// 循环时执行的事件
         /// </summary>
-        private Action OnLoop;
+        private Action<TimeTick> OnLoop;
 
         /// <summary>
         /// 完成时执行的事件
@@ -108,7 +108,7 @@ namespace JFramework
             {
                 count++;
                 waitTime += keepTime;
-                OnLoop?.Invoke();
+                OnLoop?.Invoke(this);
                 if (maxCount < 0) return;
                 if (count < maxCount) return;
                 OnFinish?.Invoke();
@@ -157,7 +157,7 @@ namespace JFramework
         /// <param name="count">计时器循环次数</param>
         /// <param name="OnLoop">循环时执行的事件</param>
         /// <returns>返回自身</returns>
-        public TimeTick SetLoop(int count, Action OnLoop)
+        public TimeTick SetLoop(int count, Action<TimeTick> OnLoop)
         {
             maxCount = count;
             this.OnLoop = OnLoop;
