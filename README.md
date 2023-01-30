@@ -233,7 +233,7 @@ public class LoginPanel : UIPanel //需要管理的UI都要继承BasePanel
     public void SetPassword(string password) => this.password = password;
 }
 ```
-(7)SceneManager(场景加载管理)
+(7)LoadManager(场景加载管理)
 ```csharp
 public class Test8 : MonoBehaviour
 {
@@ -246,12 +246,12 @@ public class Test8 : MonoBehaviour
 
     private void LoadScene()
     {
-        SceneManager.Instance.Load("SceneName");
+        LoadManager.Instance.Load("SceneName");
     }
 
     private void LoadSceneAsync()
     {
-        SceneManager.Instance.LoadAsync("SceneName", () =>
+        LoadManager.Instance.LoadAsync("SceneName", () =>
         {
             //异步加载完成后执行
         });
@@ -277,18 +277,18 @@ public class Test9 : MonoBehaviour
 
     private void Start()
     {
-        timer = TimeManager.Instance.Listen(5, () =>
+        timer = TimerManager.Instance.Listen(5, () =>
         {
             Debug.Log("不循环/间隔5秒的计时器完成");
         });
 
-        TimeManager.Instance.Listen(5, () =>
+        TimerManager.Instance.Listen(5, () =>
         {
             Debug.Log("不循环/间隔5秒的不受TimeScale影响的计时器完成");
         }).Unscale();
 
         int count = 0;
-        TimeManager.Instance.Listen(1, () =>
+        TimerManager.Instance.Listen(1, () =>
         {
             Debug.Log("循环5次/间隔1秒的计时器完成");
         }).Unscale().SetLoop(5, () =>
@@ -297,7 +297,7 @@ public class Test9 : MonoBehaviour
             Debug.Log("第" + count + "次循环完成");
         });
         
-        TimeManager.Instance.Listen(10, () =>
+        TimerManager.Instance.Listen(10, () =>
         {
             Debug.Log("设置计时器随物体销毁而停止");
         }).SetTarget(gameObject);
