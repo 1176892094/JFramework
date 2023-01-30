@@ -1,5 +1,7 @@
 # 欢迎来到JFramework介绍
 
+JFramework是基于Unity的游戏框架，封装了一些常用的Unity功能。
+
 1.导入
 
 (1)克隆下来拖进项目进行导入(需要添加AddressableAsset和NewtonsoftJson包)
