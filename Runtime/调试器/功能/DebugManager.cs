@@ -25,7 +25,7 @@ namespace JFramework.Core
         protected override void Start()
         {
             base.Start();
-            TimeManager.Instance.Listen(1).SetLoop(-1, timer =>
+            TimerManager.Instance.Listen(1).SetLoop(-1, timer =>
             {
                 if (!isDebug) return;
                 FPS = (int)(1.0f / Time.deltaTime);

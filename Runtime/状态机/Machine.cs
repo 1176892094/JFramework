@@ -64,7 +64,7 @@ namespace JFramework
         /// <param name="time">延迟时间</param>
         public void ChangeState(string name, float time)
         {
-            TimeManager.Instance.Listen(time, () => { ChangeState(name); }).SetTarget(gameObject);
+            TimerManager.Instance.Listen(time, () => { ChangeState(name); }).SetTarget(gameObject);
         }
 
         /// <summary>

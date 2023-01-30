@@ -11,21 +11,21 @@ namespace JFramework.Core
     /// <summary>
     /// 场景加载管理器
     /// </summary>
-    public class SceneManager : Singleton<SceneManager>
+    public class LoadManager : Singleton<LoadManager>
     {
 
         /// <summary>
         /// 通过接口当前场景Id
         /// </summary>
         [ShowInInspector, ReadOnly, LabelText("当前场景标识"), FoldoutGroup("场景管理视图")]
-        public int Id => UnityEngine.SceneManagement.SceneManager.GetActiveScene().buildIndex;
+        public int Id => SceneManager.GetActiveScene().buildIndex;
 
 
         /// <summary>
         /// 通过接口当前场景名称
         /// </summary>
         [ShowInInspector, ReadOnly, LabelText("当前场景名称"), FoldoutGroup("场景管理视图")]
-        public string Name => UnityEngine.SceneManagement.SceneManager.GetActiveScene().name;
+        public string Name => SceneManager.GetActiveScene().name;
         
         /// <summary>
         /// 存储所有场景的名称
@@ -39,7 +39,7 @@ namespace JFramework.Core
         protected override void OnInit(params object[] args)
         {
             sceneList = new List<SceneData>();
-            var count = UnityEngine.SceneManagement.SceneManager.sceneCountInBuildSettings;
+            var count = SceneManager.sceneCountInBuildSettings;
             for (var i = 0; i < count; i++)
             {
                 var path = SceneUtility.GetScenePathByBuildIndex(i);
@@ -60,7 +60,7 @@ namespace JFramework.Core
         /// 通过接口加载指定场景(同步)
         /// </summary>
         /// <param name="name">传入加载的场景名称</param>
-        public void Load(string name) => UnityEngine.SceneManagement.SceneManager.LoadScene(name);
+        public void Load(string name) => SceneManager.LoadScene(name);
 
         /// <summary>
         /// 通过接口异步加载场景(异步)
@@ -80,7 +80,7 @@ namespace JFramework.Core
         /// <returns>返回场景加载的迭代器</returns>
         private IEnumerator LoadSceneCompleted(string name, Action action)
         {
-            AsyncOperation asyncOperation = UnityEngine.SceneManagement.SceneManager.LoadSceneAsync(name);
+            AsyncOperation asyncOperation = SceneManager.LoadSceneAsync(name);
             asyncOperation.allowSceneActivation = false;
             while (!asyncOperation.isDone)
             {

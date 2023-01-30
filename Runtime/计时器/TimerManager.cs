@@ -7,7 +7,7 @@ namespace JFramework.Core
     /// <summary>
     /// 计时器管理器
     /// </summary>
-    public class TimeManager : Singleton<TimeManager>
+    public class TimerManager : Singleton<TimerManager>
     {
         /// <summary>
         /// 存储已经完成的计时器
