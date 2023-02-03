@@ -11,7 +11,7 @@ namespace JFramework
     /// 绑定事件变量触发组件
     /// </summary>
     [Serializable]
-    public class EventTrigger : MonoBehaviour
+    public class EventValueTrigger : MonoBehaviour
     {
         /// <summary>
         /// 事件变量列表

@@ -43,7 +43,7 @@ namespace JFramework.Core
                 handle = (AsyncOperationHandle<T>)assetDict[name];
                 if (handle.IsDone)
                 {
-                    action(handle.Result is GameObject ? Object.Instantiate(handle.Result) : handle.Result);
+                    action(handle.Result is GameObject ? Instantiate(handle.Result) : handle.Result);
                 }
                 else
                 {
@@ -51,7 +51,7 @@ namespace JFramework.Core
                     {
                         if (obj.Status == AsyncOperationStatus.Succeeded)
                         {
-                            action(obj.Result is GameObject ? Object.Instantiate(obj.Result) : obj.Result);
+                            action(obj.Result is GameObject ? Instantiate(obj.Result) : obj.Result);
                         }
                     };
                 }
@@ -64,7 +64,7 @@ namespace JFramework.Core
             {
                 if (obj.Status == AsyncOperationStatus.Succeeded)
                 {
-                    action(obj.Result is GameObject ? Object.Instantiate(obj.Result) : obj.Result);
+                    action(obj.Result is GameObject ? Instantiate(obj.Result) : obj.Result);
                 }
                 else
                 {

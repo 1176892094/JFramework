@@ -58,12 +58,10 @@ namespace JFramework.Core
         public void Load(ScriptableObject obj, bool AES = false)
         {
             var filePath = GetPath(obj.name);
-            if (!File.Exists(filePath) && !AES)
+            if (!File.Exists(filePath))
             {
                 Debug.Log($"创建存储文件: {obj.name}");
-                Save(obj, obj.name);
-                Load(obj);
-                return;
+                Save(obj, obj.name, AES);
             }
 
             if (AES)
@@ -95,13 +93,10 @@ namespace JFramework.Core
         public T Load<T>(string fileName, bool AES = false) where T : new()
         {
             var filePath = GetPath(fileName);
-            if (!File.Exists(filePath) && !AES)
+            if (!File.Exists(filePath))
             {
                 Debug.Log($"创建存储文件: {fileName}");
-                var data = new T();
-                Save(data, fileName);
-                data = Load<T>(fileName);
-                return data;
+                Save(new T(), fileName, AES);
             }
 
             if (AES)
@@ -122,7 +117,7 @@ namespace JFramework.Core
                 return data;
             }
         }
-        
+
         /// <summary>
         /// Json管理器清除存档所有数据
         /// </summary>
@@ -222,7 +217,7 @@ namespace JFramework.Core
             using StreamReader streamReader = new StreamReader(cryptoStream);
             return streamReader.ReadToEnd();
         }
-        
+
         /// <summary>
         /// Json加密数据
         /// </summary>

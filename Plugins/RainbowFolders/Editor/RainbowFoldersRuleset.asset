@@ -290,7 +290,7 @@ MonoBehaviour:
     IsBackgroundRecursive: 0
     IsHidden: 0
   - Type: 0
-    Key: Mac
+    Key: MacOS
     Ordinal: 23
     Priority: 0
     IconType: 3020
@@ -318,6 +318,18 @@ MonoBehaviour:
     Ordinal: 25
     Priority: 0
     IconType: 2160
+    SmallIcon: {fileID: 0}
+    LargeIcon: {fileID: 0}
+    IsIconRecursive: 0
+    BackgroundType: 0
+    BackgroundTexture: {fileID: 0}
+    IsBackgroundRecursive: 0
+    IsHidden: 0
+  - Type: 0
+    Key: DataTable
+    Ordinal: 26
+    Priority: 0
+    IconType: 2120
     SmallIcon: {fileID: 0}
     LargeIcon: {fileID: 0}
     IsIconRecursive: 0

@@ -73,9 +73,9 @@ namespace JFramework
         /// <param name="target">传入绑定的游戏对象，事件会随着对象销毁而释放</param>
         public void SetTarget(GameObject target)
         {
-            if (!target.TryGetComponent<EventTrigger>(out var trigger))
+            if (!target.TryGetComponent<EventValueTrigger>(out var trigger))
             {
-                trigger = target.AddComponent<EventTrigger>();
+                trigger = target.AddComponent<EventValueTrigger>();
             }
 
             trigger.Register(this);

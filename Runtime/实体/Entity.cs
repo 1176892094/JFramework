@@ -6,7 +6,7 @@ using UnityEngine;
 namespace JFramework
 {
     /// <summary>
-    /// 实体的抽象类
+    /// 实体的抽象类,对MonoBehaviour的进一步封装
     /// </summary>
     public abstract class Entity : MonoBehaviour, IEntity
     {

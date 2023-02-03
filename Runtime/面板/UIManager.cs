@@ -19,14 +19,22 @@ namespace JFramework.Core
         [ShowInInspector, ReadOnly, LabelText("游戏界面数据"), FoldoutGroup("游戏界面视图")]
         internal Dictionary<string, UIPanelData> dataDict;
 
+
         /// <summary>
         /// 存储所有UI的字典
         /// </summary>
         [ShowInInspector, ReadOnly, LabelText("当前游戏面板"), FoldoutGroup("游戏界面视图")]
         internal Dictionary<string, UIPanel> panelDict;
 
+        #region Layer
+
         /// <summary>
         /// UI最底层
+        /// </summary>
+        private Transform lowest;
+
+        /// <summary>
+        /// UI底层
         /// </summary>
         private Transform bottom;
 
@@ -41,22 +49,26 @@ namespace JFramework.Core
         private Transform height;
 
         /// <summary>
-        /// UI普通层
+        /// UI忽视射线层
         /// </summary>
-        private Transform common;
+        private Transform ignore;
 
+
+        #endregion
+        
         /// <summary>
         /// 界面管理器初始化数据
         /// </summary>
         protected override void OnInit(params object[] args)
         {
+            lowest = transform.Find("Canvas/Lowest");
             bottom = transform.Find("Canvas/Bottom");
             middle = transform.Find("Canvas/Middle");
             height = transform.Find("Canvas/Height");
-            common = transform.Find("Canvas/Common");
+            ignore = transform.Find("Canvas/Ignore");
             panelDict = new Dictionary<string, UIPanel>();
-            var textAsset = Resources.Load<TextAsset>(Global.UIPanelData);
-            dataDict = JsonConvert.DeserializeObject<Dictionary<string, UIPanelData>>(textAsset.text);
+            var textAsset = Resources.Load<TextAsset>(Global.UIPanelData);//读取UI面版相关的文本数据
+            dataDict = JsonConvert.DeserializeObject<Dictionary<string, UIPanelData>>(textAsset.text);//将文本数据转换为string:UIPanelData字典
         }
 
         /// <summary>
@@ -67,9 +79,9 @@ namespace JFramework.Core
         /// <typeparam name="T">可以使用所有继承IPanel的对象</typeparam>
         private void LoadPanel<T>(string name, Action<T> action) where T : UIPanel
         {
-            var data = dataDict[name];
+            var data = dataDict[name];//获取对应名称Panel的数据
             AssetManager.Instance.LoadAsync<GameObject>(data.Path, obj =>
-            {
+            {//通过Panel数据的路径 加载 Panel
                 var layer = GetLayer((UILayerType)data.Layer);
                 obj.transform.SetParent(layer, false);
                 var panel = obj.GetComponent<T>();
@@ -146,14 +158,16 @@ namespace JFramework.Core
         {
             switch (layer)
             {
+                case UILayerType.Lowest:
+                    return lowest;
                 case UILayerType.Bottom:
                     return bottom;
                 case UILayerType.Middle:
                     return middle;
                 case UILayerType.Height:
                     return height;
-                case UILayerType.Common:
-                    return common;
+                case UILayerType.Ignore:
+                    return ignore;
                 default:
                     return null;
             }
@@ -183,9 +197,9 @@ namespace JFramework.Core
         /// <param name="action">事件触发后的回调</param>
         public void Listen(UIBehaviour obj, EventTriggerType type, UnityAction<BaseEventData> action)
         {
-            UnityEngine.EventSystems.EventTrigger trigger = obj.GetComponent<UnityEngine.EventSystems.EventTrigger>();
-            if (trigger == null) trigger = obj.gameObject.AddComponent<UnityEngine.EventSystems.EventTrigger>();
-            UnityEngine.EventSystems.EventTrigger.Entry entry = new UnityEngine.EventSystems.EventTrigger.Entry { eventID = type };
+            EventTrigger trigger = obj.GetComponent<EventTrigger>();
+            if (trigger == null) trigger = obj.gameObject.AddComponent<EventTrigger>();
+            EventTrigger.Entry entry = new EventTrigger.Entry { eventID = type };
             entry.callback.AddListener(action);
             trigger.triggers.Add(entry);
         }

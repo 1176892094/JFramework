@@ -30,7 +30,7 @@ namespace JFramework
 
             for (int i = 1; i < nameList.Count; i++)
             {
-                GetAddressableGroup(nameList[i], pathList[i], "t:DataTable t:prefab t:AudioClip", assetPath =>
+                GetAddressableGroup(nameList[i], pathList[i], "t:DataTable t:prefab t:AudioClip t:Shader t:Material t:SceneAsset", assetPath =>
                 {
                     string fileName = Path.GetFileNameWithoutExtension(assetPath);
                     string dirPath = Path.GetDirectoryName(assetPath);

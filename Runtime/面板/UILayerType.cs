@@ -8,21 +8,26 @@ namespace JFramework
         /// <summary>
         /// 最底层
         /// </summary>
-        Bottom = 0,
+        Lowest = 0,
+
+        /// <summary>
+        /// 底层
+        /// </summary>
+        Bottom = 1,
 
         /// <summary>
         /// 中间层
         /// </summary>
-        Middle = 1,
+        Middle = 2,
 
         /// <summary>
         /// 最高层
         /// </summary>
-        Height = 2,
+        Height = 3,
 
         /// <summary>
-        /// 普通层
+        /// 忽视射线层
         /// </summary>
-        Common = 3,
+        Ignore = 4,
     }
 }

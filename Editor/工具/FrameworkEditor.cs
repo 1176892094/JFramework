@@ -41,19 +41,19 @@ namespace JFramework
             AssetDatabase.Refresh();
         }
 
-        [MenuItem("Tools/JFramework/CurrentProjectPath")]
+        [MenuItem(@"Tools/JFramework/CurrentProjectPath")]
         private static void CurrentProjectPath()
         {
-            Process.Start(System.Environment.CurrentDirectory);
+            Process.Start(Environment.CurrentDirectory);
         }
 
-        [MenuItem("Tools/JFramework/PersistentDataPath")]
+        [MenuItem(@"Tools/JFramework/PersistentDataPath")]
         private static void PersistentDataPath()
         {
             Process.Start(Application.persistentDataPath);
         }
 
-        [MenuItem("Tools/JFramework/StreamingAssetsPath")]
+        [MenuItem(@"Tools/JFramework/StreamingAssetsPath")]
         private static void StreamingAssetsPath()
         {
             if (Directory.Exists(Application.streamingAssetsPath))

@@ -13,7 +13,7 @@ namespace JFramework.Core
         /// 存储所有事件的字典
         /// </summary>
         [ShowInInspector, ReadOnly, LabelText("事件管理数据"), FoldoutGroup("事件管理视图")]
-        private Dictionary<string, EventData> eventDict;
+        private Dictionary<int, EventData> eventDict;
 
         [ShowInInspector, ReadOnly, LabelText("事件变量列表"), FoldoutGroup("事件管理视图")]
         private List<List<IEventValue>> valueList;
@@ -24,49 +24,49 @@ namespace JFramework.Core
         protected override void OnInit(params object[] args)
         {
             valueList = new List<List<IEventValue>>();
-            eventDict = new Dictionary<string, EventData>();
+            eventDict = new Dictionary<int, EventData>();
         }
 
         /// <summary>
         /// 事件管理侦听事件的方法
         /// </summary>
-        /// <param name="name">传入事件的名称</param>
+        /// <param name="id">传入事件的名称</param>
         /// <param name="action">传入事件的方法</param>
-        public void Listen(string name, EventData action)
+        public void Listen(int id, EventData action)
         {
-            if (eventDict.ContainsKey(name))
+            if (eventDict.ContainsKey(id))
             {
-                eventDict[name] += action;
+                eventDict[id] += action;
             }
             else
             {
-                eventDict.Add(name, action);
+                eventDict.Add(id, action);
             }
         }
 
         /// <summary>
         /// 事件管理移除事件的方法
         /// </summary>
-        /// <param name="name">传入事件的名称</param>
+        /// <param name="id">传入事件的名称</param>
         /// <param name="action">传入事件的方法</param>
-        public void Remove(string name, EventData action)
+        public void Remove(int id, EventData action)
         {
-            if (eventDict.ContainsKey(name))
+            if (eventDict.ContainsKey(id))
             {
-                eventDict[name] -= action;
+                eventDict[id] -= action;
             }
         }
 
         /// <summary>
         /// 事件管理发送事件的方法
         /// </summary>
-        /// <param name="name">传入事件的名称</param>
+        /// <param name="id">传入事件的名称</param>
         /// <param name="args">传入事件的参数</param>
-        public void Send(string name, params object[] args)
+        public void Send(int id, params object[] args)
         {
-            if (eventDict.ContainsKey(name))
+            if (eventDict.ContainsKey(id))
             {
-                eventDict[name]?.Invoke(args);
+                eventDict[id]?.Invoke(args);
             }
         }
 

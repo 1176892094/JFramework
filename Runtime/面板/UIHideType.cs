@@ -8,7 +8,7 @@ namespace JFramework
         /// <summary>
         /// 普通隐藏
         /// </summary>
-        Common = 0,
+        Normal = 0,
 
         /// <summary>
         /// 移除并销毁
