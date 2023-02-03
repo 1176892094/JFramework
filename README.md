@@ -78,7 +78,7 @@ public class Test1 : MonoBehaviour
 
 public struct EventName
 {
-    public const string EventTrigger = "EventTrigger"; //建议定一个事件的常量
+    public const int EventTrigger = 1001; //建议定一个事件的常量
 }
 ```
 (2)AssetManager（资源加载管理类）
