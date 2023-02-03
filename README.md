@@ -65,7 +65,7 @@ public class Test1 : MonoBehaviour
         EventManager.Instance.Send(EventName.EventTrigger); //发送事件
     }
 
-    private void EventTrigger() //触发事件调用该方法
+    private void EventTrigger(param object[] args) //触发事件调用该方法
     {
         Debug.Log("触发事件!");
     }
