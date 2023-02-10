@@ -85,7 +85,7 @@ public struct EventName
 ```csharp
 public class Test2 : MonoBehaviour
 {
-    private void LoadAssetAsync() //异步加载
+    private void LoadAsync() //异步加载
     {
         AssetManager.Instance.LoadAsync<GameObject>(ResPath.Player, obj =>
         {
