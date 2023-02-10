@@ -109,16 +109,20 @@ public class Test3 : MonoBehaviour
 {
     private void SaveAndLoad1()
     {
-        ScriptableObject playerData = ResourceManager.Load<ScriptableObject>(ResPath.PlayerData);
-        JsonManager.Instance.Save(playerData, "玩家数据"); //保存SO文件,名称为"玩家数据"
-        JsonManager.Instance.Load(playerData); //读取该SO文件
+        AssetManager.Instance.LoadAsync<ScriptableObject>("玩家数据", playerData =>
+        {
+            JsonManager.Instance.Save(playerData, "玩家数据"); //保存SO文件,名称为"玩家数据"
+            JsonManager.Instance.Load(playerData); //读取该SO文件
+        });
     }
 
     private void SaveAndLoad2()
     {
-        ScriptableObject playerData = ResourceManager.Load<ScriptableObject>(ResPath.PlayerData);
-        JsonManager.Instance.Save(playerData, "玩家数据", true); //储存数据并加密
-        JsonManager.Instance.Load(playerData, true); //解析加密数据并读取
+        AssetManager.Instance.LoadAsync<ScriptableObject>("玩家数据", playerData =>
+        {
+            JsonManager.Instance.Save(playerData, "玩家数据", true); //储存数据并加密
+            JsonManager.Instance.Load(playerData, true); //解析加密数据并读取
+        });        
     }
 
     private void SaveAndLoad3()
