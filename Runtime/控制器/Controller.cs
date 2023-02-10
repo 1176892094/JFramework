@@ -1,4 +1,5 @@
 using JFramework.Interface;
+using Sirenix.OdinInspector;
 using UnityEngine;
 
 namespace JFramework
@@ -7,7 +8,7 @@ namespace JFramework
     /// 控制器的抽象类
     /// </summary>
     /// <typeparam name="T">实现了IEntity接口的类型</typeparam>
-    public abstract class Controller<T> : ScriptableObject,IController where T : IEntity
+    public abstract class Controller<T> : SerializedScriptableObject, IController where T : IEntity
     {
         /// <summary>
         /// 控制器的所有者
@@ -19,7 +20,7 @@ namespace JFramework
         /// </summary>
         /// <param name="owner">传入控制器的所有者</param>
         protected virtual void OnInit(T owner) => this.owner = owner;
-
+        
         void IController.OnInit(object owner) => OnInit((T)owner);
     }
 

@@ -65,7 +65,7 @@ public class Test1 : MonoBehaviour
         EventManager.Instance.Send(EventName.EventTrigger); //发送事件
     }
 
-    private void EventTrigger(param object[] args) //触发事件调用该方法
+    private void EventTrigger() //触发事件调用该方法
     {
         Debug.Log("触发事件!");
     }
@@ -78,7 +78,7 @@ public class Test1 : MonoBehaviour
 
 public struct EventName
 {
-    public const int EventTrigger = 1001; //建议定一个事件的常量
+    public const string EventTrigger = "EventTrigger"; //建议定一个事件的常量
 }
 ```
 (2)AssetManager（资源加载管理类）

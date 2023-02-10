@@ -195,7 +195,7 @@ namespace JFramework.Core
         /// <param name="obj">传入的UI对象</param>
         /// <param name="type">事件触发类型</param>
         /// <param name="action">事件触发后的回调</param>
-        public void Listen(UIBehaviour obj, EventTriggerType type, UnityAction<BaseEventData> action)
+        public void Listen(MonoBehaviour obj, EventTriggerType type, UnityAction<BaseEventData> action)
         {
             EventTrigger trigger = obj.GetComponent<EventTrigger>();
             if (trigger == null) trigger = obj.gameObject.AddComponent<EventTrigger>();

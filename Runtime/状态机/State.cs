@@ -19,17 +19,22 @@ namespace JFramework
         protected virtual void OnInit(T owner) => this.owner = owner;
 
         /// <summary>
-        /// 进入该状态的方法
+        /// 状态进入
         /// </summary>
         protected abstract void OnEnter();
 
         /// <summary>
-        /// 更新该状态的方法
+        /// 状态更新
         /// </summary>
         protected abstract void OnUpdate();
 
         /// <summary>
-        /// 退出该状态的方法
+        /// 状态固定更新
+        /// </summary>
+        protected abstract void FixUpdate();
+
+        /// <summary>
+        /// 状态退出
         /// </summary>
         protected abstract void OnExit();
 
@@ -47,6 +52,11 @@ namespace JFramework
         /// 通过接口指向状态的更新方法
         /// </summary>
         void IState.OnUpdate() => OnUpdate();
+
+        /// <summary>
+        /// 通过接口指向状态的固定更新方法
+        /// </summary>
+        void IState.FixedUpdate() => FixUpdate();
 
         /// <summary>
         /// 通过接口指向状态的退出方法

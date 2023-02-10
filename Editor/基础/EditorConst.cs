@@ -18,9 +18,9 @@ internal struct EditorConst
     public const string AddressableResources = "AddressableResources";
     public const string EditorPath = "Assets/Editor";
 
-    public const int Name = 0;
-    public const int Type = 1;
-    public const int Data = 2;
+    public const int Name = 1;
+    public const int Type = 2;
+    public const int Data = 3;
     public const string Namespace = "JFramework.Table";
     public const string ScriptPath = "Assets/Scripts/DataTable/";
     public const string AssetsPath = "Assets/AddressableResources/DataTable/";

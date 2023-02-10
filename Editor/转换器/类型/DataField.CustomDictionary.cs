@@ -32,7 +32,7 @@ namespace JFramework
 			file.Append("\n");
 			file.AppendFormat("\t\t[SerializeField] private {0}[] {1}Keys;\n", keyType, fieldName);
 			file.AppendFormat("\t\t[SerializeField] private {0}[] {1}Values;\n", valueType, fieldName);
-			file.AppendFormat("\t\tpublic Dictionary<{0},{1}> {2} = new Dictionary<{0},{1}>();\n", keyType, valueType, fieldName);
+			file.AppendFormat("\t\t[ShowInInspector] public Dictionary<{0},{1}> {2} = new Dictionary<{0},{1}>();\n", keyType, valueType, fieldName);
 			return FieldBuilder.Return(file);
 		}
 
@@ -74,6 +74,7 @@ namespace JFramework
 		public override string GetInitLine()
 		{
 			var file = FieldBuilder.Borrow();
+			file.AppendFormat("\t\t\tif({2} == null) {2} = new Dictionary<{0},{1}>();\n", keyType, valueType, fieldName);
 			file.AppendFormat("\t\t\tfor (int i = 0; i < {0}Keys.Length; ++i)\n", fieldName);
 			file.Append("\t\t\t{\n");
 			file.AppendFormat("\t\t\t\tvar k = {0}Keys[i];\n", fieldName);

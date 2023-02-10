@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using Sirenix.OdinInspector;
@@ -20,7 +20,7 @@ namespace JFramework.Core
         [ShowInInspector, ReadOnly, LabelText("当前场景标识"), FoldoutGroup("场景管理视图")]
         public int Id => SceneManager.GetActiveScene().buildIndex;
 
-
+       
         /// <summary>
         /// 通过接口当前场景名称
         /// </summary>

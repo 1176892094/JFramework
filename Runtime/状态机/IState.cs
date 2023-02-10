@@ -22,6 +22,11 @@ namespace JFramework.Interface
         void OnUpdate();
 
         /// <summary>
+        /// 固定时间更新状态的方法
+        /// </summary>
+        void FixedUpdate();
+
+        /// <summary>
         /// 退出该状态的方法
         /// </summary>
         void OnExit();

@@ -139,7 +139,7 @@ namespace JFramework.Core
         }
 
         /// <summary>
-        /// 通过数据管理接口得到数据
+        /// 获取对应类型数据下主键为Key的数据
         /// </summary>
         /// <param name="key">传入的int主键</param>
         /// <typeparam name="T">可以使用所有继承IData类型的对象</typeparam>
@@ -153,10 +153,10 @@ namespace JFramework.Core
         }
 
         /// <summary>
-        /// 通过数据管理接口得到数据
+        /// 获取对应类型数据下主键为Key的数据
         /// </summary>
         /// <param name="key">传入的string主键</param>
-        /// <typeparam name="T">可以使用所有继承IData类型的对象</typeparam>
+        /// <typeparam name="T">要获取数据的类型,必须继承自JFramework.Data</typeparam>
         public T Get<T>(string key) where T : Data
         {
             StrDataDict.TryGetValue(typeof(T), out StrDataDict soDict);

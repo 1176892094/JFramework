@@ -161,6 +161,7 @@ namespace JFramework
                 csFile.Append("//------------------------------------------------------------------------------\n\n");
                 csFile.Append("using System;\n");
                 csFile.Append("using System.Collections.Generic;\n");
+                csFile.Append("using Sirenix.OdinInspector;\n");
                 csFile.Append("using UnityEngine;\n");
                 csFile.AppendFormat("namespace {0}\n", EditorConst.Namespace);
                 csFile.Append("{\n");
@@ -247,7 +248,7 @@ namespace JFramework
                     csFile.Append("\t{\n");
 
                     int rowCount = excelData.Row;
-                    for (int i = 2; i < rowCount; i++)
+                    for (int i = EditorConst.Data ; i < rowCount; i++)
                     {
                         var field = excelData.GetData(i, e);
                         csFile.AppendFormat("\t\t{0},\n", field);
