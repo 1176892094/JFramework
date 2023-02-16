@@ -1,8 +1,7 @@
 using System.Collections.Generic;
-using JFramework.Interface;
-using Sirenix.OdinInspector;
+using UnityEngine;
 
-namespace JFramework.Core
+namespace JFramework
 {
     /// <summary>
     /// 事件管理器
@@ -10,30 +9,32 @@ namespace JFramework.Core
     public sealed class EventManager : Singleton<EventManager>
     {
         /// <summary>
-        /// 存储所有事件的字典
+        /// 事件存储字典
         /// </summary>
-        [ShowInInspector, ReadOnly, LabelText("事件管理数据"), FoldoutGroup("事件管理视图")]
-        private Dictionary<int, EventData> eventDict;
-
-        [ShowInInspector, ReadOnly, LabelText("事件变量列表"), FoldoutGroup("事件管理视图")]
-        private List<List<IEventValue>> valueList;
+        internal Dictionary<int, EventData> eventDict;
 
         /// <summary>
-        /// 事件管理器初始化
+        /// 事件管理器醒来
         /// </summary>
-        protected override void OnInit(params object[] args)
+        public override void Awake()
         {
-            valueList = new List<List<IEventValue>>();
+            base.Awake();
             eventDict = new Dictionary<int, EventData>();
         }
 
         /// <summary>
-        /// 事件管理侦听事件的方法
+        /// 侦听事件
         /// </summary>
-        /// <param name="id">传入事件的名称</param>
-        /// <param name="action">传入事件的方法</param>
+        /// <param name="id">事件唯一标识</param>
+        /// <param name="action">传入侦听的事件</param>
         public void Listen(int id, EventData action)
         {
+            if (eventDict == null)
+            {
+                Debug.Log("事件管理器没有初始化!");
+                return;
+            }
+
             if (eventDict.ContainsKey(id))
             {
                 eventDict[id] += action;
@@ -45,12 +46,18 @@ namespace JFramework.Core
         }
 
         /// <summary>
-        /// 事件管理移除事件的方法
+        /// 移除事件
         /// </summary>
-        /// <param name="id">传入事件的名称</param>
-        /// <param name="action">传入事件的方法</param>
+        /// <param name="id">事件唯一标识</param>
+        /// <param name="action">传入移除的事件</param>
         public void Remove(int id, EventData action)
         {
+            if (eventDict == null)
+            {
+                Debug.Log("事件管理器没有初始化!");
+                return;
+            }
+
             if (eventDict.ContainsKey(id))
             {
                 eventDict[id] -= action;
@@ -58,9 +65,9 @@ namespace JFramework.Core
         }
 
         /// <summary>
-        /// 事件管理发送事件的方法
+        /// 发送事件
         /// </summary>
-        /// <param name="id">传入事件的名称</param>
+        /// <param name="id">事件唯一标识</param>
         /// <param name="args">传入事件的参数</param>
         public void Send(int id, params object[] args)
         {
@@ -71,21 +78,12 @@ namespace JFramework.Core
         }
 
         /// <summary>
-        /// 事件管理器侦听事件变量组
+        /// 清空事件管理器
         /// </summary>
-        /// <param name="values">对象所拥有的事件变量组</param>
-        internal void ListenValue(List<IEventValue> values)
+        public override void Clear()
         {
-            valueList.Add(values);
-        }
-
-        /// <summary>
-        /// 事件管理器移除事件变量组
-        /// </summary>
-        /// <param name="values">对象所拥有的事件变量组</param>
-        internal void RemoveValue(List<IEventValue> values)
-        {
-            valueList.Remove(values);
+            base.Clear();
+            eventDict = null;
         }
     }
 }

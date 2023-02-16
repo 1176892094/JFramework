@@ -8,26 +8,26 @@ namespace JFramework
         /// <summary>
         /// 最底层
         /// </summary>
-        Lowest = 0,
+        Layer1 = 0,
 
         /// <summary>
-        /// 底层
+        /// 较底层
         /// </summary>
-        Bottom = 1,
+        Layer2 = 1,
 
         /// <summary>
         /// 中间层
         /// </summary>
-        Middle = 2,
+        Layer3 = 2,
 
         /// <summary>
-        /// 最高层
+        /// 较高层
         /// </summary>
-        Height = 3,
+        Layer4 = 3,
 
         /// <summary>
-        /// 忽视射线层
+        /// 最高层 (忽视射线)
         /// </summary>
-        Ignore = 4,
+        Layer5 = 4,
     }
 }

@@ -3,7 +3,7 @@ using System.Runtime.CompilerServices;
 using System.Runtime.ExceptionServices;
 
 namespace JFramework
-{ 
+{
     public class CoroutineAwaiter : INotifyCompletion
     {
         private bool isCompleted;
@@ -13,7 +13,7 @@ namespace JFramework
 
         public void GetResult()
         {
-            AwaitExtension.Assert(isCompleted);
+            AsyncManager.Assert(isCompleted);
             if (exception != null)
             {
                 ExceptionDispatchInfo.Capture(exception).Throw();
@@ -22,23 +22,23 @@ namespace JFramework
 
         public void Complete(Exception exception)
         {
-            AwaitExtension.Assert(!isCompleted);
+            AsyncManager.Assert(!isCompleted);
             isCompleted = true;
             this.exception = exception;
             if (continuation != null)
             {
-                AwaitExtension.RunOnUnityScheduler(continuation);
+                AsyncManager.Run(continuation);
             }
         }
 
         void INotifyCompletion.OnCompleted(Action continuation)
         {
-            AwaitExtension.Assert(this.continuation == null);
-            AwaitExtension.Assert(!isCompleted);
+            AsyncManager.Assert(this.continuation == null);
+            AsyncManager.Assert(!isCompleted);
             this.continuation = continuation;
         }
     }
-    
+
     public class CoroutineAwaiter<T> : INotifyCompletion
     {
         private T result;
@@ -49,7 +49,7 @@ namespace JFramework
 
         public T GetResult()
         {
-            AwaitExtension.Assert(isCompleted);
+            AsyncManager.Assert(isCompleted);
             if (exception != null)
             {
                 ExceptionDispatchInfo.Capture(exception).Throw();
@@ -60,20 +60,20 @@ namespace JFramework
 
         public void Complete(T result, Exception exception)
         {
-            AwaitExtension.Assert(!isCompleted);
+            AsyncManager.Assert(!isCompleted);
             isCompleted = true;
             this.result = result;
             this.exception = exception;
             if (continuation != null)
             {
-                AwaitExtension.RunOnUnityScheduler(continuation);
+                AsyncManager.Run(continuation);
             }
         }
 
         void INotifyCompletion.OnCompleted(Action continuation)
         {
-            AwaitExtension.Assert(this.continuation == null);
-            AwaitExtension.Assert(!isCompleted);
+            AsyncManager.Assert(this.continuation == null);
+            AsyncManager.Assert(!isCompleted);
             this.continuation = continuation;
         }
     }

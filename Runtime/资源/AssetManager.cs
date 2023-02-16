@@ -1,7 +1,6 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using Sirenix.OdinInspector;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
 using UnityEngine.ResourceManagement.AsyncOperations;
@@ -15,16 +14,16 @@ namespace JFramework.Core
     public class AssetManager : Singleton<AssetManager>
     {
         /// <summary>
-        /// 存储资源的字典
+        /// 资源存储字典
         /// </summary>
-        [ShowInInspector, ReadOnly, LabelText("资源管理器"), FoldoutGroup("资源加载视图")]
         private Dictionary<string, IEnumerator> assetDict;
 
         /// <summary>
         /// 资源管理器初始化
         /// </summary>
-        protected override void OnInit(params object[] args)
+        public override void Awake()
         {
+            base.Awake();
             assetDict = new Dictionary<string, IEnumerator>();
         }
 
@@ -37,13 +36,19 @@ namespace JFramework.Core
         /// <typeparam name="T">可以使用任何继承Object的对象</typeparam>
         public void LoadAsync<T>(string name, Action<T> action) where T : Object
         {
+            if (assetDict == null)
+            {
+                Debug.Log("资源管理器没有初始化!");
+                return;
+            }
+            
             AsyncOperationHandle<T> handle;
             if (assetDict.ContainsKey(name))
             {
                 handle = (AsyncOperationHandle<T>)assetDict[name];
                 if (handle.IsDone)
                 {
-                    action(handle.Result is GameObject ? Instantiate(handle.Result) : handle.Result);
+                    action(handle.Result is GameObject ? Object.Instantiate(handle.Result) : handle.Result);
                 }
                 else
                 {
@@ -51,7 +56,7 @@ namespace JFramework.Core
                     {
                         if (obj.Status == AsyncOperationStatus.Succeeded)
                         {
-                            action(obj.Result is GameObject ? Instantiate(obj.Result) : obj.Result);
+                            action(obj.Result is GameObject ? Object.Instantiate(obj.Result) : obj.Result);
                         }
                     };
                 }
@@ -64,7 +69,7 @@ namespace JFramework.Core
             {
                 if (obj.Status == AsyncOperationStatus.Succeeded)
                 {
-                    action(obj.Result is GameObject ? Instantiate(obj.Result) : obj.Result);
+                    action(obj.Result is GameObject ? Object.Instantiate(obj.Result) : obj.Result);
                 }
                 else
                 {
@@ -85,10 +90,22 @@ namespace JFramework.Core
         /// <typeparam name="T">可以使用任何继承Object的对象</typeparam>
         public void Dispose<T>(string name)
         {
+            if (assetDict == null)
+            {
+                Debug.Log("资源管理器没有初始化!");
+                return;
+            }
+            
             if (!assetDict.ContainsKey(name)) return;
             var handle = (AsyncOperationHandle<T>)assetDict[name];
             Addressables.Release(handle);
             assetDict.Remove(name);
+        }
+
+        public override void Clear()
+        {
+            base.Clear();
+            assetDict = null;
         }
     }
 }

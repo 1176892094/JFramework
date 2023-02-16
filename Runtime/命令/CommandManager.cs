@@ -1,8 +1,8 @@
 using System.Collections.Generic;
 using JFramework.Interface;
-using Sirenix.OdinInspector;
+using UnityEngine;
 
-namespace JFramework.Core
+namespace JFramework
 {
     /// <summary>
     /// 命令管理器
@@ -10,52 +10,72 @@ namespace JFramework.Core
     public sealed class CommandManager : Singleton<CommandManager>
     {
         /// <summary>
-        /// 存储命令的字典
+        /// 命令存储字典
         /// </summary>
-        [ShowInInspector, ReadOnly, LabelText("命令管理器"), FoldoutGroup("命令管理视图")]
-        private Dictionary<string, ICommand> commandDict;
-
+        internal Dictionary<string, ICommand> commandDict;
 
         /// <summary>
         /// 命令管理器初始化
         /// </summary>
-        protected override void OnInit(params object[] args)
+        public override void Awake()
         {
+            base.Awake();
             commandDict = new Dictionary<string, ICommand>();
         }
 
         /// <summary>
-        /// 通过命令管理器接口执行命令
+        /// 执行命令
         /// </summary>
-        /// <param name="args">接口执行命令的参数</param>
-        /// <typeparam name="T">可以使用所有继承ICommand的类</typeparam>
+        /// <param name="args">传入的参数</param>
+        /// <typeparam name="T">传入继承ICommand的对象</typeparam>
         public void Execute<T>(params object[] args) where T : ICommand, new()
         {
+            if (commandDict == null)
+            {
+                Debug.Log("命令管理器没有初始化!");
+                return;
+            }
+
             var key = typeof(T).Name;
+
             if (!commandDict.ContainsKey(key))
             {
                 var command = new T();
                 commandDict.Add(key, command);
-                command.Execute(args);
+                command.OnExecute(args);
                 return;
             }
 
-            commandDict[key].Execute(args);
+            commandDict[key].OnExecute(args);
         }
 
         /// <summary>
-        /// 通过命令管理器接口释放命令
+        /// 移除命令
         /// </summary>
-        /// <typeparam name="T">可以使用所有继承ICommand的类</typeparam>
+        /// <typeparam name="T"></typeparam>
         public void Dispose<T>()
         {
+            if (commandDict == null)
+            {
+                Debug.Log("命令管理器没有初始化!");
+                return;
+            }
+
             var key = typeof(T).Name;
+
             if (commandDict.ContainsKey(key))
             {
                 commandDict.Remove(key);
             }
-
-            commandDict.Clear();
+        }
+        
+        /// <summary>
+        /// 清除命令管理器
+        /// </summary>
+        public override void Clear()
+        {
+            base.Clear();
+            commandDict = null;
         }
     }
 }

@@ -24,7 +24,5 @@ internal struct EditorConst
     public const string Namespace = "JFramework.Table";
     public const string ScriptPath = "Assets/Scripts/DataTable/";
     public const string AssetsPath = "Assets/AddressableResources/DataTable/";
-    public const string ExcelDataKey = "ExcelData";
-    public const string ExcelPathKey = "ExcelPath";
 }
 

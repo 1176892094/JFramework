@@ -8,6 +8,11 @@ namespace JFramework
     public abstract class DataTable : ScriptableObject
     {
         /// <summary>
+        /// 数据表获取列表中的数据总数
+        /// </summary>
+        /// <returns></returns>
+        public abstract int Count { get; }
+        /// <summary>
         /// 数据表初始化数据
         /// </summary>
         public abstract void InitData();
@@ -24,11 +29,5 @@ namespace JFramework
         /// <param name="index">传入数据在列表中的位置</param>
         /// <returns>返回对应位置的数据</returns>
         public abstract Data GetData(int index);
-
-        /// <summary>
-        /// 数据表获取列表中的数据总数
-        /// </summary>
-        /// <returns></returns>
-        public abstract int GetCount();
     }
 }

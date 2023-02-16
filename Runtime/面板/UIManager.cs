@@ -5,6 +5,7 @@ using Sirenix.OdinInspector;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.EventSystems;
+using Object = UnityEngine.Object;
 
 namespace JFramework.Core
 {
@@ -19,56 +20,33 @@ namespace JFramework.Core
         [ShowInInspector, ReadOnly, LabelText("游戏界面数据"), FoldoutGroup("游戏界面视图")]
         internal Dictionary<string, UIPanelData> dataDict;
 
-
         /// <summary>
         /// 存储所有UI的字典
         /// </summary>
         [ShowInInspector, ReadOnly, LabelText("当前游戏面板"), FoldoutGroup("游戏界面视图")]
         internal Dictionary<string, UIPanel> panelDict;
 
-        #region Layer
-
         /// <summary>
-        /// UI最底层
+        /// UI层级数组
         /// </summary>
-        private Transform lowest;
+        internal Transform[] layerGroup;
 
-        /// <summary>
-        /// UI底层
-        /// </summary>
-        private Transform bottom;
-
-        /// <summary>
-        /// UI中间层
-        /// </summary>
-        private Transform middle;
-
-        /// <summary>
-        /// UI最高层
-        /// </summary>
-        private Transform height;
-
-        /// <summary>
-        /// UI忽视射线层
-        /// </summary>
-        private Transform ignore;
-
-
-        #endregion
-        
         /// <summary>
         /// 界面管理器初始化数据
         /// </summary>
-        protected override void OnInit(params object[] args)
+        public override void Awake()
         {
-            lowest = transform.Find("Canvas/Lowest");
-            bottom = transform.Find("Canvas/Bottom");
-            middle = transform.Find("Canvas/Middle");
-            height = transform.Find("Canvas/Height");
-            ignore = transform.Find("Canvas/Ignore");
+            base.Awake();
+            var obj = GlobalManager.Instance.gameObject;
+            layerGroup = new Transform[5];
+            layerGroup[0] = obj.transform.Find("UICanvas/Layer1");
+            layerGroup[1] = obj.transform.Find("UICanvas/Layer2");
+            layerGroup[2] = obj.transform.Find("UICanvas/Layer3");
+            layerGroup[3] = obj.transform.Find("UICanvas/Layer4");
+            layerGroup[4] = obj.transform.Find("UICanvas/Layer5");
             panelDict = new Dictionary<string, UIPanel>();
-            var textAsset = Resources.Load<TextAsset>(Global.UIPanelData);//读取UI面版相关的文本数据
-            dataDict = JsonConvert.DeserializeObject<Dictionary<string, UIPanelData>>(textAsset.text);//将文本数据转换为string:UIPanelData字典
+            var textAsset = Resources.Load<TextAsset>("UIPanelData"); //读取UI面版相关的文本数据
+            dataDict = JsonConvert.DeserializeObject<Dictionary<string, UIPanelData>>(textAsset.text); //将文本数据转换为string:UIPanelData字典
         }
 
         /// <summary>
@@ -79,9 +57,10 @@ namespace JFramework.Core
         /// <typeparam name="T">可以使用所有继承IPanel的对象</typeparam>
         private void LoadPanel<T>(string name, Action<T> action) where T : UIPanel
         {
-            var data = dataDict[name];//获取对应名称Panel的数据
+            var data = dataDict[name]; //获取对应名称Panel的数据
             AssetManager.Instance.LoadAsync<GameObject>(data.Path, obj =>
-            {//通过Panel数据的路径 加载 Panel
+            {
+                //通过Panel数据的路径 加载 Panel
                 var layer = GetLayer((UILayerType)data.Layer);
                 obj.transform.SetParent(layer, false);
                 var panel = obj.GetComponent<T>();
@@ -99,6 +78,12 @@ namespace JFramework.Core
         /// <typeparam name="T">可以使用所有继承IPanel的对象</typeparam>
         public void ShowPanel<T>(Action<T> action = null) where T : UIPanel
         {
+            if (panelDict == null)
+            {
+                Debug.Log("面板管理器没有初始化!");
+                return;
+            }
+            
             var key = typeof(T).Name;
 
             if (panelDict.ContainsKey(key))
@@ -118,6 +103,12 @@ namespace JFramework.Core
         /// <typeparam name="T">可以使用所有继承IPanel的对象</typeparam>
         public void HidePanel<T>(UIHideType type = UIHideType.Remove) where T : UIPanel
         {
+            if (panelDict == null)
+            {
+                Debug.Log("面板管理器没有初始化!");
+                return;
+            }
+            
             var key = typeof(T).Name;
 
             if (panelDict.ContainsKey(key))
@@ -126,7 +117,7 @@ namespace JFramework.Core
 
                 if (type == UIHideType.Remove)
                 {
-                    Destroy(panelDict[key].gameObject);
+                    Object.Destroy(panelDict[key].gameObject);
                     panelDict.Remove(key);
                 }
             }
@@ -158,35 +149,42 @@ namespace JFramework.Core
         {
             switch (layer)
             {
-                case UILayerType.Lowest:
-                    return lowest;
-                case UILayerType.Bottom:
-                    return bottom;
-                case UILayerType.Middle:
-                    return middle;
-                case UILayerType.Height:
-                    return height;
-                case UILayerType.Ignore:
-                    return ignore;
+                case UILayerType.Layer1:
+                    return layerGroup[0];
+                case UILayerType.Layer2:
+                    return layerGroup[1];
+                case UILayerType.Layer3:
+                    return layerGroup[2];
+                case UILayerType.Layer4:
+                    return layerGroup[3];
+                case UILayerType.Layer5:
+                    return layerGroup[4];
                 default:
                     return null;
             }
         }
 
-        /// <summary>
-        /// UI管理器清除所有面板
-        /// </summary>
-        public void Clear()
+        public void HideAll()
         {
             foreach (var key in panelDict.Keys)
             {
                 if (panelDict.ContainsKey(key))
                 {
-                    Destroy(panelDict[key].gameObject);
+                    Object.Destroy(panelDict[key].gameObject);
                 }
             }
 
             panelDict.Clear();
+        }
+
+        /// <summary>
+        /// UI管理器清除所有面板
+        /// </summary>
+        public override void Clear()
+        {
+            dataDict = null;
+            panelDict = null;
+            layerGroup = null;
         }
 
         /// <summary>

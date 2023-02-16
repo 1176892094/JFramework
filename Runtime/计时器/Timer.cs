@@ -1,35 +1,15 @@
 using System;
 using JFramework.Core;
+using JFramework.Interface;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
 namespace JFramework
 {
     /// <summary>
-    /// 计时器状态
-    /// </summary>
-    internal enum TimeState
-    {
-        /// <summary>
-        /// 运行状态
-        /// </summary>
-        Run = 0,
-
-        /// <summary>
-        /// 暂停状态
-        /// </summary>
-        Stop = 1,
-
-        /// <summary>
-        /// 完成状态
-        /// </summary>
-        Finish = 2,
-    }
-
-    /// <summary>
     /// 计时器
     /// </summary>
-    public class TimeTick
+    internal class Timer: ITimer
     {
         /// <summary>
         /// 当前循环次数
@@ -64,17 +44,17 @@ namespace JFramework
         /// <summary>
         /// 计时器的状态
         /// </summary>
-        [ShowInInspector] private TimeState state;
+        [ShowInInspector] private TimerState state;
 
         /// <summary>
         /// 跟随单位
         /// </summary>
-        [ShowInInspector] private GameObject target;
+        [ShowInInspector] private object target;
 
         /// <summary>
         /// 循环时执行的事件
         /// </summary>
-        private Action<TimeTick> OnLoop;
+        private Action<ITimer> OnLoop;
 
         /// <summary>
         /// 完成时执行的事件
@@ -86,13 +66,13 @@ namespace JFramework
         /// </summary>
         /// <param name="keepTime">持续时间</param>
         /// <param name="OnFinish">完成时执行的事件</param>
-        internal void Open(float keepTime, Action OnFinish)
+        public void Open(float keepTime, Action OnFinish)
         {
             count = 0;
             maxCount = 1;
             unscaled = false;
             followed = false;
-            state = TimeState.Run;
+            state = TimerState.Run;
             this.keepTime = keepTime;
             this.OnFinish = OnFinish;
             waitTime = Time.time + keepTime;
@@ -119,9 +99,9 @@ namespace JFramework
         /// <summary>
         /// 根据受TimeScale影响来执行不同的计时
         /// </summary>
-        internal void OnUpdate()
+        public void OnUpdate()
         {
-            if (state != TimeState.Run) return;
+            if (state != TimerState.Run) return;
             if (followed && target == null)
             {
                 TimerManager.Instance.Remove(this);
@@ -135,9 +115,9 @@ namespace JFramework
         /// 计时器开始计时
         /// </summary>
         /// <returns>返回自身</returns>
-        public TimeTick Play()
+        public ITimer Play()
         {
-            state = TimeState.Run;
+            state = TimerState.Run;
             return this;
         }
 
@@ -145,9 +125,9 @@ namespace JFramework
         /// 计时器暂停计时
         /// </summary>
         /// <returns>返回自身</returns>
-        public TimeTick Stop()
+        public ITimer Stop()
         {
-            state = TimeState.Stop;
+            state = TimerState.Stop;
             return this;
         }
 
@@ -157,18 +137,17 @@ namespace JFramework
         /// <param name="count">计时器循环次数</param>
         /// <param name="OnLoop">循环时执行的事件</param>
         /// <returns>返回自身</returns>
-        public TimeTick SetLoop(int count, Action<TimeTick> OnLoop)
+        public void SetLoop(int count, Action<ITimer> OnLoop)
         {
             maxCount = count;
             this.OnLoop = OnLoop;
-            return this;
         }
 
         /// <summary>
         /// 设置计时器是否受TimeScale影响
         /// </summary>
         /// <returns>返回自身</returns>
-        public TimeTick Unscale()
+        public ITimer Unscale()
         {
             unscaled = true;
             waitTime = Time.unscaledTime + keepTime;
@@ -179,23 +158,24 @@ namespace JFramework
         /// 设置随目标死亡而停止
         /// </summary>
         /// <param name="target">绑定传入的目标</param>
-        public void SetTarget(GameObject target)
+        public ITimer SetTarget(object target)
         {
             followed = true;
             this.target = target;
+            return this;
         }
 
         /// <summary>
         /// 关闭计时器
         /// </summary>
-        internal void Close()
+        public void Close()
         {
             target = null;
             OnLoop = null;
             OnFinish = null;
             unscaled = false;
             followed = false;
-            state = TimeState.Finish;
+            state = TimerState.Finish;
         }
     }
 }

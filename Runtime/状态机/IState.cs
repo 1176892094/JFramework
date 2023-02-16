@@ -6,10 +6,10 @@ namespace JFramework.Interface
     public interface IState
     {
         /// <summary>
-        /// 进入状态的初始化方法
+        /// 状态的初始化方法
         /// </summary>
-        /// <param name="owner">可传入所有者的信息</param>
-        void OnInit(object owner);
+        /// <param name="stateMachine">状态的所有者</param>
+        void OnAwake(object stateMachine);
 
         /// <summary>
         /// 进入该状态的方法
@@ -20,11 +20,6 @@ namespace JFramework.Interface
         /// 更新该状态的方法
         /// </summary>
         void OnUpdate();
-
-        /// <summary>
-        /// 固定时间更新状态的方法
-        /// </summary>
-        void FixedUpdate();
 
         /// <summary>
         /// 退出该状态的方法

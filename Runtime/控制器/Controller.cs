@@ -1,6 +1,5 @@
 using JFramework.Interface;
 using Sirenix.OdinInspector;
-using UnityEngine;
 
 namespace JFramework
 {
@@ -13,22 +12,27 @@ namespace JFramework
         /// <summary>
         /// 控制器的所有者
         /// </summary>
-        protected T owner;
+        public T owner;
 
         /// <summary>
         /// 控制器初始化
         /// </summary>
         /// <param name="owner">传入控制器的所有者</param>
-        protected virtual void OnInit(T owner) => this.owner = owner;
-        
-        void IController.OnInit(object owner) => OnInit((T)owner);
-    }
-
-    public static class ControllerExtension
-    {
-        public static T Get<T>(this IController controller) where T : IController
+        private void OnInit(T owner)
         {
-            return (T)controller;
+            this.owner = owner;
+            OnInit();
         }
+
+        /// <summary>
+        /// 控制器初始化
+        /// </summary>
+        protected abstract void OnInit();
+
+        /// <summary>
+        /// 通过接口初始化控制器
+        /// </summary>
+        /// <param name="owner">控制器的所有者</param>
+        void IController.OnInit(object owner) => OnInit((T)owner);
     }
 }

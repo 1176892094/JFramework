@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace JFramework.Core
 {
-    internal partial class DebugManager : Entity
+    internal partial class DebugManager : MonoBehaviour
     {
         [ShowInInspector, LabelText("是否启动调试"), FoldoutGroup("游戏调试视图")]
         public bool isDebug;
@@ -15,21 +15,19 @@ namespace JFramework.Core
         private DebugType debugType;
 
 
-        protected override void Awake()
+        private void Awake()
         {
-            base.Awake();
             InitComponent();
             Application.logMessageReceived += LogMessageReceived;
         }
 
-        protected override void Start()
+        private void Start()
         {
-            base.Start();
-            TimerManager.Instance.Listen(1).SetLoop(-1, timer =>
+            TimerManager.Instance.Listen(1).Unscale().SetTarget(gameObject).SetLoop(-1, _ =>
             {
                 if (!isDebug) return;
                 FPS = (int)(1.0f / Time.deltaTime);
-            }).Unscale().SetTarget(gameObject);
+            });
         }
 
         private void OnGUI()
@@ -98,7 +96,7 @@ namespace JFramework.Core
             }
         }
 
-        protected override void OnDestroy()
+        private void OnDestroy()
         {
             Application.logMessageReceived -= LogMessageReceived;
         }

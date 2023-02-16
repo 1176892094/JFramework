@@ -16,23 +16,11 @@ namespace JFramework
                 filePath = filePath.Replace("\\", "/");
                 csPath = csPath.Replace("\\", "/");
 
-                if (!Directory.Exists(filePath))
-                {
-                    EditorUtility.DisplayDialog("JFramework Tool", "没有找到Excel文件!", "OK");
-                    return;
-                }
-
-                if (!Directory.Exists(csPath))
-                {
-                    Directory.CreateDirectory(csPath);
-                }
-
+                if (!Directory.Exists(filePath)) return;
+                if (!Directory.Exists(csPath)) Directory.CreateDirectory(csPath);
+                
                 var tempPath = Environment.CurrentDirectory + "/Template/";
-                if (Directory.Exists(tempPath))
-                {
-                    Directory.Delete(tempPath, true);
-                }
-
+                if (Directory.Exists(tempPath)) Directory.Delete(tempPath, true);
                 Directory.CreateDirectory(tempPath);
 
                 filePath = filePath.Replace("\\", "/");
@@ -40,6 +28,7 @@ namespace JFramework
                 if (!csPath.EndsWith("/")) csPath += "/";
 
                 var isChanged = false;
+                //获取目录下所有的Excel文件
                 var excelFiles = Directory.GetFiles(filePath);
 
                 for (var i = 0; i < excelFiles.Length; ++i)
@@ -55,7 +44,6 @@ namespace JFramework
                     }
 
                     if (!IsSupportedExcel(excelFile)) continue;
-                    var fileName = Path.GetFileName(excelFile);
                     var scriptData = ConvertScriptData(excelFile);
 
                     foreach (var data in scriptData)
@@ -81,14 +69,14 @@ namespace JFramework
 
                 if (isChanged)
                 {
-                    EditorPrefs.SetBool(EditorConst.ExcelDataKey, true);
+                    FrameworkEditor.DataKey = true;
                     var csFiles = Directory.GetFiles(tempPath);
 
                     foreach (var csFile in csFiles)
                     {
                         var path = csFile.Replace("\\", "/");
-                        File.Copy(csFile, csPath + path.Substring(path.LastIndexOf("/", StringComparison.Ordinal)),
-                            true);
+                        var desFileName = csPath + path.Substring(path.LastIndexOf("/", StringComparison.Ordinal));
+                        File.Copy(csFile, desFileName, true);
                     }
 
                     AssetDatabase.Refresh();
@@ -99,10 +87,10 @@ namespace JFramework
                     Debug.Log("没有改变的脚本文件,开始创建资源.");
                     RemoveProgress();
 
-                    var savePath = EditorPrefs.GetString(EditorConst.ExcelPathKey);
+                    var savePath = FrameworkEditor.PathKey;
                     if (!string.IsNullOrEmpty(savePath))
                     {
-                        ConvertToObject(savePath, Environment.CurrentDirectory + "/" + EditorConst.AssetsPath);
+                        ConvertToObject(savePath, FrameworkEditor.AssetsPath);
                     }
                 }
 
@@ -114,21 +102,28 @@ namespace JFramework
             catch (Exception e)
             {
                 Debug.LogError(e.ToString());
-                EditorPrefs.SetBool(EditorConst.ExcelDataKey, false);
+                FrameworkEditor.DataKey = false;
                 RemoveProgress();
                 AssetDatabase.Refresh();
             }
         }
-
+        /// <summary>
+        /// 将给定Excel文件转换为脚本文件
+        /// 也就是通过读取Excel的前几列,生成对应的C#类
+        /// </summary>
+        /// <param name="excelPath"></param>
+        /// <returns></returns>
         private static Dictionary<string, string> ConvertScriptData(string excelPath)
         {
             var tempFile = new Dictionary<string, string>();
             var dataFile = ExcelSource.Load(excelPath);
             if (dataFile == null) return tempFile;
             var fileName = Path.GetFileName(excelPath);
+            //对Excel文件中的每个表进行遍历
             foreach (var table in dataFile.tableList)
             {
                 if (table == null) continue;
+                //判断当前表能否被转换
                 if (!IsConvertTable(table))
                 {
                     Debug.Log($"{fileName}跳过生成表:{table.fileName}.");
@@ -214,8 +209,9 @@ namespace JFramework
 
                 csFile.AppendFormat("\tpublic class {0} : DataTable\n", containerName);
                 csFile.Append("\t{\n");
-                csFile.AppendFormat("\t\t[SerializeField]\n\t\tprivate List<{0}> dataList = new List<{0}>();\n\n",
-                    sheetName);
+                csFile.AppendFormat("\t\t[SerializeField]\n\t\tprivate List<{0}> dataList = new List<{0}>();\n", sheetName);
+                
+                csFile.Append("\t\tpublic override int Count => dataList.Count;\n\n");
 
                 csFile.Append("\t\tpublic override void InitData()\n\t\t{\n");
                 csFile.Append("\t\t\tforeach (var data in dataList)\n");
@@ -232,14 +228,9 @@ namespace JFramework
                 csFile.Append("\t\tpublic override Data GetData(int index)\n");
                 csFile.Append("\t\t{\n");
                 csFile.Append("\t\t\treturn dataList[index];\n");
-                csFile.Append("\t\t}\n\n");
-
-                csFile.Append("\t\tpublic override int GetCount()\n");
-                csFile.Append("\t\t{\n");
-                csFile.Append("\t\t\treturn dataList.Count;\n");
                 csFile.Append("\t\t}\n");
-
-                csFile.Append("\t}\n\n");
+                
+                csFile.Append("\t}\n");
 
                 foreach (var e in enumList)
                 {

@@ -1,75 +1,44 @@
 using System;
 using System.Collections.Generic;
-using Sirenix.OdinInspector;
+using JFramework.Core;
 using UnityEngine;
 
-namespace JFramework.Core
+namespace JFramework
 {
     public class AudioManager : Singleton<AudioManager>
     {
-        /// <summary>
-        /// 背景音效的组件
-        /// </summary>
-        [ShowInInspector, ReadOnly, LabelText("当前背景音乐"), FoldoutGroup("音效管理视图")]
-        private AudioSource audioSource;
+        internal Queue<AudioSource> audioQueue;
+        internal List<AudioSource> audioList;
+        internal float soundVolume;
+        internal float audioVolume;
+        internal AudioSource audioSource;
+        private GameObject audioManager => GlobalManager.Instance.audioManager;
+
 
         /// <summary>
-        /// 背景音乐大小
+        /// 音效管理器初始化
         /// </summary>
-        [ShowInInspector, ReadOnly, Range(0, 1), LabelText("背景音乐大小"), FoldoutGroup("音效管理视图")]
-        private float soundVolume = 1;
-
-        /// <summary>
-        /// 游戏音效大小
-        /// </summary>
-        [ShowInInspector, ReadOnly, Range(0, 1), LabelText("游戏音效大小"), FoldoutGroup("音效管理视图")]
-        private float audioVolume = 1;
-
-        /// <summary>
-        /// 正在播放音效的列表
-        /// </summary>
-        [ShowInInspector, ReadOnly, LabelText("音效播放列表"), FoldoutGroup("音效管理视图")]
-        private List<AudioSource> soundList;
-
-        /// <summary>
-        /// 构造函数初始化数据
-        /// </summary>
-        protected override void OnInit(params object[] args)
+        public override void Awake()
         {
-            soundList = new List<AudioSource>();
-            audioSource = gameObject.AddComponent<AudioSource>();
+            base.Awake();
+            audioList = new List<AudioSource>();
+            audioQueue = new Queue<AudioSource>();
+            audioSource = audioManager.GetComponent<AudioSource>();
         }
-
-
+        
         /// <summary>
-        /// 当音效播放完毕时移除
+        /// 播放背景音乐
         /// </summary>
-        protected override void OnUpdate()
+        /// <param name="path">背景音乐的路径</param>
+        public void PlaySound(string path)
         {
-            for (int i = soundList.Count - 1; i >= 0; --i)
+            if (audioSource == null)
             {
-                if (soundList[i] != null)
-                {
-                    if (!soundList[i].isPlaying)
-                    {
-                        Destroy(soundList[i]);
-                        soundList.RemoveAt(i);
-                    }
-                }
-                else
-                {
-                    soundList.RemoveAt(i);
-                }
+                Debug.Log("音乐管理器没有初始化!");
+                return;
             }
-        }
-
-        /// <summary>
-        /// 音效管理器播放指定的背景音乐
-        /// </summary>
-        /// <param name="name">背景音乐的名称</param>
-        public void PlaySound(string name)
-        {
-            AssetManager.Instance.LoadAsync<AudioClip>(name, clip =>
+            
+            AssetManager.Instance.LoadAsync<AudioClip>(path, clip =>
             {
                 audioSource.volume = soundVolume;
                 audioSource.clip = clip;
@@ -77,72 +46,106 @@ namespace JFramework.Core
                 audioSource.Play();
             });
         }
-
-
+        
         /// <summary>
-        /// 音效管理器设置背景音乐的音量
+        /// 设置背景音乐
         /// </summary>
-        /// <param name="value">音量的大小</param>
-        public void SetSound(float value)
+        /// <param name="soundVolume">音量的大小</param>
+        public void SetSound(float soundVolume)
         {
-            soundVolume = value;
+            this.soundVolume = soundVolume;
             audioSource.volume = soundVolume;
         }
 
-
         /// <summary>
-        /// 音效管理器获取背景音乐的毁掉
+        /// 暂停背景音乐
         /// </summary>
-        /// <param name="action">背景音乐的回调</param>
-        public void GetSound(Action<AudioSource> action)
+        public void StopSound()
         {
-            action?.Invoke(audioSource);
+            audioSource.Pause();
         }
-
+        
         /// <summary>
-        /// 音效管理器播放指定的音效
+        /// 播放音效
         /// </summary>
-        /// <param name="name">音效的名称</param>
-        /// <param name="action">音效的回调</param>
-        public void PlayAudio(string name, Action<AudioSource> action = null)
+        /// <param name="path">传入音效路径</param>
+        /// <param name="action">获取音效的回调</param>
+        public void PlayAudio(string path, Action<AudioSource> action = null)
         {
-            AssetManager.Instance.LoadAsync<AudioClip>(name, clip =>
+            if (audioList == null)
             {
-                AudioSource sound = gameObject.AddComponent<AudioSource>();
-                sound.volume = audioVolume;
-                sound.clip = clip;
-                sound.Play();
-                soundList.Add(sound);
-                action?.Invoke(sound);
-            });
-        }
-
-
-        /// <summary>
-        /// 音效管理器设置音效的音量
-        /// </summary>
-        /// <param name="value">音量的大小</param>
-        public void SetAudio(float value)
-        {
-            audioVolume = value;
-            foreach (AudioSource local in soundList)
+                Debug.Log("音乐管理器没有初始化!");
+                return;
+            }
+            
+            if (audioQueue.Count > 0)
             {
-                local.volume = audioVolume;
+                var audio = audioQueue.Dequeue();
+                AssetManager.Instance.LoadAsync<AudioClip>(path, audioClip =>
+                {
+                    PlayAudio(audio,audioClip);
+                    audioList.Add(audioSource);
+                    action?.Invoke(audio);
+                });
+            }
+            else
+            {
+                var audio = audioManager.AddComponent<AudioSource>();
+                AssetManager.Instance.LoadAsync<AudioClip>(path, clip =>
+                {
+                    PlayAudio(audio,clip);
+                    audioList.Add(audioSource);
+                    action?.Invoke(audio);
+                });
             }
         }
 
         /// <summary>
-        /// 音效管理器停止指定的音效
+        /// 设置音效参数
         /// </summary>
-        /// <param name="audio">需要停止的音效组件</param>
-        public void StopAudio(AudioSource audio)
+        /// <param name="audioSource">传入音源</param>
+        /// <param name="audioClip">传入音乐文件</param>
+        private void PlayAudio(AudioSource audioSource, AudioClip audioClip)
         {
-            if (soundList.Contains(audio))
+            audioSource.clip = audioClip;
+            audioSource.volume = audioVolume;
+            TimerManager.Instance.Listen(audioClip.length, () => StopAudio(audioSource));
+            audioSource.Play();
+        }
+
+        /// <summary>
+        /// 设置音量
+        /// </summary>
+        /// <param name="audioVolume">传入音量大小</param>
+        public void SetAudio(float audioVolume)
+        {
+            this.audioVolume = audioVolume;
+            foreach (var audio in audioList)
             {
-                audio.Stop();
-                soundList.Remove(audio);
-                Destroy(audio);
+                audio.volume = audioVolume;
             }
+        }
+
+        /// <summary>
+        /// 停止音效
+        /// </summary>
+        /// <param name="audioSource">传入音效数据</param>
+        public void StopAudio(AudioSource audioSource)
+        {
+            if (audioList.Contains(audioSource))
+            {
+                audioSource.Stop();
+                audioList?.Remove(audioSource);
+                audioQueue?.Enqueue(audioSource);
+            }
+        }
+
+        public override void Clear()
+        {
+            base.Clear();
+            audioList = null;
+            audioQueue = null;
+            audioSource = null;
         }
     }
 }

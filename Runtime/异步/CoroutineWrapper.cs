@@ -31,8 +31,8 @@ namespace JFramework
                 }
                 catch (Exception e)
                 {
-                    List<Type> objectTrace = GenerateObjectTrace(processStack);
-                    awaiter.Complete(default, objectTrace.Any() ? new Exception(GenerateObjectTraceMessage(objectTrace), e) : e);
+                    List<Type> objectTrace = TraceObject(processStack);
+                    awaiter.Complete(default, objectTrace.Any() ? new Exception(TraceMessage(objectTrace), e) : e);
                     yield break;
                 }
 
@@ -58,7 +58,7 @@ namespace JFramework
             }
         }
 
-        private string GenerateObjectTraceMessage(List<Type> objTrace)
+        private string TraceMessage(List<Type> objTrace)
         {
             StringBuilder result = new StringBuilder();
 
@@ -73,16 +73,17 @@ namespace JFramework
             }
 
             result.AppendLine();
-            return "Unity Coroutine Object Trace: " + result;
+            return "异步错误追踪" + result;
         }
 
-        private static List<Type> GenerateObjectTrace(IEnumerable<IEnumerator> enumerators)
+        private static List<Type> TraceObject(IEnumerable<IEnumerator> enumerators)
         {
             List<Type> objTrace = new List<Type>();
 
             foreach (var enumerator in enumerators)
             {
-                FieldInfo field = enumerator.GetType().GetField("$this", BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance);
+                BindingFlags attr = BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance;
+                FieldInfo field = enumerator.GetType().GetField("$this", attr);
                 if (field == null)
                 {
                     continue;

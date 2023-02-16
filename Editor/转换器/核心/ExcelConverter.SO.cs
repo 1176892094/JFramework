@@ -2,11 +2,8 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
-using JFramework.Interface;
-using Sirenix.OdinInspector.Editor;
 using UnityEditor;
 using UnityEngine;
-using UnityEngine.AddressableAssets;
 using Type = System.Type;
 
 namespace JFramework
@@ -20,16 +17,16 @@ namespace JFramework
 				excelPath = excelPath.Replace("\\", "/");
 				soPath = soPath.Replace("\\", "/");
 
-				if (!Directory.Exists(excelPath))
-				{
-					EditorUtility.DisplayDialog("JFramework Tool", "没有找到Excel文件!", "OK");
-					return;
-				}
+				if (!Directory.Exists(excelPath)) return;
 
 				excelPath = excelPath.Replace("\\", "/");
 				soPath = soPath.Replace("\\", "/");
 				if (!soPath.EndsWith("/")) soPath += "/";
-				if (Directory.Exists(soPath)) Directory.Delete(soPath, true);
+				if (Directory.Exists(soPath))
+				{
+					Directory.Delete(soPath, true);
+				}
+
 				Directory.CreateDirectory(soPath);
 				AssetDatabase.Refresh();
 
@@ -41,12 +38,6 @@ namespace JFramework
 					if (!IsSupportedExcel(filePath)) continue;
 					UpdateProgress(i, excelFiles.Length);
 					ConvertObjectData(filePath, soPath);
-					AddressablesUtility.GetAssetPathsInGroup("DataTable").Add(filePath);
-			
-					foreach (var path in AddressablesUtility.GetAssetPathsInGroup("DataTable"))
-					{
-						Debug.Log(path);
-					}
 					count++;
 				}
 
@@ -61,7 +52,7 @@ namespace JFramework
 				AssetDatabase.Refresh();
 			}
 		}
-		
+
 		private static void ConvertObjectData(string excelPath, string outputPath)
 		{
 			try

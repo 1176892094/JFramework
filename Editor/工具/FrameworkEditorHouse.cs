@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Sirenix.OdinInspector;
-using Sirenix.OdinInspector.Editor;
 using UnityEditor;
 using UnityEditor.AddressableAssets;
 using UnityEditor.AddressableAssets.Settings;
@@ -14,13 +13,13 @@ namespace JFramework
     internal class FrameworkEditorHouse : EditorSingleton<FrameworkEditorHouse>
     {
         private AddressableAssetSettings Settings => AddressableAssetSettingsDefaultObject.Settings;
-        public List<string> pathList;
+        public string[] pathList;
         public List<string> nameList;
 
         [Button("Addressable资源生成")]
         private void LoadAddressableGroup()
         {
-            pathList = GetDirectories("Assets/" + EditorConst.AddressableResources);
+            pathList = Directory.GetDirectories("Assets/" + EditorConst.AddressableResources);
             nameList = new List<string>();
             foreach (var dir in pathList)
             {
@@ -32,16 +31,22 @@ namespace JFramework
             for (int i = 0; i < nameList.Count; i++)
             {
                 var filter = "t:DataTable t:prefab t:AudioClip t:Shader t:Material t:SceneAsset t:Texture2D";
-                GetAddressableGroup(nameList[i], pathList[i],filter, assetPath =>
-                    {
-                        string fileName = Path.GetFileNameWithoutExtension(assetPath);
-                        string dirPath = Path.GetDirectoryName(assetPath);
-                        string dirName = Path.GetFileNameWithoutExtension(dirPath);
-                        return $"{dirName}/{fileName}";
-                    });
+                var path = i;
+                GetAddressableGroup(nameList[i], pathList[i], filter, assetPath =>
+                {
+                    string fileName = Path.GetFileNameWithoutExtension(assetPath);
+                    string dirPath = pathList[path];
+                    string dirName = Path.GetFileNameWithoutExtension(dirPath);
+                    return $"{dirName}/{fileName}";
+                });
             }
         }
 
+        /// <summary>
+        /// 得到所有文件夹
+        /// </summary>
+        /// <param name="rootPath">目标文件夹</param>
+        /// <returns>返回列表</returns>
         private List<string> GetDirectories(string rootPath)
         {
             var dirList = new List<string> { rootPath };

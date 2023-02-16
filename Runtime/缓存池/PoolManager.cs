@@ -1,33 +1,29 @@
 using System;
 using System.Collections.Generic;
-using Sirenix.OdinInspector;
+using JFramework.Core;
+using JFramework.Interface;
 using UnityEngine;
 
-namespace JFramework.Core
+namespace JFramework
 {
-    /// <summary>
-    /// 对象池管理器
-    /// </summary>
     public class PoolManager : Singleton<PoolManager>
     {
         /// <summary>
-        /// 对象池控制器
-        /// </summary>
-        [ShowInInspector, ReadOnly, LabelText("对象池控制器"), FoldoutGroup("对象池管理视图")]
-        private GameObject controller;
-
-        /// <summary>
         /// 存储所有池的字典
         /// </summary>
-        [ShowInInspector, ReadOnly, LabelText("对象池数据"), FoldoutGroup("对象池管理视图")]
-        private Dictionary<string, PoolData> poolDict;
+        internal Dictionary<string, IPool> poolDict;
 
         /// <summary>
-        /// 对象池初始化
+        /// 对象池控制器
         /// </summary>
-        protected override void OnInit(params object[] args)
+        internal GameObject manager;
+
+        /// <summary>
+        /// 对象池管理器初始化
+        /// </summary>
+        public override void Awake()
         {
-            poolDict = new Dictionary<string, PoolData>();
+            poolDict = new Dictionary<string, IPool>();
         }
 
         /// <summary>
@@ -37,9 +33,15 @@ namespace JFramework.Core
         /// <param name="action">拉取对象的回调</param>
         public void Pop(string key, Action<GameObject> action)
         {
+            if (poolDict == null)
+            {
+                Debug.Log("对象池管理器没有初始化!");
+                return;
+            }
+            
             if (poolDict.ContainsKey(key) && poolDict[key].Count > 0)
             {
-                GameObject obj = poolDict[key].Pop();
+                var obj = (GameObject)poolDict[key].Pop();
                 if (obj != null)
                 {
                     action?.Invoke(obj);
@@ -70,11 +72,17 @@ namespace JFramework.Core
         /// <param name="obj">对象的实例</param>
         public void Push(GameObject obj)
         {
+            if (poolDict == null)
+            {
+                Debug.Log("对象池管理器没有初始化!");
+                return;
+            }
+            
             if (obj == null) return;
             string key = obj.name;
-            if (controller == null)
+            if (manager == null)
             {
-                controller = new GameObject(Global.PoolManager);
+                manager = new GameObject(nameof(PoolManager));
             }
 
             if (poolDict.ContainsKey(key))
@@ -90,8 +98,17 @@ namespace JFramework.Core
             }
             else
             {
-                poolDict.Add(key, new PoolData(obj, controller));
+                var pool = new PoolData();
+                pool.Awake(obj, manager);
+                poolDict.Add(key, pool);
             }
+        }
+
+        public override void Clear()
+        {
+            base.Clear();
+            manager = null;
+            poolDict = null;
         }
     }
 }

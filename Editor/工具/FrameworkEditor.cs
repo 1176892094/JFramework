@@ -11,49 +11,57 @@ using Debug = UnityEngine.Debug;
 
 namespace JFramework
 {
-    internal partial class FrameworkEditor : OdinMenuEditorWindow
+    public abstract class FrameworkEditor : OdinMenuEditorWindow
     {
-        [MenuItem("Tools/JFramework/JFrameworkEditor _F1")]
-        private static void JFrameworkEditor()
-        {
-            var window = GetWindow<FrameworkEditor>();
-            window.position = GUIHelper.GetEditorWindowRect().AlignCenter(800, 600);
-        }
+        private static string LoadPath => string.IsNullOrEmpty(PathKey) ? Environment.CurrentDirectory : PathKey;
+
+        public static string ScriptPath => EditorConst.ScriptPath + Path.GetFileName(LoadPath) + "/";
+
+        public static string AssetsPath => EditorConst.AssetsPath + Path.GetFileName(LoadPath) + "/";
         
+        public static string PathKey
+        {
+            get => EditorPrefs.GetString("ExcelPath");
+            private set => EditorPrefs.SetString("ExcelPath", value);
+        }
+
+        public static bool DataKey
+        {
+            get => EditorPrefs.GetBool("ExcelData", false);
+            set => EditorPrefs.SetBool("ExcelData", value);
+        }
+
+
         [MenuItem("Tools/JFramework/Excel To Asset", false, 102)]
         public static void ExcelToAsset()
         {
-            var loadPath = EditorPrefs.GetString(EditorConst.ExcelPathKey);
-            if (string.IsNullOrEmpty(loadPath)) loadPath = Environment.CurrentDirectory;
-            var filePath = EditorUtility.OpenFolderPanel(default, loadPath, "");
+            var filePath = EditorUtility.OpenFolderPanel(default, LoadPath, "");
             if (string.IsNullOrEmpty(filePath)) return;
-            EditorPrefs.SetString(EditorConst.ExcelPathKey, filePath);
-            var scriptPath = Environment.CurrentDirectory + "/" + EditorConst.ScriptPath;
-            ExcelConverter.ConvertToScript(filePath, scriptPath);
+            ExcelConverter.ConvertToScript(PathKey = filePath, ScriptPath);
         }
 
         [MenuItem("Tools/JFramework/Excel Clear All", false, 103)]
         public static void ExcelClearAll()
         {
-            EditorPrefs.SetBool(EditorConst.ExcelDataKey, false);
+            DataKey = false;
             DeleteScriptFolder();
             DeleteObjectFolder();
             AssetDatabase.Refresh();
         }
 
-        [MenuItem(@"Tools/JFramework/CurrentProjectPath")]
+        [MenuItem("Tools/JFramework/CurrentProjectPath")]
         private static void CurrentProjectPath()
         {
             Process.Start(Environment.CurrentDirectory);
         }
 
-        [MenuItem(@"Tools/JFramework/PersistentDataPath")]
+        [MenuItem("Tools/JFramework/PersistentDataPath")]
         private static void PersistentDataPath()
         {
             Process.Start(Application.persistentDataPath);
         }
 
-        [MenuItem(@"Tools/JFramework/StreamingAssetsPath")]
+        [MenuItem("Tools/JFramework/StreamingAssetsPath")]
         private static void StreamingAssetsPath()
         {
             if (Directory.Exists(Application.streamingAssetsPath))
@@ -67,18 +75,22 @@ namespace JFramework
             }
         }
 
+        /// <summary>
+        /// 代码重新加载
+        /// </summary>
         [DidReloadScripts]
         private static void OnScriptsReloaded()
         {
-            if (!EditorPrefs.GetBool(EditorConst.ExcelDataKey, false)) return;
-            EditorPrefs.SetBool(EditorConst.ExcelDataKey, false);
-            var loadPath = EditorPrefs.GetString(EditorConst.ExcelPathKey);
-            if (string.IsNullOrEmpty(loadPath)) return;
+            if (!DataKey) return;
+            DataKey = false;
+            if (string.IsNullOrEmpty(LoadPath)) return;
             Debug.Log("脚本重新编译，开始生成资源.");
-            var soPath = Environment.CurrentDirectory + "/" + EditorConst.AssetsPath;
-            ExcelConverter.ConvertToObject(loadPath, soPath);
+            ExcelConverter.ConvertToObject(LoadPath, AssetsPath);
         }
 
+        /// <summary>
+        /// 删除CScript脚本的文件夹
+        /// </summary>
         private static void DeleteScriptFolder()
         {
             if (Directory.Exists(EditorConst.ScriptPath))
@@ -94,6 +106,9 @@ namespace JFramework
             }
         }
 
+        /// <summary>
+        /// 删除ScriptableObject的文件夹
+        /// </summary>
         private static void DeleteObjectFolder()
         {
             if (Directory.Exists(EditorConst.AssetsPath))
@@ -109,6 +124,10 @@ namespace JFramework
             }
         }
 
+        /// <summary>
+        /// Odin窗口面板
+        /// </summary>
+        /// <returns></returns>
         protected override OdinMenuTree BuildMenuTree()
         {
             OdinMenuTree tree = new OdinMenuTree(supportsMultiSelect: false)
@@ -118,8 +137,15 @@ namespace JFramework
                 { "资源", FrameworkEditorAsset.Instance, EditorIcons.Folder },
             };
 
+            JFrameworkWindow(tree);
             tree.SortMenuItemsByName();
             return tree;
         }
+
+        /// <summary>
+        /// 重新绘制框架窗口面板
+        /// </summary>
+        /// <param name="tree"></param>
+        protected abstract void JFrameworkWindow(OdinMenuTree tree);
     }
 }

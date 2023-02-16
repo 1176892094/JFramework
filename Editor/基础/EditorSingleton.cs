@@ -8,7 +8,7 @@ namespace JFramework
     /// 单例模式对象
     /// </summary>
     /// <typeparam name="T">所属的单例对象</typeparam>
-    internal abstract class EditorSingleton<T> : ScriptableObject where T : EditorSingleton<T>
+    public abstract class EditorSingleton<T> : ScriptableObject where T : EditorSingleton<T>
     {
         /// <summary>
         /// 所属单例对象

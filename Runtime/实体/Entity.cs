@@ -1,13 +1,9 @@
 using System;
-using JFramework.Core;
 using JFramework.Interface;
 using UnityEngine;
 
 namespace JFramework
 {
-    /// <summary>
-    /// 实体的抽象类,对MonoBehaviour的进一步封装
-    /// </summary>
     public abstract class Entity : MonoBehaviour, IEntity
     {
         protected virtual void Awake() { }
@@ -18,13 +14,13 @@ namespace JFramework
         private void Update() { }
 
         protected virtual void OnDestroy() { }
-
+        
         /// <summary>
         /// 实体启用
         /// </summary>
         private void OnEnable()
         {
-            GlobalManager.Instance.Listen(OnUpdate);
+            GlobalManager.Instance.Listen(this);
             Enable();
         }
 
@@ -34,15 +30,11 @@ namespace JFramework
         private void OnDisable()
         {
             if (!GlobalManager.Instance) return;
-            GlobalManager.Instance.Remove(OnUpdate);
+            GlobalManager.Instance.Remove(this);
             Disable();
         }
-        
-        /// <summary>
-        /// 实体初始化
-        /// </summary>
-        /// <param name="args">初始化参数</param>
-        protected virtual void OnInit(params object[] args) { }
+
+        protected virtual void OnInit(params object[] args){}
 
         /// <summary>
         /// 实体生命周期
@@ -58,19 +50,11 @@ namespace JFramework
         /// 自定义实体禁用
         /// </summary>
         protected virtual void Disable() { }
+        
+        int IEntity.Id { get; set; }
 
-        /// <summary>
-        /// 通过接口初始化
-        /// </summary>
-        /// <param name="args">初始化参数</param>
         void IEntity.OnInit(params object[] args) => OnInit(args);
-    }
-    
-    public static class EntityExtension
-    {
-        public static T Get<T>(this IEntity entity) where T : IEntity
-        {
-            return (T)entity;
-        }
+
+        void IEntity.OnUpdate() => OnUpdate();
     }
 }

@@ -9,6 +9,7 @@ namespace JFramework.Core
 {
     using IntDataDict = Dictionary<int, Data>;
     using StrDataDict = Dictionary<string, Data>;
+
     /// <summary>
     /// 数据管理器
     /// </summary>
@@ -18,19 +19,35 @@ namespace JFramework.Core
         /// 存储int为主键类型的数据字典
         /// </summary>
         [ShowInInspector, ReadOnly, LabelText("整数主键数据"), FoldoutGroup("游戏数据管理")]
-        private Dictionary<Type, IntDataDict> IntDataDict;
+        internal Dictionary<Type, IntDataDict> IntDataDict;
 
         /// <summary>
         /// 存储string为主键的数据字典
         /// </summary>
         [ShowInInspector, ReadOnly, LabelText("字符主键数据"), FoldoutGroup("游戏数据管理")]
-        private Dictionary<Type, StrDataDict> StrDataDict;
+        internal Dictionary<Type, StrDataDict> StrDataDict;
+        
+        /// <summary>
+        /// 数据表名称
+        /// </summary>
+        private const string Table = "Table";
+
+        /// <summary>
+        /// 资源路径
+        /// </summary>
+        private const string AssetPath = "DataTable/";
+
+        /// <summary>
+        /// 命名空间名称
+        /// </summary>
+        private const string Namespace = "JFramework.Table";
 
         /// <summary>
         /// 构造函数初始化数据
         /// </summary>
-        protected override void OnInit(params object[] args)
+        public override void Awake()
         {
+            base.Awake();
             IntDataDict = new Dictionary<Type, IntDataDict>();
             StrDataDict = new Dictionary<Type, StrDataDict>();
             var assembly = GetAssembly();
@@ -40,7 +57,7 @@ namespace JFramework.Core
                 try
                 {
                     var keyName = type.Name;
-                    AssetManager.Instance.LoadAsync<DataTable>(Global.AssetPath + keyName, table =>
+                    AssetManager.Instance.LoadAsync<DataTable>(AssetPath + keyName, table =>
                     {
                         table.InitData();
                         var classType = GetClassType(assembly, type);
@@ -57,7 +74,7 @@ namespace JFramework.Core
                         if (keyType == typeof(int))
                         {
                             var dataDict = new IntDataDict();
-                            for (var i = 0; i < table.GetCount(); ++i)
+                            for (var i = 0; i < table.Count; ++i)
                             {
                                 var data = table.GetData(i);
                                 int key = (int)keyField.GetValue(data);
@@ -69,7 +86,7 @@ namespace JFramework.Core
                         else if (keyType == typeof(string))
                         {
                             var dataDict = new StrDataDict();
-                            for (var i = 0; i < table.GetCount(); ++i)
+                            for (var i = 0; i < table.Count; ++i)
                             {
                                 var data = table.GetData(i);
                                 string key = (string)keyField.GetValue(data);
@@ -102,7 +119,7 @@ namespace JFramework.Core
         private Type GetClassType(Assembly assembly, Type classType)
         {
             var className = GetClassName(classType);
-            var type = assembly.GetType(Global.Namespace + "." + className);
+            var type = assembly.GetType(Namespace + "." + className);
             return type;
         }
 
@@ -117,8 +134,8 @@ namespace JFramework.Core
             var parts = fullName.Split('.');
             var lastPart = parts[^1];
             lastPart = lastPart.Substring(lastPart.IndexOf('_') + 1);
-            var length = lastPart.IndexOf(Global.Table, StringComparison.Ordinal);
-            return string.IsNullOrEmpty(Global.Table) ? lastPart : lastPart.Substring(0, length);
+            var length = lastPart.IndexOf(Table, StringComparison.Ordinal);
+            return string.IsNullOrEmpty(Table) ? lastPart : lastPart.Substring(0, length);
         }
 
         /// <summary>
@@ -143,7 +160,7 @@ namespace JFramework.Core
         /// </summary>
         /// <param name="key">传入的int主键</param>
         /// <typeparam name="T">可以使用所有继承IData类型的对象</typeparam>
-        /// <returns></returns>
+        /// <returns>返回一个数据对象</returns>
         public T Get<T>(int key) where T : Data
         {
             IntDataDict.TryGetValue(typeof(T), out IntDataDict soDict);
@@ -157,6 +174,7 @@ namespace JFramework.Core
         /// </summary>
         /// <param name="key">传入的string主键</param>
         /// <typeparam name="T">要获取数据的类型,必须继承自JFramework.Data</typeparam>
+        /// <returns>返回一个数据对象</returns>
         public T Get<T>(string key) where T : Data
         {
             StrDataDict.TryGetValue(typeof(T), out StrDataDict soDict);
@@ -164,11 +182,11 @@ namespace JFramework.Core
             soDict.TryGetValue(key, out Data data);
             return (T)data;
         }
-
+        
         /// <summary>
-        /// 通过数据管理接口得到数据表
+        /// 通过数据管理器得到数据表
         /// </summary>
-        /// <typeparam name="T">可以使用所有继承IData类型的对象</typeparam>
+        /// <typeparam name="T">可以使用所有继承Data类型的对象</typeparam>
         /// <returns>返回泛型列表</returns>
         public List<T> GetTable<T>() where T : Data
         {
@@ -200,10 +218,10 @@ namespace JFramework.Core
         }
 
         /// <summary>
-        /// 通过数据管理接口得到数据表
+        /// 通过数据管理器得到数据表
         /// </summary>
         /// <param name="type">传入的类型</param>
-        /// <returns>返回一个IData的列表</returns>
+        /// <returns>返回一个Data的列表</returns>
         public List<Data> GetTable(Type type)
         {
             IntDataDict.TryGetValue(type, out IntDataDict dictInt);
