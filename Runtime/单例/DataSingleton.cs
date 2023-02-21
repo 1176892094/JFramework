@@ -1,5 +1,7 @@
 using System.IO;
+#if UNITY_EDITOR
 using UnityEditor;
+#endif
 using UnityEngine;
 
 namespace JFramework
@@ -8,7 +10,7 @@ namespace JFramework
     /// 单例模式对象
     /// </summary>
     /// <typeparam name="T">所属的单例对象</typeparam>
-    public abstract class EditorSingleton<T> : ScriptableObject where T : EditorSingleton<T>
+    public abstract class DataSingleton<T> : ScriptableObject where T : DataSingleton<T>
     {
         /// <summary>
         /// 所属单例对象
@@ -23,17 +25,24 @@ namespace JFramework
             get
             {
                 if (instance != null) return instance;
-                string name = typeof(T).Name;
-                instance = AssetDatabase.LoadAssetAtPath<T>(EditorConst.EditorPath + $"/{name}.asset");
+                instance = Resources.Load<T>(typeof(T).Name);
+                if (instance != null) return instance;
+#if UNITY_EDITOR
+                instance = FindObjectOfType<T>();
+                if (instance != null) return instance;
+                var name = typeof(T).Name;
+                const string path = "Assets/Editor";
+                instance = AssetDatabase.LoadAssetAtPath<T>(path + $"/{name}.asset");
                 if (instance != null) return instance;
                 instance = CreateInstance<T>();
-                if (!Directory.Exists(EditorConst.EditorPath))
+                if (!Directory.Exists(path))
                 {
-                    Directory.CreateDirectory(EditorConst.EditorPath);
+                    Directory.CreateDirectory(path);
                 }
 
-                AssetDatabase.CreateAsset(instance, EditorConst.EditorPath + $"/{name}.asset");
+                AssetDatabase.CreateAsset(instance, path + $"/{name}.asset");
                 AssetDatabase.Refresh();
+#endif
                 return instance;
             }
         }

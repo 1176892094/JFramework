@@ -104,9 +104,9 @@ namespace JFramework
             }
         }
 
-        public override void Clear()
+        public override void Destroy()
         {
-            base.Clear();
+            base.Destroy();
             manager = null;
             poolDict = null;
         }

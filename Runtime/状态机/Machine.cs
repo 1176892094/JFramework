@@ -1,56 +1,83 @@
 using System.Collections.Generic;
+using JFramework.Core;
 using JFramework.Interface;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
 namespace JFramework
 {
-    public class Machine<T> : Controller<T>, IMachine where T : MonoBehaviour, IEntity
+    public class Machine<T> : Controller<T> where T : MonoBehaviour, IEntity
     {
         /// <summary>
         /// 存储状态的字典
         /// </summary>
-        [ShowInInspector, LabelText("持有状态")]
+        [ShowInInspector, LabelText("持有状态")] 
         private Dictionary<string, IState> stateDict;
 
         /// <summary>
         /// 状态的接口
         /// </summary>
         [ShowInInspector, LabelText("当前状态"), SerializeField]
-        protected IState state;
+        private IState state;
 
+        /// <summary>
+        /// 状态机初始化
+        /// </summary>
         protected override void OnInit()
         {
             stateDict = new Dictionary<string, IState>();
         }
 
-        public void AddState<T1>(IState state = null) where T1 : IState, new()
+        /// <summary>
+        /// 状态机更新
+        /// </summary>
+        public virtual void OnUpdate() => state?.OnUpdate();
+
+        /// <summary>
+        /// 状态机添加状态
+        /// </summary>
+        /// <param name="state">添加的状态类型</param>
+        /// <typeparam name="TState">可传入任何继承IState的对象</typeparam>
+        public void AddState<TState>(IState state = null) where TState : IState, new()
         {
-            var key = typeof(T1).Name;
+            var key = typeof(TState).Name;
             if (!stateDict.ContainsKey(key))
             {
-                state ??= new T1();
+                state ??= new TState();
                 stateDict.Add(key, state);
                 state.OnAwake(owner);
             }
         }
 
-        public void ChangeState<T1>() where T1 : IState
+        /// <summary>
+        /// 改变状态
+        /// </summary>
+        /// <typeparam name="TState">可传入任何继承IState的对象</typeparam>
+        public void ChangeState<TState>() where TState : IState
         {
-            var key = typeof(T1).Name;
+            var key = typeof(TState).Name;
             state?.OnExit();
             state = stateDict[key];
             state?.OnEnter();
         }
 
-        public void ChangeState<T1>(float time) where T1 : IState
+        /// <summary>
+        /// 延迟改变状态
+        /// </summary>
+        /// <param name="time">延迟时间</param>
+        /// <typeparam name="TState">可传入任何继承IState的对象</typeparam>
+        public void ChangeState<TState>(float time) where TState : IState
         {
-            throw new System.NotImplementedException();
+            TimerManager.Instance.Listen(time, ChangeState<TState>);
         }
 
-        public void RemoveState<T1>() where T1 : IState
+        /// <summary>
+        /// 移除状态
+        /// </summary>
+        /// <typeparam name="TState">可传入任何继承IState的对象</typeparam>
+        public void RemoveState<TState>() where TState : IState
         {
-            var key = typeof(T1).Name;
+            var key = typeof(TState).Name;
             if (stateDict.ContainsKey(key))
             {
                 stateDict.Remove(key);

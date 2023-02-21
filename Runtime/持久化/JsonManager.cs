@@ -124,6 +124,7 @@ namespace JFramework.Core
                 if (key == null || key.Length <= 0 || iv == null || iv.Length <= 0) return new T();
                 var saveJson = JsonSetting.Decrypt(loadJson, key, iv);
                 var data = JsonConvert.DeserializeObject<T>(saveJson);
+                Debug.Log(saveJson);
                 return data;
             }
             else
@@ -132,6 +133,15 @@ namespace JFramework.Core
                 var data = JsonConvert.DeserializeObject<T>(saveJson);
                 return data;
             }
+        }
+
+        /// <summary>
+        /// 清空管理器
+        /// </summary>
+        public void Clear()
+        {
+            jsonDict.Clear();
+            Save(jsonDict, name);
         }
 
         /// <summary>
@@ -186,10 +196,9 @@ namespace JFramework.Core
         /// <summary>
         /// Json管理器清除存档所有数据
         /// </summary>
-        public override void Clear()
+        public override void Destroy()
         {
-            base.Clear();
-            Save(jsonDict, name);
+            base.Destroy();
             jsonDict = null;
         }
     }

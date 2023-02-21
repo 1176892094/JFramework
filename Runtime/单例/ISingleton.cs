@@ -13,6 +13,6 @@ namespace JFramework.Interface
         /// <summary>
         /// 清空单例
         /// </summary>
-        void Clear();
+        void Destroy();
     }
 }

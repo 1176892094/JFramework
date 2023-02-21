@@ -14,12 +14,12 @@ namespace JFramework
         /// <summary>
         /// 游戏物体组
         /// </summary>
-        [ShowInInspector] private GameObject poolGroup;
+        [ShowInInspector, LabelText("对象池组")] private GameObject poolGroup;
 
         /// <summary>
         /// 游戏物体栈
         /// </summary>
-        [ShowInInspector] private Stack<GameObject> poolManager;
+        [ShowInInspector, LabelText("对象池栈")] private Stack<GameObject> poolManager;
 
         /// <summary>
         /// 栈中对象数量

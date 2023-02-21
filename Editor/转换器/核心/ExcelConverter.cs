@@ -10,6 +10,14 @@ namespace JFramework
     {
         private static bool isCompleted;
         
+        private static string GetDataName(string sheetName) => sheetName + "Data";
+
+        private static string GetTableName(string sheetName) => sheetName + "DataTable";
+
+        private static string GetScriptName(string sheetName) => sheetName + "DataTable.cs";
+
+        private static string GetObjectName(string sheetName) => sheetName + "DataTable.asset";
+
         /// <summary>
         /// 获取Excel数据
         /// </summary>
@@ -23,15 +31,14 @@ namespace JFramework
                 var rowData = new List<string>();
                 for (var j = 0; j < table.columnCount; j++)
                 {
-                    var item = table.GetData(i, j);
-                    rowData.Add(item != null ? item.value : "");
+                    rowData.Add(table.GetData(i, j));
                 }
 
-                excelData.DataList.Add(rowData);
+                excelData.dataList.Add(rowData);
             }
 
-            excelData.Row = table.rowCount;
-            excelData.Column = table.columnCount;
+            excelData.row = table.rowCount;
+            excelData.column = table.columnCount;
             return excelData;
         }
 
@@ -53,7 +60,7 @@ namespace JFramework
             foreach (var name in nameList)
             {
                 var type = table.GetValue(EditorConst.Type, name);
-                if (FieldParser.IsSupportedType(type)) typeList.Add(name);
+                if (ExcelBuilder.IsSupportedType(type)) typeList.Add(name);
             }
 
             var excelData = new ExcelData();
@@ -62,15 +69,14 @@ namespace JFramework
                 var rowList = new List<string>();
                 foreach (var column in typeList)
                 {
-                    var item = table.GetData(i, column);
-                    rowList.Add(item != null ? item.value : "");
+                    rowList.Add(table.GetData(i, column));
                 }
 
-                excelData.DataList.Add(rowList);
+                excelData.dataList.Add(rowList);
             }
 
-            excelData.Row = table.rowCount;
-            excelData.Column = typeList.Count;
+            excelData.row = table.rowCount;
+            excelData.column = typeList.Count;
             return excelData;
         }
 
@@ -88,7 +94,7 @@ namespace JFramework
             {
                 var type = table.GetValue(EditorConst.Type, i);
                 if (string.IsNullOrEmpty(type) || type.Equals(" ") || type.Equals("\r")) continue;
-                if (FieldParser.IsSupportedType(type))
+                if (ExcelBuilder.IsSupportedType(type))
                 {
                     if (!string.IsNullOrEmpty(table.GetValue(EditorConst.Name, i)))
                     {
@@ -141,28 +147,25 @@ namespace JFramework
                 isCompleted = false;
             }
         }
-        
-        public static string GetTableName(string sheetName)
-        {
-            return sheetName + "Table";
-        }
-
-        public static string GetScriptName(string sheetName)
-        {
-            return sheetName + "Table.cs";
-        }
-
-        public static string GetObjectName(string sheetName)
-        {
-            return sheetName + "Table.asset";
-        }
 
         private class ExcelData
         {
-            private readonly List<List<string>> dataList = new List<List<string>>();
-            public List<List<string>> DataList => dataList;
-            public int Column;
-            public int Row;
+            public readonly List<List<string>> dataList;
+
+            /// <summary>
+            /// Excel数据行
+            /// </summary>
+            public int column;
+
+            /// <summary>
+            /// Excel数据列
+            /// </summary>
+            public int row;
+
+            /// <summary>
+            /// 构造函数初始化
+            /// </summary>
+            public ExcelData() => dataList = new List<List<string>>();
 
             /// <summary>
             /// 获取列表中的字段
@@ -170,10 +173,7 @@ namespace JFramework
             /// <param name="row">目标行</param>
             /// <param name="column">目标列</param>
             /// <returns></returns>
-            public string GetData(int row, int column)
-            {
-                return dataList[row][column];
-            }
+            public string GetData(int row, int column) => dataList[row][column];
 
             /// <summary>
             /// 设置列表中的字段
@@ -181,11 +181,7 @@ namespace JFramework
             /// <param name="row">目标行</param>
             /// <param name="column">目标列</param>
             /// <param name="value">目标值</param>
-            public void SetData(int row, int column, string value)
-            {
-                dataList[row][column] = value;
-            }
+            public void SetData(int row, int column, string value) => dataList[row][column] = value;
         }
     }
-
 }

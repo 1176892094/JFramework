@@ -5,7 +5,7 @@ namespace JFramework.Core
 {
     internal partial class DebugManager : MonoBehaviour
     {
-        [ShowInInspector, LabelText("是否启动调试"), FoldoutGroup("游戏调试视图")]
+        [ShowInInspector, LabelText("是否启动"),BoxGroup("调试器")]
         public bool isDebug;
 
         private int FPS;
@@ -23,11 +23,11 @@ namespace JFramework.Core
 
         private void Start()
         {
-            TimerManager.Instance.Listen(1).Unscale().SetTarget(gameObject).SetLoop(-1, _ =>
+            TimerManager.Instance.Listen(1).SetLoop(-1, _ =>
             {
                 if (!isDebug) return;
                 FPS = (int)(1.0f / Time.deltaTime);
-            });
+            }).Unscale().SetTarget(gameObject);
         }
 
         private void OnGUI()

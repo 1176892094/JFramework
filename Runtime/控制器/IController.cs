@@ -6,9 +6,9 @@ namespace JFramework.Interface
     public interface IController
     {
         /// <summary>
-        /// 控制器醒来
+        /// 控制器初始化
         /// </summary>
         /// <param name="owner">控制器的所有者</param>
-        void OnInit(object owner);
+        void OnInit(IEntity owner);
     }
 }

@@ -1,3 +1,5 @@
+using JFramework.Interface;
+
 namespace JFramework
 {
     /// <summary>

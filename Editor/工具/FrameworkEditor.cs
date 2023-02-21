@@ -76,7 +76,7 @@ namespace JFramework
         }
 
         /// <summary>
-        /// 代码重新加载
+        /// 脚本重新编译
         /// </summary>
         [DidReloadScripts]
         private static void OnScriptsReloaded()
@@ -122,6 +122,16 @@ namespace JFramework
                 var meta = EditorConst.AssetsPath.Substring(0, length) + ".meta";
                 if (!string.IsNullOrEmpty(meta) && File.Exists(meta)) File.Delete(meta);
             }
+        }
+         
+        /// <summary>
+        /// 获取编辑器窗口面板
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        protected static void ShowEditorWindow<T>() where T : EditorWindow
+        {
+            var window = GetWindow<T>();
+            window.position = GUIHelper.GetEditorWindowRect().AlignCenter(800, 600);
         }
 
         /// <summary>

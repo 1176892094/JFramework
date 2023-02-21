@@ -1,28 +1,14 @@
-using System;
-using JFramework.Core;
-
 namespace JFramework
 {
-    /// <summary>
-    /// 基本数据的抽象类
-    /// </summary>
-    [Serializable]
-    public abstract class Data
+    public static class DataExtension
     {
         /// <summary>
-        /// 获取数据的键值
+        /// 转换数据
         /// </summary>
-        /// <returns>返回数据的主键</returns>
-        public object KeyValue()
-        {
-            var key = DataManager.KeyValue(GetType());
-            return key == null ? null : key.GetValue(this);
-        }
-
-        /// <summary>
-        /// 数据对象初始化
-        /// </summary>
-        public abstract void InitData();
+        /// <param name="data">数据自身</param>
+        /// <typeparam name="T">可以转换继承IData的对象</typeparam>
+        /// <returns>返回目标数据</returns>
+        public static T As<T>(this IData data) where T : IData => (T)data;
 
         /// <summary>
         /// string转string
@@ -30,11 +16,7 @@ namespace JFramework
         /// <param name="reword">改写string类型</param>
         /// <param name="result">输出string类型</param>
         /// <returns>返回改写是否成功</returns>
-        protected bool TryParse(string reword, out string result)
-        {
-            result = reword;
-            return true;
-        }
+        public static bool TryParse(this string reword, out string result) => string.IsNullOrEmpty(result = reword);
 
         /// <summary>
         /// string转int
@@ -42,10 +24,7 @@ namespace JFramework
         /// <param name="reword">改写string类型</param>
         /// <param name="result">输出int类型</param>
         /// <returns>返回改写是否成功</returns>
-        protected bool TryParse(string reword, out int result)
-        {
-            return int.TryParse(reword, out result);
-        }
+        public static bool TryParse(this string reword, out int result) => int.TryParse(reword, out result);
 
         /// <summary>
         /// string转float
@@ -53,10 +32,7 @@ namespace JFramework
         /// <param name="reword">改写string类型</param>
         /// <param name="result">输出float类型</param>
         /// <returns>返回改写是否成功</returns>
-        protected bool TryParse(string reword, out float result)
-        {
-            return float.TryParse(reword, out result);
-        }
+        public static bool TryParse(this string reword, out float result) => float.TryParse(reword, out result);
 
         /// <summary>
         /// string转double
@@ -64,10 +40,7 @@ namespace JFramework
         /// <param name="reword">改写string类型</param>
         /// <param name="result">输出double类型</param>
         /// <returns>返回改写是否成功</returns>
-        protected bool TryParse(string reword, out double result)
-        {
-            return double.TryParse(reword, out result);
-        }
+        public static bool TryParse(this string reword, out double result) => double.TryParse(reword, out result);
 
         /// <summary>
         /// string转bool
@@ -75,10 +48,7 @@ namespace JFramework
         /// <param name="reword">改写string类型</param>
         /// <param name="result">输出bool类型</param>
         /// <returns>返回改写是否成功</returns>
-        protected bool TryParse(string reword, out bool result)
-        {
-            return bool.TryParse(reword, out result);
-        }
+        public static bool TryParse(this string reword, out bool result) => bool.TryParse(reword, out result);
 
         /// <summary>
         /// string转long
@@ -86,9 +56,6 @@ namespace JFramework
         /// <param name="reword">改写string类型</param>
         /// <param name="result">输出long类型</param>
         /// <returns>返回改写是否成功</returns>
-        protected bool TryParse(string reword, out long result)
-        {
-            return long.TryParse(reword, out result);
-        }
+        public static bool TryParse(this string reword, out long result) => long.TryParse(reword, out result);
     }
 }

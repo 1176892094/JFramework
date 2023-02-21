@@ -1,5 +1,6 @@
 using JFramework.Interface;
 using Sirenix.OdinInspector;
+using UnityEngine;
 
 namespace JFramework
 {
@@ -12,7 +13,7 @@ namespace JFramework
         /// <summary>
         /// 控制器的所有者
         /// </summary>
-        public T owner;
+        [HideInInspector] public T owner;
 
         /// <summary>
         /// 控制器初始化
@@ -33,6 +34,6 @@ namespace JFramework
         /// 通过接口初始化控制器
         /// </summary>
         /// <param name="owner">控制器的所有者</param>
-        void IController.OnInit(object owner) => OnInit((T)owner);
+        void IController.OnInit(IEntity owner) => OnInit((T)owner);
     }
 }

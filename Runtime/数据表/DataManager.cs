@@ -2,13 +2,13 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using Sirenix.OdinInspector;
+using Sirenix.Utilities;
 using UnityEngine;
 
 namespace JFramework.Core
 {
-    using IntDataDict = Dictionary<int, Data>;
-    using StrDataDict = Dictionary<string, Data>;
+    using IntDataDict = Dictionary<int, IData>;
+    using StrDataDict = Dictionary<string, IData>;
 
     /// <summary>
     /// 数据管理器
@@ -18,13 +18,11 @@ namespace JFramework.Core
         /// <summary>
         /// 存储int为主键类型的数据字典
         /// </summary>
-        [ShowInInspector, ReadOnly, LabelText("整数主键数据"), FoldoutGroup("游戏数据管理")]
         internal Dictionary<Type, IntDataDict> IntDataDict;
 
         /// <summary>
         /// 存储string为主键的数据字典
         /// </summary>
-        [ShowInInspector, ReadOnly, LabelText("字符主键数据"), FoldoutGroup("游戏数据管理")]
         internal Dictionary<Type, StrDataDict> StrDataDict;
         
         /// <summary>
@@ -161,11 +159,11 @@ namespace JFramework.Core
         /// <param name="key">传入的int主键</param>
         /// <typeparam name="T">可以使用所有继承IData类型的对象</typeparam>
         /// <returns>返回一个数据对象</returns>
-        public T Get<T>(int key) where T : Data
+        public T Get<T>(int key) where T : IData
         {
             IntDataDict.TryGetValue(typeof(T), out IntDataDict soDict);
             if (soDict == null) return default;
-            soDict.TryGetValue(key, out Data data);
+            soDict.TryGetValue(key, out IData data);
             return (T)data;
         }
 
@@ -175,11 +173,11 @@ namespace JFramework.Core
         /// <param name="key">传入的string主键</param>
         /// <typeparam name="T">要获取数据的类型,必须继承自JFramework.Data</typeparam>
         /// <returns>返回一个数据对象</returns>
-        public T Get<T>(string key) where T : Data
+        public T Get<T>(string key) where T : IData
         {
             StrDataDict.TryGetValue(typeof(T), out StrDataDict soDict);
             if (soDict == null) return default;
-            soDict.TryGetValue(key, out Data data);
+            soDict.TryGetValue(key, out IData data);
             return (T)data;
         }
         
@@ -188,17 +186,13 @@ namespace JFramework.Core
         /// </summary>
         /// <typeparam name="T">可以使用所有继承Data类型的对象</typeparam>
         /// <returns>返回泛型列表</returns>
-        public List<T> GetTable<T>() where T : Data
+        public List<T> GetTable<T>() where T : IData
         {
             IntDataDict.TryGetValue(typeof(T), out IntDataDict dictInt);
             if (dictInt != null)
             {
                 List<T> list = new List<T>();
-                foreach (var data in dictInt)
-                {
-                    list.Add((T)data.Value);
-                }
-
+                dictInt.Values.ForEach(data => list.Add((T)data));
                 return list;
             }
 
@@ -206,11 +200,7 @@ namespace JFramework.Core
             if (dictStr != null)
             {
                 List<T> list = new List<T>();
-                foreach (var data in dictStr)
-                {
-                    list.Add((T)data.Value);
-                }
-
+                dictStr.Values.ForEach(data => list.Add((T)data));
                 return list;
             }
 
@@ -222,7 +212,7 @@ namespace JFramework.Core
         /// </summary>
         /// <param name="type">传入的类型</param>
         /// <returns>返回一个Data的列表</returns>
-        public List<Data> GetTable(Type type)
+        public List<IData> GetTable(Type type)
         {
             IntDataDict.TryGetValue(type, out IntDataDict dictInt);
             if (dictInt != null) return dictInt.Values.ToList();
@@ -236,7 +226,7 @@ namespace JFramework.Core
         /// </summary>
         /// <param name="type">传入的数据类型</param>
         /// <returns>返回字段的信息</returns>
-        public static FieldInfo KeyValue(Type type)
+        private static FieldInfo KeyValue(Type type)
         {
             var fields = type.GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
             var key = (from fieldInfo in fields
@@ -244,6 +234,16 @@ namespace JFramework.Core
                 where attrs.Length > 0
                 select fieldInfo).FirstOrDefault();
             return key;
+        }
+        
+        /// <summary>
+        /// 获取数据的键值
+        /// </summary>
+        /// <returns>返回数据的主键</returns>
+        public static object KeyValue(IData data)
+        {
+            var key = KeyValue(data.GetType());
+            return key == null ? null : key.GetValue(data);
         }
     }
 }

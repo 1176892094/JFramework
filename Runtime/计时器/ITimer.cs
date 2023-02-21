@@ -36,6 +36,6 @@ namespace JFramework.Interface
         /// </summary>
         /// <param name="count">循环次数</param>
         /// <param name="OnLoop">每次循环触发的事件</param>
-        void SetLoop(int count, Action<ITimer> OnLoop);
+        ITimer SetLoop(int count, Action<ITimer> OnLoop);
     }
 }

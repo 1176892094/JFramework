@@ -10,7 +10,7 @@ using UnityEngine;
 
 namespace JFramework
 {
-    internal class FrameworkEditorHouse : EditorSingleton<FrameworkEditorHouse>
+    internal class FrameworkEditorHouse : DataSingleton<FrameworkEditorHouse>
     {
         private AddressableAssetSettings Settings => AddressableAssetSettingsDefaultObject.Settings;
         public string[] pathList;
@@ -40,25 +40,6 @@ namespace JFramework
                     return $"{dirName}/{fileName}";
                 });
             }
-        }
-
-        /// <summary>
-        /// 得到所有文件夹
-        /// </summary>
-        /// <param name="rootPath">目标文件夹</param>
-        /// <returns>返回列表</returns>
-        private List<string> GetDirectories(string rootPath)
-        {
-            var dirList = new List<string> { rootPath };
-            for (int i = 0; i < dirList.Count; i++)
-            {
-                if (Directory.Exists(dirList[i]))
-                {
-                    dirList.AddRange(Directory.GetDirectories(dirList[i]));
-                }
-            }
-
-            return dirList;
         }
 
         private void GetAddressableGroup(string name, string folder, string filter, Func<string, string> getAddress)

@@ -3,15 +3,18 @@ using OfficeOpenXml;
 
 namespace JFramework
 {
+    using DataDict = Dictionary<int, string>;
+    
     internal class ExcelTable
     {
-        private readonly Dictionary<int, Dictionary<int, ExcelData>> itemDict = new Dictionary<int, Dictionary<int, ExcelData>>();
+        private readonly Dictionary<int, DataDict> itemDict;
         public readonly string fileName;
         public int columnCount;
         public int rowCount;
 
         public ExcelTable(ExcelWorksheet sheet)
         {
+            itemDict = new Dictionary<int, DataDict>();
             fileName = sheet.Name;
 
             if (sheet.Dimension != null)
@@ -42,37 +45,30 @@ namespace JFramework
             if (rowCount < row) rowCount = row + 1;
             if (columnCount < column) columnCount = column + 1;
 
-            if (!itemDict.TryGetValue(row, out var data))
+            if (!itemDict.TryGetValue(row, out DataDict data))
             {
-                data = new Dictionary<int, ExcelData>();
+                data = new DataDict();
                 itemDict.Add(row, data);
             }
 
             if (!data.TryGetValue(column, out var item))
             {
-                item = new ExcelData(row, column, value);
+                item = value;
                 data.Add(column, item);
             }
         }
-        
-        public ExcelData GetData(int row, int column)
-        {
-            if (itemDict.TryGetValue(row, out var data))
-            {
-                if (data.TryGetValue(column, out var item))
-                {
-                    return item;
-                }
-            }
 
-            return null;
+        public string GetData(int row, int column)
+        {
+            if (!itemDict.TryGetValue(row, out DataDict data)) return null;
+            return data.TryGetValue(column, out var item) ? item : null;
         }
 
         public string GetValue(int row, int column)
         {
             if (row < 0 || column < 0) return null;
             var item = GetData(row, column);
-            return item?.value;
+            return item;
         }
     }
 }

@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using UnityEngine;
 
 namespace JFramework
 {
@@ -29,11 +28,7 @@ namespace JFramework
         /// <param name="action">传入侦听的事件</param>
         public void Listen(int id, EventData action)
         {
-            if (eventDict == null)
-            {
-                Debug.Log("事件管理器没有初始化!");
-                return;
-            }
+            if (eventDict == null) return;
 
             if (eventDict.ContainsKey(id))
             {
@@ -52,11 +47,7 @@ namespace JFramework
         /// <param name="action">传入移除的事件</param>
         public void Remove(int id, EventData action)
         {
-            if (eventDict == null)
-            {
-                Debug.Log("事件管理器没有初始化!");
-                return;
-            }
+            if (eventDict == null) return;
 
             if (eventDict.ContainsKey(id))
             {
@@ -80,9 +71,9 @@ namespace JFramework
         /// <summary>
         /// 清空事件管理器
         /// </summary>
-        public override void Clear()
+        public override void Destroy()
         {
-            base.Clear();
+            base.Destroy();
             eventDict = null;
         }
     }

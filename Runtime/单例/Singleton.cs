@@ -25,6 +25,6 @@ namespace JFramework
         /// <summary>
         /// 单例清除
         /// </summary>
-        public virtual void Clear() => instance = default;
+        public virtual void Destroy() => instance = default;
     }
 }

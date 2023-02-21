@@ -23,15 +23,15 @@ namespace JFramework
         {
             while (true)
             {
-                IEnumerator topWorker = processStack.Peek();
+                var worker = processStack.Peek();
                 bool isDone;
                 try
                 {
-                    isDone = !topWorker.MoveNext();
+                    isDone = !worker.MoveNext();
                 }
                 catch (Exception e)
                 {
-                    List<Type> objectTrace = TraceObject(processStack);
+                    var objectTrace = TraceObject(processStack);
                     awaiter.Complete(default, objectTrace.Any() ? new Exception(TraceMessage(objectTrace), e) : e);
                     yield break;
                 }
@@ -42,34 +42,34 @@ namespace JFramework
 
                     if (processStack.Count == 0)
                     {
-                        awaiter.Complete((T)topWorker.Current, null);
+                        awaiter.Complete((T)worker.Current, null);
                         yield break;
                     }
                 }
 
-                if (topWorker.Current is IEnumerator current)
+                if (worker.Current is IEnumerator current)
                 {
                     processStack.Push(current);
                 }
                 else
                 {
-                    yield return topWorker.Current;
+                    yield return worker.Current;
                 }
             }
         }
 
         private string TraceMessage(List<Type> objTrace)
         {
-            StringBuilder result = new StringBuilder();
+            var result = new StringBuilder();
 
-            foreach (Type objType in objTrace)
+            foreach (var trace in objTrace)
             {
                 if (result.Length != 0)
                 {
                     result.Append(" -> ");
                 }
 
-                result.Append(objType);
+                result.Append(trace);
             }
 
             result.AppendLine();
@@ -78,24 +78,24 @@ namespace JFramework
 
         private static List<Type> TraceObject(IEnumerable<IEnumerator> enumerators)
         {
-            List<Type> objTrace = new List<Type>();
+            var objTrace = new List<Type>();
 
             foreach (var enumerator in enumerators)
             {
-                BindingFlags attr = BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance;
-                FieldInfo field = enumerator.GetType().GetField("$this", attr);
+                const BindingFlags attr = BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance;
+                var field = enumerator.GetType().GetField("$this", attr);
                 if (field == null)
                 {
                     continue;
                 }
 
-                Object obj = field.GetValue(enumerator);
+                var obj = field.GetValue(enumerator);
                 if (obj == null)
                 {
                     continue;
                 }
 
-                Type objType = obj.GetType();
+                var objType = obj.GetType();
                 if (!objTrace.Any() || objType != objTrace.Last())
                 {
                     objTrace.Add(objType);

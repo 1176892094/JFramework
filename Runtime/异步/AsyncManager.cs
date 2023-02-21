@@ -12,42 +12,21 @@ namespace JFramework
         private static SynchronizationContext synchronize;
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
-        private static void Install() => synchronize = SynchronizationContext.Current;
+        private static void Synchronization() => synchronize = SynchronizationContext.Current;
 
-        public static CoroutineAwaiter GetAwaiter(this WaitForSeconds result)
-        {
-            return GetAwaiterNone(result);
-        }
-
-        public static CoroutineAwaiter GetAwaiter(this WaitForEndOfFrame result)
-        {
-            return GetAwaiterNone(result);
-        }
-
-        public static CoroutineAwaiter GetAwaiter(this WaitForFixedUpdate result)
-        {
-            return GetAwaiterNone(result);
-        }
-
-        public static CoroutineAwaiter GetAwaiter(this WaitForSecondsRealtime result)
-        {
-            return GetAwaiterNone(result);
-        }
-
-        public static CoroutineAwaiter GetAwaiter(this WaitUntil result)
-        {
-            return GetAwaiterNone(result);
-        }
-
-        public static CoroutineAwaiter GetAwaiter(this WaitWhile result)
-        {
-            return GetAwaiterNone(result);
-        }
-
-        public static CoroutineAwaiter<AsyncOperation> GetAwaiter(this AsyncOperation result)
-        {
-            return GetAwaiterSelf(result);
-        }
+        public static CoroutineAwaiter GetAwaiter(this WaitForSeconds result) => GetAwaiterNone(result);
+        
+        public static CoroutineAwaiter GetAwaiter(this WaitForEndOfFrame result) => GetAwaiterNone(result);
+        
+        public static CoroutineAwaiter GetAwaiter(this WaitForFixedUpdate result) => GetAwaiterNone(result);
+        
+        public static CoroutineAwaiter GetAwaiter(this WaitForSecondsRealtime result) => GetAwaiterNone(result);
+        
+        public static CoroutineAwaiter GetAwaiter(this WaitUntil result) => GetAwaiterNone(result);
+        
+        public static CoroutineAwaiter GetAwaiter(this WaitWhile result) => GetAwaiterNone(result);
+        
+        public static CoroutineAwaiter<AsyncOperation> GetAwaiter(this AsyncOperation result) => GetAwaiterSelf(result);
 
         public static CoroutineAwaiter<Object> GetAwaiter(this ResourceRequest result)
         {

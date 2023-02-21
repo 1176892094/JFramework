@@ -1,6 +1,6 @@
 namespace JFramework
 {
-    internal class FrameworkEditorSetting : EditorSingleton<FrameworkEditorSetting>
+    internal class FrameworkEditorSetting : DataSingleton<FrameworkEditorSetting>
     {
     }
 }

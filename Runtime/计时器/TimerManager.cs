@@ -36,7 +36,7 @@ namespace JFramework.Core
         {
             for (int i = timerList.Count - 1; i >= 0; i--)
             {
-                timerList[i].OnUpdate();
+                timerList[i]?.OnUpdate();
             }
         }
 
@@ -93,9 +93,9 @@ namespace JFramework.Core
         /// <summary>
         /// 计时器管理器清除计时器
         /// </summary>
-        public override void Clear()
+        public override void Destroy()
         {
-            base.Clear();
+            base.Destroy();
             timerQueue = null;
             timerList = null;
         }

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
+using JFramework.Core;
 using UnityEditor;
 using UnityEngine;
 using Type = System.Type;
@@ -82,7 +83,7 @@ namespace JFramework
 				var asset = ScriptableObject.CreateInstance(sheetClassName);
 				var container = asset as DataTable;
 				if (container == null) return;
-				string className = EditorConst.Namespace + "." + sheetName;
+				string className = EditorConst.Namespace + "." + GetDataName(sheetName);
 				Type dataType = Type.GetType(className);
 				if (dataType == null)
 				{
@@ -107,17 +108,17 @@ namespace JFramework
 				});
 				if (constructor == null) return;
 				var keySet = new HashSet<object>();
-				for (var row = EditorConst.Data; row < excelData.Row; ++row)
+				for (var row = EditorConst.Data; row < excelData.row; ++row)
 				{
-					for (var col = 0; col < excelData.Column; ++col)
+					for (var col = 0; col < excelData.column; ++col)
 					{
 						excelData.SetData(row, col, excelData.GetData(row, col).Replace("\n", "\\n"));
 					}
 
-					var data = (Data)constructor.Invoke(new object[] { excelData.DataList, row, 0 });
+					var data = (IData)constructor.Invoke(new object[] { excelData.dataList, row, 0 });
 					if (data == null) continue;
 					
-					var key = data.KeyValue();
+					var key = DataManager.KeyValue(data);
 					if (key == null)
 					{
 						Debug.LogWarning($"Excel表中缺少主键:{sheetName}");

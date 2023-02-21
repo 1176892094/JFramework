@@ -14,7 +14,7 @@ namespace JFramework
         /// <summary>
         /// 当前循环次数
         /// </summary>
-        [ShowInInspector] private int count;
+        private int count;
 
         /// <summary>
         /// 最大循环次数
@@ -24,12 +24,12 @@ namespace JFramework
         /// <summary>
         /// 是否受TimeScale影响
         /// </summary>
-        [ShowInInspector] private bool unscaled;
+        private bool unscaled;
 
         /// <summary>
         /// 是否随单位死亡而停止
         /// </summary>
-        [ShowInInspector] private bool followed;
+        private bool followed;
 
         /// <summary>
         /// 持续时间
@@ -137,10 +137,11 @@ namespace JFramework
         /// <param name="count">计时器循环次数</param>
         /// <param name="OnLoop">循环时执行的事件</param>
         /// <returns>返回自身</returns>
-        public void SetLoop(int count, Action<ITimer> OnLoop)
+        public ITimer SetLoop(int count, Action<ITimer> OnLoop)
         {
             maxCount = count;
             this.OnLoop = OnLoop;
+            return this;
         }
 
         /// <summary>

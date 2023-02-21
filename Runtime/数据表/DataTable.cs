@@ -12,6 +12,7 @@ namespace JFramework
         /// </summary>
         /// <returns></returns>
         public abstract int Count { get; }
+        
         /// <summary>
         /// 数据表初始化数据
         /// </summary>
@@ -21,13 +22,13 @@ namespace JFramework
         /// 数据表添加数据
         /// </summary>
         /// <param name="data">传入添加的数据</param>
-        public abstract void AddData(Data data);
+        public abstract void AddData(IData data);
 
         /// <summary>
         /// 数据表得到数据
         /// </summary>
         /// <param name="index">传入数据在列表中的位置</param>
         /// <returns>返回对应位置的数据</returns>
-        public abstract Data GetData(int index);
+        public abstract IData GetData(int index);
     }
 }

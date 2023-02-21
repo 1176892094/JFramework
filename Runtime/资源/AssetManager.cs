@@ -102,9 +102,9 @@ namespace JFramework.Core
             assetDict.Remove(name);
         }
 
-        public override void Clear()
+        public override void Destroy()
         {
-            base.Clear();
+            base.Destroy();
             assetDict = null;
         }
     }

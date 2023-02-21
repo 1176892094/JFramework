@@ -72,9 +72,10 @@ namespace JFramework
         /// <summary>
         /// 清除命令管理器
         /// </summary>
-        public override void Clear()
+        public override void Destroy()
         {
-            base.Clear();
+            base.Destroy();
+            commandDict?.Clear();
             commandDict = null;
         }
     }
