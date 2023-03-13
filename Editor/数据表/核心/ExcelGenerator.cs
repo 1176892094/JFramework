@@ -9,16 +9,16 @@ using UnityEngine;
 
 namespace JFramework
 {
-    public static class ExcelEditor
+    public static class ExcelGenerator
     {
         public static void GenerateAsset()
         {
             AssetDatabase.Refresh();
-            var filesPath = Directory.GetFiles(Const.TablePath);
+            var filesPath = Directory.GetFiles(ExcelSetting.PathDataKey);
             var excelsPath = filesPath.Where(ExcelSetting.IsSupported).ToArray();
-            if (!Directory.Exists(ExcelSetting.AssetsPath))
+            if (!Directory.Exists(Const.AssetsPath))
             {
-                Directory.CreateDirectory(ExcelSetting.AssetsPath);
+                Directory.CreateDirectory(Const.AssetsPath);
             }
 
             foreach (var excelPath in excelsPath)
@@ -31,7 +31,7 @@ namespace JFramework
                     var dataTable = ScriptableObject.CreateInstance(tableName);
                     if (dataTable == null)
                     {
-                        Debug.LogWarning($"创建{tableName}失败!");
+                        Debug.LogWarning($"创建 {tableName} 失败!");
                         continue;
                     }
                     
@@ -92,7 +92,7 @@ namespace JFramework
         
         public static void GenerateCode()
         {
-            var filesPath = Directory.GetFiles(Const.TablePath);
+            var filesPath = Directory.GetFiles(ExcelSetting.PathDataKey);
             var excelsPath = filesPath.Where(ExcelSetting.IsSupported).ToArray();
             var scriptContents = new List<(string, string)>();
             foreach (var excelPath in excelsPath)
@@ -103,9 +103,9 @@ namespace JFramework
             foreach (var (sheetName, scriptText) in scriptContents)
             {
                 var csFileSavePath = ExcelSetting.GetScriptPath(sheetName);
-                if (!Directory.Exists(ExcelSetting.ScriptPath))
+                if (!Directory.Exists(Const.ScriptPath))
                 {
-                    Directory.CreateDirectory(ExcelSetting.ScriptPath);
+                    Directory.CreateDirectory(Const.ScriptPath);
                 }
 
                 if (!File.Exists(csFileSavePath))
@@ -116,6 +116,7 @@ namespace JFramework
                 File.WriteAllText(csFileSavePath, scriptText);
             }
 
+            ExcelSetting.SaveDataKey = true;
             AssetDatabase.Refresh();
         }
 
@@ -134,15 +135,21 @@ namespace JFramework
                     var column = sheet.Dimension.End.Column;
                     var names = sheet.Cells[Const.Name, 1, Const.Name, column].Select(_ => _.Value?.ToString()).ToArray();
                     var types = sheet.Cells[Const.Type, 1, Const.Type, column].Select(_ => _.Value?.ToString()).ToArray();
-                    if (names.Length == 0 || types.Length == 0) continue;
-              
+                    if (names.Length == 0 || types.Length == 0)
+                    {
+                        Debug.Log($"跳过 {sheet.Name} 表生成！");
+                        continue;
+                    }
+                    
+                    Debug.Log($"生成 {sheet.Name} 表成功。");
+
                     for (int x = 1; x <= column; x++)
                     {
                         if (sheet.Cells[Const.Type, x].Value != null)
                         {
                             var name = sheet.Cells[Const.Name, x].Value.ToString();
                             var type = sheet.Cells[Const.Type, x].Value.ToString();
-                            if (!type.IsEmpty() && type is Support.Enum or Support.Struct)
+                            if (!type.IsEmpty() && type is Const.Enum or Const.Struct)
                             {
                                 var valueList = new List<string>();
                                 for (int y = Const.Data; y <= row; y++)
@@ -229,14 +236,14 @@ namespace JFramework
                 var data = value.Split(',');
                 switch (type)
                 {
-                    case Support.Enum when data.Length != 2:
+                    case Const.Enum when data.Length != 2:
                         return "";
-                    case Support.Enum:
+                    case Const.Enum:
                         builder.AppendFormat("\t\t{0} = {1},\n", data[0], data[1]);
                         break;
-                    case Support.Struct when data.Length != 3:
+                    case Const.Struct when data.Length != 3:
                         return "";
-                    case Support.Struct:
+                    case Const.Struct:
                         builder.AppendFormat("\t\tpublic const {0} {1} = {2};\n", data[0], data[1], data[2]);
                         break;
                 }

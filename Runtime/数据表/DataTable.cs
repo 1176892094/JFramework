@@ -6,7 +6,7 @@ namespace JFramework
 {
     public interface IData { }
 
-    public class DataAttribute : Attribute { }
+    public class KeyAttribute : Attribute { }
 
     public interface IDataTable
     {

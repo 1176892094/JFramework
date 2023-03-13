@@ -65,8 +65,8 @@ namespace JFramework
             CreateLabel(parent, "JFramework");
             VisualElement container = CreateContainer(parent);
             CreateButton(container, Const.MenuPath + Const.EditorWindow, Const.EditorWindow);
-            CreateButton(container, Const.MenuPath + Const.ExcelToAsset, Const.ExcelToAsset);
-            CreateButton(container, Const.MenuPath + Const.ExcelClearAll, Const.ExcelClearAll);
+            CreateButton(container, Const.MenuPath + Const.ExcelToScripts, Const.ExcelToScripts);
+            CreateButton(container, Const.MenuPath + Const.ExcelToAssets, Const.ExcelToAssets);
             CreateButton(container, Const.MenuPath + Const.CurrentProjectPath, Const.CurrentProjectPath);
             CreateButton(container, Const.MenuPath + Const.PersistentDataPath, Const.PersistentDataPath);
             CreateButton(container, Const.MenuPath + Const.StreamingAssetsPath, Const.StreamingAssetsPath);

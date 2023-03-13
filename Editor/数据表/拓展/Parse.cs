@@ -81,20 +81,20 @@ namespace JFramework
 
             private static readonly Dictionary<string, Action> dataDict = new Dictionary<string, Action>
             {
-                { Support.Int, Struct.Create },
-                { Support.Bool, Struct.Create },
-                { Support.Long, Struct.Create },
-                { Support.Float, Struct.Create },
-                { Support.Double, Struct.Create },
-                { Support.String, Struct.Create },
-                { Support.Vector2, Struct.Create },
-                { Support.Vector3, Struct.Create },
+                { Const.Int, Struct.Create },
+                { Const.Bool, Struct.Create },
+                { Const.Long, Struct.Create },
+                { Const.Float, Struct.Create },
+                { Const.Double, Struct.Create },
+                { Const.String, Struct.Create },
+                { Const.Vector2, Struct.Create },
+                { Const.Vector3, Struct.Create },
             };
 
             public static Struct TryParse(string name, string type)
             {
                 type = type.Trim();
-                if (!Support.Array.Any(type.Equals)) return null;
+                if (!Const.Array.Any(type.Equals)) return null;
                 dataDict.TryGetValue(type, out var action);
                 return action?.Invoke(name, type);
             }

@@ -12,7 +12,7 @@ namespace JFramework
         {
             this.name = name.Trim();
             var fixType =type.Substring(0, type.IndexOf('[')).Trim().ToLower();
-            if (fixType is Support.Vector2 or Support.Vector3) isVector = true;
+            if (fixType is Const.Vector2 or Const.Vector3) isVector = true;
             this.type = fixType.Replace('v', 'V');
         }
 

@@ -9,30 +9,34 @@ namespace JFramework
 {
     public static class ExcelSetting
     {
-        public static string ScriptPath => Const.ScriptPath + Path.GetFileName(LoadPath) + "/";
+        private static string LoadPath => PathDataKey.IsEmpty() ? Environment.CurrentDirectory : PathDataKey;
 
-        public static string AssetsPath => Const.AssetsPath + Path.GetFileName(LoadPath) + "/";
-
-        private static string PathKey
+        public static string PathDataKey
         {
-            get => EditorPrefs.GetString("ExcelPath");
-            set => EditorPrefs.SetString("ExcelPath", value);
+            get => EditorPrefs.GetString("PathData");
+            private set => EditorPrefs.SetString("PathData", value);
         }
-
-        private static string LoadPath => PathKey.IsEmpty() ? Environment.CurrentDirectory : PathKey;
+        
+        public static bool SaveDataKey
+        {
+            get => EditorPrefs.GetBool("SavePath");
+            set => EditorPrefs.SetBool("SavePath", value);
+        }
 
         [MenuItem("Tools/JFramework/ExcelToScripts", false, 102)]
         public static void ExcelToScripts()
         {
             var filePath = EditorUtility.OpenFolderPanel(default, LoadPath, "");
             if (filePath.IsEmpty()) return;
-            ExcelEditor.GenerateCode();
-            PathKey = filePath;
+            PathDataKey = filePath;
+            ExcelGenerator.GenerateCode();
         }
         
         [DidReloadScripts]
         private static void OnScriptsReloaded()
         {
+            if (SaveDataKey == false) return;
+            SaveDataKey = false;
             if (LoadPath.IsEmpty()) return;
             Debug.Log("脚本重新编译，开始生成资源.");
         }
@@ -100,19 +104,19 @@ namespace JFramework
             return dataType;
         }
 
-        private static bool IsNormal(string type) => Support.Array.Any(type.Equals);
+        private static bool IsNormal(string type) => Const.Array.Any(type.Equals);
 
         private static bool IsNormalArray(string type)
         {
             if (!type.EndsWith("[]")) return false;
             var name = type.Substring(0, type.IndexOf('['));
-            return !name.IsEmpty() && Support.Array.Any(t => name.Equals(t));
+            return !name.IsEmpty() && Const.Array.Any(t => name.Equals(t));
         }
 
         private static bool IsStruct(string type) => type.StartsWith("{") && type.EndsWith("}");
 
         private static bool IsStructArray(string type) => type.StartsWith("{") && type.EndsWith("}[]");
 
-        private static bool IsEnum(string type) => type == Support.EnumField;
+        private static bool IsEnum(string type) => type == Const.EnumField;
     }
 }

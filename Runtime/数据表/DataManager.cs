@@ -196,7 +196,7 @@ namespace JFramework.Core
         private static FieldInfo KeyValue(Type type)
         {
             var fields = type.GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
-            return (from field in fields let attrs = field.GetCustomAttributes(typeof(DataAttribute), false) 
+            return (from field in fields let attrs = field.GetCustomAttributes(typeof(KeyAttribute), false) 
                 where attrs.Length > 0 select field).FirstOrDefault();
         }
         
