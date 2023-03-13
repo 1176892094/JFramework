@@ -11,9 +11,9 @@ namespace JFramework
 {
     public static class ParseGenerator
     {
-        public static void GenerateAsset()
+        public static void GenerateAssets()
         {
-            AssetDatabase.Refresh();
+            ParseSetting.SaveDataKey = false;
             var filesPath = Directory.GetFiles(ParseSetting.PathDataKey);
             var excelsPath = filesPath.Where(ParseSetting.IsSupported).ToArray();
             if (!Directory.Exists(Const.AssetsPath))
@@ -90,7 +90,7 @@ namespace JFramework
             }
         }
         
-        public static void GenerateCode()
+        public static void GenerateScripts()
         {
             var filesPath = Directory.GetFiles(ParseSetting.PathDataKey);
             var excelsPath = filesPath.Where(ParseSetting.IsSupported).ToArray();

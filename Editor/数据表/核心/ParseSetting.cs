@@ -29,7 +29,15 @@ namespace JFramework
             var filePath = EditorUtility.OpenFolderPanel(default, LoadPath, "");
             if (filePath.IsEmpty()) return;
             PathDataKey = filePath;
-            ParseGenerator.GenerateCode();
+            ParseGenerator.GenerateScripts();
+        }
+        
+        [MenuItem("Tools/JFramework/ExcelToAssets", false, 102)]
+        public static void ExcelToAssets()
+        {
+            if (PathDataKey.IsEmpty()) return;
+            ParseGenerator.GenerateAssets();
+            FrameworkEditorHouse.Instance.LoadAddressableGroup();
         }
         
         [DidReloadScripts]

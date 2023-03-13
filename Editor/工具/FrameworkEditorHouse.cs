@@ -13,6 +13,7 @@ namespace JFramework
     internal class FrameworkEditorHouse : DataSingleton<FrameworkEditorHouse>
     {
         private AddressableAssetSettings Settings => AddressableAssetSettingsDefaultObject.Settings;
+        private const string filter = "t:ScriptableObject t:prefab t:AudioClip t:Shader t:Material t:SceneAsset t:Texture2D";
         public string[] pathList;
         public List<string> nameList;
 
@@ -30,12 +31,11 @@ namespace JFramework
 
             for (int i = 0; i < nameList.Count; i++)
             {
-                var filter = "t:ScriptableObject t:prefab t:AudioClip t:Shader t:Material t:SceneAsset t:Texture2D";
-                var path = i;
+                var index = i;
                 GetAddressableGroup(nameList[i], pathList[i], filter, assetPath =>
                 {
                     string fileName = Path.GetFileNameWithoutExtension(assetPath);
-                    string dirPath = pathList[path];
+                    string dirPath = pathList[index];
                     string dirName = Path.GetFileNameWithoutExtension(dirPath);
                     return $"{dirName}/{fileName}";
                 });

@@ -16,7 +16,7 @@ internal struct Const
     public const string MenuPath = "Tools/JFramework/";
     public const string Inspector = "JFramework Inspector";
     public const string EditorWindow = "JFrameworkEditor";
-    
+
     /// <summary>
     /// Framework
     /// </summary>
