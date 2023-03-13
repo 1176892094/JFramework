@@ -6,20 +6,6 @@ using UnityEngine;
 
 namespace JFramework
 {
-    public interface IParser
-    {
-        string GetField();
-        string GetParse();
-    }
-    
-    public abstract class Parser : IParser
-    {
-        public string name;
-        protected string type;
-        public abstract string GetField();
-        public abstract string GetParse();
-    }
-    
     public class StructParser : Parser
     {
         public List<Parser> fieldList;
