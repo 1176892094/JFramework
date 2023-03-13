@@ -60,7 +60,7 @@ namespace JFramework
         /// 完成时执行的事件
         /// </summary>
         private Action OnFinish;
-
+        
         /// <summary>
         /// 计时器初始化时调用
         /// </summary>
@@ -76,11 +76,6 @@ namespace JFramework
             this.keepTime = keepTime;
             this.OnFinish = OnFinish;
             waitTime = Time.time + keepTime;
-
-            if (DebugManager.Instance.isShowTimer)
-            {
-                Debug.Log($"TimerManager创建 {OnFinish.Target.ToString().Yellow()} 计时器！");
-            }
         }
 
         /// <summary>
@@ -176,11 +171,6 @@ namespace JFramework
         /// </summary>
         public void Close()
         {
-            if (DebugManager.Instance.isShowTimer)
-            {
-                Debug.Log($"TimerManager停止 {OnFinish.Target.ToString().Yellow()} 计时器！");
-            }
-            
             target = null;
             OnLoop = null;
             OnFinish = null;

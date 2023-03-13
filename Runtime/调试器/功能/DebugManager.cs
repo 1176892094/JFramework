@@ -19,9 +19,6 @@ namespace JFramework.Core
 
         [ShowInInspector, LabelText("显示Event事件信息"), BoxGroup("调试选项")]
         public bool isShowEvent;
-        
-        [ShowInInspector, LabelText("显示Timer创建信息"), BoxGroup("调试选项")]
-        public bool isShowTimer;
 
         private int FPS;
         private bool IsExtend;
