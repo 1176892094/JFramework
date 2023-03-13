@@ -43,6 +43,7 @@ namespace JFramework
                     var row = sheetData.GetLength(0);
                     for (var y = Const.Data - 1; y < row; ++y)
                     {
+                        if (sheetData[y, 0].IsEmpty()) continue;
                         var data = (IData)constructor.Invoke(new object[] { sheetData, y, 0 });
                         var key = DataManager.GetKeyField(data);
                         if (key is 0 or "") continue;

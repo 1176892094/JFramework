@@ -72,6 +72,8 @@ namespace JFramework
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
         private static void Register()
         {
+            entityDict.Clear();
+            entityQueue.Clear();
             CommandManager.Instance.Awake();
             AssetManager.Instance.Awake();
             EventManager.Instance.Awake();
