@@ -46,6 +46,8 @@ namespace JFramework
             if (SaveDataKey == false) return;
             SaveDataKey = false;
             if (LoadPath.IsEmpty()) return;
+            ParseGenerator.GenerateAssets();
+            FrameworkEditorAsset.Instance.LoadAddressableGroup();
             Debug.Log("脚本重新编译，开始生成资源.");
         }
 

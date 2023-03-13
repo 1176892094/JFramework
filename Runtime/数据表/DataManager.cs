@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using Sirenix.Utilities;
 using UnityEngine;
 
 namespace JFramework.Core
@@ -24,11 +23,6 @@ namespace JFramework.Core
         /// 存储string为主键的数据字典
         /// </summary>
         internal Dictionary<Type, StrDataDict> StrDataDict;
-        
-        /// <summary>
-        /// 数据表名称
-        /// </summary>
-        private const string Table = "Table";
 
         /// <summary>
         /// 资源路径
@@ -48,8 +42,7 @@ namespace JFramework.Core
             base.Awake();
             IntDataDict = new Dictionary<Type, IntDataDict>();
             StrDataDict = new Dictionary<Type, StrDataDict>();
-            var assembly = GetAssembly();
-            var types = assembly.GetTypes().Where(type => type.IsSubclassOf(typeof(IDataTable)));
+            var assembly = GetAssembly(out IEnumerable<Type> types);
             foreach (var type in types)
             {
                 try
@@ -58,12 +51,12 @@ namespace JFramework.Core
                     AssetManager.Instance.LoadAsync<ScriptableObject>(AssetPath + keyName, obj =>
                     {
                         var dataTable = (IDataTable)obj;
-                        var tableType = GetTableType(assembly, type);
-                        var keyField = KeyValue(tableType);
+                        var keyData = GetKeyField(assembly, type);
+                        var keyField = GetKeyField(keyData);
 
-                        if (keyField == null)
+                        if (keyData == null)
                         {
-                            Debug.LogError($"DataManager没有找到主键:{keyName}!");
+                            Debug.LogWarning($"DataManager没有找到主键:{keyName}!");
                             return;
                         }
 
@@ -71,31 +64,15 @@ namespace JFramework.Core
 
                         if (keyType == typeof(int))
                         {
-                            var dataDict = new IntDataDict();
-                            for (var i = 0; i < dataTable.Count; ++i)
-                            {
-                                var data = (IData)dataTable.GetData(i);
-                                int key = (int)keyField.GetValue(data);
-                                dataDict.Add(key, data);
-                            }
-
-                            IntDataDict.Add(tableType, dataDict);
+                            IntDataDict.Add(type, Add<int>(keyField,dataTable));
                         }
                         else if (keyType == typeof(string))
                         {
-                            var dataDict = new StrDataDict();
-                            for (var i = 0; i < dataTable.Count; ++i)
-                            {
-                                var data = (IData)dataTable.GetData(i);
-                                string key = (string)keyField.GetValue(data);
-                                dataDict.Add(key, data);
-                            }
-
-                            StrDataDict.Add(tableType, dataDict);
+                            StrDataDict.Add(type, Add<string>(keyField,dataTable));
                         }
                         else
                         {
-                            Debug.LogError($"DataManager加载{type.Name}失败.这不是有效的主键!");
+                            Debug.LogWarning($"DataManager加载 {type.Name} 失败 {keyField} 不是有效的主键!");
                         }
                     });
                 }
@@ -107,30 +84,25 @@ namespace JFramework.Core
 
             Debug.Log($"DataManager加载资源完成!");
         }
-        
-        /// <summary>
-        /// 得到数据表对象的类型
-        /// </summary>
-        /// <param name="assembly"></param>
-        /// <param name="type"></param>
-        /// <returns></returns>
-        private Type GetTableType(Assembly assembly, Type type) => assembly.GetType(Namespace + "." + type.Name);
 
         /// <summary>
-        /// 获取当前程序集中的数据表对象类
+        /// 增加字典数据
         /// </summary>
-        /// <returns></returns>
-        private Assembly GetAssembly()
+        /// <param name="field"></param>
+        /// <param name="table"></param>
+        /// <typeparam name="T"></typeparam>
+        /// <returns>返回数据字典</returns>
+        private Dictionary<T, IData> Add<T>(FieldInfo field, IDataTable table)
         {
-            var assemblies = AppDomain.CurrentDomain.GetAssemblies();
-            foreach (var assembly in assemblies)
+            var dataDict = new Dictionary<T, IData>();
+            for (var i = 0; i < table.Count; ++i)
             {
-                var types = assembly.GetTypes().Where(t => t.IsSubclassOf(typeof(IDataTable)));
-                var collectionTypes = types as Type[] ?? types.ToArray();
-                if (collectionTypes.Any()) return assembly;
+                var data = (IData)table.GetData(i);
+                var key = (T)field.GetValue(data);
+                dataDict.Add(key, data);
             }
 
-            return typeof(IDataTable).Assembly;
+            return dataDict;
         }
 
         /// <summary>
@@ -160,7 +132,7 @@ namespace JFramework.Core
             soDict.TryGetValue(key, out IData data);
             return (T)data;
         }
-        
+
         /// <summary>
         /// 通过数据管理器得到数据表
         /// </summary>
@@ -187,26 +159,62 @@ namespace JFramework.Core
             StrDataDict.TryGetValue(type, out StrDataDict dictStr);
             return dictStr?.Values.ToList();
         }
-        
+
+        /// <summary>
+        /// 获取当前程序集中的数据表对象类
+        /// </summary>
+        /// <returns></returns>
+        private Assembly GetAssembly(out IEnumerable<Type> types)
+        {
+            var assemblies = AppDomain.CurrentDomain.GetAssemblies();
+            foreach (var assembly in assemblies)
+            {
+                types = assembly.GetTypes().Where(_ => _.GetInterfaces().Contains(typeof(IDataTable)));
+                var tableTypes = types as Type[] ?? types.ToArray();
+                if (tableTypes.Any())
+                {
+                    return assembly;
+                }
+            }
+
+            types = null;
+            return null;
+        }
+
         /// <summary>
         /// 获取数据的主键
         /// </summary>
         /// <param name="type">传入的数据类型</param>
         /// <returns>返回字段的信息</returns>
-        private static FieldInfo KeyValue(Type type)
+        private static FieldInfo GetKeyField(Type type)
         {
             var fields = type.GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
-            return (from field in fields let attrs = field.GetCustomAttributes(typeof(KeyAttribute), false) 
-                where attrs.Length > 0 select field).FirstOrDefault();
+            return (from field in fields
+                let attrs = field.GetCustomAttributes(typeof(KeyAttribute), false)
+                where attrs.Length > 0
+                select field).FirstOrDefault();
         }
-        
+
+        /// <summary>
+        /// 得到数据表对象的类型
+        /// </summary>
+        /// <param name="assembly"></param>
+        /// <param name="type"></param>
+        /// <returns></returns>
+        private Type GetKeyField(Assembly assembly, Type type)
+        {
+            var name = type.Name;
+            name = name.Substring(0, name.Length - 5);
+            return assembly.GetType(Namespace + "." + name);
+        }
+
         /// <summary>
         /// 获取数据的键值
         /// </summary>
         /// <returns>返回数据的主键</returns>
-        public static object KeyValue(IData data)
+        public static object GetKeyField(IData data)
         {
-            var key = KeyValue(data.GetType());
+            var key = GetKeyField(data.GetType());
             return key == null ? null : key.GetValue(data);
         }
     }

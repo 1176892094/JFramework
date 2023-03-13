@@ -10,17 +10,10 @@ using UnityEngine;
 
 namespace JFramework
 {
-    public class FrameworkEditor : OdinMenuEditorWindow
+    public abstract class FrameworkEditor : OdinMenuEditorWindow
     {
         private static OdinMenuTree EditorWindow;
-        
-        [MenuItem("Tools/JFramework/JFrameworkEditor _F1")]
-        private static void JFrameworkEditor()
-        {
-            var window = GetWindow<FrameworkEditor>();
-            window.position = GUIHelper.GetEditorWindowRect().AlignCenter(800, 600);
-        }
-        
+
         [MenuItem("Tools/JFramework/CurrentProjectPath")]
         private static void CurrentProjectPath()
         {
@@ -46,6 +39,12 @@ namespace JFramework
                 Process.Start(Application.streamingAssetsPath);
             }
         }
+        
+        protected static void ShowEditorWindow<T>() where T : EditorWindow
+        {
+            var window = GetWindow<T>();
+            window.position = GUIHelper.GetEditorWindowRect().AlignCenter(800, 600);
+        }
 
         /// <summary>
         /// Odin窗口面板
@@ -65,9 +64,6 @@ namespace JFramework
         /// 重新绘制框架窗口面板
         /// </summary>
         /// <param name="window"></param>
-        protected virtual void JFrameworkWindow(OdinMenuTree window)
-        {
-            
-        }
+        protected abstract void JFrameworkWindow(OdinMenuTree window);
     }
 }

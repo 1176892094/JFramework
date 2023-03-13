@@ -44,7 +44,7 @@ namespace JFramework
                     for (var y = Const.Data - 1; y < row; ++y)
                     {
                         var data = (IData)constructor.Invoke(new object[] { sheetData, y, 0 });
-                        var key = DataManager.KeyValue(data);
+                        var key = DataManager.GetKeyField(data);
                         if (key is 0 or "") continue;
                         ((IDataTable)dataTable).AddData(data);
                     }

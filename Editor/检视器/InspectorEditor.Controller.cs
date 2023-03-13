@@ -15,6 +15,9 @@ namespace JFramework
 
         private InspectorController()
         {
+            Selection.selectionChanged -= Init;
+            EditorApplication.delayCall -= Init;
+            InspectorView.OnMaximizedChanged -= OnMaximizedChanged;
             Selection.selectionChanged += Init;
             EditorApplication.delayCall += Init;
             InspectorView.OnMaximizedChanged += OnMaximizedChanged;
@@ -67,6 +70,7 @@ namespace JFramework
             CreateButton(container, Const.MenuPath + Const.EditorWindow, Const.EditorWindow);
             CreateButton(container, Const.MenuPath + Const.ExcelToScripts, Const.ExcelToScripts);
             CreateButton(container, Const.MenuPath + Const.ExcelToAssets, Const.ExcelToAssets);
+            CreateButton(container, "Window/Asset Management/Addressables/Groups","AddressablesView");
             CreateButton(container, Const.MenuPath + Const.CurrentProjectPath, Const.CurrentProjectPath);
             CreateButton(container, Const.MenuPath + Const.PersistentDataPath, Const.PersistentDataPath);
             CreateButton(container, Const.MenuPath + Const.StreamingAssetsPath, Const.StreamingAssetsPath);
