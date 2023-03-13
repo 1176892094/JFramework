@@ -16,42 +16,17 @@ namespace JFramework
             get => EditorPrefs.GetString("PathData");
             private set => EditorPrefs.SetString("PathData", value);
         }
-        
-        public static bool SaveDataKey
-        {
-            get => EditorPrefs.GetBool("SavePath");
-            set => EditorPrefs.SetBool("SavePath", value);
-        }
 
-        [MenuItem("Tools/JFramework/ExcelToScripts", false, 102)]
+        [MenuItem("Tools/JFramework/ExcelToAssets", false, 102)]
         public static void ExcelToScripts()
         {
             var filePath = EditorUtility.OpenFolderPanel(default, LoadPath, "");
             if (filePath.IsEmpty()) return;
             PathDataKey = filePath;
             ParseGenerator.GenerateScripts();
-        }
-        
-        [MenuItem("Tools/JFramework/ExcelToAssets", false, 102)]
-        public static void ExcelToAssets()
-        {
-            if (PathDataKey.IsEmpty()) return;
-            ParseGenerator.GenerateAssets();
             FrameworkEditorAsset.Instance.LoadAddressableGroup();
         }
         
-        [DidReloadScripts]
-        private static void OnScriptsReloaded()
-        {
-            if (SaveDataKey == false) return;
-            SaveDataKey = false;
-            if (LoadPath.IsEmpty()) return;
-            ParseGenerator.GenerateAssets();
-            FrameworkEditorAsset.Instance.LoadAddressableGroup();
-            Debug.Log("脚本重新编译，开始生成资源.");
-        }
-
-
         public static string GetDataName(string sheetName) => sheetName + "Data";
         public static string GetTableName(string sheetName) => sheetName + "DataTable";
         public static string GetDataFullName(string sheetName) => Const.Namespace + "." + GetDataName(sheetName);
