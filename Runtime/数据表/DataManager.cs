@@ -49,17 +49,17 @@ namespace JFramework.Core
             IntDataDict = new Dictionary<Type, IntDataDict>();
             StrDataDict = new Dictionary<Type, StrDataDict>();
             var assembly = GetAssembly();
-            var types = assembly.GetTypes().Where(type => type.IsSubclassOf(typeof(DataTable)));
+            var types = assembly.GetTypes().Where(type => type.IsSubclassOf(typeof(IDataTable)));
             foreach (var type in types)
             {
                 try
                 {
                     var keyName = type.Name;
-                    AssetManager.Instance.LoadAsync<DataTable>(AssetPath + keyName, table =>
+                    AssetManager.Instance.LoadAsync<ScriptableObject>(AssetPath + keyName, obj =>
                     {
-                        table.InitData();
-                        var classType = GetClassType(assembly, type);
-                        var keyField = KeyValue(classType);
+                        var dataTable = (IDataTable)obj;
+                        var tableType = GetTableType(assembly, type);
+                        var keyField = KeyValue(tableType);
 
                         if (keyField == null)
                         {
@@ -72,26 +72,26 @@ namespace JFramework.Core
                         if (keyType == typeof(int))
                         {
                             var dataDict = new IntDataDict();
-                            for (var i = 0; i < table.Count; ++i)
+                            for (var i = 0; i < dataTable.Count; ++i)
                             {
-                                var data = table.GetData(i);
+                                var data = (IData)dataTable.GetData(i);
                                 int key = (int)keyField.GetValue(data);
                                 dataDict.Add(key, data);
                             }
 
-                            IntDataDict.Add(classType, dataDict);
+                            IntDataDict.Add(tableType, dataDict);
                         }
                         else if (keyType == typeof(string))
                         {
                             var dataDict = new StrDataDict();
-                            for (var i = 0; i < table.Count; ++i)
+                            for (var i = 0; i < dataTable.Count; ++i)
                             {
-                                var data = table.GetData(i);
+                                var data = (IData)dataTable.GetData(i);
                                 string key = (string)keyField.GetValue(data);
                                 dataDict.Add(key, data);
                             }
 
-                            StrDataDict.Add(classType, dataDict);
+                            StrDataDict.Add(tableType, dataDict);
                         }
                         else
                         {
@@ -109,32 +109,12 @@ namespace JFramework.Core
         }
         
         /// <summary>
-        /// 得到数据表的类名
-        /// </summary>
-        /// <param name="classType">传入类对象类型</param>
-        /// <returns></returns>
-        private string GetClassName(Type classType)
-        {
-            var fullName = classType.Name;
-            var parts = fullName.Split('.');
-            var lastPart = parts[^1];
-            lastPart = lastPart.Substring(lastPart.IndexOf('_') + 1);
-            var length = lastPart.IndexOf(Table, StringComparison.Ordinal);
-            return lastPart.Substring(0, length);
-        }
-
-        /// <summary>
         /// 得到数据表对象的类型
         /// </summary>
         /// <param name="assembly"></param>
-        /// <param name="classType"></param>
+        /// <param name="type"></param>
         /// <returns></returns>
-        private Type GetClassType(Assembly assembly, Type classType)
-        {
-            var className = GetClassName(classType);
-            var type = assembly.GetType(Namespace + "." + className);
-            return type;
-        }
+        private Type GetTableType(Assembly assembly, Type type) => assembly.GetType(Namespace + "." + type.Name);
 
         /// <summary>
         /// 获取当前程序集中的数据表对象类
@@ -145,12 +125,12 @@ namespace JFramework.Core
             var assemblies = AppDomain.CurrentDomain.GetAssemblies();
             foreach (var assembly in assemblies)
             {
-                var types = assembly.GetTypes().Where(t => t.IsSubclassOf(typeof(DataTable)));
+                var types = assembly.GetTypes().Where(t => t.IsSubclassOf(typeof(IDataTable)));
                 var collectionTypes = types as Type[] ?? types.ToArray();
                 if (collectionTypes.Any()) return assembly;
             }
 
-            return typeof(DataTable).Assembly;
+            return typeof(IDataTable).Assembly;
         }
 
         /// <summary>
@@ -188,23 +168,11 @@ namespace JFramework.Core
         /// <returns>返回泛型列表</returns>
         public List<T> GetTable<T>() where T : IData
         {
-            IntDataDict.TryGetValue(typeof(T), out IntDataDict dictInt);
-            if (dictInt != null)
-            {
-                List<T> list = new List<T>();
-                dictInt.Values.ForEach(data => list.Add((T)data));
-                return list;
-            }
-
-            StrDataDict.TryGetValue(typeof(T), out StrDataDict dictStr);
-            if (dictStr != null)
-            {
-                List<T> list = new List<T>();
-                dictStr.Values.ForEach(data => list.Add((T)data));
-                return list;
-            }
-
-            return null;
+            var table = GetTable(typeof(T));
+            if (table == null) return null;
+            var dataList = new List<T>();
+            table.ForEach(data => dataList.Add((T)data));
+            return dataList;
         }
 
         /// <summary>
@@ -212,15 +180,14 @@ namespace JFramework.Core
         /// </summary>
         /// <param name="type">传入的类型</param>
         /// <returns>返回一个Data的列表</returns>
-        public List<IData> GetTable(Type type)
+        private List<IData> GetTable(Type type)
         {
             IntDataDict.TryGetValue(type, out IntDataDict dictInt);
             if (dictInt != null) return dictInt.Values.ToList();
             StrDataDict.TryGetValue(type, out StrDataDict dictStr);
-            if (dictStr != null) return dictStr.Values.ToList();
-            return null;
+            return dictStr?.Values.ToList();
         }
-
+        
         /// <summary>
         /// 获取数据的主键
         /// </summary>
@@ -229,11 +196,8 @@ namespace JFramework.Core
         private static FieldInfo KeyValue(Type type)
         {
             var fields = type.GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
-            var key = (from fieldInfo in fields
-                let attrs = fieldInfo.GetCustomAttributes(typeof(KeyAttribute), false)
-                where attrs.Length > 0
-                select fieldInfo).FirstOrDefault();
-            return key;
+            return (from field in fields let attrs = field.GetCustomAttributes(typeof(DataAttribute), false) 
+                where attrs.Length > 0 select field).FirstOrDefault();
         }
         
         /// <summary>

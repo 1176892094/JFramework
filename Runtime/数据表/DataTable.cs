@@ -1,34 +1,29 @@
+using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace JFramework
 {
-    /// <summary>
-    /// 数据表的抽象类
-    /// </summary>
-    public abstract class DataTable : ScriptableObject
+    public interface IData { }
+
+    public class DataAttribute : Attribute { }
+
+    public interface IDataTable
     {
-        /// <summary>
-        /// 数据表获取列表中的数据总数
-        /// </summary>
-        /// <returns></returns>
-        public abstract int Count { get; }
-        
-        /// <summary>
-        /// 数据表初始化数据
-        /// </summary>
-        public abstract void InitData();
+        int Count { get; }
 
-        /// <summary>
-        /// 数据表添加数据
-        /// </summary>
-        /// <param name="data">传入添加的数据</param>
-        public abstract void AddData(IData data);
+        void AddData(object data);
 
-        /// <summary>
-        /// 数据表得到数据
-        /// </summary>
-        /// <param name="index">传入数据在列表中的位置</param>
-        /// <returns>返回对应位置的数据</returns>
-        public abstract IData GetData(int index);
+        object GetData(int index);
+    }
+
+    public class DataTable<T> : ScriptableObject, IDataTable where T : IData
+    {
+        [SerializeField] private List<T> dataList = new List<T>();
+        private void AddData(T data) => dataList.Add(data);
+        private T GetData(int index) => dataList[index];
+        int IDataTable.Count => dataList.Count;
+        void IDataTable.AddData(object data) => AddData((T)data);
+        object IDataTable.GetData(int index) => GetData(index);
     }
 }
