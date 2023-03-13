@@ -37,7 +37,7 @@ namespace JFramework
         {
             if (PathDataKey.IsEmpty()) return;
             ParseGenerator.GenerateAssets();
-            FrameworkEditorHouse.Instance.LoadAddressableGroup();
+            FrameworkEditorAsset.Instance.LoadAddressableGroup();
         }
         
         [DidReloadScripts]

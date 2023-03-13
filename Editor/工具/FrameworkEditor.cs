@@ -1,17 +1,16 @@
 using System;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using Sirenix.OdinInspector.Editor;
 using Sirenix.Utilities;
 using Sirenix.Utilities.Editor;
 using UnityEditor;
-using UnityEditor.Callbacks;
 using UnityEngine;
-using Debug = UnityEngine.Debug;
 
 namespace JFramework
 {
-    public abstract class FrameworkEditor : OdinMenuEditorWindow
+    public class FrameworkEditor : OdinMenuEditorWindow
     {
         private static OdinMenuTree EditorWindow;
         
@@ -55,9 +54,9 @@ namespace JFramework
         protected override OdinMenuTree BuildMenuTree()
         {
             EditorWindow = new OdinMenuTree(supportsMultiSelect: false);
-            EditorWindow.Add("主页", FrameworkEditorHouse.Instance, EditorIcons.House);
-            EditorWindow.Add("设置", FrameworkEditorSetting.Instance, EditorIcons.SettingsCog);
             EditorWindow.Add("资源", FrameworkEditorAsset.Instance, EditorIcons.Folder);
+            EditorWindow.Add("主页", FrameworkEditorHouse.Instance, EditorIcons.House);
+            EditorWindow.Add("设置", Resources.FindObjectsOfTypeAll<PlayerSettings>().FirstOrDefault(), EditorIcons.SettingsCog);
             JFrameworkWindow(EditorWindow);
             return EditorWindow;
         }
@@ -66,6 +65,9 @@ namespace JFramework
         /// 重新绘制框架窗口面板
         /// </summary>
         /// <param name="window"></param>
-        protected abstract void JFrameworkWindow(OdinMenuTree window);
+        protected virtual void JFrameworkWindow(OdinMenuTree window)
+        {
+            
+        }
     }
 }
