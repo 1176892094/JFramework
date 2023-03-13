@@ -13,9 +13,9 @@ namespace JFramework
 {
     public abstract class FrameworkEditor : OdinMenuEditorWindow
     {
-        private static string LoadPath => string.IsNullOrEmpty(PathKey) ? Environment.CurrentDirectory : PathKey;
+        private static string LoadPath => PathKey.IsEmpty() ? Environment.CurrentDirectory : PathKey;
 
-        public static string ScriptPath => EditorConst.ScriptPath + Path.GetFileName(LoadPath) + "/";
+        private static string ScriptPath => EditorConst.ScriptPath + Path.GetFileName(LoadPath) + "/";
 
         public static string AssetsPath => EditorConst.AssetsPath + Path.GetFileName(LoadPath) + "/";
         
@@ -36,7 +36,7 @@ namespace JFramework
         public static void ExcelToAsset()
         {
             var filePath = EditorUtility.OpenFolderPanel(default, LoadPath, "");
-            if (string.IsNullOrEmpty(filePath)) return;
+            if (filePath.IsEmpty()) return;
             ExcelConverter.ConvertToScript(PathKey = filePath, ScriptPath);
         }
 
@@ -83,7 +83,7 @@ namespace JFramework
         {
             if (!DataKey) return;
             DataKey = false;
-            if (string.IsNullOrEmpty(LoadPath)) return;
+            if (LoadPath.IsEmpty()) return;
             Debug.Log("脚本重新编译，开始生成资源.");
             ExcelConverter.ConvertToObject(LoadPath, AssetsPath);
         }
@@ -102,7 +102,7 @@ namespace JFramework
             {
                 var length = EditorConst.ScriptPath.Length - 1;
                 var meta = EditorConst.ScriptPath.Substring(0, length) + ".meta";
-                if (!string.IsNullOrEmpty(meta) && File.Exists(meta)) File.Delete(meta);
+                if (!meta.IsEmpty() && File.Exists(meta)) File.Delete(meta);
             }
         }
 
@@ -120,7 +120,7 @@ namespace JFramework
             {
                 var length = EditorConst.AssetsPath.Length - 1;
                 var meta = EditorConst.AssetsPath.Substring(0, length) + ".meta";
-                if (!string.IsNullOrEmpty(meta) && File.Exists(meta)) File.Delete(meta);
+                if (!meta.IsEmpty() && File.Exists(meta)) File.Delete(meta);
             }
         }
          
@@ -140,15 +140,11 @@ namespace JFramework
         /// <returns></returns>
         protected override OdinMenuTree BuildMenuTree()
         {
-            OdinMenuTree tree = new OdinMenuTree(supportsMultiSelect: false)
-            {
-                { "主页", FrameworkEditorHouse.Instance, EditorIcons.House },
-                { "设置", FrameworkEditorSetting.Instance, EditorIcons.SettingsCog },
-                { "资源", FrameworkEditorAsset.Instance, EditorIcons.Folder },
-            };
-
+            OdinMenuTree tree = new OdinMenuTree(supportsMultiSelect: false);
+            tree.Add("主页", FrameworkEditorHouse.Instance, EditorIcons.House);
+            tree.Add("设置", FrameworkEditorSetting.Instance, EditorIcons.SettingsCog);
+            tree.Add( "资源", FrameworkEditorAsset.Instance, EditorIcons.Folder );
             JFrameworkWindow(tree);
-            tree.SortMenuItemsByName();
             return tree;
         }
 

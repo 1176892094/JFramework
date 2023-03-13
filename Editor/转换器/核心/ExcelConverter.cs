@@ -53,7 +53,7 @@ namespace JFramework
             for (var i = 0; i < table.columnCount; i++)
             {
                 var name = table.GetValue(EditorConst.Name, i);
-                if (!string.IsNullOrEmpty(name)) nameList.Add(i);
+                if (!name.IsEmpty()) nameList.Add(i);
             }
 
             var typeList = new List<int>();
@@ -93,10 +93,10 @@ namespace JFramework
             for (var i = 0; i < table.columnCount; i++)
             {
                 var type = table.GetValue(EditorConst.Type, i);
-                if (string.IsNullOrEmpty(type) || type.Equals(" ") || type.Equals("\r")) continue;
+                if (type.IsEmpty() || type.Equals(" ") || type.Equals("\r")) continue;
                 if (ExcelBuilder.IsSupportedType(type))
                 {
-                    if (!string.IsNullOrEmpty(table.GetValue(EditorConst.Name, i)))
+                    if (!table.GetValue(EditorConst.Name, i).IsEmpty())
                     {
                         columnCount++;
                     }
@@ -108,7 +108,7 @@ namespace JFramework
 
         private static bool IsSupportedExcel(string filePath)
         {
-            if (string.IsNullOrEmpty(filePath)) return false;
+            if (filePath.IsEmpty()) return false;
             var fileName = Path.GetFileName(filePath);
             if (fileName.Contains("~$")) return false;
             var lower = Path.GetExtension(filePath).ToLower();

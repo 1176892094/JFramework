@@ -44,6 +44,7 @@ namespace JFramework
 
 				Debug.Log($"资源生成成功,总计{count}个.");
 				RemoveProgress();
+				FrameworkEditorHouse.Instance.LoadAddressableGroup();
 				AssetDatabase.Refresh();
 			}
 			catch (Exception e)
@@ -67,6 +68,7 @@ namespace JFramework
 					var sheetData = RemoveEmptyColumn(sheet);
 					ConvertObject(sheet.fileName, outputPath, sheetData);
 				}
+				
 			}
 			catch (Exception e)
 			{
@@ -125,7 +127,7 @@ namespace JFramework
 						continue;
 					}
 
-					if (key is 0 || key is string s && string.IsNullOrEmpty(s)) continue;
+					if (key is 0 || key is string s && s.IsEmpty()) continue;
 					
 					if (!keySet.Contains(key))
 					{

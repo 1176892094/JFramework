@@ -10,7 +10,7 @@ namespace JFramework.Core
     /// <summary>
     /// Json管理器
     /// </summary>
-    public class JsonManager : Singleton<JsonManager>
+    public sealed class JsonManager : Singleton<JsonManager>
     {
         /// <summary>
         /// 存储Json的字典
@@ -19,7 +19,7 @@ namespace JFramework.Core
 
         private string name => nameof(JsonManager);
 
-        public override void Awake()
+        internal override void Awake()
         {
             base.Awake();
             jsonDict = Load<Dictionary<string, JsonData>>(name);
@@ -196,7 +196,7 @@ namespace JFramework.Core
         /// <summary>
         /// Json管理器清除存档所有数据
         /// </summary>
-        public override void Destroy()
+        internal override void Destroy()
         {
             base.Destroy();
             jsonDict = null;

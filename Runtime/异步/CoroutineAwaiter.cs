@@ -4,7 +4,7 @@ using System.Runtime.ExceptionServices;
 
 namespace JFramework
 {
-    public class CoroutineAwaiter : INotifyCompletion
+    public sealed class CoroutineAwaiter : INotifyCompletion
     {
         private bool isCompleted;
         private Action continuation;

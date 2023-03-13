@@ -3,7 +3,7 @@ namespace JFramework
 	/// <summary>
 	/// 解析的抽象类
 	/// </summary>
-	internal abstract class Parse
+	internal interface IParser
 	{
 		/// <summary>
 		/// 解析字段行
@@ -16,11 +16,5 @@ namespace JFramework
 		/// </summary>
 		/// <returns>返回转换行</returns>
 		public abstract string GetParseLine();
-
-		/// <summary>
-		/// 解析初始化行
-		/// </summary>
-		/// <returns>返回初始化行</returns>
-		public abstract string GetInitLine();
 	}
 }

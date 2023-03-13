@@ -9,7 +9,7 @@ using UnityEngine.Profiling;
 
 namespace JFramework.Core
 {
-    internal partial class DebugManager
+    internal sealed partial class DebugManager
     { 
         private readonly Dictionary<Type, Type> typeDict = new Dictionary<Type, Type>();
         private readonly List<Type> typeList = new List<Type>();

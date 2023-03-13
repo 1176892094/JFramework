@@ -1,4 +1,5 @@
 using System.IO;
+using JFramework.Core;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -25,13 +26,11 @@ namespace JFramework
             get
             {
                 if (instance != null) return instance;
-                instance = Resources.Load<T>(typeof(T).Name);
-                if (instance != null) return instance;
 #if UNITY_EDITOR
                 instance = FindObjectOfType<T>();
                 if (instance != null) return instance;
                 var name = typeof(T).Name;
-                const string path = "Assets/Editor";
+                var path = "Assets/Editor";
                 instance = AssetDatabase.LoadAssetAtPath<T>(path + $"/{name}.asset");
                 if (instance != null) return instance;
                 instance = CreateInstance<T>();
@@ -42,6 +41,8 @@ namespace JFramework
 
                 AssetDatabase.CreateAsset(instance, path + $"/{name}.asset");
                 AssetDatabase.Refresh();
+#else
+                instance = AssetManager.Instance.Load<T>("Setttngs/"+typeof(T).Name);
 #endif
                 return instance;
             }

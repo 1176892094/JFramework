@@ -17,7 +17,7 @@ namespace JFramework
         /// <summary>
         /// 命令管理器初始化
         /// </summary>
-        public override void Awake()
+        internal override void Awake()
         {
             base.Awake();
             commandDict = new Dictionary<string, ICommand>();
@@ -72,10 +72,9 @@ namespace JFramework
         /// <summary>
         /// 清除命令管理器
         /// </summary>
-        public override void Destroy()
+        internal override void Destroy()
         {
             base.Destroy();
-            commandDict?.Clear();
             commandDict = null;
         }
     }

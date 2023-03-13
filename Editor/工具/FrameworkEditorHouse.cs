@@ -17,7 +17,7 @@ namespace JFramework
         public List<string> nameList;
 
         [Button("Addressable资源生成")]
-        private void LoadAddressableGroup()
+        public void LoadAddressableGroup()
         {
             pathList = Directory.GetDirectories("Assets/" + EditorConst.AddressableResources);
             nameList = new List<string>();
@@ -30,7 +30,7 @@ namespace JFramework
 
             for (int i = 0; i < nameList.Count; i++)
             {
-                var filter = "t:DataTable t:prefab t:AudioClip t:Shader t:Material t:SceneAsset t:Texture2D";
+                var filter = "t:ScriptableObject t:prefab t:AudioClip t:Shader t:Material t:SceneAsset t:Texture2D";
                 var path = i;
                 GetAddressableGroup(nameList[i], pathList[i], filter, assetPath =>
                 {
@@ -76,8 +76,8 @@ namespace JFramework
 
         private string[] GetAssets(string folder, string filter)
         {
-            if (string.IsNullOrEmpty(folder)) return null;
-            if (string.IsNullOrEmpty(filter)) return null;
+            if (folder.IsEmpty()) return null;
+            if (filter.IsEmpty()) return null;
             folder = folder.TrimEnd('/').TrimEnd('\\');
             if (!filter.StartsWith("t:")) return null;
             var guids = AssetDatabase.FindAssets(filter, new[] { folder });

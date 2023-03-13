@@ -1,14 +1,17 @@
+using System;
+using UnityEngine;
+
+
 namespace JFramework
 {
-    public static class DataExtension
+    public static class StringExtension
     {
         /// <summary>
-        /// 转换数据
+        /// 判断自身是否有文本
         /// </summary>
-        /// <param name="data">数据自身</param>
-        /// <typeparam name="T">可以转换继承IData的对象</typeparam>
-        /// <returns>返回目标数据</returns>
-        public static T As<T>(this IData data) where T : IData => (T)data;
+        /// <param name="self">传递自身</param>
+        /// <returns></returns>
+        public static bool IsEmpty(this string self) => string.IsNullOrEmpty(self);
 
         /// <summary>
         /// string转string
@@ -16,7 +19,7 @@ namespace JFramework
         /// <param name="reword">改写string类型</param>
         /// <param name="result">输出string类型</param>
         /// <returns>返回改写是否成功</returns>
-        public static bool TryParse(this string reword, out string result) => string.IsNullOrEmpty(result = reword);
+        public static bool TryParse(this string reword, out string result) => (result = reword).IsEmpty();
 
         /// <summary>
         /// string转int
@@ -57,5 +60,54 @@ namespace JFramework
         /// <param name="result">输出long类型</param>
         /// <returns>返回改写是否成功</returns>
         public static bool TryParse(this string reword, out long result) => long.TryParse(reword, out result);
+
+        /// <summary>
+        /// string转枚举
+        /// </summary>
+        /// <param name="reword">改写string类型</param>
+        /// <param name="result">输出enum类型</param>
+        /// <returns>返回改写是否成功</returns>
+        public static void TryParse<T>(this string reword, out T result) where T : struct => Enum.TryParse(reword, out result);
+
+        /// <summary>
+        /// string转Vector2
+        /// </summary>
+        /// <param name="reword">改写string类型</param>
+        /// <param name="result">输出Vector2类型</param>
+        /// <returns>返回改写是否成功</returns>
+        public static void TryParse(this string reword, out Vector2 result)
+        {
+            var values = reword.Split(",");
+            if (values.Length < 2)
+            {
+                result = Vector2.zero;
+                return;
+            }
+
+            var x = float.Parse(values[0]);
+            var y = float.Parse(values[1]);
+            result = new Vector2(x, y);
+        }
+
+        /// <summary>
+        /// string转Vector3
+        /// </summary>
+        /// <param name="reword">改写string类型</param>
+        /// <param name="result">输出Vector3类型</param>
+        /// <returns>返回改写是否成功</returns>
+        public static void TryParse(this string reword, out Vector3 result)
+        {
+            var values = reword.Split(",");
+            if (values.Length < 3)
+            {
+                result = Vector3.zero;
+                return;
+            }
+
+            var x = float.Parse(values[0]);
+            var y = float.Parse(values[1]);
+            var z = float.Parse(values[2]);
+            result = new Vector3(x, y, z);
+        }
     }
 }

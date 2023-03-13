@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace JFramework.Core
 {
-    internal partial class DebugManager : MonoBehaviour
+    internal sealed partial class DebugManager : MonoBehaviour
     {
         [ShowInInspector, LabelText("是否启动"),BoxGroup("调试器")]
         public bool isDebug;
@@ -23,7 +23,7 @@ namespace JFramework.Core
 
         private void Start()
         {
-            TimerManager.Instance.Listen(1).SetLoop(-1, _ =>
+            TimerManager.Instance.Pop(1).SetLoop(-1, _ =>
             {
                 if (!isDebug) return;
                 FPS = (int)(1.0f / Time.deltaTime);

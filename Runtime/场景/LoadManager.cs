@@ -6,12 +6,12 @@ using UnityEngine.SceneManagement;
 
 namespace JFramework
 {
-    public class LoadManager : Singleton<LoadManager>
+    public sealed class LoadManager : Singleton<LoadManager>
     {
         /// <summary>
         /// 当前场景名称
         /// </summary>
-        public string Scene => SceneManager.GetActiveScene().name;
+        public static string Scene => SceneManager.GetActiveScene().name;
 
         /// <summary>
         /// 场景列表
@@ -21,7 +21,7 @@ namespace JFramework
         /// <summary>
         /// 场景管理器初始化
         /// </summary>
-        public override void Awake()
+        internal override void Awake()
         {
             sceneList = new List<SceneData>();
             var count = SceneManager.sceneCountInBuildSettings;
@@ -83,7 +83,7 @@ namespace JFramework
                 while (progress < 0.999f)
                 {
                     progress = Mathf.Lerp(progress, asyncOperation.progress / 9f * 10f, Time.deltaTime);
-                    EventManager.Instance.Send(999, progress);
+                    EventManager.Instance.SendMessage(999, progress);
                     yield return new WaitForEndOfFrame();
                 }
 

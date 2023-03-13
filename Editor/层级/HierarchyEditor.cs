@@ -20,10 +20,7 @@ namespace JFramework
         private Action<Rect, Object, int> DisplayObjectContextMenuDelegate;
         private Func<GameObject, Rect, bool, bool> IconSelectorShowAtPositionDelegate;
 
-        static HierarchyEditor()
-        {
-            instance = new HierarchyEditor();
-        }
+        static HierarchyEditor() => instance = new HierarchyEditor();
 
         private HierarchyEditor()
         {
@@ -37,11 +34,9 @@ namespace JFramework
         {
             MethodInfo DisplayObjectContextMenu = typeof(EditorUtility)
                 .GetMethods(BindingFlags.Static | BindingFlags.NonPublic)
-                .Single(method => method.Name == nameof(DisplayObjectContextMenu) &&
-                                  method.GetParameters()[1].ParameterType == typeof(Object));
+                .Single(method => method.Name == nameof(DisplayObjectContextMenu) && method.GetParameters()[1].ParameterType == typeof(Object));
             DisplayObjectContextMenuDelegate =
-                (Action<Rect, Object, int>)Delegate.CreateDelegate(typeof(Action<Rect, Object, int>),
-                    DisplayObjectContextMenu);
+                (Action<Rect, Object, int>)Delegate.CreateDelegate(typeof(Action<Rect, Object, int>), DisplayObjectContextMenu);
         }
 
         private void HierarchyOnGUI(int instanceId, Rect selectionRect)

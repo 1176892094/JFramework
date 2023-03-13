@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Newtonsoft.Json;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.EventSystems;
@@ -12,13 +11,8 @@ namespace JFramework.Core
     /// <summary>
     /// UI界面管理器
     /// </summary>
-    public class UIManager : Singleton<UIManager>
+    public sealed class UIManager : Singleton<UIManager>
     {
-        /// <summary>
-        /// 存储UI层级的字典
-        /// </summary>
-        internal Dictionary<string, UIPanelData> dataDict;
-
         /// <summary>
         /// 存储所有UI的字典
         /// </summary>
@@ -32,19 +26,18 @@ namespace JFramework.Core
         /// <summary>
         /// 界面管理器初始化数据
         /// </summary>
-        public override void Awake()
+        internal override void Awake()
         {
             base.Awake();
             layerGroup = new Transform[5];
             panelDict = new Dictionary<string, UIPanel>();
+            if (GlobalManager.Instance == null) return;
             var obj = GlobalManager.Instance.gameObject;
             layerGroup[0] = obj.transform.Find("UICanvas/Layer1");
             layerGroup[1] = obj.transform.Find("UICanvas/Layer2");
             layerGroup[2] = obj.transform.Find("UICanvas/Layer3");
             layerGroup[3] = obj.transform.Find("UICanvas/Layer4");
             layerGroup[4] = obj.transform.Find("UICanvas/Layer5");
-            var asset = Resources.Load<TextAsset>("UIManager"); //读取UI面版相关的文本数据
-            dataDict = JsonConvert.DeserializeObject<Dictionary<string, UIPanelData>>(asset.text);
         }
 
         /// <summary>
@@ -55,16 +48,14 @@ namespace JFramework.Core
         /// <typeparam name="T">可以使用所有继承IPanel的对象</typeparam>
         private void LoadPanel<T>(string name, Action<T> action) where T : UIPanel
         {
-            var data = dataDict[name]; //获取对应名称Panel的数据
-            AssetManager.Instance.LoadAsync<GameObject>(data.Path, obj =>
+            AssetManager.Instance.LoadAsync<GameObject>("UI/" + name, obj =>
             {
                 if (panelDict.ContainsKey(name)) HidePanel<T>();
-                var layer = GetLayer((UILayerType)data.Layer);
-                obj.transform.SetParent(layer, false);
+                obj.transform.SetParent(layerGroup[0], false);
                 var panel = obj.GetComponent<T>();
                 panelDict.Add(name, panel);
-                action?.Invoke(panel);
                 panel.Show();
+                action?.Invoke(panel);
             });
         }
 
@@ -80,8 +71,8 @@ namespace JFramework.Core
 
             if (panelDict.ContainsKey(key))
             {
-                action?.Invoke((T)panelDict[key]);
                 panelDict[key].Show();
+                action?.Invoke((T)panelDict[key]);
                 return;
             }
 
@@ -115,7 +106,18 @@ namespace JFramework.Core
         /// </summary>
         /// <typeparam name="T">可以使用所有继承IPanel的对象</typeparam>
         /// <returns>返回获取到的UI面板</returns>
-        public T GetPanel<T>() where T : UIPanel => (T)panelDict?[typeof(T).Name];
+        public T GetPanel<T>() where T : UIPanel
+        {
+            if (panelDict == null) return null;
+            var key = typeof(T).Name;
+
+            if (panelDict.ContainsKey(key))
+            {
+                return (T)panelDict?[key];
+            }
+
+            return null;
+        }
 
         /// <summary>
         /// UI管理器得到层级
@@ -123,14 +125,14 @@ namespace JFramework.Core
         /// <param name="layer">层级的类型</param>
         /// <returns>返回得到的层级</returns>
         public Transform GetLayer(UILayerType layer) => panelDict == null ? null : layerGroup[(int)layer];
-        
+
         /// <summary>
         /// UI管理器侦听UI面板事件
         /// </summary>
         /// <param name="target">传入的UI对象</param>
         /// <param name="type">事件触发类型</param>
         /// <param name="action">事件触发后的回调</param>
-        public void Listen(MonoBehaviour target, EventTriggerType type, UnityAction<BaseEventData> action)
+        public void AddListener(MonoBehaviour target, EventTriggerType type, UnityAction<BaseEventData> action)
         {
             var trigger = target.GetComponent<EventTrigger>();
             if (trigger == null) trigger = target.gameObject.AddComponent<EventTrigger>();
@@ -155,9 +157,8 @@ namespace JFramework.Core
         /// <summary>
         /// UI管理器销毁
         /// </summary>
-        public override void Destroy()
+        internal override void Destroy()
         {
-            dataDict = null;
             panelDict = null;
             layerGroup = null;
         }

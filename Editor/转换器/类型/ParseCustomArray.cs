@@ -1,23 +1,21 @@
-using UnityEngine;
-
 namespace JFramework
 {
-    internal class ParseCustomArray : Parse
+    internal class ParseCustomArray : IParser
     {
         private readonly ParserCustomClass custom;
 
         public ParseCustomArray(string name, string type) => custom = ParserCustomClass.Parse(name, type);
 
-        public override string GetFieldLine()
+        public string GetFieldLine()
         {
             if (custom == null) return null;
             var file = ExcelBuilder.Borrow();
-            file.Append(custom.GetClassLine());
+            file.Append(custom.GetParseLine());
             file.Append(custom.GetFieldLine());
             return ExcelBuilder.Return(file);
         }
 
-        public override string GetParseLine()
+        public string GetParseLine()
         {
             if (custom == null) return null;
             var file = ExcelBuilder.Borrow();
@@ -31,7 +29,6 @@ namespace JFramework
             file.AppendFormat("\t\t\t\tfor (int i = 0; i < {0}Array.Length; ++i)\n", custom.fieldName);
             file.Append("\t\t\t\t{\n");
             file.AppendFormat("\t\t\t\t\tvar strValue = {0}Array[i];\n", custom.fieldName);
-
             for (int i = 0; i < custom.fieldList.Count; ++i)
             {
                 file.AppendFormat("\t\t\t\t\t{0}if (i == {1})\n", (i == 0 ? "" : "else "), i);
@@ -45,7 +42,5 @@ namespace JFramework
             file.Append("\t\t\t}\n");
             return ExcelBuilder.Return(file);
         }
-
-        public override string GetInitLine() => null;
     }
 }

@@ -1,19 +1,19 @@
 namespace JFramework
 {
-    internal class ParseNormalData : Parse
+    internal class ParseNormal : IParser
     {
         private readonly bool isKey;
         private readonly string fieldName;
         private readonly string fieldType;
 
-        public ParseNormalData(string name, string type)
+        public ParseNormal(string name, string type)
         {
             isKey = ExcelBuilder.GetKeyValue(name, type);
             fieldName = isKey ? name.Split(':')[0].Trim() : name.Trim();
             fieldType = type.Trim();
         }
 
-        public override string GetFieldLine()
+        public string GetFieldLine()
         {
             var file = ExcelBuilder.Borrow();
             if (isKey) file.Append("\t\t[Key]\n");
@@ -22,12 +22,10 @@ namespace JFramework
             return ExcelBuilder.Return(file);
         }
 
-        public override string GetParseLine()
+        public string GetParseLine()
         {
             if (fieldType == "enum") return "\t\t\tcolumn++;\n";
             return $"\t\t\tsheet[row][column++].TryParse(out {fieldName});\n";
         }
-
-        public override string GetInitLine() => null;
     }
 }

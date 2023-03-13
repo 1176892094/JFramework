@@ -11,7 +11,7 @@ namespace JFramework.Core
     /// <summary>
     /// 资源管理器
     /// </summary>
-    public class AssetManager : Singleton<AssetManager>
+    public sealed class AssetManager : Singleton<AssetManager>
     {
         /// <summary>
         /// 资源存储字典
@@ -21,13 +21,29 @@ namespace JFramework.Core
         /// <summary>
         /// 资源管理器初始化
         /// </summary>
-        public override void Awake()
+        internal override void Awake()
         {
             base.Awake();
             assetDict = new Dictionary<string, IEnumerator>();
         }
 
-
+        /// <summary>
+        /// 通过资源管理器加载资源 (同步)
+        /// </summary>
+        /// <param name="name">资源的名称</param>
+        /// <typeparam name="T">可以使用任何继承Object的对象</typeparam>
+        public T Load<T>(string name) where T : Object
+        {
+            if (assetDict == null)
+            {
+                Debug.Log("资源管理器没有初始化!");
+                return null;
+            }
+            
+            var result = Addressables.LoadAssetAsync<T>(name).WaitForCompletion();
+            return result is GameObject ? Object.Instantiate(result) : result;
+        }
+        
         /// <summary>
         /// 通过资源加载管理器异步加载资源
         /// </summary>
@@ -102,7 +118,7 @@ namespace JFramework.Core
             assetDict.Remove(name);
         }
 
-        public override void Destroy()
+        internal override void Destroy()
         {
             base.Destroy();
             assetDict = null;

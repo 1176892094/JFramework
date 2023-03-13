@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace JFramework.Core
 {
-    internal partial class DebugManager
+    internal sealed partial class DebugManager
     {
         private readonly List<LogData> logList = new List<LogData>();
         private int logIndex = -1;

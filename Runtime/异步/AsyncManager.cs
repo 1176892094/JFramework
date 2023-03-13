@@ -12,7 +12,7 @@ namespace JFramework
         private static SynchronizationContext synchronize;
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
-        private static void Synchronization() => synchronize = SynchronizationContext.Current;
+        private static void Awake() => synchronize = SynchronizationContext.Current;
 
         public static CoroutineAwaiter GetAwaiter(this WaitForSeconds result) => GetAwaiterNone(result);
         

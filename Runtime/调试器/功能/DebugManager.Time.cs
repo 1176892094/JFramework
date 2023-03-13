@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace JFramework.Core
 {
-    internal partial class DebugManager
+    internal sealed partial class DebugManager
     {
         private void DebugTime()
         {

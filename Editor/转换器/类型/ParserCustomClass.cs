@@ -4,6 +4,14 @@ using UnityEngine;
 
 namespace JFramework
 {
+    internal abstract class Parser: IParser
+    {
+        public string name;
+        protected string type;
+        public abstract string GetFieldLine();
+        public abstract string GetParseLine();
+    }
+    
     internal class ParserCustomClass : Parser
     {
         public List<Parser> fieldList;
@@ -19,8 +27,8 @@ namespace JFramework
             file.AppendFormat("\t\tpublic {0}{1} {0}s;\n", fieldName, array);
             return ExcelBuilder.Return(file);
         }
-
-        public string GetClassLine()
+        
+        public override string GetParseLine()
         {
             var file = ExcelBuilder.Borrow();
             file.AppendFormat("\t\t[Serializable]\n");
@@ -68,13 +76,13 @@ namespace JFramework
 
             private static readonly Dictionary<string, ParseFunc> parserDict = new Dictionary<string, ParseFunc>
             {
-                { EditorConst.Int, ParserNormalClass.Parse },
-                { EditorConst.Bool, ParserNormalClass.Parse },
-                { EditorConst.Enum, ParserNormalClass.Parse },
-                { EditorConst.Long, ParserNormalClass.Parse },
-                { EditorConst.Float, ParserNormalClass.Parse },
-                { EditorConst.Double, ParserNormalClass.Parse },
-                { EditorConst.String, ParserNormalClass.Parse },
+                { EditorConst.Int, Struct.Create },
+                { EditorConst.Bool, Struct.Create },
+                { EditorConst.Enum, Struct.Create },
+                { EditorConst.Long, Struct.Create },
+                { EditorConst.Float, Struct.Create },
+                { EditorConst.Double, Struct.Create },
+                { EditorConst.String, Struct.Create },
             };
 
             public static Parser TryParse(string name, string type)
@@ -84,6 +92,20 @@ namespace JFramework
                 parserDict.TryGetValue(type, out var func);
                 return func?.Invoke(name, type);
             }
+        }
+        
+        private class Struct : Parser
+        {
+            public static Struct Create(string name, string type) => new Struct() { name = name, type = type };
+
+            public override string GetFieldLine()
+            {
+                var stringBuilder = ExcelBuilder.Borrow();
+                stringBuilder.AppendFormat("public {0} {1};", type, name);
+                return ExcelBuilder.Return(stringBuilder);
+            }
+
+            public override string GetParseLine() => null;
         }
     }
 }

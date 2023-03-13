@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace JFramework
 {
-    public class PoolManager : Singleton<PoolManager>
+    public sealed class PoolManager : Singleton<PoolManager>
     {
         /// <summary>
         /// 存储所有池的字典
@@ -21,7 +21,7 @@ namespace JFramework
         /// <summary>
         /// 对象池管理器初始化
         /// </summary>
-        public override void Awake()
+        internal override void Awake()
         {
             poolDict = new Dictionary<string, IPool>();
         }
@@ -38,32 +38,24 @@ namespace JFramework
                 Debug.Log("对象池管理器没有初始化!");
                 return;
             }
-            
+
             if (poolDict.ContainsKey(key) && poolDict[key].Count > 0)
             {
                 var obj = (GameObject)poolDict[key].Pop();
                 if (obj != null)
                 {
                     action?.Invoke(obj);
+                    return;
                 }
-                else
-                {
-                    poolDict.Remove(key);
-                    AssetManager.Instance.LoadAsync<GameObject>(key, o =>
-                    {
-                        o.name = key;
-                        action?.Invoke(o);
-                    });
-                }
+
+                poolDict.Remove(key);
             }
-            else
+
+            AssetManager.Instance.LoadAsync<GameObject>(key, o =>
             {
-                AssetManager.Instance.LoadAsync<GameObject>(key, o =>
-                {
-                    o.name = key;
-                    action?.Invoke(o);
-                });
-            }
+                o.name = key;
+                action?.Invoke(o);
+            });
         }
 
         /// <summary>
@@ -77,7 +69,7 @@ namespace JFramework
                 Debug.Log("对象池管理器没有初始化!");
                 return;
             }
-            
+
             if (obj == null) return;
             string key = obj.name;
             if (manager == null)
@@ -99,12 +91,12 @@ namespace JFramework
             else
             {
                 var pool = new PoolData();
-                pool.Awake(obj, manager);
+                pool.Create(obj, manager);
                 poolDict.Add(key, pool);
             }
         }
-
-        public override void Destroy()
+        
+        internal override void Destroy()
         {
             base.Destroy();
             manager = null;

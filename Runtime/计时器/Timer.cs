@@ -92,7 +92,7 @@ namespace JFramework
                 if (maxCount < 0) return;
                 if (count < maxCount) return;
                 OnFinish?.Invoke();
-                TimerManager.Instance.Remove(this);
+                TimerManager.Instance.Push(this);
             }
         }
 
@@ -104,7 +104,7 @@ namespace JFramework
             if (state != TimerState.Run) return;
             if (followed && target == null)
             {
-                TimerManager.Instance.Remove(this);
+                TimerManager.Instance.Push(this);
                 return;
             }
 

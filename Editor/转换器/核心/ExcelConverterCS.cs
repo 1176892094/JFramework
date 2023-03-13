@@ -65,7 +65,7 @@ namespace JFramework
                     }
                 }
 
-                ExcelBuilder.Reset();
+                ExcelBuilder.Clear();
 
                 if (isChanged)
                 {
@@ -88,7 +88,7 @@ namespace JFramework
                     RemoveProgress();
 
                     var savePath = FrameworkEditor.PathKey;
-                    if (!string.IsNullOrEmpty(savePath))
+                    if (!savePath.IsEmpty())
                     {
                         ConvertToObject(savePath, FrameworkEditor.AssetsPath);
                     }
@@ -124,7 +124,6 @@ namespace JFramework
             {
                 if (table == null) continue;
                 //判断当前表能否被转换
-                ExcelBuilder.isClass = false;
                 if (!IsConvertTable(table))
                 {
                     Debug.Log($"{fileName}跳过生成表:{table.fileName}.");
@@ -163,17 +162,17 @@ namespace JFramework
                 csFile.AppendFormat("namespace {0}\n", EditorConst.Namespace);
                 csFile.Append("{\n");
                 csFile.Append("\t[Serializable]\n");
-                csFile.AppendFormat("\tpublic {0} {1} : IData\n", ExcelBuilder.isClass ? "class" : "struct", dataName);
+                csFile.AppendFormat("\tpublic {0} {1} : IData\n", "struct", dataName);
                 csFile.Append("\t{\n");
                 int columnCount = excelData.column;
                 List<int> enumList = new List<int>();
-                Parse[] columnFields = new Parse[columnCount];
+                IParser[] columnFields = new IParser[columnCount];
                 for (int i = 0; i < columnCount; i++)
                 {
                     string name = excelData.GetData(EditorConst.Name, i);
                     string type = excelData.GetData(EditorConst.Type, i);
                     if (type == "enum") enumList.Add(i);
-                    Parse data = ExcelBuilder.Parse(name, type);
+                    IParser data = ExcelBuilder.Parse(name, type);
                     columnFields[i] = data;
                 }
 
@@ -195,17 +194,7 @@ namespace JFramework
                 }
 
                 csFile.Append("\t\t}\n#endif\n");
-
-                csFile.Append("\t\tpublic void InitData()\n");
-                csFile.Append("\t\t{\n");
-                for (var i = 0; i < columnCount; i++)
-                {
-                    var columnField = columnFields[i];
-                    if (columnField == null) continue;
-                    csFile.Append(columnField.GetInitLine());
-                }
-
-                csFile.Append("\t\t}\n");
+                
                 csFile.Append("\t}\n\n");
 
                 csFile.AppendFormat("\tpublic class {0} : DataTable\n", tableName);

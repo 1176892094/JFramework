@@ -4,7 +4,7 @@ using UnityEngine.Profiling;
 
 namespace JFramework.Core
 {
-    internal partial class DebugManager
+    internal sealed partial class DebugManager
     {
         private long minTotalReservedMemory = 10000;
         private long maxTotalReservedMemory;
@@ -48,11 +48,7 @@ namespace JFramework.Core
             GUILayout.EndVertical();
 
             GUILayout.BeginHorizontal();
-            if (GUILayout.Button(DebugConst.UninstallResources, DebugData.Button, DebugData.Height))
-            {
-                Resources.UnloadUnusedAssets();
-            }
-
+      
             if (GUILayout.Button(DebugConst.GarbageCollections, DebugData.Button, DebugData.Height))
             {
                 GC.Collect();

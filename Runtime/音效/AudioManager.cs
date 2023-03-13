@@ -5,13 +5,13 @@ using UnityEngine;
 
 namespace JFramework
 {
-    public class AudioManager : Singleton<AudioManager>
+    public sealed class AudioManager : Singleton<AudioManager>
     {
         internal Queue<AudioSource> audioQueue;
         internal List<AudioSource> audioList;
         internal GameObject audioManager;
         internal AudioSource audioSource;
-        
+
         public float SoundVolume
         {
             get
@@ -21,7 +21,7 @@ namespace JFramework
                     return audioSetting.soundVolume;
                 }
 
-                return 0;
+                return 0.5f;
             }
         }
 
@@ -34,7 +34,7 @@ namespace JFramework
                     return audioSetting.audioVolume;
                 }
 
-                return 0;
+                return 0.5f;
             }
         }
 
@@ -45,11 +45,12 @@ namespace JFramework
         /// <summary>
         /// 音效管理器初始化
         /// </summary>
-        public override void Awake()
+        internal override void Awake()
         {
             base.Awake();
             audioList = new List<AudioSource>();
             audioQueue = new Queue<AudioSource>();
+            if (!GlobalManager.Instance) return;
             var obj = GlobalManager.Instance.gameObject;
             audioManager = obj.transform.Find("AudioSystem").gameObject;
             audioSetting = JsonManager.Instance.Load<AudioSetting>(name, true);
@@ -95,6 +96,12 @@ namespace JFramework
         /// </summary>
         public void StopSound()
         {
+            if (audioSource == null)
+            {
+                Debug.Log("音乐管理器没有初始化!");
+                return;
+            }
+
             audioSource.Pause();
         }
 
@@ -111,39 +118,16 @@ namespace JFramework
                 return;
             }
 
-            if (audioQueue.Count > 0)
+            var audio = audioQueue.Count > 0 ? audioQueue.Dequeue() : audioManager.AddComponent<AudioSource>();
+            AssetManager.Instance.LoadAsync<AudioClip>(path, clip =>
             {
-                var audio = audioQueue.Dequeue();
-                AssetManager.Instance.LoadAsync<AudioClip>(path, audioClip =>
-                {
-                    audioList.Add(audio);
-                    PlayAudio(audio, audioClip);
-                    action?.Invoke(audio);
-                });
-            }
-            else
-            {
-                var audio = audioManager.AddComponent<AudioSource>();
-                AssetManager.Instance.LoadAsync<AudioClip>(path, clip =>
-                {
-                    audioList.Add(audio);
-                    PlayAudio(audio, clip);
-                    action?.Invoke(audio);
-                });
-            }
-        }
-
-        /// <summary>
-        /// 设置音效参数
-        /// </summary>
-        /// <param name="audioSource">传入音源</param>
-        /// <param name="audioClip">传入音乐文件</param>
-        private void PlayAudio(AudioSource audioSource, AudioClip audioClip)
-        {
-            audioSource.clip = audioClip;
-            audioSource.volume = audioSetting.audioVolume;
-            audioSource.Play();
-            TimerManager.Instance.Listen(audioClip.length, () => StopAudio(audioSource));
+                audioList.Add(audio);
+                audio.volume = audioSetting.audioVolume;
+                audio.clip = clip;
+                audio.Play();
+                TimerManager.Instance.Pop(clip.length, () => StopAudio(audio));
+                action?.Invoke(audio);
+            });
         }
 
         /// <summary>
@@ -175,7 +159,7 @@ namespace JFramework
             }
         }
 
-        public override void Destroy()
+        internal override void Destroy()
         {
             base.Destroy();
             audioList = null;

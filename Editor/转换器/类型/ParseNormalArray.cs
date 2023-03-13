@@ -1,6 +1,6 @@
 namespace JFramework
 {
-    internal class ParseNormalArray : Parse
+    internal class ParseNormalArray : IParser
     {
         private readonly string fieldName;
         private readonly string fieldType;
@@ -12,14 +12,14 @@ namespace JFramework
             fieldType = type.Substring(0, startIndex).Trim();
         }
 
-        public override string GetFieldLine()
+        public string GetFieldLine()
         {
             var file = ExcelBuilder.Borrow();
             file.AppendFormat("\t\tpublic {0}[] {1};\n", fieldType, fieldName);
             return ExcelBuilder.Return(file);
         }
 
-        public override string GetParseLine()
+        public string GetParseLine()
         {
             var file = ExcelBuilder.Borrow();
             file.AppendFormat("\t\t\tstring[] {0}Array = sheet[row][column++].Split(\',\');" + "\n", fieldName);
@@ -31,7 +31,5 @@ namespace JFramework
             file.Append("\t\t\t}\n");
             return ExcelBuilder.Return(file);
         }
-
-        public override string GetInitLine() => null;
     }
 }

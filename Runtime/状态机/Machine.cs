@@ -18,7 +18,7 @@ namespace JFramework
         /// 状态的接口
         /// </summary>
         [ShowInInspector, LabelText("当前状态"), SerializeField]
-        private IState state;
+        protected IState state;
 
         /// <summary>
         /// 状态机初始化
@@ -68,7 +68,7 @@ namespace JFramework
         /// <typeparam name="TState">可传入任何继承IState的对象</typeparam>
         public void ChangeState<TState>(float time) where TState : IState
         {
-            TimerManager.Instance.Listen(time, ChangeState<TState>);
+            TimerManager.Instance.Pop(time, ChangeState<TState>);
         }
 
         /// <summary>

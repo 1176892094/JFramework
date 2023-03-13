@@ -15,7 +15,7 @@ namespace JFramework
         /// <summary>
         /// 事件管理器醒来
         /// </summary>
-        public override void Awake()
+        internal override void Awake()
         {
             base.Awake();
             eventDict = new Dictionary<int, EventData>();
@@ -26,7 +26,7 @@ namespace JFramework
         /// </summary>
         /// <param name="id">事件唯一标识</param>
         /// <param name="action">传入侦听的事件</param>
-        public void Listen(int id, EventData action)
+        public void AddListener(int id, EventData action)
         {
             if (eventDict == null) return;
 
@@ -45,7 +45,7 @@ namespace JFramework
         /// </summary>
         /// <param name="id">事件唯一标识</param>
         /// <param name="action">传入移除的事件</param>
-        public void Remove(int id, EventData action)
+        public void RemoveListener(int id, EventData action)
         {
             if (eventDict == null) return;
 
@@ -60,7 +60,7 @@ namespace JFramework
         /// </summary>
         /// <param name="id">事件唯一标识</param>
         /// <param name="args">传入事件的参数</param>
-        public void Send(int id, params object[] args)
+        public void SendMessage(int id, params object[] args)
         {
             if (eventDict.ContainsKey(id))
             {
@@ -71,7 +71,7 @@ namespace JFramework
         /// <summary>
         /// 清空事件管理器
         /// </summary>
-        public override void Destroy()
+        internal override void Destroy()
         {
             base.Destroy();
             eventDict = null;

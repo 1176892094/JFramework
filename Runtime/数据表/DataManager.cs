@@ -13,7 +13,7 @@ namespace JFramework.Core
     /// <summary>
     /// 数据管理器
     /// </summary>
-    public class DataManager : Singleton<DataManager>
+    public sealed class DataManager : Singleton<DataManager>
     {
         /// <summary>
         /// 存储int为主键类型的数据字典
@@ -43,7 +43,7 @@ namespace JFramework.Core
         /// <summary>
         /// 构造函数初始化数据
         /// </summary>
-        public override void Awake()
+        internal override void Awake()
         {
             base.Awake();
             IntDataDict = new Dictionary<Type, IntDataDict>();
@@ -107,20 +107,7 @@ namespace JFramework.Core
 
             Debug.Log($"DataManager加载资源完成!");
         }
-
-        /// <summary>
-        /// 得到数据表对象的类型
-        /// </summary>
-        /// <param name="assembly"></param>
-        /// <param name="classType"></param>
-        /// <returns></returns>
-        private Type GetClassType(Assembly assembly, Type classType)
-        {
-            var className = GetClassName(classType);
-            var type = assembly.GetType(Namespace + "." + className);
-            return type;
-        }
-
+        
         /// <summary>
         /// 得到数据表的类名
         /// </summary>
@@ -133,7 +120,20 @@ namespace JFramework.Core
             var lastPart = parts[^1];
             lastPart = lastPart.Substring(lastPart.IndexOf('_') + 1);
             var length = lastPart.IndexOf(Table, StringComparison.Ordinal);
-            return string.IsNullOrEmpty(Table) ? lastPart : lastPart.Substring(0, length);
+            return lastPart.Substring(0, length);
+        }
+
+        /// <summary>
+        /// 得到数据表对象的类型
+        /// </summary>
+        /// <param name="assembly"></param>
+        /// <param name="classType"></param>
+        /// <returns></returns>
+        private Type GetClassType(Assembly assembly, Type classType)
+        {
+            var className = GetClassName(classType);
+            var type = assembly.GetType(Namespace + "." + className);
+            return type;
         }
 
         /// <summary>

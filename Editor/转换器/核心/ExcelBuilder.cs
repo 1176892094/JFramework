@@ -9,7 +9,6 @@ namespace JFramework
     internal static class ExcelBuilder
     {
         private static readonly List<StringBuilder> stringList = new List<StringBuilder>();
-        public static bool isClass;
 
         /// <summary>
         /// 指定容器大小
@@ -45,7 +44,7 @@ namespace JFramework
         /// <summary>
         /// 重制StringBuilder
         /// </summary>
-        public static void Reset() => stringList.Clear();
+        public static void Clear() => stringList.Clear();
 
         /// <summary>
         /// 转换数据
@@ -53,24 +52,20 @@ namespace JFramework
         /// <param name="name"></param>
         /// <param name="type"></param>
         /// <returns></returns>
-        public static Parse Parse(string name, string type)
+        public static IParser Parse(string name, string type)
         {
             try
             {
                 type = type.Trim();
                 if (IsNormalData(type))
-                    return new ParseNormalData(name, type);
+                    return new ParseNormal(name, type);
                 if (IsNormalArray(type))
                     return new ParseNormalArray(name, type);
-                if (IsNormalDict(type))
-                    return new ParseNormalDict(name, type);
                 if (IsCustomData(type))
-                    return new ParseCustomData(name, type);
+                    return new ParseCustom(name, type);
                 if (IsCustomArray(type))
                     return new ParseCustomArray(name, type);
-                if (IsCustomDict(type))
-                    return new ParseCustomDict(name, type);
-                if (!string.IsNullOrEmpty(name) && !string.IsNullOrEmpty(type))
+                if (!name.IsEmpty() && !type.IsEmpty())
                     Debug.LogError($"不能转换列: \"{name}\"   类型为: \"{type}\".");
             }
             catch (Exception e)
@@ -86,14 +81,12 @@ namespace JFramework
         /// </summary>
         public static bool IsSupportedType(string type)
         {
-            if (string.IsNullOrEmpty(type)) return false;
+            if (type.IsEmpty()) return false;
             var fixType = type.ToLower().Trim();
             if (IsNormalData(fixType)) return true;
             if (IsNormalArray(fixType)) return true;
-            if (IsNormalDict(fixType)) return true;
             if (IsCustomData(fixType)) return true;
-            if (IsCustomArray(fixType)) return true;
-            return IsCustomDict(fixType);
+            return IsCustomArray(fixType);
         }
 
         /// <summary>
@@ -121,22 +114,7 @@ namespace JFramework
             if (!data.EndsWith("[]")) return false;
             var index = data.IndexOf('[');
             var name = data.Substring(0, index);
-            return !string.IsNullOrEmpty(name) && EditorConst.Array.Any(type => name.Equals(type));
-        }
-
-        /// <summary>
-        /// 判断是标准字典
-        /// </summary>
-        private static bool IsNormalDict(string data)
-        {
-            if (!data.StartsWith("<") || !data.EndsWith(">")) return false;
-            if (data.Contains("{") || data.Contains("}")) return false;
-            var startIndex = data.IndexOf('<');
-            var sepIndex = data.IndexOf(',');
-            var endIndex = data.IndexOf('>');
-            var isNormal = startIndex == 0 && sepIndex > 0 && endIndex > sepIndex;
-            if (isNormal) isClass = true;
-            return isNormal;
+            return !name.IsEmpty() && EditorConst.Array.Any(type => name.Equals(type));
         }
 
         /// <summary>
@@ -148,16 +126,5 @@ namespace JFramework
         /// 判断是自定义数组
         /// </summary>
         private static bool IsCustomArray(string data) => data.StartsWith("{") && data.EndsWith("}[]");
-
-        /// <summary>
-        /// 判断是自定义字典
-        /// </summary>
-        private static bool IsCustomDict(string data)
-        {
-            if (!data.StartsWith("<") || !data.EndsWith("}>")) return false;
-            var isCustom = data.Contains(",{") || data.Contains(", {");
-            if (isCustom) isClass = true;
-            return isCustom;
-        }
     }
 }

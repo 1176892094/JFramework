@@ -1,21 +1,21 @@
 namespace JFramework
 {
-    internal class ParseCustomData : Parse
+    internal class ParseCustom : IParser
     {
         private readonly ParserCustomClass custom;
 
-        public ParseCustomData(string name, string type) => custom = ParserCustomClass.Parse(name, type);
+        public ParseCustom(string name, string type) => custom = ParserCustomClass.Parse(name, type);
 
-        public override string GetFieldLine()
+        public string GetFieldLine()
         {
             if (custom == null) return null;
             var file = ExcelBuilder.Borrow();
-            file.Append(custom.GetClassLine());
+            file.Append(custom.GetParseLine());
             file.Append(custom.GetFieldLine());
             return ExcelBuilder.Return(file);
         }
 
-        public override string GetParseLine()
+        public string GetParseLine()
         {
             if (custom == null) return null;
             var file = ExcelBuilder.Borrow();
@@ -38,7 +38,5 @@ namespace JFramework
 
             return ExcelBuilder.Return(file);
         }
-
-        public override string GetInitLine() => null;
     }
 }

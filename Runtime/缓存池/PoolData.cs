@@ -14,29 +14,29 @@ namespace JFramework
         /// <summary>
         /// 游戏物体组
         /// </summary>
-        [ShowInInspector, LabelText("对象池组")] private GameObject poolGroup;
+        [ShowInInspector, LabelText("对象池组")] private GameObject pool;
 
         /// <summary>
         /// 游戏物体栈
         /// </summary>
-        [ShowInInspector, LabelText("对象池栈")] private Stack<GameObject> poolManager;
+        [ShowInInspector, LabelText("对象池栈")] private Stack<GameObject> stack;
 
         /// <summary>
         /// 栈中对象数量
         /// </summary>
-        public override int Count => poolManager.Count;
+        public override int Count => stack.Count;
 
         /// <summary>
         /// 构造函数初始化数据
         /// </summary>
-        /// <param name="poolGroup">推入的游戏对象</param>
-        /// <param name="poolManager">池中的游戏对象栈</param>
-        public void Awake(GameObject poolGroup, GameObject poolManager)
+        /// <param name="pool">推入的游戏对象</param>
+        /// <param name="stack">池中的游戏对象栈</param>
+        public void Create(GameObject pool, GameObject stack)
         {
-            this.poolManager = new Stack<GameObject>();
-            this.poolGroup = new GameObject(poolGroup.name + "Group");
-            this.poolGroup.transform.SetParent(poolManager.transform);
-            Push(poolGroup);
+            this.stack = new Stack<GameObject>();
+            this.pool = new GameObject(pool.name + "Group");
+            this.pool.transform.SetParent(stack.transform);
+            Push(pool);
         }
 
         /// <summary>
@@ -45,7 +45,7 @@ namespace JFramework
         /// <returns>返回拉取的游戏物体</returns>
         protected override GameObject Pop()
         {
-            GameObject obj = poolManager.Pop();
+            GameObject obj = stack.Pop();
             if (obj == null) return null;
             obj.transform.SetParent(null);
             obj.SetActive(true);
@@ -58,8 +58,8 @@ namespace JFramework
         /// <param name="obj">推出的游戏物体</param>
         protected override void Push(GameObject obj)
         {
-            poolManager.Push(obj);
-            if (poolGroup != null) obj.transform.SetParent(poolGroup.transform);
+            stack.Push(obj);
+            if (pool != null) obj.transform.SetParent(pool.transform);
             obj.SetActive(false);
         }
     }
