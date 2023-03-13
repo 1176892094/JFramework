@@ -5,14 +5,23 @@ namespace JFramework.Core
 {
     internal sealed partial class DebugManager : MonoSingleton<DebugManager>
     {
-        [ShowInInspector, LabelText("是否开启调试器"), BoxGroup("调试选项")]
+        [ShowInInspector, LabelText("开启Debug调试工具"), BoxGroup("调试选项")]
         public bool isDebug;
 
         [ShowInInspector, LabelText("显示Json加载信息"), BoxGroup("调试选项")]
         public bool isShowJson;
-        
+
         [ShowInInspector, LabelText("显示Data加载信息"), BoxGroup("调试选项")]
         public bool isShowData;
+
+        [ShowInInspector, LabelText("显示Asset加载信息"), BoxGroup("调试选项")]
+        public bool isShowAsset;
+
+        [ShowInInspector, LabelText("显示Event事件信息"), BoxGroup("调试选项")]
+        public bool isShowEvent;
+        
+        [ShowInInspector, LabelText("显示Timer创建信息"), BoxGroup("调试选项")]
+        public bool isShowTimer;
 
         private int FPS;
         private bool IsExtend;

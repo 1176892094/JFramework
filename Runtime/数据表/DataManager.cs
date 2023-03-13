@@ -68,7 +68,7 @@ namespace JFramework.Core
 
                     if (keyType == typeof(int))
                     {
-                        IntDataDict.Add(type, Add<int>(keyField, dataTable));
+                        IntDataDict.Add(keyData, Add<int>(keyField, dataTable));
                         if (DebugManager.Instance.isShowData)
                         {
                             Debug.Log($"DataManager加载 {type.Name.Green()} 成功!");
@@ -76,7 +76,7 @@ namespace JFramework.Core
                     }
                     else if (keyType == typeof(string))
                     {
-                        StrDataDict.Add(type, Add<string>(keyField, dataTable));
+                        StrDataDict.Add(keyData, Add<string>(keyField, dataTable));
                         if (DebugManager.Instance.isShowData)
                         {
                             Debug.Log($"DataManager加载 {type.Name.Green()} 成功!");

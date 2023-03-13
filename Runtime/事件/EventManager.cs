@@ -1,4 +1,6 @@
 using System.Collections.Generic;
+using JFramework.Core;
+using UnityEngine;
 
 namespace JFramework
 {
@@ -38,6 +40,11 @@ namespace JFramework
             {
                 eventDict.Add(id, action);
             }
+            
+            if (DebugManager.Instance.isShowEvent)
+            {
+                Debug.Log($"EventManager侦听 {id.ToString().Yellow()} 事件！");
+            }
         }
 
         /// <summary>
@@ -53,6 +60,11 @@ namespace JFramework
             {
                 eventDict[id] -= action;
             }
+            
+            if (DebugManager.Instance.isShowEvent)
+            {
+                Debug.Log($"EventManager移除 {id.ToString().Yellow()} 事件！");
+            }
         }
 
         /// <summary>
@@ -65,6 +77,11 @@ namespace JFramework
             if (eventDict.ContainsKey(id))
             {
                 eventDict[id]?.Invoke(args);
+            }
+            
+            if (DebugManager.Instance.isShowEvent)
+            {
+                Debug.Log($"EventManager广播 {id.ToString().Yellow()} 事件！");
             }
         }
 

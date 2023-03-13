@@ -31,7 +31,7 @@ namespace JFramework
                     var dataTable = ScriptableObject.CreateInstance(tableName);
                     if (dataTable == null)
                     {
-                        Debug.LogWarning($"创建 {tableName} 失败!");
+                        Debug.LogWarning($"创建 {tableName.Red()} 失败!");
                         continue;
                     }
                     
@@ -138,11 +138,11 @@ namespace JFramework
                     var types = sheet.Cells[Const.Type, 1, Const.Type, column].Select(_ => _.Value?.ToString()).ToArray();
                     if (names.Length == 0 || types.Length == 0)
                     {
-                        Debug.Log($"跳过 {sheet.Name} 表生成！");
+                        Debug.Log($"跳过 {sheet.Name.Yellow()} 表生成！");
                         continue;
                     }
                     
-                    Debug.Log($"生成 {sheet.Name} 表成功。");
+                    Debug.Log($"生成 {sheet.Name.Green()} 表成功。");
 
                     for (int x = 1; x <= column; x++)
                     {

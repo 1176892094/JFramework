@@ -46,7 +46,7 @@ namespace JFramework
                 AddAssetEntry(group, assetPath, address);
             }
 
-            Debug.Log($"重新生成Addressable资源组: {name} \r\n资源文件路径: {folder} \r\n资源文件数量: {assets.Length}");
+            Debug.Log($"可寻址资源文件夹: {name.Orange()} 资源文件数量: {assets.Length.ToString().Green()}");
         }
 
         private AddressableAssetGroup CreateGroup<T>(string groupName)

@@ -52,6 +52,11 @@ namespace JFramework.Core
             {
                 File.WriteAllText(filePath, saveJson);
             }
+
+            if (DebugManager.Instance.isShowJson)
+            {
+                Debug.Log($"JsonManager保存 {name.Orange()} 资源成功！");
+            }
         }
 
         /// <summary>
@@ -64,7 +69,7 @@ namespace JFramework.Core
             var filePath = GetPath(obj.name);
             if (!File.Exists(filePath))
             {
-                Debug.Log($"创建存储文件: {obj.name}");
+                Debug.Log($"创建存储文件: {obj.name.Orange()}");
                 Save(obj, obj.name, isAes);
             }
 
@@ -83,13 +88,16 @@ namespace JFramework.Core
                 if (key == null || key.Length <= 0 || iv == null || iv.Length <= 0) return;
                 var saveJson = JsonSetting.Decrypt(loadJson, key, iv);
                 JsonUtility.FromJsonOverwrite(saveJson, obj);
-                if (DebugManager.Instance.isShowJson) Debug.Log(saveJson);
             }
             else
             {
                 var saveJson = File.ReadAllText(filePath);
                 JsonUtility.FromJsonOverwrite(saveJson, obj);
-                if (DebugManager.Instance.isShowJson) Debug.Log(saveJson);
+            }
+
+            if (DebugManager.Instance.isShowJson)
+            {
+                Debug.Log($"JsonManager加载 {obj.name.Orange()} 资源成功！");
             }
         }
 
@@ -105,7 +113,7 @@ namespace JFramework.Core
             var filePath = GetPath(name);
             if (!File.Exists(filePath))
             {
-                Debug.Log($"创建存储文件: {name}");
+                Debug.Log($"创建存储文件: {name.Orange()}");
                 Save(new T(), name, isAes);
             }
 
@@ -124,14 +132,20 @@ namespace JFramework.Core
                 if (key == null || key.Length <= 0 || iv == null || iv.Length <= 0) return new T();
                 var saveJson = JsonSetting.Decrypt(loadJson, key, iv);
                 var data = JsonConvert.DeserializeObject<T>(saveJson);
-                if (DebugManager.Instance.isShowJson) Debug.Log(saveJson);
+                if (DebugManager.Instance.isShowJson)
+                {
+                    Debug.Log($"JsonManager加载 {name.Orange()} 资源成功！");
+                }
                 return data;
             }
             else
             {
                 var saveJson = File.ReadAllText(filePath);
                 var data = JsonConvert.DeserializeObject<T>(saveJson);
-                if (DebugManager.Instance.isShowJson) Debug.Log(saveJson);
+                if (DebugManager.Instance.isShowJson)
+                {
+                    Debug.Log($"JsonManager加载 {name.Orange()} 资源成功！");
+                }
                 return data;
             }
         }
