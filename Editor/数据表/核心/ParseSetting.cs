@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace JFramework
 {
-    public static class ExcelSetting
+    public static class ParseSetting
     {
         private static string LoadPath => PathDataKey.IsEmpty() ? Environment.CurrentDirectory : PathDataKey;
 
@@ -29,7 +29,7 @@ namespace JFramework
             var filePath = EditorUtility.OpenFolderPanel(default, LoadPath, "");
             if (filePath.IsEmpty()) return;
             PathDataKey = filePath;
-            ExcelGenerator.GenerateCode();
+            ParseGenerator.GenerateCode();
         }
         
         [DidReloadScripts]

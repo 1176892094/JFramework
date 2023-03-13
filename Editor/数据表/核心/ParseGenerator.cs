@@ -9,13 +9,13 @@ using UnityEngine;
 
 namespace JFramework
 {
-    public static class ExcelGenerator
+    public static class ParseGenerator
     {
         public static void GenerateAsset()
         {
             AssetDatabase.Refresh();
-            var filesPath = Directory.GetFiles(ExcelSetting.PathDataKey);
-            var excelsPath = filesPath.Where(ExcelSetting.IsSupported).ToArray();
+            var filesPath = Directory.GetFiles(ParseSetting.PathDataKey);
+            var excelsPath = filesPath.Where(ParseSetting.IsSupported).ToArray();
             if (!Directory.Exists(Const.AssetsPath))
             {
                 Directory.CreateDirectory(Const.AssetsPath);
@@ -26,7 +26,7 @@ namespace JFramework
                 var excelData = GetExcelData(excelPath);
                 foreach (var (sheetName, sheetData) in excelData)
                 {
-                    var tableName = ExcelSetting.GetTableFullName(sheetName);
+                    var tableName = ParseSetting.GetTableFullName(sheetName);
                     
                     var dataTable = ScriptableObject.CreateInstance(tableName);
                     if (dataTable == null)
@@ -35,8 +35,8 @@ namespace JFramework
                         continue;
                     }
                     
-                    var fullName = ExcelSetting.GetDataFullName(sheetName);
-                    var dataType = ExcelSetting.GetTypeByString(fullName);
+                    var fullName = ParseSetting.GetDataFullName(sheetName);
+                    var dataType = ParseSetting.GetTypeByString(fullName);
 
                     var constructor = dataType.GetConstructor(new[] { typeof(string[,]), typeof(int), typeof(int) });
                     if (constructor == null) return;
@@ -49,7 +49,7 @@ namespace JFramework
                         ((IDataTable)dataTable).AddData(data);
                     }
 
-                    var soSavePath = ExcelSetting.GetAssetsPath(sheetName);
+                    var soSavePath = ParseSetting.GetAssetsPath(sheetName);
                     AssetDatabase.CreateAsset(dataTable, soSavePath);
                 }
 
@@ -92,8 +92,8 @@ namespace JFramework
         
         public static void GenerateCode()
         {
-            var filesPath = Directory.GetFiles(ExcelSetting.PathDataKey);
-            var excelsPath = filesPath.Where(ExcelSetting.IsSupported).ToArray();
+            var filesPath = Directory.GetFiles(ParseSetting.PathDataKey);
+            var excelsPath = filesPath.Where(ParseSetting.IsSupported).ToArray();
             var scriptContents = new List<(string, string)>();
             foreach (var excelPath in excelsPath)
             {
@@ -102,7 +102,7 @@ namespace JFramework
 
             foreach (var (sheetName, scriptText) in scriptContents)
             {
-                var csFileSavePath = ExcelSetting.GetScriptPath(sheetName);
+                var csFileSavePath = ParseSetting.GetScriptPath(sheetName);
                 if (!Directory.Exists(Const.ScriptPath))
                 {
                     Directory.CreateDirectory(Const.ScriptPath);
@@ -116,7 +116,7 @@ namespace JFramework
                 File.WriteAllText(csFileSavePath, scriptText);
             }
 
-            ExcelSetting.SaveDataKey = true;
+            ParseSetting.SaveDataKey = true;
             AssetDatabase.Refresh();
         }
 
@@ -177,8 +177,8 @@ namespace JFramework
         private static string WriteScriptsFile(string className, string[] types, string[] names, string value)
         {
             var builder = new StringBuilder(1024);
-            var dataName = ExcelSetting.GetDataName(className);
-            var tableName = ExcelSetting.GetTableName(className);
+            var dataName = ParseSetting.GetDataName(className);
+            var tableName = ParseSetting.GetTableName(className);
             builder.Append("using System;\n");
             builder.Append("using UnityEngine;\n\n");
             builder.AppendFormat("namespace {0}\n", Const.Namespace);
@@ -195,7 +195,7 @@ namespace JFramework
                 var name = names.ElementAt(i);
                 var type = types.ElementAt(i);
                 if (type == null) continue;
-                var parser = ExcelSetting.Parse(name, type);
+                var parser = ParseSetting.Parse(name, type);
                 columnField[i] = parser;
             }
 

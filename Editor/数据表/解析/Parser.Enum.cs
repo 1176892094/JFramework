@@ -7,7 +7,7 @@ namespace JFramework
 
         public ParseEnum(string name, string type)
         {
-            isField = ExcelSetting.IsEnumField(type);
+            isField = ParseSetting.IsEnumField(type);
             this.name = isField ? name.Split(':')[0].Trim() : name.Trim();
         }
 
