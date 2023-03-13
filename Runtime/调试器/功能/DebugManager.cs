@@ -3,10 +3,16 @@ using UnityEngine;
 
 namespace JFramework.Core
 {
-    internal sealed partial class DebugManager : MonoBehaviour
+    internal sealed partial class DebugManager : MonoSingleton<DebugManager>
     {
-        [ShowInInspector, LabelText("是否启动"),BoxGroup("调试器")]
+        [ShowInInspector, LabelText("是否开启调试器"), BoxGroup("调试选项")]
         public bool isDebug;
+
+        [ShowInInspector, LabelText("显示Json加载信息"), BoxGroup("调试选项")]
+        public bool isShowJson;
+        
+        [ShowInInspector, LabelText("显示Data加载信息"), BoxGroup("调试选项")]
+        public bool isShowData;
 
         private int FPS;
         private bool IsExtend;
@@ -15,13 +21,14 @@ namespace JFramework.Core
         private DebugType debugType;
 
 
-        private void Awake()
+        protected override void Awake()
         {
+            base.Awake();
             InitComponent();
             Application.logMessageReceived += LogMessageReceived;
         }
 
-        private void Start()
+        protected override void Start()
         {
             TimerManager.Instance.Pop(1).SetLoop(-1, _ =>
             {
@@ -96,8 +103,9 @@ namespace JFramework.Core
             }
         }
 
-        private void OnDestroy()
+        protected override void OnDestroy()
         {
+            base.OnDestroy();
             Application.logMessageReceived -= LogMessageReceived;
         }
     }

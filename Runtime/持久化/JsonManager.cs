@@ -83,13 +83,13 @@ namespace JFramework.Core
                 if (key == null || key.Length <= 0 || iv == null || iv.Length <= 0) return;
                 var saveJson = JsonSetting.Decrypt(loadJson, key, iv);
                 JsonUtility.FromJsonOverwrite(saveJson, obj);
-                Debug.Log(saveJson);
+                if (DebugManager.Instance.isShowJson) Debug.Log(saveJson);
             }
             else
             {
                 var saveJson = File.ReadAllText(filePath);
                 JsonUtility.FromJsonOverwrite(saveJson, obj);
-                Debug.Log(saveJson);
+                if (DebugManager.Instance.isShowJson) Debug.Log(saveJson);
             }
         }
 
@@ -124,13 +124,14 @@ namespace JFramework.Core
                 if (key == null || key.Length <= 0 || iv == null || iv.Length <= 0) return new T();
                 var saveJson = JsonSetting.Decrypt(loadJson, key, iv);
                 var data = JsonConvert.DeserializeObject<T>(saveJson);
-                Debug.Log(saveJson);
+                if (DebugManager.Instance.isShowJson) Debug.Log(saveJson);
                 return data;
             }
             else
             {
                 var saveJson = File.ReadAllText(filePath);
                 var data = JsonConvert.DeserializeObject<T>(saveJson);
+                if (DebugManager.Instance.isShowJson) Debug.Log(saveJson);
                 return data;
             }
         }

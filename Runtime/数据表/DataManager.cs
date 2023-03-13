@@ -8,6 +8,7 @@ namespace JFramework.Core
 {
     using IntDataDict = Dictionary<int, IData>;
     using StrDataDict = Dictionary<string, IData>;
+    using EnmDataDict = Dictionary<Enum, IData>;
 
     /// <summary>
     /// 数据管理器
@@ -23,6 +24,11 @@ namespace JFramework.Core
         /// 存储string为主键的数据字典
         /// </summary>
         internal Dictionary<Type, StrDataDict> StrDataDict;
+
+        /// <summary>
+        /// 存储enum为主键的数据字典
+        /// </summary>
+        internal Dictionary<Type, StrDataDict> EnmDataDict;
 
         /// <summary>
         /// 资源路径
@@ -45,41 +51,43 @@ namespace JFramework.Core
             var assembly = GetAssembly(out IEnumerable<Type> types);
             foreach (var type in types)
             {
-                try
+                var keyName = type.Name;
+                AssetManager.Instance.LoadAsync<ScriptableObject>(AssetPath + keyName, obj =>
                 {
-                    var keyName = type.Name;
-                    AssetManager.Instance.LoadAsync<ScriptableObject>(AssetPath + keyName, obj =>
+                    var dataTable = (IDataTable)obj;
+                    var keyData = GetKeyField(assembly, type);
+                    var keyField = GetKeyField(keyData);
+
+                    if (keyData == null)
                     {
-                        var dataTable = (IDataTable)obj;
-                        var keyData = GetKeyField(assembly, type);
-                        var keyField = GetKeyField(keyData);
+                        Debug.LogWarning($"DataManager没有找到主键:{keyName.Red()}!");
+                        return;
+                    }
 
-                        if (keyData == null)
-                        {
-                            Debug.LogWarning($"DataManager没有找到主键:{keyName}!");
-                            return;
-                        }
+                    var keyType = keyField.FieldType;
 
-                        var keyType = keyField.FieldType;
-
-                        if (keyType == typeof(int))
+                    if (keyType == typeof(int))
+                    {
+                        IntDataDict.Add(type, Add<int>(keyField, dataTable));
+                        if (DebugManager.Instance.isShowData)
                         {
-                            IntDataDict.Add(type, Add<int>(keyField,dataTable));
+                            Debug.Log($"DataManager加载 {type.Name.Green()} 成功!");
                         }
-                        else if (keyType == typeof(string))
+                    }
+                    else if (keyType == typeof(string))
+                    {
+                        StrDataDict.Add(type, Add<string>(keyField, dataTable));
+                        if (DebugManager.Instance.isShowData)
                         {
-                            StrDataDict.Add(type, Add<string>(keyField,dataTable));
+                            Debug.Log($"DataManager加载 {type.Name.Green()} 成功!");
                         }
-                        else
-                        {
-                            Debug.LogWarning($"DataManager加载 {type.Name} 失败 {keyField} 不是有效的主键!");
-                        }
-                    });
-                }
-                catch (Exception e)
-                {
-                    Debug.LogError(e.ToString());
-                }
+                    }
+                    else
+                    {
+                        Debug.LogWarning($"加载 {type.Name.Red()} 失败!");
+                        Debug.LogWarning($"{keyField.ToString().Red()} 不是有效的主键!");
+                    }
+                });
             }
 
             Debug.Log($"DataManager加载资源完成!");
