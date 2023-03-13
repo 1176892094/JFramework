@@ -14,12 +14,12 @@ namespace JFramework
         /// <summary>
         /// 游戏物体组
         /// </summary>
-        [ShowInInspector, LabelText("对象池组")] private GameObject pool;
+        [ShowInInspector, LabelText("对象池组")] private readonly GameObject pool;
 
         /// <summary>
         /// 游戏物体栈
         /// </summary>
-        [ShowInInspector, LabelText("对象池栈")] private Stack<GameObject> stack;
+        [ShowInInspector, LabelText("对象池栈")] private readonly Stack<GameObject> stack;
 
         /// <summary>
         /// 栈中对象数量
@@ -31,7 +31,7 @@ namespace JFramework
         /// </summary>
         /// <param name="pool">推入的游戏对象</param>
         /// <param name="stack">池中的游戏对象栈</param>
-        public void Create(GameObject pool, GameObject stack)
+        public PoolData(GameObject pool, GameObject stack)
         {
             this.stack = new Stack<GameObject>();
             this.pool = new GameObject(pool.name + "Group");
@@ -43,7 +43,7 @@ namespace JFramework
         /// 对象池拉取对象
         /// </summary>
         /// <returns>返回拉取的游戏物体</returns>
-        protected override GameObject Pop()
+        protected sealed override GameObject Pop()
         {
             GameObject obj = stack.Pop();
             if (obj == null) return null;
@@ -56,7 +56,7 @@ namespace JFramework
         /// 对象池推入对象
         /// </summary>
         /// <param name="obj">推出的游戏物体</param>
-        protected override void Push(GameObject obj)
+        protected sealed override void Push(GameObject obj)
         {
             stack.Push(obj);
             if (pool != null) obj.transform.SetParent(pool.transform);

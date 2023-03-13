@@ -22,7 +22,7 @@ namespace JFramework
 
         protected override bool Show(EditorWindow w, VisualElement element)
         {
-            if (element.parent[0].name == EditorConst.Inspector) element.parent.RemoveAt(0);
+            if (element.parent[0].name == Const.Inspector) element.parent.RemoveAt(0);
             if (element.childCount != 0 || float.IsNaN(element.layout.width)) return false;
             InspectorController.element ??= InitInspector();
             element.parent.Insert(0, InspectorController.element);
@@ -33,7 +33,7 @@ namespace JFramework
         {
             var visualElement = new VisualElement
             {
-                name = EditorConst.Inspector
+                name = Const.Inspector
             };
 
             InitTitle(visualElement);
@@ -45,7 +45,7 @@ namespace JFramework
 
         private void InitTitle(VisualElement visualElement)
         {
-            Label box = new Label(EditorConst.Inspector)
+            Label box = new Label(Const.Inspector)
             {
                 style =
                 {
@@ -64,12 +64,12 @@ namespace JFramework
         {
             CreateLabel(parent, "JFramework");
             VisualElement container = CreateContainer(parent);
-            CreateButton(container, EditorConst.MenuPath + EditorConst.EditorWindow, EditorConst.EditorWindow);
-            CreateButton(container, EditorConst.MenuPath + EditorConst.ExcelToAsset, EditorConst.ExcelToAsset);
-            CreateButton(container, EditorConst.MenuPath + EditorConst.ExcelClearAll, EditorConst.ExcelClearAll);
-            CreateButton(container, EditorConst.MenuPath + EditorConst.CurrentProjectPath, EditorConst.CurrentProjectPath);
-            CreateButton(container, EditorConst.MenuPath + EditorConst.PersistentDataPath, EditorConst.PersistentDataPath);
-            CreateButton(container, EditorConst.MenuPath + EditorConst.StreamingAssetsPath, EditorConst.StreamingAssetsPath);
+            CreateButton(container, Const.MenuPath + Const.EditorWindow, Const.EditorWindow);
+            CreateButton(container, Const.MenuPath + Const.ExcelToAsset, Const.ExcelToAsset);
+            CreateButton(container, Const.MenuPath + Const.ExcelClearAll, Const.ExcelClearAll);
+            CreateButton(container, Const.MenuPath + Const.CurrentProjectPath, Const.CurrentProjectPath);
+            CreateButton(container, Const.MenuPath + Const.PersistentDataPath, Const.PersistentDataPath);
+            CreateButton(container, Const.MenuPath + Const.StreamingAssetsPath, Const.StreamingAssetsPath);
         }
 
         private void InitSettings(VisualElement parent)

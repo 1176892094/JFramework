@@ -51,9 +51,9 @@ namespace JFramework
             icon.nameRect = icon.iconRect;
             var nameStyle = new GUIStyle(TreeView.DefaultStyles.label);
             icon.nameRect.width = nameStyle.CalcSize(new GUIContent(icon.gameObject.name)).x;
-            icon.nameRect.x += EditorConst.Int8;
+            icon.nameRect.x += Const.Int8;
             nameDistance = icon.nameRect.x + icon.nameRect.width;
-            nameDistance += EditorConst.Int8;
+            nameDistance += Const.Int8;
             ShowSplitLine();
             ShowComponent();
         }
@@ -62,9 +62,9 @@ namespace JFramework
         {
             if (currentEvent.type != EventType.Repaint) return;
             var rect = icon.iconRect;
-            rect.xMin = EditorConst.Int32;
-            rect.y += EditorConst.Int16 - 1;
-            rect.width += EditorConst.Int16;
+            rect.xMin = Const.Int32;
+            rect.y += Const.Int16 - 1;
+            rect.width += Const.Int16;
             rect.height = 1;
             var color = GUI.color;
             GUI.color = new Color(0, 0, 0, 0.2f);
@@ -87,28 +87,28 @@ namespace JFramework
             }
 
             var count = components.Count;
-            nameDistance += EditorConst.Int4;
+            nameDistance += Const.Int4;
 
             for (int i = 0; i < count; ++i)
             {
                 var component = components[i];
                 if (component == null) continue;
                 var type = component.GetType();
-                var rect = ComponentPosition(icon.nameRect, EditorConst.Int12, ref nameDistance);
+                var rect = ComponentPosition(icon.nameRect, Const.Int12, ref nameDistance);
                 if (hasMaterial && i == count - renderer.sharedMaterials.Length)
                 {
                     foreach (var material in renderer.sharedMaterials)
                     {
                         if (material == null) continue;
                         ComponentIcon(material, type, rect, true);
-                        rect = ComponentPosition(icon.nameRect, EditorConst.Int12, ref nameDistance);
+                        rect = ComponentPosition(icon.nameRect, Const.Int12, ref nameDistance);
                     }
 
                     break;
                 }
 
                 ComponentIcon(component, type, rect, false);
-                nameDistance += EditorConst.Int2;
+                nameDistance += Const.Int2;
             }
         }
 
@@ -171,9 +171,9 @@ namespace JFramework
             public void Display()
             {
                 var pos = Event.current.mousePosition;
-                var isHover = pos.x >= 0 && pos.x <= iconRect.xMax + EditorConst.Int16 && pos.y >= iconRect.y && pos.y < iconRect.yMax;
+                var isHover = pos.x >= 0 && pos.x <= iconRect.xMax + Const.Int16 && pos.y >= iconRect.y && pos.y < iconRect.yMax;
                 if (!isHover) return;
-                var rect = new Rect(EditorConst.Int32 + 0.5f, iconRect.y, EditorConst.Int16, iconRect.height);
+                var rect = new Rect(Const.Int32 + 0.5f, iconRect.y, Const.Int16, iconRect.height);
                 var isShow = EditorGUI.Toggle(rect, GUIContent.none, gameObject.activeSelf);
                 gameObject.SetActive(isShow);
             }

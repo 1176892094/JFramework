@@ -1,4 +1,4 @@
-internal struct EditorConst
+internal struct Const
 {
     public const int Int2 = 2;
     public const int Int4 = 4;

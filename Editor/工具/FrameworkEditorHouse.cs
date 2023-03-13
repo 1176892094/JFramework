@@ -19,7 +19,7 @@ namespace JFramework
         [Button("Addressable资源生成")]
         public void LoadAddressableGroup()
         {
-            pathList = Directory.GetDirectories("Assets/" + EditorConst.AddressableResources);
+            pathList = Directory.GetDirectories("Assets/" + Const.AddressableResources);
             nameList = new List<string>();
             foreach (var dir in pathList)
             {

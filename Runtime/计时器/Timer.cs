@@ -9,7 +9,7 @@ namespace JFramework
     /// <summary>
     /// 计时器
     /// </summary>
-    internal class Timer: ITimer
+    internal class Timer : ITimer
     {
         /// <summary>
         /// 当前循环次数

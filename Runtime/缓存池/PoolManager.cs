@@ -90,9 +90,7 @@ namespace JFramework
             }
             else
             {
-                var pool = new PoolData();
-                pool.Create(obj, manager);
-                poolDict.Add(key, pool);
+                poolDict.Add(key, new PoolData(obj, manager));
             }
         }
         

@@ -15,9 +15,9 @@ namespace JFramework
     {
         private static string LoadPath => PathKey.IsEmpty() ? Environment.CurrentDirectory : PathKey;
 
-        private static string ScriptPath => EditorConst.ScriptPath + Path.GetFileName(LoadPath) + "/";
+        private static string ScriptPath => Const.ScriptPath + Path.GetFileName(LoadPath) + "/";
 
-        public static string AssetsPath => EditorConst.AssetsPath + Path.GetFileName(LoadPath) + "/";
+        public static string AssetsPath => Const.AssetsPath + Path.GetFileName(LoadPath) + "/";
         
         public static string PathKey
         {
@@ -37,16 +37,7 @@ namespace JFramework
         {
             var filePath = EditorUtility.OpenFolderPanel(default, LoadPath, "");
             if (filePath.IsEmpty()) return;
-            ExcelConverter.ConvertToScript(PathKey = filePath, ScriptPath);
-        }
-
-        [MenuItem("Tools/JFramework/Excel Clear All", false, 103)]
-        public static void ExcelClearAll()
-        {
-            DataKey = false;
-            DeleteScriptFolder();
-            DeleteObjectFolder();
-            AssetDatabase.Refresh();
+            //ExcelConverter.ConvertToScript(PathKey = filePath, ScriptPath);
         }
 
         [MenuItem("Tools/JFramework/CurrentProjectPath")]
@@ -81,49 +72,13 @@ namespace JFramework
         [DidReloadScripts]
         private static void OnScriptsReloaded()
         {
-            if (!DataKey) return;
-            DataKey = false;
-            if (LoadPath.IsEmpty()) return;
+            // if (!DataKey) return;
+            // DataKey = false;
+            // if (LoadPath.IsEmpty()) return;
             Debug.Log("脚本重新编译，开始生成资源.");
-            ExcelConverter.ConvertToObject(LoadPath, AssetsPath);
+            // ExcelConverter.ConvertToObject(LoadPath, AssetsPath);
         }
 
-        /// <summary>
-        /// 删除CScript脚本的文件夹
-        /// </summary>
-        private static void DeleteScriptFolder()
-        {
-            if (Directory.Exists(EditorConst.ScriptPath))
-            {
-                Directory.Delete(EditorConst.ScriptPath, true);
-            }
-
-            if (EditorConst.ScriptPath.EndsWith("/") || EditorConst.ScriptPath.EndsWith("\\"))
-            {
-                var length = EditorConst.ScriptPath.Length - 1;
-                var meta = EditorConst.ScriptPath.Substring(0, length) + ".meta";
-                if (!meta.IsEmpty() && File.Exists(meta)) File.Delete(meta);
-            }
-        }
-
-        /// <summary>
-        /// 删除ScriptableObject的文件夹
-        /// </summary>
-        private static void DeleteObjectFolder()
-        {
-            if (Directory.Exists(EditorConst.AssetsPath))
-            {
-                Directory.Delete(EditorConst.AssetsPath, true);
-            }
-
-            if (EditorConst.AssetsPath.EndsWith("/") || EditorConst.AssetsPath.EndsWith("\\"))
-            {
-                var length = EditorConst.AssetsPath.Length - 1;
-                var meta = EditorConst.AssetsPath.Substring(0, length) + ".meta";
-                if (!meta.IsEmpty() && File.Exists(meta)) File.Delete(meta);
-            }
-        }
-         
         /// <summary>
         /// 获取编辑器窗口面板
         /// </summary>
