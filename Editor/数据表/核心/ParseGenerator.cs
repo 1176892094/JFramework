@@ -67,13 +67,14 @@ namespace JFramework
                     var typeList = new List<int>();
                     foreach (var type in nameList)
                     {
-                        var value = sheet.Cells[Const.Type, type].Value.ToString();
-                        if (value is Const.Enum or Const.Struct)
+                        var value = sheet.Cells[Const.Type, type].Value?.ToString();
+                        if (!value.IsEmpty() && value is Const.Enum or Const.Struct)
                         {
                             typeList.Add(type);
                         }
                     }
 
+                    if (typeList.Count == 0) continue;
 
                     var writer = string.Empty;
                     foreach (var x in typeList)
@@ -83,7 +84,10 @@ namespace JFramework
                         {
                             var field = sheet.Cells[y, x].Value;
                             var value = field?.ToString();
-                            dataList.Add(value);
+                            if (!value.IsEmpty())
+                            {
+                                dataList.Add(value);
+                            }
                         }
 
                         var name = sheet.Cells[Const.Name, x].Value.ToString();
@@ -145,7 +149,7 @@ namespace JFramework
                 if (field == null) continue;
                 builder.Append(field.GetParse());
             }
-
+            
             builder.Append("\t\t}\n");
             builder.Append("#endif\n");
 
@@ -212,7 +216,7 @@ namespace JFramework
                     var constructor = dataType.GetConstructor(new[] { typeof(string[,]), typeof(int), typeof(int) });
                     if (constructor == null) return;
                     var row = sheetData.GetLength(0);
-                    for (var y = Const.Data - 1; y < row; ++y)
+                    for (var y = 0; y < row; ++y)
                     {
                         if (sheetData[y, 0].IsEmpty()) continue;
                         var data = (IData)constructor.Invoke(new object[] { sheetData, y, 0 });
@@ -262,13 +266,15 @@ namespace JFramework
                     }
 
                     var dataList = new List<int>();
-                    for (int i = Const.Data; i < row; i++)
+                    for (int i = Const.Data; i <= row; i++)
                     {
                         if (sheet.Cells[i, 1].Value != null)
                         {
                             dataList.Add(i);
                         }
                     }
+                    
+                    if (typeList.Count == 0) continue;
 
                     var data = new string[row, typeList.Count];
                     for (int y = 0; y < dataList.Count; y++)

@@ -74,6 +74,8 @@ namespace JFramework
         /// <param name="args">传入事件的参数</param>
         public void SendMessage(int id, params object[] args)
         {
+            if (eventDict == null) return;
+                    
             if (eventDict.ContainsKey(id))
             {
                 eventDict[id]?.Invoke(args);

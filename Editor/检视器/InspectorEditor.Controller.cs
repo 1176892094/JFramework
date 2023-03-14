@@ -68,7 +68,6 @@ namespace JFramework
             CreateLabel(parent, "JFramework");
             VisualElement container = CreateContainer(parent);
             CreateButton(container, Const.MenuPath + Const.EditorWindow, Const.EditorWindow);
-            CreateButton(container, Const.MenuPath + Const.ExcelToScripts, Const.ExcelToScripts);
             CreateButton(container, Const.MenuPath + Const.ExcelToAssets, Const.ExcelToAssets);
             CreateButton(container, "Window/Asset Management/Addressables/Groups","AddressablesView");
             CreateButton(container, Const.MenuPath + Const.CurrentProjectPath, Const.CurrentProjectPath);
