@@ -20,7 +20,7 @@ namespace JFramework
                 TextColor.Sky => "<color=#00FFFF>" + s + "</color>",
                 TextColor.Purple => "<color=#FF00AA>" + s + "</color>",
                 TextColor.Orange => "<color=#FFAA00>" + s + "</color>",
-                TextColor.Red => "<color=#FFAAAA>" + s + "</color>",
+                TextColor.Red => "<color=#FF8888>" + s + "</color>",
                 TextColor.Blue => "<color=#00CCFF>" + s + "</color>",
                 TextColor.Green => "<color=#00FF00>" + s + "</color>",
                 _ => s

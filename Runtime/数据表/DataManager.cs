@@ -75,13 +75,13 @@ namespace JFramework.Core
                             for (var i = 0; i < dataTable.Count; ++i)
                             {
                                 var data = (IData)dataTable.GetData(i);
-                                var key  = keyField.GetValue(data);
+                                var key = keyField.GetValue(data);
                                 dataDict.Add(key.ToString(), data);
                             }
 
                             StrDataDict.Add(keyData, dataDict);
                         }
-                        
+
                         if (DebugManager.IsDebugData)
                         {
                             Debug.Log($"{Name.Sky()} <= Success => {type.Name.Blue()}");
@@ -108,7 +108,7 @@ namespace JFramework.Core
             for (var i = 0; i < table.Count; ++i)
             {
                 var data = (IData)table.GetData(i);
-                var key  = (T)field.GetValue(data);
+                var key = (T)field.GetValue(data);
                 dataDict.Add(key, data);
             }
 
@@ -128,8 +128,11 @@ namespace JFramework.Core
             soDict.TryGetValue(key, out IData data);
             if (DebugManager.IsDebugData)
             {
-                Debug.Log($"{Name.Sky()} <= Get => {typeof(T).Name.Blue()}");
+                Debug.Log(data != null
+                    ? $"{Name.Sky()} <= Get => {typeof(T).Name.Blue()} : {key.ToString().Green()}"
+                    : $"{Name.Sky()} <= Get => {typeof(T).Name.Red()} : {key.ToString().Green()}");
             }
+
             return (T)data;
         }
 
@@ -146,11 +149,14 @@ namespace JFramework.Core
             soDict.TryGetValue(key, out IData data);
             if (DebugManager.IsDebugData)
             {
-                Debug.Log($"{Name.Sky()} <= Get => {typeof(T).Name.Blue()}");
+                Debug.Log(data != null
+                    ? $"{Name.Sky()} <= Get => {typeof(T).Name.Blue()} : {key.Green()}"
+                    : $"{Name.Sky()} <= Get => {typeof(T).Name.Red()} : {key.Green()}");
             }
+
             return (T)data;
         }
-        
+
         /// <summary>
         /// 获取对应类型数据下主键为Key的数据
         /// </summary>
@@ -164,11 +170,14 @@ namespace JFramework.Core
             soDict.TryGetValue(key.ToString(), out IData data);
             if (DebugManager.IsDebugData)
             {
-                Debug.Log($"{Name.Sky()} <= Get => {typeof(T).Name.Blue()}");
+                Debug.Log(data != null
+                    ? $"{Name.Sky()} <= Get => {typeof(T).Name.Blue()} : {key.ToString().Green()}"
+                    : $"{Name.Sky()} <= Get => {typeof(T).Name.Red()} : {key.ToString().Green()}");
             }
+
             return (T)data;
         }
-        
+
 
         /// <summary>
         /// 通过数据管理器得到数据表
