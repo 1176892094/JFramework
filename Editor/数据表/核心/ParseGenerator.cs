@@ -53,37 +53,21 @@ namespace JFramework
                 {
                     var row = sheet.Dimension.End.Row;
                     var column = sheet.Dimension.End.Column;
-                    var nameList = new List<int>();
-                    for (int i = 1; i <= column; i++)
-                    {
-                        if (sheet.Cells[Const.Name, i].Value != null)
-                        {
-                            nameList.Add(i);
-                        }
-                    }
-
-                    if (nameList.Count == 0) continue;
-
-                    var typeList = new List<int>();
-                    foreach (var type in nameList)
-                    {
-                        var value = sheet.Cells[Const.Type, type].Value?.ToString();
-                        if (!value.IsEmpty() && value is Const.Enum or Const.Struct)
-                        {
-                            typeList.Add(type);
-                        }
-                    }
-
-                    if (typeList.Count == 0) continue;
-
+                    var nameList = Array(1, column).Where(_ => sheet.Cells[Const.Name, _].Value != null).ToArray();
+                    if (nameList.Length == 0) continue; //可用名称行
+                    var typeList = (from type in nameList
+                        let value = sheet.Cells[Const.Type, type].Value?.ToString()
+                        where !value.IsEmpty() && value is Const.Enum or Const.Struct
+                        select type).ToArray();
+                    
+                    if (typeList.Length == 0) continue;
                     var writer = string.Empty;
                     foreach (var x in typeList)
                     {
                         var dataList = new List<string>();
                         for (int y = Const.Data; y <= row; y++)
                         {
-                            var field = sheet.Cells[y, x].Value;
-                            var value = field?.ToString();
+                            var value = sheet.Cells[y, x].Value?.ToString();
                             if (!value.IsEmpty())
                             {
                                 dataList.Add(value);
@@ -95,10 +79,8 @@ namespace JFramework
                         writer += WriteEnumOrStruct(name, type, dataList);
                     }
 
-                    var names = sheet.Cells[Const.Name, 1, Const.Name, column].Select(_ => _.Value?.ToString())
-                        .ToArray();
-                    var types = sheet.Cells[Const.Type, 1, Const.Type, column].Select(_ => _.Value?.ToString())
-                        .ToArray();
+                    var names = sheet.Cells[Const.Name, 1, Const.Name, column].Select(_ => _.Value?.ToString()).ToArray();
+                    var types = sheet.Cells[Const.Type, 1, Const.Type, column].Select(_ => _.Value?.ToString()).ToArray();
                     var fileContent = WriteScriptsFile(sheet.Name, types, names, writer);
                     contents.Add((sheet.Name, fileContent));
                 }
@@ -149,7 +131,7 @@ namespace JFramework
                 if (field == null) continue;
                 builder.Append(field.GetParse());
             }
-            
+
             builder.Append("\t\t}\n");
             builder.Append("#endif\n");
 
@@ -183,7 +165,6 @@ namespace JFramework
             }
 
             builder.Append("\t}\n");
-
             return builder.ToString();
         }
 
@@ -194,39 +175,45 @@ namespace JFramework
             if (!Directory.Exists(Const.AssetsPath))
             {
                 Directory.CreateDirectory(Const.AssetsPath);
+                
             }
-
+            
             foreach (var excelPath in excelsPath)
             {
                 var excelData = GetExcelData(excelPath);
                 foreach (var (sheetName, sheetData) in excelData)
                 {
+                    var assetPath = ParseSetting.GetAssetsPath(sheetName);
+                    if (File.Exists(assetPath))
+                    {
+                        Debug.Log(assetPath);
+                        AssetDatabase.DeleteAsset(assetPath);
+                    }
+                    
                     var tableName = ParseSetting.GetTableFullName(sheetName);
-
-                    var dataTable = ScriptableObject.CreateInstance(tableName);
-                    if (dataTable == null)
+                    var tableData = ScriptableObject.CreateInstance(tableName);
+                    if (tableData == null)
                     {
                         Debug.LogWarning($"创建 {tableName.Red()} 失败!");
                         continue;
                     }
 
-                    var fullName = ParseSetting.GetDataFullName(sheetName);
-                    var dataType = ParseSetting.GetTypeByString(fullName);
-
+                    var dataName = ParseSetting.GetDataFullName(sheetName);
+                    var dataType = ParseSetting.GetTypeByString(dataName);
                     var constructor = dataType.GetConstructor(new[] { typeof(string[,]), typeof(int), typeof(int) });
                     if (constructor == null) return;
-                    var row = sheetData.GetLength(0);
-                    for (var y = 0; y < row; ++y)
+                    var length = sheetData.GetLength(0);
+                    for (var y = 0; y < length; ++y)
                     {
                         if (sheetData[y, 0].IsEmpty()) continue;
                         var data = (IData)constructor.Invoke(new object[] { sheetData, y, 0 });
                         var key = DataManager.GetKeyField(data);
                         if (key is 0 or "") continue;
-                        ((IDataTable)dataTable).AddData(data);
+                        ((IDataTable)tableData).AddData(data);
                     }
 
                     var soSavePath = ParseSetting.GetAssetsPath(sheetName);
-                    AssetDatabase.CreateAsset(dataTable, soSavePath);
+                    AssetDatabase.CreateAsset(tableData, soSavePath);
                 }
 
                 AssetDatabase.Refresh();
@@ -245,41 +232,20 @@ namespace JFramework
                 {
                     var row = sheet.Dimension.End.Row;
                     var column = sheet.Dimension.End.Column;
-                    var nameList = new List<int>();
-                    for (int i = 1; i <= column; i++)
-                    {
-                        if (sheet.Cells[Const.Name, i].Value != null)
-                        {
-                            nameList.Add(i);
-                        }
-                    }
-
-                    if (nameList.Count == 0) continue;
-
-                    var typeList = new List<int>();
-                    foreach (var type in nameList)
-                    {
-                        if (sheet.Cells[Const.Type, type].Value != null)
-                        {
-                            typeList.Add(type);
-                        }
-                    }
-
-                    var dataList = new List<int>();
-                    for (int i = Const.Data; i <= row; i++)
-                    {
-                        if (sheet.Cells[i, 1].Value != null)
-                        {
-                            dataList.Add(i);
-                        }
-                    }
+                    var nameList = Array(1, column).Where(_ => sheet.Cells[Const.Name, _].Value != null).ToArray();
+                    if (nameList.Length == 0) continue; //可用名称行
+                    var typeList = (from type in nameList
+                        let value = sheet.Cells[Const.Type, type].Value?.ToString()
+                        where !value.IsEmpty() && value != Const.Enum && value != Const.Struct
+                        select type).ToArray();
                     
-                    if (typeList.Count == 0) continue;
-
-                    var data = new string[row, typeList.Count];
-                    for (int y = 0; y < dataList.Count; y++)
+                    if (typeList.Length == 0) continue; //可用类型行
+                    var dataList = Array(Const.Data, row).Where(_ => sheet.Cells[_, 1].Value != null).ToArray();
+                    if (dataList.Length == 0) continue; //可用类型列
+                    var data = new string[row, typeList.Length];
+                    for (int y = 0; y < dataList.Length; y++)
                     {
-                        for (int x = 0; x < typeList.Count; x++)
+                        for (int x = 0; x < typeList.Length; x++)
                         {
                             var field = sheet.Cells[dataList[y], typeList[x]].Value;
                             var value = field?.ToString();
@@ -292,6 +258,16 @@ namespace JFramework
 
                 return results;
             }
+        }
+
+        private static int[] Array(int start, int end)
+        {
+            var array = new int[end];
+            for (int i = 0; i < end; i++)
+            {
+                array[i] = start + i;
+            }
+            return array;
         }
     }
 }
