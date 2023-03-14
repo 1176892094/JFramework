@@ -61,7 +61,7 @@ namespace JFramework
                         where !value.IsEmpty() && value is Const.Enum or Const.Struct
                         select type).ToArray();
                     
-                    if (typeList.Length == 0) continue;
+                    if (typeList.Length == 0) continue; //可用类型行
                     var writer = string.Empty;
                     foreach (var x in typeList)
                     {
@@ -71,7 +71,7 @@ namespace JFramework
                             var value = sheet.Cells[y, x].Value?.ToString();
                             if (!value.IsEmpty())
                             {
-                                dataList.Add(value);
+                                dataList.Add(value); //可用类型列
                             }
                         }
 
