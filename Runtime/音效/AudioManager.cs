@@ -7,14 +7,13 @@ namespace JFramework
 {
     public sealed class AudioManager : Singleton<AudioManager>
     {
-        internal Queue<AudioSource> audioQueue;
-        internal List<AudioSource> audioList;
-        internal GameObject audioSystem;
-        internal AudioSource audioSource;
-        private AudioSetting audioSetting;
-        private string name => nameof(AudioManager);
-        public float SoundVolume => audioSetting?.soundVolume ?? 0.5f;
-        public float AudioVolume => audioSetting?.audioVolume ?? 0.5f;
+        internal static Queue<AudioSource> audioQueue;
+        internal static List<AudioSource> audioList;
+        internal static GameObject audioSystem;
+        internal static AudioSource audioSource;
+        private static AudioSetting audioSetting;
+        public static float SoundVolume => audioSetting?.soundVolume ?? 0.5f;
+        public static float AudioVolume => audioSetting?.audioVolume ?? 0.5f;
         
         /// <summary>
         /// 音效管理器初始化
@@ -24,10 +23,9 @@ namespace JFramework
             base.Awake();
             audioList = new List<AudioSource>();
             audioQueue = new Queue<AudioSource>();
-            if (!GlobalManager.Instance) return;
             var obj = GlobalManager.Instance.gameObject;
             audioSystem = obj.transform.Find("AudioSystem").gameObject;
-            audioSetting = JsonManager.Instance.Load<AudioSetting>(name, true);
+            audioSetting = JsonManager.Load<AudioSetting>(Name, true);
             audioSource = audioSystem.GetComponent<AudioSource>();
             SetSound(audioSetting.soundVolume);
             SetAudio(audioSetting.audioVolume);
@@ -37,7 +35,7 @@ namespace JFramework
         /// 播放背景音乐
         /// </summary>
         /// <param name="path">背景音乐的路径</param>
-        public void PlaySound(string path)
+        public static void PlaySound(string path)
         {
             if (audioSource == null)
             {
@@ -45,7 +43,7 @@ namespace JFramework
                 return;
             }
 
-            AssetManager.Instance.LoadAsync<AudioClip>(path, clip =>
+            AssetManager.LoadAsync<AudioClip>(path, clip =>
             {
                 audioSource.volume = audioSetting.soundVolume;
                 audioSource.clip = clip;
@@ -58,17 +56,17 @@ namespace JFramework
         /// 设置背景音乐
         /// </summary>
         /// <param name="soundVolume">音量的大小</param>
-        public void SetSound(float soundVolume)
+        public static void SetSound(float soundVolume)
         {
             audioSetting.soundVolume = soundVolume;
             audioSource.volume = soundVolume;
-            JsonManager.Instance.Save(audioSetting, name, true);
+            JsonManager.Save(audioSetting, Name, true);
         }
 
         /// <summary>
         /// 暂停背景音乐
         /// </summary>
-        public void StopSound()
+        public static void StopSound()
         {
             if (audioSource == null)
             {
@@ -84,7 +82,7 @@ namespace JFramework
         /// </summary>
         /// <param name="path">传入音效路径</param>
         /// <param name="action">获取音效的回调</param>
-        public void PlayAudio(string path, Action<AudioSource> action = null)
+        public static void PlayAudio(string path, Action<AudioSource> action = null)
         {
             if (audioList == null)
             {
@@ -93,13 +91,13 @@ namespace JFramework
             }
 
             var audio = audioQueue.Count > 0 ? audioQueue.Dequeue() : audioSystem.AddComponent<AudioSource>();
-            AssetManager.Instance.LoadAsync<AudioClip>(path, clip =>
+            AssetManager.LoadAsync<AudioClip>(path, clip =>
             {
                 audioList.Add(audio);
                 audio.volume = audioSetting.audioVolume;
                 audio.clip = clip;
                 audio.Play();
-                TimerManager.Instance.Pop(clip.length, () => StopAudio(audio));
+                TimerManager.Pop(clip.length, () => StopAudio(audio));
                 action?.Invoke(audio);
             });
         }
@@ -108,7 +106,7 @@ namespace JFramework
         /// 设置音量
         /// </summary>
         /// <param name="audioVolume">传入音量大小</param>
-        public void SetAudio(float audioVolume)
+        public static void SetAudio(float audioVolume)
         {
             audioSetting.audioVolume = audioVolume;
             foreach (var audio in audioList)
@@ -116,14 +114,14 @@ namespace JFramework
                 audio.volume = audioVolume;
             }
 
-            JsonManager.Instance.Save(audioSetting, name, true);
+            JsonManager.Save(audioSetting, Name, true);
         }
 
         /// <summary>
         /// 停止音效
         /// </summary>
         /// <param name="audioSource">传入音效数据</param>
-        public void StopAudio(AudioSource audioSource)
+        public static void StopAudio(AudioSource audioSource)
         {
             if (audioList.Contains(audioSource))
             {
@@ -138,6 +136,7 @@ namespace JFramework
             base.Destroy();
             audioList = null;
             audioQueue = null;
+            audioSystem = null;
             audioSource = null;
             audioSetting = null;
         }

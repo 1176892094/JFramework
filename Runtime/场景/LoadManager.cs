@@ -17,7 +17,7 @@ namespace JFramework
         /// <summary>
         /// 场景列表
         /// </summary>
-        internal List<SceneData> sceneList;
+        internal static List<SceneData> sceneList;
 
         /// <summary>
         /// 场景管理器初始化
@@ -41,7 +41,7 @@ namespace JFramework
         /// 同步加载场景
         /// </summary>
         /// <param name="name">场景名称</param>
-        public void LoadScene(string name)
+        public static void LoadScene(string name)
         {
             if (sceneList == null)
             {
@@ -67,7 +67,7 @@ namespace JFramework
         /// </summary>
         /// <param name="name">场景名称</param>
         /// <param name="action">场景加载完成的回调</param>
-        public void LoadSceneAsync(string name, Action action)
+        public static void LoadSceneAsync(string name, Action action)
         {
             if (sceneList == null)
             {
@@ -89,7 +89,7 @@ namespace JFramework
         /// <param name="name">场景名称</param>
         /// <param name="action">场景加载完成的回调</param>
         /// <returns>返回场景加载迭代器</returns>
-        private IEnumerator LoadSceneCompleted(string name, Action action)
+        private static IEnumerator LoadSceneCompleted(string name, Action action)
         {
             AsyncOperation asyncOperation = SceneManager.LoadSceneAsync(name);
             asyncOperation.allowSceneActivation = false;
@@ -99,7 +99,7 @@ namespace JFramework
                 while (progress < 0.999f)
                 {
                     progress = Mathf.Lerp(progress, asyncOperation.progress / 9f * 10f, Time.deltaTime);
-                    EventManager.Instance.Send(999, progress);
+                    EventManager.Send(999, progress);
                     yield return new WaitForEndOfFrame();
                 }
 

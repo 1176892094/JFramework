@@ -15,7 +15,7 @@ namespace JFramework.Core
         /// <summary>
         /// 存储Json的字典
         /// </summary>
-        internal Dictionary<string, JsonData> jsonDict;
+        internal static Dictionary<string, JsonData> jsonDict;
 
         internal override void Awake()
         {
@@ -29,7 +29,7 @@ namespace JFramework.Core
         /// <param name="obj">保存的数据</param>
         /// <param name="name">保存的名称</param>
         /// <param name="isAes">加密</param>
-        public void Save(object obj, string name, bool isAes = false)
+        public static void Save(object obj, string name, bool isAes = false)
         {
             var filePath = GetPath(name);
             var saveJson = obj is ScriptableObject ? JsonUtility.ToJson(obj) : JsonConvert.SerializeObject(obj);
@@ -67,7 +67,7 @@ namespace JFramework.Core
         /// </summary>
         /// <param name="obj">加载的数据</param>
         /// <param name="isAes">解密</param>
-        public void Load(ScriptableObject obj, bool isAes = false)
+        public static void Load(ScriptableObject obj, bool isAes = false)
         {
             var filePath = GetPath(obj.name);
             if (!File.Exists(filePath))
@@ -116,7 +116,7 @@ namespace JFramework.Core
         /// <param name="isAes">解密</param>
         /// <typeparam name="T">可以使用任何类型</typeparam>
         /// <returns>返回解密的数据</returns>
-        public T Load<T>(string name, bool isAes = false) where T : class, new()
+        public static T Load<T>(string name, bool isAes = false) where T : class, new()
         {
             var filePath = GetPath(name);
             if (!File.Exists(filePath))
@@ -163,7 +163,7 @@ namespace JFramework.Core
         /// <summary>
         /// 清空管理器
         /// </summary>
-        public void Clear()
+        public static void Clear()
         {
             if (DebugManager.IsDebugJson)
             {
@@ -180,7 +180,7 @@ namespace JFramework.Core
         /// <param name="id">加密数据的id</param>
         /// <param name="key">加密数据的键值</param>
         /// <param name="iv">加密数据的向量</param>
-        private void SetData(string id, byte[] key, byte[] iv)
+        private static void SetData(string id, byte[] key, byte[] iv)
         {
             if (!jsonDict.ContainsKey(id))
             {
@@ -197,7 +197,7 @@ namespace JFramework.Core
         /// </summary>
         /// <param name="id">加密数据的id</param>
         /// <returns>返回得到的加密数据</returns>
-        private JsonData GetData(string id)
+        private static JsonData GetData(string id)
         {
             if (!jsonDict.ContainsKey(id))
             {
@@ -212,7 +212,7 @@ namespace JFramework.Core
         /// </summary>
         /// <param name="name">传入的路径名称</param>
         /// <returns>返回的到的路径</returns>
-        private string GetPath(string name)
+        private static string GetPath(string name)
         {
             var filePath = Application.streamingAssetsPath + "/" + name + ".json";
             if (!File.Exists(filePath))

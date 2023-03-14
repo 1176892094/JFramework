@@ -13,12 +13,12 @@ namespace JFramework.Core
         /// <summary>
         /// 存储已经完成的计时器
         /// </summary>
-        internal Queue<Timer> timerQueue;
+        internal static Queue<Timer> timerQueue;
 
         /// <summary>
         /// 存储正在执行的计时器
         /// </summary>
-        internal List<Timer> timerList;
+        internal static List<Timer> timerList;
 
         /// <summary>
         /// 构造函数初始化数据
@@ -27,14 +27,13 @@ namespace JFramework.Core
         {
             timerQueue = new Queue<Timer>();
             timerList = new List<Timer>();
-            if (GlobalManager.Instance == null) return;
             GlobalManager.Instance.UpdateAction += OnUpdate;
         }
 
         /// <summary>
         /// 计时器管理器进行计时器更新
         /// </summary>
-        private void OnUpdate()
+        private static void OnUpdate()
         {
             if (timerList == null) return;
             for (int i = timerList.Count - 1; i >= 0; i--)
@@ -48,7 +47,7 @@ namespace JFramework.Core
         /// </summary>
         /// <param name="time">持续时间</param>
         /// <param name="action">完成回调</param>
-        public ITimer Pop(float time, Action action = null)
+        public static ITimer Pop(float time, Action action = null)
         {
             if (timerList == null)
             {
@@ -66,7 +65,7 @@ namespace JFramework.Core
         /// 计时器管理器移除计时器
         /// </summary>
         /// <param name="timer">传入需要移除的计时器</param>
-        public void Push(ITimer timer)
+        public static void Push(ITimer timer)
         {
             if (timerList == null)
             {

@@ -14,7 +14,7 @@ namespace JFramework
         /// <summary>
         /// 单例名称
         /// </summary>
-        protected string Name => typeof(T).Name;
+        protected static string Name => typeof(T).Name;
 
         /// <summary>
         /// 单例的所有者

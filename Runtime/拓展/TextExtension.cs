@@ -10,7 +10,6 @@ namespace JFramework
         public static string Blue(this string s) => s.SetColor(TextColor.Blue);
         public static string Red(this string s) => s.SetColor(TextColor.Red);
         public static string Sky(this string s) => s.SetColor(TextColor.Sky);
-
         public static string SetColor(this string s, TextColor type)
         {
             return type switch
@@ -30,13 +29,13 @@ namespace JFramework
 
     public enum TextColor
     {
-        White = 0,
-        Yellow = 1,
-        Sky = 2,
-        Purple = 3,
-        Orange = 4,
-        Red = 5,
-        Green = 6,
-        Blue = 7,
+        Sky = 0,
+        Red = 1,
+        Blue = 2,
+        Green = 3,
+        White = 4,
+        Yellow = 5,
+        Purple = 6,
+        Orange = 7,
     }
 }

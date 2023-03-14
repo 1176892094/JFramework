@@ -17,12 +17,12 @@ namespace JFramework.Core
         /// <summary>
         /// 存储int为主键类型的数据字典
         /// </summary>
-        internal Dictionary<Type, IntDataDict> IntDataDict;
+        internal static Dictionary<Type, IntDataDict> IntDataDict;
 
         /// <summary>
         /// 存储string为主键的数据字典
         /// </summary>
-        internal Dictionary<Type, StrDataDict> StrDataDict;
+        internal static Dictionary<Type, StrDataDict> StrDataDict;
 
         /// <summary>
         /// 资源路径
@@ -48,7 +48,7 @@ namespace JFramework.Core
                 try
                 {
                     var keyName = type.Name;
-                    AssetManager.Instance.LoadAsync<ScriptableObject>(AssetPath + keyName, obj =>
+                    AssetManager.LoadAsync<ScriptableObject>(AssetPath + keyName, obj =>
                     {
                         var dataTable = (IDataTable)obj;
                         var keyData = GetKeyField(assembly, type);
@@ -102,7 +102,7 @@ namespace JFramework.Core
         /// <param name="table"></param>
         /// <typeparam name="T"></typeparam>
         /// <returns>返回数据字典</returns>
-        private Dictionary<T, IData> Add<T>(FieldInfo field, IDataTable table)
+        private static Dictionary<T, IData> Add<T>(FieldInfo field, IDataTable table)
         {
             var dataDict = new Dictionary<T, IData>();
             for (var i = 0; i < table.Count; ++i)
@@ -121,7 +121,7 @@ namespace JFramework.Core
         /// <param name="key">传入的int主键</param>
         /// <typeparam name="T">可以使用所有继承IData类型的对象</typeparam>
         /// <returns>返回一个数据对象</returns>
-        public T Get<T>(int key) where T : IData
+        public static T Get<T>(int key) where T : IData
         {
             IntDataDict.TryGetValue(typeof(T), out IntDataDict soDict);
             if (soDict == null) return default;
@@ -142,7 +142,7 @@ namespace JFramework.Core
         /// <param name="key">传入的string主键</param>
         /// <typeparam name="T">要获取数据的类型,必须继承自JFramework.Data</typeparam>
         /// <returns>返回一个数据对象</returns>
-        public T Get<T>(string key) where T : IData
+        public static T Get<T>(string key) where T : IData
         {
             StrDataDict.TryGetValue(typeof(T), out StrDataDict soDict);
             if (soDict == null) return default;
@@ -163,7 +163,7 @@ namespace JFramework.Core
         /// <param name="key">传入的string主键</param>
         /// <typeparam name="T">要获取数据的类型,必须继承自JFramework.Data</typeparam>
         /// <returns>返回一个数据对象</returns>
-        public T Get<T>(Enum key) where T : IData
+        public static T Get<T>(Enum key) where T : IData
         {
             StrDataDict.TryGetValue(typeof(T), out StrDataDict soDict);
             if (soDict == null) return default;
@@ -184,7 +184,7 @@ namespace JFramework.Core
         /// </summary>
         /// <typeparam name="T">可以使用所有继承Data类型的对象</typeparam>
         /// <returns>返回泛型列表</returns>
-        public List<T> GetTable<T>() where T : IData
+        public static List<T> GetTable<T>() where T : IData
         {
             var table = GetTable(typeof(T));
             if (table == null) return null;
@@ -198,7 +198,7 @@ namespace JFramework.Core
         /// </summary>
         /// <param name="type">传入的类型</param>
         /// <returns>返回一个Data的列表</returns>
-        private List<IData> GetTable(Type type)
+        private static List<IData> GetTable(Type type)
         {
             IntDataDict.TryGetValue(type, out IntDataDict dictInt);
             if (dictInt != null) return dictInt.Values.ToList();
@@ -210,7 +210,7 @@ namespace JFramework.Core
         /// 获取当前程序集中的数据表对象类
         /// </summary>
         /// <returns></returns>
-        private Assembly GetAssembly(out IEnumerable<Type> types)
+        private static Assembly GetAssembly(out IEnumerable<Type> types)
         {
             var assemblies = AppDomain.CurrentDomain.GetAssemblies();
             foreach (var assembly in assemblies)
@@ -247,7 +247,7 @@ namespace JFramework.Core
         /// <param name="assembly"></param>
         /// <param name="type"></param>
         /// <returns></returns>
-        private Type GetKeyField(Assembly assembly, Type type)
+        private static Type GetKeyField(Assembly assembly, Type type)
         {
             var name = type.Name;
             name = name.Substring(0, name.Length - 5);
@@ -262,6 +262,15 @@ namespace JFramework.Core
         {
             var key = GetKeyField(data.GetType());
             return key == null ? null : key.GetValue(data);
+        }
+
+        /// <summary>
+        /// 清除数据管理器
+        /// </summary>
+        internal override void Destroy()
+        {
+            IntDataDict = null;
+            StrDataDict = null;
         }
     }
 }

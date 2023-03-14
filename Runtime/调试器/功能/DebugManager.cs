@@ -27,7 +27,7 @@ namespace JFramework.Core
 
         private void Start()
         {
-            TimerManager.Instance.Pop(1).SetLoop(-1, _ =>
+            TimerManager.Pop(1).SetLoop(-1, _ =>
             {
                 if (!IsDebugTool) return;
                 FPS = (int)(1.0f / Time.deltaTime);

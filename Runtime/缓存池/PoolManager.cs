@@ -11,12 +11,12 @@ namespace JFramework
         /// <summary>
         /// 存储所有池的字典
         /// </summary>
-        internal Dictionary<string, IPool> poolDict;
+        internal static Dictionary<string, IPool> poolDict;
 
         /// <summary>
         /// 对象池控制器
         /// </summary>
-        internal GameObject manager;
+        internal static GameObject manager;
 
         /// <summary>
         /// 对象池管理器初始化
@@ -31,7 +31,7 @@ namespace JFramework
         /// </summary>
         /// <param name="key">拉取对象的名称</param>
         /// <param name="action">拉取对象的回调</param>
-        public void Pop(string key, Action<GameObject> action)
+        public static void Pop(string key, Action<GameObject> action)
         {
             if (poolDict == null)
             {
@@ -51,7 +51,7 @@ namespace JFramework
                 poolDict.Remove(key);
             }
 
-            AssetManager.Instance.LoadAsync<GameObject>(key, o =>
+            AssetManager.LoadAsync<GameObject>(key, o =>
             {
                 o.name = key;
                 action?.Invoke(o);
@@ -62,7 +62,7 @@ namespace JFramework
         /// 对象池管理器推入对象
         /// </summary>
         /// <param name="obj">对象的实例</param>
-        public void Push(GameObject obj)
+        public static void Push(GameObject obj)
         {
             if (poolDict == null)
             {

@@ -16,12 +16,12 @@ namespace JFramework.Core
         /// <summary>
         /// 存储所有UI的字典
         /// </summary>
-        internal Dictionary<string, UIPanel> panelDict;
+        internal static Dictionary<string, UIPanel> panelDict;
 
         /// <summary>
         /// UI层级数组
         /// </summary>
-        internal Transform[] layerGroup;
+        internal static Transform[] layerGroup;
 
         /// <summary>
         /// 界面管理器初始化数据
@@ -31,7 +31,6 @@ namespace JFramework.Core
             base.Awake();
             layerGroup = new Transform[5];
             panelDict = new Dictionary<string, UIPanel>();
-            if (GlobalManager.Instance == null) return;
             var obj = GlobalManager.Instance.gameObject;
             layerGroup[0] = obj.transform.Find("UICanvas/Layer1");
             layerGroup[1] = obj.transform.Find("UICanvas/Layer2");
@@ -46,9 +45,9 @@ namespace JFramework.Core
         /// <param name="name">加载UI面板的名称</param>
         /// <param name="action">显示面板的回调</param>
         /// <typeparam name="T">可以使用所有继承IPanel的对象</typeparam>
-        private void LoadPanel<T>(string name, Action<T> action) where T : UIPanel
+        private static void LoadPanel<T>(string name, Action<T> action) where T : UIPanel
         {
-            AssetManager.Instance.LoadAsync<GameObject>("UI/" + name, obj =>
+            AssetManager.LoadAsync<GameObject>("UI/" + name, obj =>
             {
                 if (panelDict.ContainsKey(name)) HidePanel<T>();
                 obj.transform.SetParent(layerGroup[0], false);
@@ -64,7 +63,7 @@ namespace JFramework.Core
         /// </summary>
         /// <param name="action">显示面板的回调</param>
         /// <typeparam name="T">可以使用所有继承IPanel的对象</typeparam>
-        public void ShowPanel<T>(Action<T> action = null) where T : UIPanel
+        public static void ShowPanel<T>(Action<T> action = null) where T : UIPanel
         {
             if (panelDict == null) return;
             var key = typeof(T).Name;
@@ -84,7 +83,7 @@ namespace JFramework.Core
         /// </summary>
         /// <param name="type">隐藏UI的方式</param>
         /// <typeparam name="T">可以使用所有继承IPanel的对象</typeparam>
-        public void HidePanel<T>(UIHideType type = UIHideType.Remove) where T : UIPanel
+        public static void HidePanel<T>(UIHideType type = UIHideType.Remove) where T : UIPanel
         {
             if (panelDict == null) return;
             var key = typeof(T).Name;
@@ -106,7 +105,7 @@ namespace JFramework.Core
         /// </summary>
         /// <typeparam name="T">可以使用所有继承IPanel的对象</typeparam>
         /// <returns>返回获取到的UI面板</returns>
-        public T GetPanel<T>() where T : UIPanel
+        public static T GetPanel<T>() where T : UIPanel
         {
             if (panelDict == null) return null;
             var key = typeof(T).Name;
@@ -124,7 +123,7 @@ namespace JFramework.Core
         /// </summary>
         /// <param name="layer">层级的类型</param>
         /// <returns>返回得到的层级</returns>
-        public Transform GetLayer(UILayerType layer) => panelDict == null ? null : layerGroup[(int)layer];
+        public static Transform GetLayer(UILayerType layer) => panelDict == null ? null : layerGroup[(int)layer];
 
         /// <summary>
         /// UI管理器侦听UI面板事件
@@ -132,7 +131,7 @@ namespace JFramework.Core
         /// <param name="target">传入的UI对象</param>
         /// <param name="type">事件触发类型</param>
         /// <param name="action">事件触发后的回调</param>
-        public void Listen(MonoBehaviour target, EventTriggerType type, UnityAction<BaseEventData> action)
+        public static void Listen(MonoBehaviour target, EventTriggerType type, UnityAction<BaseEventData> action)
         {
             var trigger = target.GetComponent<EventTrigger>();
             if (trigger == null) trigger = target.gameObject.AddComponent<EventTrigger>();
@@ -144,7 +143,7 @@ namespace JFramework.Core
         /// <summary>
         /// UI管理器清除所有面板
         /// </summary>
-        public void Clear()
+        public static void Clear()
         {
             foreach (var key in panelDict.Keys.Where(key => panelDict.ContainsKey(key)))
             {

@@ -13,10 +13,10 @@ namespace JFramework
     public sealed partial class GlobalManager : MonoSingleton<GlobalManager>
     {
         [ShowInInspector, LabelText("实体管理数据"), FoldoutGroup("实体管理器"), ReadOnly]
-        private static Dictionary<int, IEntity> entityDict = new Dictionary<int, IEntity>();
+        private static Dictionary<int, IEntity> entityDict;
 
         [ShowInInspector, LabelText("实体索引队列"), FoldoutGroup("实体管理器"), ReadOnly]
-        private static Queue<int> entityQueue = new Queue<int>();
+        private static Queue<int> entityQueue;
 
         private static string Name => nameof(GlobalManager);
 
@@ -47,7 +47,7 @@ namespace JFramework
         {
             UpdateAction += entity.OnUpdate;
             entity.Id = entityQueue.Count > 0 ? entityQueue.Dequeue() : entityDict.Count + 1;
-            entityDict.Add(entity.Id, entity);
+            entityDict?.Add(entity.Id, entity);
         }
 
         /// <summary>
@@ -57,8 +57,8 @@ namespace JFramework
         public void Remove(IEntity entity)
         {
             UpdateAction -= entity.OnUpdate;
-            entityQueue.Enqueue(entity.Id);
-            entityDict.Remove(entity.Id);
+            entityQueue?.Enqueue(entity.Id);
+            entityDict?.Remove(entity.Id);
         }
 
         /// <summary>
@@ -84,8 +84,8 @@ namespace JFramework
         private static void Register()
         {
             AutoCreate();
-            entityDict.Clear();
-            entityQueue.Clear();
+            entityDict = new Dictionary<int, IEntity>();
+            entityQueue = new Queue<int>();
             CommandManager.Instance.Awake();
             AssetManager.Instance.Awake();
             EventManager.Instance.Awake();
@@ -113,8 +113,8 @@ namespace JFramework
             AssetManager.Instance.Destroy();
             EventManager.Instance.Destroy();
             CommandManager.Instance.Destroy();
-            entityDict.Clear();
-            entityQueue.Clear();
+            entityDict = null;
+            entityQueue = null;
             UpdateAction = null;
         }
     }

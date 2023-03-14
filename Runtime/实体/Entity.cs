@@ -43,7 +43,7 @@ namespace JFramework
         /// </summary>
         private void OnEnable()
         {
-            if (!GlobalManager.Instance) return;
+            if (this == GlobalManager.Instance) return;
             GlobalManager.Instance.Listen(this);
             Enable();
         }

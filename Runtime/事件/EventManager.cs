@@ -12,7 +12,7 @@ namespace JFramework
         /// <summary>
         /// 事件存储字典
         /// </summary>
-        internal Dictionary<int, EventData> eventDict;
+        internal static Dictionary<int, EventData> eventDict;
 
         /// <summary>
         /// 事件管理器醒来
@@ -28,7 +28,7 @@ namespace JFramework
         /// </summary>
         /// <param name="id">事件唯一标识</param>
         /// <param name="action">传入侦听的事件</param>
-        public void Listen(int id, EventData action)
+        public static void Listen(int id, EventData action)
         {
             if (eventDict == null) return;
 
@@ -52,7 +52,7 @@ namespace JFramework
         /// </summary>
         /// <param name="id">事件唯一标识</param>
         /// <param name="action">传入移除的事件</param>
-        public void Remove(int id, EventData action)
+        public static void Remove(int id, EventData action)
         {
             if (eventDict == null) return;
 
@@ -72,7 +72,7 @@ namespace JFramework
         /// </summary>
         /// <param name="id">事件唯一标识</param>
         /// <param name="args">传入事件的参数</param>
-        public void Send(int id, params object[] args)
+        public static void Send(int id, params object[] args)
         {
             if (eventDict == null) return;
 

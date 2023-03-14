@@ -68,7 +68,7 @@ namespace JFramework
         /// <typeparam name="TState">可传入任何继承IState的对象</typeparam>
         public void ChangeState<TState>(float time) where TState : IState
         {
-            TimerManager.Instance.Pop(time, ChangeState<TState>);
+            TimerManager.Pop(time, ChangeState<TState>);
         }
 
         /// <summary>

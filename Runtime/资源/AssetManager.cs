@@ -16,7 +16,7 @@ namespace JFramework.Core
         /// <summary>
         /// 资源存储字典
         /// </summary>
-        private Dictionary<string, IEnumerator> assetDict;
+        private static Dictionary<string, IEnumerator> assetDict;
 
         /// <summary>
         /// 资源管理器初始化
@@ -32,7 +32,7 @@ namespace JFramework.Core
         /// </summary>
         /// <param name="name">资源的名称</param>
         /// <typeparam name="T">可以使用任何继承Object的对象</typeparam>
-        public T Load<T>(string name) where T : Object
+        public static T Load<T>(string name) where T : Object
         {
             if (assetDict == null)
             {
@@ -55,7 +55,7 @@ namespace JFramework.Core
         /// <param name="name">资源的名称</param>
         /// <param name="action">资源的回调函数</param>
         /// <typeparam name="T">可以使用任何继承Object的对象</typeparam>
-        public void LoadAsync<T>(string name, Action<T> action) where T : Object
+        public static void LoadAsync<T>(string name, Action<T> action) where T : Object
         {
             if (assetDict == null)
             {
@@ -124,7 +124,7 @@ namespace JFramework.Core
         /// </summary>
         /// <param name="name">资源的名称</param>
         /// <typeparam name="T">可以使用任何继承Object的对象</typeparam>
-        public void Dispose<T>(string name)
+        public static void Dispose<T>(string name)
         {
             if (assetDict == null)
             {
