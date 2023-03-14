@@ -8,7 +8,6 @@ namespace JFramework.Core
 {
     using IntDataDict = Dictionary<int, IData>;
     using StrDataDict = Dictionary<string, IData>;
-    using EnmDataDict = Dictionary<Enum, IData>;
 
     /// <summary>
     /// 数据管理器
@@ -24,11 +23,6 @@ namespace JFramework.Core
         /// 存储string为主键的数据字典
         /// </summary>
         internal Dictionary<Type, StrDataDict> StrDataDict;
-
-        /// <summary>
-        /// 存储enum为主键的数据字典
-        /// </summary>
-        internal Dictionary<Type, StrDataDict> EnmDataDict;
 
         /// <summary>
         /// 资源路径
@@ -65,7 +59,6 @@ namespace JFramework.Core
                     }
 
                     var keyType = keyField.FieldType;
-
                     if (keyType == typeof(int))
                     {
                         IntDataDict.Add(keyData, Add<int>(keyField, dataTable));
@@ -77,6 +70,22 @@ namespace JFramework.Core
                     else if (keyType == typeof(string))
                     {
                         StrDataDict.Add(keyData, Add<string>(keyField, dataTable));
+                        if (DebugManager.IsShowData)
+                        {
+                            Debug.Log($"DataManager加载 {type.Name.Green()} 成功!");
+                        }
+                    }
+                    else if (keyType.IsEnum)
+                    {
+                        var dataDict = new StrDataDict();
+                        for (var i = 0; i < dataTable.Count; ++i)
+                        {
+                            var data = (IData)dataTable.GetData(i);
+                            var key  = keyField.GetValue(data);
+                            dataDict.Add(key.ToString(), data);
+                        }
+
+                        StrDataDict.Add(keyData, dataDict);
                         if (DebugManager.IsShowData)
                         {
                             Debug.Log($"DataManager加载 {type.Name.Green()} 成功!");
@@ -98,6 +107,7 @@ namespace JFramework.Core
         /// </summary>
         /// <param name="field"></param>
         /// <param name="table"></param>
+        /// <param name="isEnum"></param>
         /// <typeparam name="T"></typeparam>
         /// <returns>返回数据字典</returns>
         private Dictionary<T, IData> Add<T>(FieldInfo field, IDataTable table)
@@ -106,7 +116,7 @@ namespace JFramework.Core
             for (var i = 0; i < table.Count; ++i)
             {
                 var data = (IData)table.GetData(i);
-                var key = (T)field.GetValue(data);
+                var key  = (T)field.GetValue(data);
                 dataDict.Add(key, data);
             }
 
@@ -140,6 +150,21 @@ namespace JFramework.Core
             soDict.TryGetValue(key, out IData data);
             return (T)data;
         }
+        
+        /// <summary>
+        /// 获取对应类型数据下主键为Key的数据
+        /// </summary>
+        /// <param name="key">传入的string主键</param>
+        /// <typeparam name="T">要获取数据的类型,必须继承自JFramework.Data</typeparam>
+        /// <returns>返回一个数据对象</returns>
+        public T Get<T>(Enum key) where T : IData
+        {
+            StrDataDict.TryGetValue(typeof(T), out StrDataDict soDict);
+            if (soDict == null) return default;
+            soDict.TryGetValue(key.ToString(), out IData data);
+            return (T)data;
+        }
+        
 
         /// <summary>
         /// 通过数据管理器得到数据表

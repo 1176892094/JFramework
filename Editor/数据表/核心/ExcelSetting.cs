@@ -18,13 +18,22 @@ namespace JFramework
         
         private static bool IsCompleted;
 
-        [MenuItem("Tools/JFramework/ExcelToAssets", false, 102)]
+        [MenuItem("Tools/JFramework/ExcelToScripts", false, 102)]
         public static void ExcelToScripts()
         {
             var filePath = EditorUtility.OpenFolderPanel(default, LoadPath, "");
             if (filePath.IsEmpty()) return;
             PathDataKey = filePath;
             ExcelGenerator.GenerateScripts();
+        }
+        
+        [MenuItem("Tools/JFramework/ExcelToAssets", false, 102)]
+        public static void ExcelToAssets()
+        {
+            var filePath = EditorUtility.OpenFolderPanel(default, LoadPath, "");
+            if (filePath.IsEmpty()) return;
+            PathDataKey = filePath;
+            ExcelGenerator.GenerateAssets();
             FrameworkEditorAsset.Instance.LoadAddressableGroup();
         }
         
@@ -34,33 +43,17 @@ namespace JFramework
         public static string GetTableFullName(string sheetName) => Const.Namespace + "." + GetTableName(sheetName);
         public static string GetScriptPath(string sheetName) => Const.ScriptPath + GetTableName(sheetName) + ".cs";
         public static string GetAssetsPath(string sheetName) => Const.AssetsPath + GetTableName(sheetName) + ".asset";
-
-        public static bool IsKeyField(string name, string type)
-        {
-            var key = name.ToLower().Trim();
-            if (!key.EndsWith(":key")) return false;
-            if (type.Equals("int") || type.Equals("string")) return true;
-            Debug.LogWarning($"主键只支持int和string两种类型!");
-            return false;
-        }
-
-        public static bool IsEnumField(string type)
-        {
-            type = type.ToLower().Trim();
-            if (!type.EndsWith(":field")) return false;
-            if (type.Split(":")[0].Equals("enum")) return true;
-            Debug.LogWarning($"不是有效的枚举字段!");
-            return false;
-        }
+        public static bool IsKeyField(string name) => name.ToLower().Trim().EndsWith(":key");
+        public static bool IsEnumField(string type) => type.ToLower().Trim() == Const.EnumField;
 
         public static IParser Parse(string name, string type)
         {
             var fixType = type.Trim().ToLower();
             if (IsNormal(fixType)) return new ParseNormal(name, type);
+            if (IsEnum(fixType)) return new ParseNormal(name, type);
             if (IsNormalArray(fixType)) return new ParseNormalArray(name, type);
             if (IsStruct(fixType)) return new ParseStruct(name, type);
             if (IsStructArray(type)) return new ParseStructArray(name, type);
-            if (IsEnum(fixType)) return new ParseEnum(name, type);
             if (name.IsEmpty() || type.IsEmpty()) Debug.LogWarning($"不能转换:{name}=>{type}");
             return null;
         }

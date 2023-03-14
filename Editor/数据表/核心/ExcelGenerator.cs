@@ -39,7 +39,6 @@ namespace JFramework
             }
 
             AssetDatabase.Refresh();
-            GenerateAssets();
         }
 
         private static IEnumerable<(string, string)> GenerateScriptText(string excelPath)
@@ -61,7 +60,6 @@ namespace JFramework
                         where !value.IsEmpty() && value is Const.Enum or Const.Struct
                         select type).ToArray();
                     
-                    if (typeList.Length == 0) continue; //可用类型行
                     var writer = string.Empty;
                     foreach (var x in typeList)
                     {
@@ -82,6 +80,7 @@ namespace JFramework
 
                     var names = sheet.Cells[Const.Name, 1, Const.Name, column].Select(_ => _.Value?.ToString()).ToArray();
                     var types = sheet.Cells[Const.Type, 1, Const.Type, column].Select(_ => _.Value?.ToString()).ToArray();
+                    if (names.Length == 0 || types.Length == 0) continue;
                     var fileContent = WriteScriptsFile(sheet.Name, types, names, writer);
                     contents.Add((sheet.Name, fileContent));
                 }
@@ -169,7 +168,7 @@ namespace JFramework
             return builder.ToString();
         }
 
-        private static void GenerateAssets()
+        public static void GenerateAssets()
         {
             var filesPath = Directory.GetFiles(ExcelSetting.PathDataKey);
             var excelsPath = filesPath.Where(ExcelSetting.IsSupported).ToArray();

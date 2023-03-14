@@ -20,6 +20,7 @@ internal struct Const
     /// <summary>
     /// Framework
     /// </summary>
+    public const string ExcelToScripts = nameof(ExcelToScripts);
     public const string ExcelToAssets = nameof(ExcelToAssets);
     public const string CurrentProjectPath = nameof(CurrentProjectPath);
     public const string PersistentDataPath = nameof(PersistentDataPath);
