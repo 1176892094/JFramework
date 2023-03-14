@@ -156,7 +156,7 @@ namespace JFramework.Core
                         {
                             if (componentList[componentIndex] is DebugManager)
                             {
-                                Debug.LogWarning($"不能销毁组件{componentList[componentIndex].GetType().Name}!");
+                                UnityEngine.Debug.LogWarning($"不能销毁组件{componentList[componentIndex].GetType().Name}!");
                             }
                             else
                             {

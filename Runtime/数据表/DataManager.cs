@@ -45,58 +45,53 @@ namespace JFramework.Core
             var assembly = GetAssembly(out IEnumerable<Type> types);
             foreach (var type in types)
             {
-                var keyName = type.Name;
-                AssetManager.Instance.LoadAsync<ScriptableObject>(AssetPath + keyName, obj =>
+                try
                 {
-                    var dataTable = (IDataTable)obj;
-                    var keyData = GetKeyField(assembly, type);
-                    var keyField = GetKeyField(keyData);
+                    var keyName = type.Name;
+                    AssetManager.Instance.LoadAsync<ScriptableObject>(AssetPath + keyName, obj =>
+                    {
+                        var dataTable = (IDataTable)obj;
+                        var keyData = GetKeyField(assembly, type);
+                        var keyField = GetKeyField(keyData);
 
-                    if (keyData == null)
-                    {
-                        Debug.LogWarning($"DataManager没有找到主键:{keyName.Red()}!");
-                        return;
-                    }
-
-                    var keyType = keyField.FieldType;
-                    if (keyType == typeof(int))
-                    {
-                        IntDataDict.Add(keyData, Add<int>(keyField, dataTable));
-                        if (DebugManager.IsShowData)
+                        if (keyData == null)
                         {
-                            Debug.Log($"DataManager加载 {type.Name.Green()} 成功!");
-                        }
-                    }
-                    else if (keyType == typeof(string))
-                    {
-                        StrDataDict.Add(keyData, Add<string>(keyField, dataTable));
-                        if (DebugManager.IsShowData)
-                        {
-                            Debug.Log($"DataManager加载 {type.Name.Green()} 成功!");
-                        }
-                    }
-                    else if (keyType.IsEnum)
-                    {
-                        var dataDict = new StrDataDict();
-                        for (var i = 0; i < dataTable.Count; ++i)
-                        {
-                            var data = (IData)dataTable.GetData(i);
-                            var key  = keyField.GetValue(data);
-                            dataDict.Add(key.ToString(), data);
+                            Debug.Log($"{Name.Sky()} <= Missing => {keyName.Red()} Key");
+                            return;
                         }
 
-                        StrDataDict.Add(keyData, dataDict);
-                        if (DebugManager.IsShowData)
+                        var keyType = keyField.FieldType;
+                        if (keyType == typeof(int))
                         {
-                            Debug.Log($"DataManager加载 {type.Name.Green()} 成功!");
+                            IntDataDict.Add(keyData, Add<int>(keyField, dataTable));
                         }
-                    }
-                    else
-                    {
-                        Debug.LogWarning($"加载 {type.Name.Red()} 失败!");
-                        Debug.LogWarning($"{keyField.ToString().Red()} 不是有效的主键!");
-                    }
-                });
+                        else if (keyType == typeof(string))
+                        {
+                            StrDataDict.Add(keyData, Add<string>(keyField, dataTable));
+                        }
+                        else if (keyType.IsEnum)
+                        {
+                            var dataDict = new StrDataDict();
+                            for (var i = 0; i < dataTable.Count; ++i)
+                            {
+                                var data = (IData)dataTable.GetData(i);
+                                var key  = keyField.GetValue(data);
+                                dataDict.Add(key.ToString(), data);
+                            }
+
+                            StrDataDict.Add(keyData, dataDict);
+                        }
+                        
+                        if (DebugManager.IsDebugData)
+                        {
+                            Debug.Log($"{Name.Sky()} <= Load => {type.Name.Green()} Success");
+                        }
+                    });
+                }
+                catch
+                {
+                    Debug.Log($"{Name.Sky()} <= Load => {type.Name.Red()} Failure");
+                }
             }
 
             Debug.Log($"DataManager加载资源完成!");
@@ -107,7 +102,6 @@ namespace JFramework.Core
         /// </summary>
         /// <param name="field"></param>
         /// <param name="table"></param>
-        /// <param name="isEnum"></param>
         /// <typeparam name="T"></typeparam>
         /// <returns>返回数据字典</returns>
         private Dictionary<T, IData> Add<T>(FieldInfo field, IDataTable table)

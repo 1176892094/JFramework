@@ -122,7 +122,7 @@ namespace JFramework
         {
             if (!condition)
             {
-                throw new Exception("异步执行抛出异常！");
+                throw new Exception("异步执行异常！".Red());
             }
         }
     }

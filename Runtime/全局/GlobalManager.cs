@@ -16,6 +16,7 @@ namespace JFramework
         private static Dictionary<int, IEntity> entityDict = new Dictionary<int, IEntity>();
         [ShowInInspector, LabelText("实体索引队列"), FoldoutGroup("实体管理器"), ReadOnly]
         private static Queue<int> entityQueue = new Queue<int>();
+        private static string Name => nameof(GlobalManager);
 
         /// <summary>
         /// Update更新事件
@@ -37,13 +38,6 @@ namespace JFramework
         private void Update() => UpdateAction?.Invoke();
 
         /// <summary>
-        /// 获取实体
-        /// </summary>
-        /// <param name="id">传入实体的id</param>
-        /// <returns>返回对应的实体</returns>
-        public T Get<T>(int id) where T : IEntity => entityDict.ContainsKey(id) ? (T)entityDict[id] : default;
-
-        /// <summary>
         /// 添加实体到管理器
         /// </summary>
         /// <param name="entity">传入实体</param>
@@ -52,6 +46,11 @@ namespace JFramework
             UpdateAction += entity.OnUpdate;
             entity.Id = entityQueue.Count > 0 ? entityQueue.Dequeue() : entityDict.Count + 1;
             entityDict.Add(entity.Id, entity);
+
+            if (DebugManager.IsDebugEntity)
+            {
+                Debug.Log($"{Name.Sky()} <= Listen => {entity} : {entity.Id}");
+            }
         }
 
         /// <summary>
@@ -63,12 +62,32 @@ namespace JFramework
             UpdateAction -= entity.OnUpdate;
             entityQueue.Enqueue(entity.Id);
             entityDict.Remove(entity.Id);
+            
+            if (DebugManager.IsDebugEntity)
+            {
+                Debug.Log($"{Name.Sky()} <= Remove => {entity} : {entity.Id}");
+            }
+        }
+
+        /// <summary>
+        /// 获取实体
+        /// </summary>
+        /// <param name="id">传入实体的id</param>
+        /// <returns>返回对应的实体</returns>
+        public static T Get<T>(int id) where T : IEntity
+        {
+            if (DebugManager.IsDebugEntity)
+            {
+                Debug.Log($"{Name.Sky()} <= Get => {entityDict[id]} : {id}");
+            }
+            
+            return entityDict.ContainsKey(id) ? (T)entityDict[id] : default;
         }
 
         private static void AutoCreate()
         {
-            if (FindObjectOfType(typeof(GlobalManager)) != null) return;
-            Instantiate(Resources.Load<GameObject>("GlobalManager"));
+            if (FindObjectOfType(typeof(GlobalManager))) return;
+            Instantiate(Resources.Load<GameObject>(Name));
         }
 
         /// <summary>

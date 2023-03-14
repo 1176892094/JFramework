@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using JFramework.Core;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -44,11 +45,21 @@ namespace JFramework
         {
             if (sceneList == null)
             {
-                Debug.Log("场景管理器没有初始化!");
+                Debug.Log($"{Name.Red()} 没有初始化!");
                 return;
             }
 
+            if (DebugManager.IsDebugScene)
+            {
+                Debug.Log($"{Name.Sky()} <= Load => {name.Green()} Loading...");
+            }
+
             SceneManager.LoadScene(name);
+            
+            if (DebugManager.IsDebugScene)
+            {
+                Debug.Log($"{Name.Sky()} <= Load => {name.Green()} Completed");
+            }
         }
 
         /// <summary>
@@ -60,8 +71,13 @@ namespace JFramework
         {
             if (sceneList == null)
             {
-                Debug.Log("场景管理器没有初始化!");
+                Debug.Log($"{Name.Red()} 没有初始化!");
                 return;
+            }
+            
+            if (DebugManager.IsDebugScene)
+            {
+                Debug.Log($"{Name.Sky()} <= LoadAsync => {name.Green()} Loading...");
             }
 
             GlobalManager.Instance.StartCoroutine(LoadSceneCompleted(name, action));
@@ -83,7 +99,7 @@ namespace JFramework
                 while (progress < 0.999f)
                 {
                     progress = Mathf.Lerp(progress, asyncOperation.progress / 9f * 10f, Time.deltaTime);
-                    EventManager.Instance.SendMessage(999, progress);
+                    EventManager.Instance.Send(999, progress);
                     yield return new WaitForEndOfFrame();
                 }
 
@@ -92,7 +108,11 @@ namespace JFramework
             }
 
             action?.Invoke();
-            Debug.Log($"场景管理器异步加载 {name} 场景完成!");
+            
+            if (DebugManager.IsDebugScene)
+            {
+                Debug.Log($"{Name.Sky()} <= LoadAsync => {name.Green()} Completed");
+            }
         }
     }
 }

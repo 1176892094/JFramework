@@ -17,12 +17,10 @@ namespace JFramework.Core
         /// </summary>
         internal Dictionary<string, JsonData> jsonDict;
 
-        private string name => nameof(JsonManager);
-
         internal override void Awake()
         {
             base.Awake();
-            jsonDict = Load<Dictionary<string, JsonData>>(name);
+            jsonDict = Load<Dictionary<string, JsonData>>(Name);
         }
 
         /// <summary>
@@ -39,8 +37,13 @@ namespace JFramework.Core
             {
                 if (jsonDict == null)
                 {
-                    Debug.Log("存储管理器没有初始化!");
+                    Debug.Log($"{Name.Red()} 没有初始化!");
                     return;
+                }
+
+                if (DebugManager.IsDebugJson)
+                {
+                    Debug.Log($"{Name.Sky()} <= Encrypt => {name.Orange()}");
                 }
 
                 using Aes aes = Aes.Create();
@@ -50,12 +53,12 @@ namespace JFramework.Core
             }
             else
             {
-                File.WriteAllText(filePath, saveJson);
-            }
+                if (DebugManager.IsDebugJson)
+                {
+                    Debug.Log($"{Name.Sky()} <= Save => {name.Orange()}");
+                }
 
-            if (DebugManager.IsShowJson)
-            {
-                Debug.Log($"JsonManager保存 {name.Orange()} 资源成功！");
+                File.WriteAllText(filePath, saveJson);
             }
         }
 
@@ -69,7 +72,7 @@ namespace JFramework.Core
             var filePath = GetPath(obj.name);
             if (!File.Exists(filePath))
             {
-                Debug.Log($"创建存储文件: {obj.name.Orange()}");
+                Debug.Log($"{Name.Sky()} <= Create => {obj.name.Orange()}");
                 Save(obj, obj.name, isAes);
             }
 
@@ -77,8 +80,13 @@ namespace JFramework.Core
             {
                 if (jsonDict == null)
                 {
-                    Debug.Log("存储管理器没有初始化!");
+                    Debug.Log($"{Name.Red()} 没有初始化!");
                     return;
+                }
+
+                if (DebugManager.IsDebugJson)
+                {
+                    Debug.Log($"{Name.Sky()} <= Decrypt => {obj.name.Orange()}");
                 }
 
                 var loadJson = File.ReadAllBytes(filePath);
@@ -91,13 +99,13 @@ namespace JFramework.Core
             }
             else
             {
+                if (DebugManager.IsDebugJson)
+                {
+                    Debug.Log($"{Name.Sky()} <= Load => {Name.Orange()}");
+                }
+                
                 var saveJson = File.ReadAllText(filePath);
                 JsonUtility.FromJsonOverwrite(saveJson, obj);
-            }
-
-            if (DebugManager.IsShowJson)
-            {
-                Debug.Log($"JsonManager加载 {obj.name.Orange()} 资源成功！");
             }
         }
 
@@ -113,7 +121,7 @@ namespace JFramework.Core
             var filePath = GetPath(name);
             if (!File.Exists(filePath))
             {
-                Debug.Log($"创建存储文件: {name.Orange()}");
+                Debug.Log($"{Name.Sky()} <= Create => {name.Orange()}");
                 Save(new T(), name, isAes);
             }
 
@@ -121,10 +129,15 @@ namespace JFramework.Core
             {
                 if (jsonDict == null)
                 {
-                    Debug.Log("存储管理器没有初始化!");
+                    Debug.Log($"{Name.Red()} 没有初始化!");
                     return null;
                 }
-
+                
+                if (DebugManager.IsDebugJson)
+                {
+                    Debug.Log($"{Name.Sky()} <= Decrypt => {name.Orange()}");
+                }
+                
                 var loadJson = File.ReadAllBytes(filePath);
                 var json = GetData(name);
                 var key = json.key;
@@ -132,20 +145,17 @@ namespace JFramework.Core
                 if (key == null || key.Length <= 0 || iv == null || iv.Length <= 0) return new T();
                 var saveJson = JsonSetting.Decrypt(loadJson, key, iv);
                 var data = JsonConvert.DeserializeObject<T>(saveJson);
-                if (DebugManager.IsShowJson)
-                {
-                    Debug.Log($"JsonManager加载 {name.Orange()} 资源成功！");
-                }
                 return data;
             }
             else
             {
+                if (DebugManager.IsDebugJson)
+                {
+                    Debug.Log($"{Name.Sky()} <= Load => {name.Orange()}");
+                }
+                
                 var saveJson = File.ReadAllText(filePath);
                 var data = JsonConvert.DeserializeObject<T>(saveJson);
-                if (DebugManager.IsShowJson)
-                {
-                    Debug.Log($"JsonManager加载 {name.Orange()} 资源成功！");
-                }
                 return data;
             }
         }
@@ -155,8 +165,13 @@ namespace JFramework.Core
         /// </summary>
         public void Clear()
         {
+            if (DebugManager.IsDebugJson)
+            {
+                Debug.Log($"{Name.Sky()} <= Clear => {Name.Orange()}");
+            }
+
             jsonDict.Clear();
-            Save(jsonDict, name);
+            Save(jsonDict, Name);
         }
 
         /// <summary>
@@ -174,7 +189,7 @@ namespace JFramework.Core
 
             jsonDict[id].key = key;
             jsonDict[id].iv = iv;
-            Save(jsonDict, name);
+            Save(jsonDict, Name);
         }
 
         /// <summary>

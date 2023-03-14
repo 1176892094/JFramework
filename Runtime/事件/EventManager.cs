@@ -28,9 +28,14 @@ namespace JFramework
         /// </summary>
         /// <param name="id">事件唯一标识</param>
         /// <param name="action">传入侦听的事件</param>
-        public void AddListener(int id, EventData action)
+        public void Listen(int id, EventData action)
         {
             if (eventDict == null) return;
+
+            if (DebugManager.IsDebugEvent)
+            {
+                Debug.Log($"{Name.Sky()} <= Listen => {action.Method.ToString().Yellow()}");
+            }
 
             if (eventDict.ContainsKey(id))
             {
@@ -40,11 +45,6 @@ namespace JFramework
             {
                 eventDict.Add(id, action);
             }
-            
-            if (DebugManager.IsShowEvent)
-            {
-                Debug.Log($"EventManager侦听 {id.ToString().Yellow()} 事件！");
-            }
         }
 
         /// <summary>
@@ -52,18 +52,18 @@ namespace JFramework
         /// </summary>
         /// <param name="id">事件唯一标识</param>
         /// <param name="action">传入移除的事件</param>
-        public void RemoveListener(int id, EventData action)
+        public void Remove(int id, EventData action)
         {
             if (eventDict == null) return;
+
+            if (DebugManager.IsDebugEvent)
+            {
+                Debug.Log($"{Name.Sky()} <= Remove => {action.Method.ToString().Yellow()}");
+            }
 
             if (eventDict.ContainsKey(id))
             {
                 eventDict[id] -= action;
-            }
-            
-            if (DebugManager.IsShowEvent)
-            {
-                Debug.Log($"EventManager移除 {id.ToString().Yellow()} 事件！");
             }
         }
 
@@ -72,18 +72,18 @@ namespace JFramework
         /// </summary>
         /// <param name="id">事件唯一标识</param>
         /// <param name="args">传入事件的参数</param>
-        public void SendMessage(int id, params object[] args)
+        public void Send(int id, params object[] args)
         {
             if (eventDict == null) return;
-                    
+
+            if (DebugManager.IsDebugEvent)
+            {
+                Debug.Log($"{Name.Sky()} <= Send => {eventDict[id]?.Method.ToString().Yellow()}");
+            }
+
             if (eventDict.ContainsKey(id))
             {
                 eventDict[id]?.Invoke(args);
-            }
-            
-            if (DebugManager.IsShowEvent)
-            {
-                Debug.Log($"EventManager广播 {id.ToString().Yellow()} 事件！");
             }
         }
 

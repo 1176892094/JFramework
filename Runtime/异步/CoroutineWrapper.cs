@@ -73,7 +73,7 @@ namespace JFramework
             }
 
             result.AppendLine();
-            return "异步错误追踪" + result;
+            return "异步错误追踪：".Yellow() + result;
         }
 
         private static List<Type> TraceObject(IEnumerable<IEnumerator> enumerators)

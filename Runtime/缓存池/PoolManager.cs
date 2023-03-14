@@ -35,7 +35,7 @@ namespace JFramework
         {
             if (poolDict == null)
             {
-                Debug.Log("对象池管理器没有初始化!");
+                Debug.Log($"{Name.Red()} 没有初始化");
                 return;
             }
 
@@ -66,7 +66,7 @@ namespace JFramework
         {
             if (poolDict == null)
             {
-                Debug.Log("对象池管理器没有初始化!");
+                Debug.Log($"{Name.Red()} 没有初始化");
                 return;
             }
 
@@ -81,7 +81,7 @@ namespace JFramework
             {
                 if (obj == null)
                 {
-                    Debug.LogWarning(key + "已被销毁,无法推入对象！");
+                    Debug.Log($"{Name.Sky()} <= Push => {key} Failure");
                     poolDict[key].Pop();
                     return;
                 }

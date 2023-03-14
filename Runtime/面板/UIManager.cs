@@ -132,7 +132,7 @@ namespace JFramework.Core
         /// <param name="target">传入的UI对象</param>
         /// <param name="type">事件触发类型</param>
         /// <param name="action">事件触发后的回调</param>
-        public void AddListener(MonoBehaviour target, EventTriggerType type, UnityAction<BaseEventData> action)
+        public void Listen(MonoBehaviour target, EventTriggerType type, UnityAction<BaseEventData> action)
         {
             var trigger = target.GetComponent<EventTrigger>();
             if (trigger == null) trigger = target.gameObject.AddComponent<EventTrigger>();

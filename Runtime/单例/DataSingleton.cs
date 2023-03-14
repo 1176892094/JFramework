@@ -1,9 +1,8 @@
 using System.IO;
-using JFramework.Core;
+using UnityEngine;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
-using UnityEngine;
 
 namespace JFramework
 {
@@ -17,7 +16,7 @@ namespace JFramework
         /// 所属单例对象
         /// </summary>
         private static T instance;
-
+        
         /// <summary>
         /// 返回单例对象
         /// </summary>
@@ -27,19 +26,16 @@ namespace JFramework
             {
                 if (instance != null) return instance;
 #if UNITY_EDITOR
-                instance = FindObjectOfType<T>();
-                if (instance != null) return instance;
-                var name = typeof(T).Name;
-                var path = "Assets/Editor";
-                instance = AssetDatabase.LoadAssetAtPath<T>(path + $"/{name}.asset");
+                var name = $"Assets/Editor/{typeof(T).Name}.asset";
+                instance = AssetDatabase.LoadAssetAtPath<T>(name);
                 if (instance != null) return instance;
                 instance = CreateInstance<T>();
-                if (!Directory.Exists(path))
+                if (!Directory.Exists("Assets/Editor"))
                 {
-                    Directory.CreateDirectory(path);
+                    Directory.CreateDirectory("Assets/Editor");
                 }
 
-                AssetDatabase.CreateAsset(instance, path + $"/{name}.asset");
+                AssetDatabase.CreateAsset(instance, name);
                 AssetDatabase.Refresh();
 #else
                 instance = AssetManager.Instance.Load<T>("Setttngs/"+typeof(T).Name);

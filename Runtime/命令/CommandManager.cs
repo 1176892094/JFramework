@@ -32,7 +32,7 @@ namespace JFramework
         {
             if (commandDict == null)
             {
-                Debug.Log("命令管理器没有初始化!");
+                Debug.Log($"{Name.Red()} 没有初始化!");
                 return;
             }
 
@@ -57,7 +57,7 @@ namespace JFramework
         {
             if (commandDict == null)
             {
-                Debug.Log("命令管理器没有初始化!");
+                Debug.Log($"{Name.Red()} 没有初始化!");
                 return;
             }
 

@@ -42,7 +42,7 @@ namespace JFramework.Core
         private IEnumerator ScreenShot()
         {
 #if UNITY_EDITOR
-            IsShowDebug = false;
+            IsDebugTool = false;
             yield return new WaitForEndOfFrame();
             string screenPath = "Assets/Screen/";
             if (!Directory.Exists(screenPath)) Directory.CreateDirectory(screenPath);
@@ -51,7 +51,7 @@ namespace JFramework.Core
             texture.Apply();
             string title = DateTime.Now.ToString("yyyyMMddhhmmss") + ".png";
             byte[] bytes = texture.EncodeToPNG();
-            IsShowDebug = true;
+            IsDebugTool = true;
             yield return File.WriteAllBytesAsync(screenPath + title, bytes);
             AssetDatabase.Refresh();
 #else

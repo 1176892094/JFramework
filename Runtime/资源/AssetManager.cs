@@ -36,11 +36,16 @@ namespace JFramework.Core
         {
             if (assetDict == null)
             {
-                Debug.Log("资源管理器没有初始化!");
+                Debug.Log($"{Name.Red()} 没有初始化");
                 return null;
             }
             
             var result = Addressables.LoadAssetAsync<T>(name).WaitForCompletion();
+            if (DebugManager.IsDebugAsset)
+            {
+                Debug.Log($"{Name.Sky()} <= Load => {name.Green()} Success");
+            }
+            
             return result is GameObject ? Object.Instantiate(result) : result;
         }
         
@@ -54,7 +59,7 @@ namespace JFramework.Core
         {
             if (assetDict == null)
             {
-                Debug.Log("资源管理器没有初始化!");
+                Debug.Log($"{Name.Red()} 没有初始化");
                 return;
             }
             
@@ -65,7 +70,10 @@ namespace JFramework.Core
                 if (handle.IsDone)
                 {
                     action(handle.Result is GameObject ? Object.Instantiate(handle.Result) : handle.Result);
-                    if(DebugManager.IsShowAsset)Debug.Log($"AssetManager创建 {name.Green()} 资源成功！");
+                    if (DebugManager.IsDebugAsset)
+                    {
+                        Debug.Log($"{Name.Sky()} <= LoadAssetAsync => {name.Green()} Success");
+                    }
                 }
                 else
                 {
@@ -74,7 +82,10 @@ namespace JFramework.Core
                         if (obj.Status == AsyncOperationStatus.Succeeded)
                         {
                             action(obj.Result is GameObject ? Object.Instantiate(obj.Result) : obj.Result);
-                            if(DebugManager.IsShowAsset)Debug.Log($"AssetManager创建 {name.Green()} 资源成功！");
+                            if (DebugManager.IsDebugAsset)
+                            {
+                                Debug.Log($"{Name.Sky()} <= LoadAssetAsync => {name.Green()} Success");
+                            }
                         }
                     };
                 }
@@ -88,11 +99,17 @@ namespace JFramework.Core
                 if (obj.Status == AsyncOperationStatus.Succeeded)
                 {
                     action(obj.Result is GameObject ? Object.Instantiate(obj.Result) : obj.Result);
-                    if(DebugManager.IsShowAsset)Debug.Log($"AssetManager加载 {name.Green()} 资源成功！");
+                    if (DebugManager.IsDebugAsset)
+                    {
+                        Debug.Log($"{Name.Sky()} <= LoadAssetAsync => {name.Green()} Success");
+                    }
                 }
                 else
                 {
-                    Debug.LogWarning($"资源 {name.Red()} 未获取到！");
+                    if (DebugManager.IsDebugAsset)
+                    {
+                        Debug.Log($"{Name.Sky()} <= LoadAssetAsync => {name.Red()} Success");
+                    }
                     if (assetDict.ContainsKey(name))
                     {
                         assetDict.Remove(name);
@@ -111,7 +128,7 @@ namespace JFramework.Core
         {
             if (assetDict == null)
             {
-                Debug.Log("资源管理器没有初始化!");
+                Debug.Log($"{Name.Red()} 没有初始化");
                 return;
             }
             
