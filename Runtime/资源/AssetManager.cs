@@ -41,7 +41,7 @@ namespace JFramework.Core
             var result = Addressables.LoadAssetAsync<T>(name).WaitForCompletion();
             if (DebugManager.IsDebugAsset)
             {
-                Debug.Log($"{Name.Sky()} 加载 => {name.Green()}成功");
+                Debug.Log($"{Name.Sky()} 加载 => {name.Green()} 成功");
             }
             
             return result is GameObject ? Object.Instantiate(result) : result;
@@ -70,7 +70,7 @@ namespace JFramework.Core
                     action(handle.Result is GameObject ? Object.Instantiate(handle.Result) : handle.Result);
                     if (DebugManager.IsDebugAsset)
                     {
-                        Debug.Log($"{Name.Sky()} 加载 => {name.Green()}成功");
+                        Debug.Log($"{Name.Sky()} 加载 => {name.Green()} 成功");
                     }
                 }
                 else
@@ -82,7 +82,7 @@ namespace JFramework.Core
                             action(obj.Result is GameObject ? Object.Instantiate(obj.Result) : obj.Result);
                             if (DebugManager.IsDebugAsset)
                             {
-                                Debug.Log($"{Name.Sky()} 加载 => {name.Green()}成功");
+                                Debug.Log($"{Name.Sky()} 加载 => {name.Green()} 成功");
                             }
                         }
                     };
@@ -99,14 +99,14 @@ namespace JFramework.Core
                     action(obj.Result is GameObject ? Object.Instantiate(obj.Result) : obj.Result);
                     if (DebugManager.IsDebugAsset)
                     {
-                        Debug.Log($"{Name.Sky()} 加载 => {name.Green()}成功");
+                        Debug.Log($"{Name.Sky()} 加载 => {name.Green()} 成功");
                     }
                 }
                 else
                 {
                     if (DebugManager.IsDebugAsset)
                     {
-                        Debug.Log($"{Name.Sky()} 加载 => {name.Red()}失败");
+                        Debug.Log($"{Name.Sky()} 加载 => {name.Red()} 失败");
                     }
                     if (assetDict.ContainsKey(name))
                     {

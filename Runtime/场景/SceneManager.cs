@@ -4,10 +4,11 @@ using System.Collections.Generic;
 using JFramework.Core;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnitySceneManager = UnityEngine.SceneManagement.SceneManager;
 
 namespace JFramework
 {
-    public static class LoadManager
+    public static class SceneManager
     {
         /// <summary>
         /// 场景列表
@@ -17,12 +18,12 @@ namespace JFramework
         /// <summary>
         /// 管理器名称
         /// </summary>
-        private static string Name => nameof(EventManager);
+        private static string Name => nameof(SceneManager);
 
         /// <summary>
         /// 当前场景名称
         /// </summary>
-        public static string Scene => SceneManager.GetActiveScene().name;
+        public static string Scene => UnitySceneManager.GetActiveScene().name;
 
         /// <summary>
         /// 场景管理器初始化
@@ -30,7 +31,7 @@ namespace JFramework
         internal static void Awake()
         {
             sceneDict = new Dictionary<int, SceneData>();
-            for (var i = 0; i < SceneManager.sceneCountInBuildSettings; i++)
+            for (var i = 0; i < UnitySceneManager.sceneCountInBuildSettings; i++)
             {
                 var path = SceneUtility.GetScenePathByBuildIndex(i);
                 var data = path.Split('/');
@@ -58,7 +59,7 @@ namespace JFramework
                 Debug.Log($"{Name.Sky()} 加载 => {name.Green()}场景");
             }
 
-            SceneManager.LoadScene(name);
+            UnitySceneManager.LoadScene(name);
         }
 
         /// <summary>
@@ -90,7 +91,7 @@ namespace JFramework
         /// <returns>返回场景加载迭代器</returns>
         private static IEnumerator LoadSceneCompleted(string name, Action action)
         {
-            var asyncOperation = SceneManager.LoadSceneAsync(name);
+            var asyncOperation = UnitySceneManager.LoadSceneAsync(name);
             asyncOperation.allowSceneActivation = false;
             while (!asyncOperation.isDone)
             {

@@ -27,9 +27,9 @@ namespace JFramework
         /// <summary>
         /// 执行命令
         /// </summary>
-        /// <param name="args">传入的参数</param>
+        /// <param name="values">传入的参数</param>
         /// <typeparam name="T">传入继承ICommand的对象</typeparam>
-        public static void Execute<T>(params object[] args) where T : ICommand, new()
+        public static void Execute<T>(params object[] values) where T : ICommand, new()
         {
             if (commandDict == null)
             {
@@ -42,11 +42,11 @@ namespace JFramework
             {
                 var command = new T();
                 commandDict.Add(key, command);
-                command.OnExecute(args);
+                command.OnExecute(values);
                 return;
             }
 
-            commandDict[key].OnExecute(args);
+            commandDict[key].OnExecute(values);
         }
 
         /// <summary>

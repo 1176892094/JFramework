@@ -49,7 +49,7 @@ namespace JFramework
         /// <param name="entity">传入实体</param>
         public void Listen(IEntity entity)
         {
-            UpdateAction += entity.Update;
+            UpdateAction += entity.OnUpdate;
         }
 
         /// <summary>
@@ -58,7 +58,7 @@ namespace JFramework
         /// <param name="entity">传入实体</param>
         public void Remove(IEntity entity)
         {
-            UpdateAction -= entity.Update;
+            UpdateAction -= entity.OnUpdate;
         }
 
         private static void Singleton()
@@ -85,7 +85,7 @@ namespace JFramework
             JsonManager.Awake();
             AudioManager.Awake();
             PoolManager.Awake();
-            LoadManager.Awake();
+            SceneManager.Awake();
             DataManager.Awake();
             UIManager.Awake();
         }
@@ -97,7 +97,7 @@ namespace JFramework
         {
             UIManager.Destroy();
             PoolManager.Destroy();
-            LoadManager.Destroy();
+            SceneManager.Destroy();
             DataManager.Destroy();
             JsonManager.Destroy();
             TimerManager.Destroy();

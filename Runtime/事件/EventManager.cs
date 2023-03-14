@@ -48,7 +48,7 @@ namespace JFramework
 
             if (DebugManager.IsDebugEvent)
             {
-                Debug.Log($"{Name.Sky()} 侦听 => {action.Method.ToString().Yellow()}事件");
+                Debug.Log($"{Name.Sky()} 侦听 => {action.Method.ToString().Yellow()} 事件");
             }
         }
 
@@ -64,7 +64,7 @@ namespace JFramework
             {
                 if (DebugManager.IsDebugEvent)
                 {
-                    Debug.Log($"{Name.Sky()} 移除 => {action.Method.ToString().Yellow()}事件");
+                    Debug.Log($"{Name.Sky()} 移除 => {action.Method.ToString().Yellow()} 事件");
                 }
 
                 eventDict[id] -= action;
@@ -83,7 +83,7 @@ namespace JFramework
             {
                 if (DebugManager.IsDebugEvent)
                 {
-                    Debug.Log($"{Name.Sky()} 触发 => {eventDict[id]?.Method.ToString().Yellow()}");
+                    Debug.Log($"{Name.Sky()} 触发 => {eventDict[id]?.Method.ToString().Yellow()} 事件");
                 }
 
                 eventDict[id]?.Invoke(args);
