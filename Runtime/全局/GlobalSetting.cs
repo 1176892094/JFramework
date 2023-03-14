@@ -40,7 +40,7 @@ namespace JFramework
         private Transform[] layerGroup => UIManager.Instance.layerGroup;
 
         [ShowInInspector, LabelText("音乐管理对象"), FoldoutGroup("音效管理器")]
-        private GameObject audioManager => AudioManager.Instance.audioManager;
+        private GameObject audioManager => AudioManager.Instance.audioSystem;
 
         [ShowInInspector, LabelText("当前背景音乐"), FoldoutGroup("音效管理器")]
         private AudioSource audioSource => AudioManager.Instance.audioSource;

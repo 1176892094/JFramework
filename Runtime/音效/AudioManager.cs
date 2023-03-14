@@ -9,39 +9,13 @@ namespace JFramework
     {
         internal Queue<AudioSource> audioQueue;
         internal List<AudioSource> audioList;
-        internal GameObject audioManager;
+        internal GameObject audioSystem;
         internal AudioSource audioSource;
-
-        public float SoundVolume
-        {
-            get
-            {
-                if (audioSetting != null)
-                {
-                    return audioSetting.soundVolume;
-                }
-
-                return 0.5f;
-            }
-        }
-
-        public float AudioVolume
-        {
-            get
-            {
-                if (audioSetting != null)
-                {
-                    return audioSetting.audioVolume;
-                }
-
-                return 0.5f;
-            }
-        }
-
         private AudioSetting audioSetting;
-
         private string name => nameof(AudioManager);
-
+        public float SoundVolume => audioSetting?.soundVolume ?? 0.5f;
+        public float AudioVolume => audioSetting?.audioVolume ?? 0.5f;
+        
         /// <summary>
         /// 音效管理器初始化
         /// </summary>
@@ -52,9 +26,9 @@ namespace JFramework
             audioQueue = new Queue<AudioSource>();
             if (!GlobalManager.Instance) return;
             var obj = GlobalManager.Instance.gameObject;
-            audioManager = obj.transform.Find("AudioSystem").gameObject;
+            audioSystem = obj.transform.Find("AudioSystem").gameObject;
             audioSetting = JsonManager.Instance.Load<AudioSetting>(name, true);
-            audioSource = audioManager.GetComponent<AudioSource>();
+            audioSource = audioSystem.GetComponent<AudioSource>();
             SetSound(audioSetting.soundVolume);
             SetAudio(audioSetting.audioVolume);
         }
@@ -118,7 +92,7 @@ namespace JFramework
                 return;
             }
 
-            var audio = audioQueue.Count > 0 ? audioQueue.Dequeue() : audioManager.AddComponent<AudioSource>();
+            var audio = audioQueue.Count > 0 ? audioQueue.Dequeue() : audioSystem.AddComponent<AudioSource>();
             AssetManager.Instance.LoadAsync<AudioClip>(path, clip =>
             {
                 audioList.Add(audio);

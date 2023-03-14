@@ -14,7 +14,6 @@ namespace JFramework
     {
         [ShowInInspector, LabelText("实体管理数据"), FoldoutGroup("实体管理器"), ReadOnly]
         private static Dictionary<int, IEntity> entityDict = new Dictionary<int, IEntity>();
-
         [ShowInInspector, LabelText("实体索引队列"), FoldoutGroup("实体管理器"), ReadOnly]
         private static Queue<int> entityQueue = new Queue<int>();
 
@@ -66,12 +65,19 @@ namespace JFramework
             entityDict.Remove(entity.Id);
         }
 
+        private static void AutoCreate()
+        {
+            if (FindObjectOfType(typeof(GlobalManager)) != null) return;
+            Instantiate(Resources.Load<GameObject>("GlobalManager"));
+        }
+
         /// <summary>
         /// 注册管理器
         /// </summary>
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
         private static void Register()
         {
+            AutoCreate();
             entityDict.Clear();
             entityQueue.Clear();
             CommandManager.Instance.Awake();
@@ -85,10 +91,12 @@ namespace JFramework
             DataManager.Instance.Awake();
             UIManager.Instance.Awake();
         }
-
-        protected override void OnDestroy()
+        
+        /// <summary>
+        /// 当程序退出
+        /// </summary>
+        private void OnApplicationQuit()
         {
-            base.OnDestroy();
             UIManager.Instance.Destroy();
             PoolManager.Instance.Destroy();
             LoadManager.Instance.Destroy();
@@ -99,13 +107,6 @@ namespace JFramework
             AssetManager.Instance.Destroy();
             EventManager.Instance.Destroy();
             CommandManager.Instance.Destroy();
-        }
-
-        /// <summary>
-        /// 当程序退出
-        /// </summary>
-        private void OnApplicationQuit()
-        {
             entityDict.Clear();
             entityQueue.Clear();
             UpdateAction = null;
