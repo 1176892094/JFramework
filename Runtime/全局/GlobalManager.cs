@@ -86,11 +86,9 @@ namespace JFramework
             UIManager.Instance.Awake();
         }
 
-        /// <summary>
-        /// 当程序退出
-        /// </summary>
-        private void OnApplicationQuit()
+        protected override void OnDestroy()
         {
+            base.OnDestroy();
             UIManager.Instance.Destroy();
             PoolManager.Instance.Destroy();
             LoadManager.Instance.Destroy();
@@ -101,6 +99,13 @@ namespace JFramework
             AssetManager.Instance.Destroy();
             EventManager.Instance.Destroy();
             CommandManager.Instance.Destroy();
+        }
+
+        /// <summary>
+        /// 当程序退出
+        /// </summary>
+        private void OnApplicationQuit()
+        {
             entityDict.Clear();
             entityQueue.Clear();
             UpdateAction = null;

@@ -3,22 +3,22 @@ using UnityEngine;
 
 namespace JFramework.Core
 {
-    internal sealed partial class DebugManager : MonoSingleton<DebugManager>
+    internal sealed partial class DebugManager : MonoBehaviour
     {
         [ShowInInspector, LabelText("开启Debug调试工具"), BoxGroup("调试选项")]
-        public bool isDebug;
+        public static bool IsShowDebug;
 
         [ShowInInspector, LabelText("显示Json加载信息"), BoxGroup("调试选项")]
-        public bool isShowJson;
+        public static bool IsShowJson;
 
         [ShowInInspector, LabelText("显示Data加载信息"), BoxGroup("调试选项")]
-        public bool isShowData;
+        public static bool IsShowData;
 
         [ShowInInspector, LabelText("显示Asset加载信息"), BoxGroup("调试选项")]
-        public bool isShowAsset;
+        public static bool IsShowAsset;
 
         [ShowInInspector, LabelText("显示Event事件信息"), BoxGroup("调试选项")]
-        public bool isShowEvent;
+        public static bool IsShowEvent;
 
         private int FPS;
         private bool IsExtend;
@@ -27,25 +27,24 @@ namespace JFramework.Core
         private DebugType debugType;
 
 
-        protected override void Awake()
+        private void Awake()
         {
-            base.Awake();
             InitComponent();
             Application.logMessageReceived += LogMessageReceived;
         }
 
-        protected override void Start()
+        private void Start()
         {
             TimerManager.Instance.Pop(1).SetLoop(-1, _ =>
             {
-                if (!isDebug) return;
+                if (!IsShowDebug) return;
                 FPS = (int)(1.0f / Time.deltaTime);
             }).Unscale().SetTarget(gameObject);
         }
 
         private void OnGUI()
         {
-            if (!isDebug) return;
+            if (!IsShowDebug) return;
             Matrix4x4 cachedMatrix = GUI.matrix;
             GUI.matrix = Matrix4x4.Scale(new Vector3(DebugData.WindowScale, DebugData.WindowScale, 1f));
 
@@ -109,9 +108,8 @@ namespace JFramework.Core
             }
         }
 
-        protected override void OnDestroy()
+        private void OnDestroy()
         {
-            base.OnDestroy();
             Application.logMessageReceived -= LogMessageReceived;
         }
     }

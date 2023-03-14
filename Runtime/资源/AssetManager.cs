@@ -65,7 +65,7 @@ namespace JFramework.Core
                 if (handle.IsDone)
                 {
                     action(handle.Result is GameObject ? Object.Instantiate(handle.Result) : handle.Result);
-                    if(DebugManager.Instance.isShowAsset)Debug.Log($"AssetManager创建 {name.Green()} 资源成功！");
+                    if(DebugManager.IsShowAsset)Debug.Log($"AssetManager创建 {name.Green()} 资源成功！");
                 }
                 else
                 {
@@ -74,7 +74,7 @@ namespace JFramework.Core
                         if (obj.Status == AsyncOperationStatus.Succeeded)
                         {
                             action(obj.Result is GameObject ? Object.Instantiate(obj.Result) : obj.Result);
-                            if(DebugManager.Instance.isShowAsset)Debug.Log($"AssetManager创建 {name.Green()} 资源成功！");
+                            if(DebugManager.IsShowAsset)Debug.Log($"AssetManager创建 {name.Green()} 资源成功！");
                         }
                     };
                 }
@@ -88,7 +88,7 @@ namespace JFramework.Core
                 if (obj.Status == AsyncOperationStatus.Succeeded)
                 {
                     action(obj.Result is GameObject ? Object.Instantiate(obj.Result) : obj.Result);
-                    if(DebugManager.Instance.isShowAsset)Debug.Log($"AssetManager加载 {name.Green()} 资源成功！");
+                    if(DebugManager.IsShowAsset)Debug.Log($"AssetManager加载 {name.Green()} 资源成功！");
                 }
                 else
                 {

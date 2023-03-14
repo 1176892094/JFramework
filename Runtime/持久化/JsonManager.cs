@@ -53,7 +53,7 @@ namespace JFramework.Core
                 File.WriteAllText(filePath, saveJson);
             }
 
-            if (DebugManager.Instance.isShowJson)
+            if (DebugManager.IsShowJson)
             {
                 Debug.Log($"JsonManager保存 {name.Orange()} 资源成功！");
             }
@@ -95,7 +95,7 @@ namespace JFramework.Core
                 JsonUtility.FromJsonOverwrite(saveJson, obj);
             }
 
-            if (DebugManager.Instance.isShowJson)
+            if (DebugManager.IsShowJson)
             {
                 Debug.Log($"JsonManager加载 {obj.name.Orange()} 资源成功！");
             }
@@ -132,7 +132,7 @@ namespace JFramework.Core
                 if (key == null || key.Length <= 0 || iv == null || iv.Length <= 0) return new T();
                 var saveJson = JsonSetting.Decrypt(loadJson, key, iv);
                 var data = JsonConvert.DeserializeObject<T>(saveJson);
-                if (DebugManager.Instance.isShowJson)
+                if (DebugManager.IsShowJson)
                 {
                     Debug.Log($"JsonManager加载 {name.Orange()} 资源成功！");
                 }
@@ -142,7 +142,7 @@ namespace JFramework.Core
             {
                 var saveJson = File.ReadAllText(filePath);
                 var data = JsonConvert.DeserializeObject<T>(saveJson);
-                if (DebugManager.Instance.isShowJson)
+                if (DebugManager.IsShowJson)
                 {
                     Debug.Log($"JsonManager加载 {name.Orange()} 资源成功！");
                 }

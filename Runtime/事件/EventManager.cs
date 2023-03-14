@@ -41,7 +41,7 @@ namespace JFramework
                 eventDict.Add(id, action);
             }
             
-            if (DebugManager.Instance.isShowEvent)
+            if (DebugManager.IsShowEvent)
             {
                 Debug.Log($"EventManager侦听 {id.ToString().Yellow()} 事件！");
             }
@@ -61,7 +61,7 @@ namespace JFramework
                 eventDict[id] -= action;
             }
             
-            if (DebugManager.Instance.isShowEvent)
+            if (DebugManager.IsShowEvent)
             {
                 Debug.Log($"EventManager移除 {id.ToString().Yellow()} 事件！");
             }
@@ -81,7 +81,7 @@ namespace JFramework
                 eventDict[id]?.Invoke(args);
             }
             
-            if (DebugManager.Instance.isShowEvent)
+            if (DebugManager.IsShowEvent)
             {
                 Debug.Log($"EventManager广播 {id.ToString().Yellow()} 事件！");
             }
