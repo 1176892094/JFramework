@@ -9,6 +9,6 @@ namespace JFramework.Interface
         /// 控制器初始化
         /// </summary>
         /// <param name="owner">控制器的所有者</param>
-        void OnInit(IEntity owner);
+        void Start(IEntity owner);
     }
 }

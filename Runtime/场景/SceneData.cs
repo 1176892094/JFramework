@@ -14,5 +14,11 @@ namespace JFramework
         /// 场景名称
         /// </summary>
         public string Name;
+
+        public SceneData(int Id, string Name)
+        {
+            this.Id = Id;
+            this.Name = Name;
+        }
     }
 }

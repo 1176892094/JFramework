@@ -19,21 +19,21 @@ namespace JFramework
         /// 控制器初始化
         /// </summary>
         /// <param name="owner">传入控制器的所有者</param>
-        private void OnInit(T owner)
+        private void Start(T owner)
         {
             this.owner = owner;
-            OnInit();
+            Start();
         }
 
         /// <summary>
         /// 控制器初始化
         /// </summary>
-        protected abstract void OnInit();
+        protected abstract void Start();
 
         /// <summary>
         /// 通过接口初始化控制器
         /// </summary>
         /// <param name="owner">控制器的所有者</param>
-        void IController.OnInit(IEntity owner) => OnInit((T)owner);
+        void IController.Start(IEntity owner) => Start((T)owner);
     }
 }

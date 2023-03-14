@@ -3,7 +3,7 @@ namespace JFramework.Interface
     /// <summary>
     /// 对象池
     /// </summary>
-    public interface IPool
+    internal interface IPool
     {
         /// <summary>
         /// 对象池物体数量

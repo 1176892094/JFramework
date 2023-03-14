@@ -109,7 +109,5 @@ namespace JFramework
             var z = float.Parse(values[2]);
             r = new Vector3(x, y, z);
         }
-
-      
     }
 }

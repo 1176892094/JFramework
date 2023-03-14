@@ -7,7 +7,7 @@ namespace JFramework
     /// <summary>
     /// 命令管理器
     /// </summary>
-    public sealed class CommandManager : Singleton<CommandManager>
+    public static class CommandManager
     {
         /// <summary>
         /// 命令存储字典
@@ -15,13 +15,14 @@ namespace JFramework
         internal static Dictionary<string, ICommand> commandDict;
 
         /// <summary>
+        /// 管理器名称
+        /// </summary>
+        private static string Name => nameof(EventManager);
+
+        /// <summary>
         /// 命令管理器初始化
         /// </summary>
-        internal override void Awake()
-        {
-            base.Awake();
-            commandDict = new Dictionary<string, ICommand>();
-        }
+        internal static void Awake() => commandDict = new Dictionary<string, ICommand>();
 
         /// <summary>
         /// 执行命令
@@ -37,7 +38,6 @@ namespace JFramework
             }
 
             var key = typeof(T).Name;
-
             if (!commandDict.ContainsKey(key))
             {
                 var command = new T();
@@ -62,20 +62,15 @@ namespace JFramework
             }
 
             var key = typeof(T).Name;
-
             if (commandDict.ContainsKey(key))
             {
                 commandDict.Remove(key);
             }
         }
-        
+
         /// <summary>
         /// 清除命令管理器
         /// </summary>
-        internal override void Destroy()
-        {
-            base.Destroy();
-            commandDict = null;
-        }
+        internal static void Destroy() => commandDict = null;
     }
 }

@@ -6,7 +6,7 @@ namespace JFramework
     /// 对象池的抽象类
     /// </summary>
     /// <typeparam name="T">传入对象池的对象类型</typeparam>
-    public abstract class Pool<T> : IPool where T : class
+    internal abstract class Pool<T> : IPool where T : class
     {
         /// <summary>
         /// 对象池物体数量

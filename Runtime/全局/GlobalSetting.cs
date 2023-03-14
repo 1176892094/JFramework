@@ -10,7 +10,7 @@ namespace JFramework
     public sealed partial class GlobalManager
     {
         [ShowInInspector, LabelText("场景管理数据"), FoldoutGroup("通用管理器")]
-        private List<SceneData> sceneList => LoadManager.sceneList;
+        private Dictionary<int, SceneData> sceneList => LoadManager.sceneDict;
 
         [ShowInInspector, LabelText("事件管理数据"), FoldoutGroup("通用管理器")]
         private Dictionary<int, EventData> eventDict => EventManager.eventDict;

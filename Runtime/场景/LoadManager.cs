@@ -7,33 +7,37 @@ using UnityEngine.SceneManagement;
 
 namespace JFramework
 {
-    public sealed class LoadManager : Singleton<LoadManager>
+    public static class LoadManager
     {
+        /// <summary>
+        /// 场景列表
+        /// </summary>
+        internal static Dictionary<int, SceneData> sceneDict;
+
+        /// <summary>
+        /// 管理器名称
+        /// </summary>
+        private static string Name => nameof(EventManager);
+
         /// <summary>
         /// 当前场景名称
         /// </summary>
         public static string Scene => SceneManager.GetActiveScene().name;
 
         /// <summary>
-        /// 场景列表
-        /// </summary>
-        internal static List<SceneData> sceneList;
-
-        /// <summary>
         /// 场景管理器初始化
         /// </summary>
-        internal override void Awake()
+        internal static void Awake()
         {
-            sceneList = new List<SceneData>();
-            var count = SceneManager.sceneCountInBuildSettings;
-            for (var i = 0; i < count; i++)
+            sceneDict = new Dictionary<int, SceneData>();
+            for (var i = 0; i < SceneManager.sceneCountInBuildSettings; i++)
             {
                 var path = SceneUtility.GetScenePathByBuildIndex(i);
-                var array = path.Split('/');
-                var name = array[^1];
-                array = name.Split('.');
-                name = array[0];
-                sceneList.Add(new SceneData() { Name = name, Id = i });
+                var data = path.Split('/');
+                var name = data[^1];
+                data = name.Split('.');
+                name = data[0];
+                sceneDict.Add(i, new SceneData(i, name));
             }
         }
 
@@ -43,7 +47,7 @@ namespace JFramework
         /// <param name="name">场景名称</param>
         public static void LoadScene(string name)
         {
-            if (sceneList == null)
+            if (sceneDict == null)
             {
                 Debug.Log($"{Name.Red()} 没有初始化!");
                 return;
@@ -51,15 +55,10 @@ namespace JFramework
 
             if (DebugManager.IsDebugScene)
             {
-                Debug.Log($"{Name.Sky()} <= Load => {name.Green()}");
+                Debug.Log($"{Name.Sky()} 加载 => {name.Green()}场景");
             }
 
             SceneManager.LoadScene(name);
-            
-            if (DebugManager.IsDebugScene)
-            {
-                Debug.Log($"{Name.Sky()} <= Load => {name.Green()}");
-            }
         }
 
         /// <summary>
@@ -69,15 +68,15 @@ namespace JFramework
         /// <param name="action">场景加载完成的回调</param>
         public static void LoadSceneAsync(string name, Action action)
         {
-            if (sceneList == null)
+            if (sceneDict == null)
             {
                 Debug.Log($"{Name.Red()} 没有初始化!");
                 return;
             }
-            
+
             if (DebugManager.IsDebugScene)
             {
-                Debug.Log($"{Name.Sky()} <= LoadAsync => {name.Green()}");
+                Debug.Log($"{Name.Sky()} 异步加载 => {name.Green()}场景");
             }
 
             GlobalManager.Instance.StartCoroutine(LoadSceneCompleted(name, action));
@@ -91,15 +90,21 @@ namespace JFramework
         /// <returns>返回场景加载迭代器</returns>
         private static IEnumerator LoadSceneCompleted(string name, Action action)
         {
-            AsyncOperation asyncOperation = SceneManager.LoadSceneAsync(name);
+            var asyncOperation = SceneManager.LoadSceneAsync(name);
             asyncOperation.allowSceneActivation = false;
             while (!asyncOperation.isDone)
             {
-                float progress = 0;
+                var progress = 0f;
                 while (progress < 0.999f)
                 {
                     progress = Mathf.Lerp(progress, asyncOperation.progress / 9f * 10f, Time.deltaTime);
                     EventManager.Send(999, progress);
+
+                    if (DebugManager.IsDebugScene)
+                    {
+                        Debug.Log($"{Name.Sky()} 加载进度条 => {progress}%");
+                    }
+
                     yield return new WaitForEndOfFrame();
                 }
 
@@ -108,11 +113,16 @@ namespace JFramework
             }
 
             action?.Invoke();
-            
+
             if (DebugManager.IsDebugScene)
             {
-                Debug.Log($"{Name.Sky()} <= LoadAsync => {name.Green()}");
+                Debug.Log($"{Name.Sky()} 加载 => {name.Green()}场景完成");
             }
         }
+
+        /// <summary>
+        /// 清空场景管理器
+        /// </summary>
+        internal static void Destroy() => sceneDict = null;
     }
 }

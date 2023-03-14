@@ -11,7 +11,7 @@ namespace JFramework.Core
     /// <summary>
     /// UI界面管理器
     /// </summary>
-    public sealed class UIManager : Singleton<UIManager>
+    public static class UIManager
     {
         /// <summary>
         /// 存储所有UI的字典
@@ -26,9 +26,8 @@ namespace JFramework.Core
         /// <summary>
         /// 界面管理器初始化数据
         /// </summary>
-        internal override void Awake()
+        internal static void Awake()
         {
-            base.Awake();
             layerGroup = new Transform[5];
             panelDict = new Dictionary<string, UIPanel>();
             var obj = GlobalManager.Instance.gameObject;
@@ -156,7 +155,7 @@ namespace JFramework.Core
         /// <summary>
         /// UI管理器销毁
         /// </summary>
-        internal override void Destroy()
+        internal static void Destroy()
         {
             panelDict = null;
             layerGroup = null;

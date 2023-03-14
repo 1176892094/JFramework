@@ -8,7 +8,7 @@ namespace JFramework.Core
     /// <summary>
     /// 计时器管理器
     /// </summary>
-    public sealed class TimerManager : Singleton<TimerManager>
+    public static class TimerManager
     {
         /// <summary>
         /// 存储已经完成的计时器
@@ -19,11 +19,16 @@ namespace JFramework.Core
         /// 存储正在执行的计时器
         /// </summary>
         internal static List<Timer> timerList;
+        
+        /// <summary>
+        /// 计时器管理名称
+        /// </summary>
+        private static string Name => nameof(TimerManager);
 
         /// <summary>
         /// 构造函数初始化数据
         /// </summary>
-        internal override void Awake()
+        internal static void Awake()
         {
             timerQueue = new Queue<Timer>();
             timerList = new List<Timer>();
@@ -51,7 +56,7 @@ namespace JFramework.Core
         {
             if (timerList == null)
             {
-                Debug.Log("计时器管理器没有初始化!");
+                Debug.Log($"{Name.Red()} 没有初始化!");
                 return null;
             }
 
@@ -69,7 +74,7 @@ namespace JFramework.Core
         {
             if (timerList == null)
             {
-                Debug.Log("计时器管理器没有初始化!");
+                Debug.Log($"{Name.Red()} 没有初始化!");
                 return;
             }
 
@@ -85,9 +90,8 @@ namespace JFramework.Core
         /// <summary>
         /// 计时器管理器清除计时器
         /// </summary>
-        internal override void Destroy()
+        internal static void Destroy()
         {
-            base.Destroy();
             timerQueue = null;
             timerList = null;
         }

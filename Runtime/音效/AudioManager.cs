@@ -5,22 +5,22 @@ using UnityEngine;
 
 namespace JFramework
 {
-    public sealed class AudioManager : Singleton<AudioManager>
+    public static class AudioManager
     {
         internal static Queue<AudioSource> audioQueue;
         internal static List<AudioSource> audioList;
         internal static GameObject audioSystem;
         internal static AudioSource audioSource;
         private static AudioSetting audioSetting;
+        private static string Name => nameof(AssetManager);
         public static float SoundVolume => audioSetting?.soundVolume ?? 0.5f;
         public static float AudioVolume => audioSetting?.audioVolume ?? 0.5f;
         
         /// <summary>
         /// 音效管理器初始化
         /// </summary>
-        internal override void Awake()
+        internal static void Awake()
         {
-            base.Awake();
             audioList = new List<AudioSource>();
             audioQueue = new Queue<AudioSource>();
             var obj = GlobalManager.Instance.gameObject;
@@ -131,9 +131,8 @@ namespace JFramework
             }
         }
 
-        internal override void Destroy()
+        internal static void Destroy()
         {
-            base.Destroy();
             audioList = null;
             audioQueue = null;
             audioSystem = null;

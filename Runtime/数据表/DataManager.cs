@@ -12,7 +12,7 @@ namespace JFramework.Core
     /// <summary>
     /// 数据管理器
     /// </summary>
-    public sealed class DataManager : Singleton<DataManager>
+    public static class DataManager
     {
         /// <summary>
         /// 存储int为主键类型的数据字典
@@ -23,6 +23,8 @@ namespace JFramework.Core
         /// 存储string为主键的数据字典
         /// </summary>
         internal static Dictionary<Type, StrDataDict> StrDataDict;
+        
+        private static string Name => nameof(DataManager);
 
         /// <summary>
         /// 资源路径
@@ -37,9 +39,8 @@ namespace JFramework.Core
         /// <summary>
         /// 构造函数初始化数据
         /// </summary>
-        internal override void Awake()
+        internal static void Awake()
         {
-            base.Awake();
             IntDataDict = new Dictionary<Type, IntDataDict>();
             StrDataDict = new Dictionary<Type, StrDataDict>();
             var assembly = GetAssembly(out IEnumerable<Type> types);
@@ -267,7 +268,7 @@ namespace JFramework.Core
         /// <summary>
         /// 清除数据管理器
         /// </summary>
-        internal override void Destroy()
+        internal static void Destroy()
         {
             IntDataDict = null;
             StrDataDict = null;

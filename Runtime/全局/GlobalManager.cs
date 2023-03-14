@@ -10,15 +10,23 @@ namespace JFramework
     /// <summary>
     /// 全局控制器
     /// </summary>
-    public sealed partial class GlobalManager : MonoSingleton<GlobalManager>
+    public sealed partial class GlobalManager : MonoBehaviour
     {
+        /// <summary>
+        /// 全局实体列表
+        /// </summary>
         [ShowInInspector, LabelText("实体管理数据"), FoldoutGroup("实体管理器"), ReadOnly]
-        private static Dictionary<int, IEntity> entityDict;
+        private static List<IEntity> entityList;
 
-        [ShowInInspector, LabelText("实体索引队列"), FoldoutGroup("实体管理器"), ReadOnly]
-        private static Queue<int> entityQueue;
-
+        /// <summary>
+        /// 全局管理器名称
+        /// </summary>
         private static string Name => nameof(GlobalManager);
+
+        /// <summary>
+        /// 全局管理器单例
+        /// </summary>
+        public static GlobalManager Instance;
 
         /// <summary>
         /// Update更新事件
@@ -28,11 +36,7 @@ namespace JFramework
         /// <summary>
         /// 全局管理器醒来
         /// </summary>
-        protected override void Awake()
-        {
-            base.Awake();
-            DontDestroyOnLoad(gameObject);
-        }
+        private void Awake() => DontDestroyOnLoad(gameObject);
 
         /// <summary>
         /// 全局Update更新
@@ -45,9 +49,7 @@ namespace JFramework
         /// <param name="entity">传入实体</param>
         public void Listen(IEntity entity)
         {
-            UpdateAction += entity.OnUpdate;
-            entity.Id = entityQueue.Count > 0 ? entityQueue.Dequeue() : entityDict.Count + 1;
-            entityDict?.Add(entity.Id, entity);
+            UpdateAction += entity.Update;
         }
 
         /// <summary>
@@ -56,25 +58,16 @@ namespace JFramework
         /// <param name="entity">传入实体</param>
         public void Remove(IEntity entity)
         {
-            UpdateAction -= entity.OnUpdate;
-            entityQueue?.Enqueue(entity.Id);
-            entityDict?.Remove(entity.Id);
+            UpdateAction -= entity.Update;
         }
 
-        /// <summary>
-        /// 获取实体
-        /// </summary>
-        /// <param name="id">传入实体的id</param>
-        /// <returns>返回对应的实体</returns>
-        public static T Get<T>(int id) where T : IEntity
+        private static void Singleton()
         {
-            return entityDict.ContainsKey(id) ? (T)entityDict[id] : default;
-        }
-
-        private static void AutoCreate()
-        {
-            if (FindObjectOfType(typeof(GlobalManager))) return;
-            Instantiate(Resources.Load<GameObject>(Name));
+            if (Instance != null) return;
+            Instance = FindObjectOfType<GlobalManager>();
+            if (Instance != null) return;
+            var obj = Resources.Load<GameObject>(Name);
+            Instance = Instantiate(obj).GetComponent<GlobalManager>();
         }
 
         /// <summary>
@@ -83,19 +76,18 @@ namespace JFramework
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
         private static void Register()
         {
-            AutoCreate();
-            entityDict = new Dictionary<int, IEntity>();
-            entityQueue = new Queue<int>();
-            CommandManager.Instance.Awake();
-            AssetManager.Instance.Awake();
-            EventManager.Instance.Awake();
-            TimerManager.Instance.Awake();
-            JsonManager.Instance.Awake();
-            AudioManager.Instance.Awake();
-            PoolManager.Instance.Awake();
-            LoadManager.Instance.Awake();
-            DataManager.Instance.Awake();
-            UIManager.Instance.Awake();
+            Singleton();
+            entityList = new List<IEntity>();
+            CommandManager.Awake();
+            AssetManager.Awake();
+            EventManager.Awake();
+            TimerManager.Awake();
+            JsonManager.Awake();
+            AudioManager.Awake();
+            PoolManager.Awake();
+            LoadManager.Awake();
+            DataManager.Awake();
+            UIManager.Awake();
         }
 
         /// <summary>
@@ -103,18 +95,18 @@ namespace JFramework
         /// </summary>
         private void OnApplicationQuit()
         {
-            UIManager.Instance.Destroy();
-            PoolManager.Instance.Destroy();
-            LoadManager.Instance.Destroy();
-            DataManager.Instance.Destroy();
-            JsonManager.Instance.Destroy();
-            TimerManager.Instance.Destroy();
-            AudioManager.Instance.Destroy();
-            AssetManager.Instance.Destroy();
-            EventManager.Instance.Destroy();
-            CommandManager.Instance.Destroy();
-            entityDict = null;
-            entityQueue = null;
+            UIManager.Destroy();
+            PoolManager.Destroy();
+            LoadManager.Destroy();
+            DataManager.Destroy();
+            JsonManager.Destroy();
+            TimerManager.Destroy();
+            AudioManager.Destroy();
+            AssetManager.Destroy();
+            EventManager.Destroy();
+            CommandManager.Destroy();
+            Instance = null;
+            entityList = null;
             UpdateAction = null;
         }
     }

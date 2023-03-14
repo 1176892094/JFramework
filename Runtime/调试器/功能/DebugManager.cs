@@ -11,7 +11,7 @@ namespace JFramework.Core
         [ShowInInspector, LabelText("显示Asset加载信息"), BoxGroup("调试选项")] public static bool IsDebugAsset;
         [ShowInInspector, LabelText("显示Event事件信息"), BoxGroup("调试选项")] public static bool IsDebugEvent;
         [ShowInInspector, LabelText("显示Scene加载信息"), BoxGroup("调试选项")] public static bool IsDebugScene;
-        
+
         private int FPS;
         private bool IsExtend;
         private Rect minRect;

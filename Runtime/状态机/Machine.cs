@@ -23,7 +23,7 @@ namespace JFramework
         /// <summary>
         /// 状态机初始化
         /// </summary>
-        protected override void OnInit()
+        protected override void Start()
         {
             stateDict = new Dictionary<string, IState>();
         }
@@ -31,7 +31,7 @@ namespace JFramework
         /// <summary>
         /// 状态机更新
         /// </summary>
-        public virtual void OnUpdate() => state?.OnUpdate();
+        public void OnUpdate() => state?.OnUpdate();
 
         /// <summary>
         /// 状态机添加状态

@@ -5,23 +5,29 @@ using UnityEngine;
 namespace JFramework
 {
     /// <summary>
+    /// 可变长参数委托
+    /// </summary>
+    public delegate void EventData(params object[] args);
+
+    /// <summary>
     /// 事件管理器
     /// </summary>
-    public sealed class EventManager : Singleton<EventManager>
+    public static class EventManager
     {
         /// <summary>
-        /// 事件存储字典
+        /// 事件字典
         /// </summary>
         internal static Dictionary<int, EventData> eventDict;
 
         /// <summary>
+        /// 管理器名称
+        /// </summary>
+        private static string Name => nameof(EventManager);
+
+        /// <summary>
         /// 事件管理器醒来
         /// </summary>
-        internal override void Awake()
-        {
-            base.Awake();
-            eventDict = new Dictionary<int, EventData>();
-        }
+        internal static void Awake() => eventDict = new Dictionary<int, EventData>();
 
         /// <summary>
         /// 侦听事件
@@ -31,12 +37,6 @@ namespace JFramework
         public static void Listen(int id, EventData action)
         {
             if (eventDict == null) return;
-
-            if (DebugManager.IsDebugEvent)
-            {
-                Debug.Log($"{Name.Sky()} <= Listen => {action.Method.ToString().Yellow()}");
-            }
-
             if (eventDict.ContainsKey(id))
             {
                 eventDict[id] += action;
@@ -44,6 +44,11 @@ namespace JFramework
             else
             {
                 eventDict.Add(id, action);
+            }
+
+            if (DebugManager.IsDebugEvent)
+            {
+                Debug.Log($"{Name.Sky()} 侦听 => {action.Method.ToString().Yellow()}事件");
             }
         }
 
@@ -55,14 +60,13 @@ namespace JFramework
         public static void Remove(int id, EventData action)
         {
             if (eventDict == null) return;
-
-            if (DebugManager.IsDebugEvent)
-            {
-                Debug.Log($"{Name.Sky()} <= Remove => {action.Method.ToString().Yellow()}");
-            }
-
             if (eventDict.ContainsKey(id))
             {
+                if (DebugManager.IsDebugEvent)
+                {
+                    Debug.Log($"{Name.Sky()} 移除 => {action.Method.ToString().Yellow()}事件");
+                }
+
                 eventDict[id] -= action;
             }
         }
@@ -75,14 +79,13 @@ namespace JFramework
         public static void Send(int id, params object[] args)
         {
             if (eventDict == null) return;
-
             if (eventDict.ContainsKey(id))
             {
                 if (DebugManager.IsDebugEvent)
                 {
-                    Debug.Log($"{Name.Sky()} <= Send => {eventDict[id]?.Method.ToString().Yellow()}");
+                    Debug.Log($"{Name.Sky()} 触发 => {eventDict[id]?.Method.ToString().Yellow()}");
                 }
-                
+
                 eventDict[id]?.Invoke(args);
             }
         }
@@ -90,10 +93,6 @@ namespace JFramework
         /// <summary>
         /// 清空事件管理器
         /// </summary>
-        internal override void Destroy()
-        {
-            base.Destroy();
-            eventDict = null;
-        }
+        internal static void Destroy() => eventDict = null;
     }
 }

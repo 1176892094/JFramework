@@ -6,12 +6,17 @@ using UnityEngine;
 
 namespace JFramework
 {
-    public sealed class PoolManager : Singleton<PoolManager>
+    public static class PoolManager
     {
         /// <summary>
         /// 存储所有池的字典
         /// </summary>
         internal static Dictionary<string, IPool> poolDict;
+        
+        /// <summary>
+        /// 对象池管理器
+        /// </summary>
+        private static string Name => nameof(PoolManager);
 
         /// <summary>
         /// 对象池控制器
@@ -21,7 +26,7 @@ namespace JFramework
         /// <summary>
         /// 对象池管理器初始化
         /// </summary>
-        internal override void Awake()
+        internal static void Awake()
         {
             poolDict = new Dictionary<string, IPool>();
         }
@@ -94,9 +99,8 @@ namespace JFramework
             }
         }
         
-        internal override void Destroy()
+        internal static void Destroy()
         {
-            base.Destroy();
             manager = null;
             poolDict = null;
         }

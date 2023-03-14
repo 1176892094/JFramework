@@ -19,7 +19,7 @@ namespace JFramework
             get
             {
                 if (instance != null) return instance;
-                instance = (T)FindObjectOfType(typeof(T));
+                instance = FindObjectOfType<T>();
                 return instance;
             }
         }

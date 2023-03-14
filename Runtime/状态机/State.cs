@@ -25,9 +25,7 @@ namespace JFramework
         /// <summary>
         /// 状态初始化
         /// </summary>
-        protected virtual void OnAwake()
-        {
-        }
+        protected virtual void OnAwake() { }
 
         /// <summary>
         /// 进入状态
