@@ -84,17 +84,15 @@ namespace JFramework.Core
                         
                         if (DebugManager.IsDebugData)
                         {
-                            Debug.Log($"{Name.Sky()} <= Load => {type.Name.Green()} Success");
+                            Debug.Log($"{Name.Sky()} <= Success => {type.Name.Blue()}");
                         }
                     });
                 }
                 catch
                 {
-                    Debug.Log($"{Name.Sky()} <= Load => {type.Name.Red()} Failure");
+                    Debug.Log($"{Name.Sky()} <= Failure => {type.Name.Red()}");
                 }
             }
-
-            Debug.Log($"DataManager加载资源完成!");
         }
 
         /// <summary>
@@ -128,6 +126,10 @@ namespace JFramework.Core
             IntDataDict.TryGetValue(typeof(T), out IntDataDict soDict);
             if (soDict == null) return default;
             soDict.TryGetValue(key, out IData data);
+            if (DebugManager.IsDebugData)
+            {
+                Debug.Log($"{Name.Sky()} <= Get => {typeof(T).Name.Blue()}");
+            }
             return (T)data;
         }
 
@@ -142,6 +144,10 @@ namespace JFramework.Core
             StrDataDict.TryGetValue(typeof(T), out StrDataDict soDict);
             if (soDict == null) return default;
             soDict.TryGetValue(key, out IData data);
+            if (DebugManager.IsDebugData)
+            {
+                Debug.Log($"{Name.Sky()} <= Get => {typeof(T).Name.Blue()}");
+            }
             return (T)data;
         }
         
@@ -156,6 +162,10 @@ namespace JFramework.Core
             StrDataDict.TryGetValue(typeof(T), out StrDataDict soDict);
             if (soDict == null) return default;
             soDict.TryGetValue(key.ToString(), out IData data);
+            if (DebugManager.IsDebugData)
+            {
+                Debug.Log($"{Name.Sky()} <= Get => {typeof(T).Name.Blue()}");
+            }
             return (T)data;
         }
         

@@ -43,7 +43,7 @@ namespace JFramework.Core
             var result = Addressables.LoadAssetAsync<T>(name).WaitForCompletion();
             if (DebugManager.IsDebugAsset)
             {
-                Debug.Log($"{Name.Sky()} <= Load => {name.Green()} Success");
+                Debug.Log($"{Name.Sky()} <= Load => {name.Green()}");
             }
             
             return result is GameObject ? Object.Instantiate(result) : result;
@@ -72,7 +72,7 @@ namespace JFramework.Core
                     action(handle.Result is GameObject ? Object.Instantiate(handle.Result) : handle.Result);
                     if (DebugManager.IsDebugAsset)
                     {
-                        Debug.Log($"{Name.Sky()} <= LoadAssetAsync => {name.Green()} Success");
+                        Debug.Log($"{Name.Sky()} <= Success => {name.Green()}");
                     }
                 }
                 else
@@ -84,7 +84,7 @@ namespace JFramework.Core
                             action(obj.Result is GameObject ? Object.Instantiate(obj.Result) : obj.Result);
                             if (DebugManager.IsDebugAsset)
                             {
-                                Debug.Log($"{Name.Sky()} <= LoadAssetAsync => {name.Green()} Success");
+                                Debug.Log($"{Name.Sky()} <= Success => {name.Green()}");
                             }
                         }
                     };
@@ -101,14 +101,14 @@ namespace JFramework.Core
                     action(obj.Result is GameObject ? Object.Instantiate(obj.Result) : obj.Result);
                     if (DebugManager.IsDebugAsset)
                     {
-                        Debug.Log($"{Name.Sky()} <= LoadAssetAsync => {name.Green()} Success");
+                        Debug.Log($"{Name.Sky()} <= Success => {name.Green()}");
                     }
                 }
                 else
                 {
                     if (DebugManager.IsDebugAsset)
                     {
-                        Debug.Log($"{Name.Sky()} <= LoadAssetAsync => {name.Red()} Success");
+                        Debug.Log($"{Name.Sky()} <= Failure => {name.Red()}");
                     }
                     if (assetDict.ContainsKey(name))
                     {

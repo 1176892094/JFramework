@@ -51,14 +51,14 @@ namespace JFramework
 
             if (DebugManager.IsDebugScene)
             {
-                Debug.Log($"{Name.Sky()} <= Load => {name.Green()} Loading...");
+                Debug.Log($"{Name.Sky()} <= Load => {name.Green()}");
             }
 
             SceneManager.LoadScene(name);
             
             if (DebugManager.IsDebugScene)
             {
-                Debug.Log($"{Name.Sky()} <= Load => {name.Green()} Completed");
+                Debug.Log($"{Name.Sky()} <= Load => {name.Green()}");
             }
         }
 
@@ -77,7 +77,7 @@ namespace JFramework
             
             if (DebugManager.IsDebugScene)
             {
-                Debug.Log($"{Name.Sky()} <= LoadAsync => {name.Green()} Loading...");
+                Debug.Log($"{Name.Sky()} <= LoadAsync => {name.Green()}");
             }
 
             GlobalManager.Instance.StartCoroutine(LoadSceneCompleted(name, action));
@@ -111,7 +111,7 @@ namespace JFramework
             
             if (DebugManager.IsDebugScene)
             {
-                Debug.Log($"{Name.Sky()} <= LoadAsync => {name.Green()} Completed");
+                Debug.Log($"{Name.Sky()} <= LoadAsync => {name.Green()}");
             }
         }
     }

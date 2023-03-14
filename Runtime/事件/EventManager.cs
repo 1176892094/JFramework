@@ -76,13 +76,13 @@ namespace JFramework
         {
             if (eventDict == null) return;
 
-            if (DebugManager.IsDebugEvent)
-            {
-                Debug.Log($"{Name.Sky()} <= Send => {eventDict[id]?.Method.ToString().Yellow()}");
-            }
-
             if (eventDict.ContainsKey(id))
             {
+                if (DebugManager.IsDebugEvent)
+                {
+                    Debug.Log($"{Name.Sky()} <= Send => {eventDict[id]?.Method.ToString().Yellow()}");
+                }
+                
                 eventDict[id]?.Invoke(args);
             }
         }

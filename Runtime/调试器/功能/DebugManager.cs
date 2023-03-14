@@ -10,7 +10,6 @@ namespace JFramework.Core
         [ShowInInspector, LabelText("显示Data加载信息"), BoxGroup("调试选项")] public static bool IsDebugData;
         [ShowInInspector, LabelText("显示Asset加载信息"), BoxGroup("调试选项")] public static bool IsDebugAsset;
         [ShowInInspector, LabelText("显示Event事件信息"), BoxGroup("调试选项")] public static bool IsDebugEvent;
-        [ShowInInspector, LabelText("显示Entity更新信息"), BoxGroup("调试选项")] public static bool IsDebugEntity;
         [ShowInInspector, LabelText("显示Scene加载信息"), BoxGroup("调试选项")] public static bool IsDebugScene;
         
         private int FPS;

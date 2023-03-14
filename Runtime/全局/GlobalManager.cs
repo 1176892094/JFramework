@@ -14,8 +14,10 @@ namespace JFramework
     {
         [ShowInInspector, LabelText("实体管理数据"), FoldoutGroup("实体管理器"), ReadOnly]
         private static Dictionary<int, IEntity> entityDict = new Dictionary<int, IEntity>();
+
         [ShowInInspector, LabelText("实体索引队列"), FoldoutGroup("实体管理器"), ReadOnly]
         private static Queue<int> entityQueue = new Queue<int>();
+
         private static string Name => nameof(GlobalManager);
 
         /// <summary>
@@ -46,11 +48,6 @@ namespace JFramework
             UpdateAction += entity.OnUpdate;
             entity.Id = entityQueue.Count > 0 ? entityQueue.Dequeue() : entityDict.Count + 1;
             entityDict.Add(entity.Id, entity);
-
-            if (DebugManager.IsDebugEntity)
-            {
-                Debug.Log($"{Name.Sky()} <= Listen => {entity} : {entity.Id}");
-            }
         }
 
         /// <summary>
@@ -62,11 +59,6 @@ namespace JFramework
             UpdateAction -= entity.OnUpdate;
             entityQueue.Enqueue(entity.Id);
             entityDict.Remove(entity.Id);
-            
-            if (DebugManager.IsDebugEntity)
-            {
-                Debug.Log($"{Name.Sky()} <= Remove => {entity} : {entity.Id}");
-            }
         }
 
         /// <summary>
@@ -76,11 +68,6 @@ namespace JFramework
         /// <returns>返回对应的实体</returns>
         public static T Get<T>(int id) where T : IEntity
         {
-            if (DebugManager.IsDebugEntity)
-            {
-                Debug.Log($"{Name.Sky()} <= Get => {entityDict[id]} : {id}");
-            }
-            
             return entityDict.ContainsKey(id) ? (T)entityDict[id] : default;
         }
 
@@ -110,7 +97,7 @@ namespace JFramework
             DataManager.Instance.Awake();
             UIManager.Instance.Awake();
         }
-        
+
         /// <summary>
         /// 当程序退出
         /// </summary>
