@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -9,12 +10,12 @@ using UnityEngine;
 
 namespace JFramework
 {
-    public static class ParseGenerator
+    public static class ExcelGenerator
     {
         public static void GenerateScripts()
         {
-            var filesPath = Directory.GetFiles(ParseSetting.PathDataKey);
-            var excelsPath = filesPath.Where(ParseSetting.IsSupported).ToArray();
+            var filesPath = Directory.GetFiles(ExcelSetting.PathDataKey);
+            var excelsPath = filesPath.Where(ExcelSetting.IsSupported).ToArray();
             var scriptContents = new List<(string, string)>();
             foreach (var excelPath in excelsPath)
             {
@@ -23,7 +24,7 @@ namespace JFramework
 
             foreach (var (sheetName, scriptText) in scriptContents)
             {
-                var csFileSavePath = ParseSetting.GetScriptPath(sheetName);
+                var csFileSavePath = ExcelSetting.GetScriptPath(sheetName);
                 if (!Directory.Exists(Const.ScriptPath))
                 {
                     Directory.CreateDirectory(Const.ScriptPath);
@@ -92,8 +93,8 @@ namespace JFramework
         private static string WriteScriptsFile(string className, string[] types, string[] names, string value)
         {
             var builder = new StringBuilder(1024);
-            var dataName = ParseSetting.GetDataName(className);
-            var tableName = ParseSetting.GetTableName(className);
+            var dataName = ExcelSetting.GetDataName(className);
+            var tableName = ExcelSetting.GetTableName(className);
             builder.Append("using System;\n");
             builder.Append("using UnityEngine;\n\n");
             builder.AppendFormat("namespace {0}\n", Const.Namespace);
@@ -110,7 +111,7 @@ namespace JFramework
                 var name = names.ElementAt(i);
                 var type = types.ElementAt(i);
                 if (type == null) continue;
-                var parser = ParseSetting.Parse(name, type);
+                var parser = ExcelSetting.Parse(name, type);
                 columnField[i] = parser;
             }
 
@@ -170,27 +171,35 @@ namespace JFramework
 
         private static void GenerateAssets()
         {
-            var filesPath = Directory.GetFiles(ParseSetting.PathDataKey);
-            var excelsPath = filesPath.Where(ParseSetting.IsSupported).ToArray();
+            var filesPath = Directory.GetFiles(ExcelSetting.PathDataKey);
+            var excelsPath = filesPath.Where(ExcelSetting.IsSupported).ToArray();
             if (!Directory.Exists(Const.AssetsPath))
             {
                 Directory.CreateDirectory(Const.AssetsPath);
-                
             }
             
+            var currentExcel = 0;
+            var excelDataCount = 0;
+            var excelsDataList = new List<(string, string[,])>();
             foreach (var excelPath in excelsPath)
             {
                 var excelData = GetExcelData(excelPath);
-                foreach (var (sheetName, sheetData) in excelData)
+                excelDataCount += excelData.Count;
+                excelsDataList.AddRange(excelData);
+            }
+
+            try
+            {
+                foreach (var (sheetName, sheetData) in excelsDataList)
                 {
-                    var assetPath = ParseSetting.GetAssetsPath(sheetName);
-                    if (File.Exists(assetPath))
+                    ExcelSetting.UpdateProgress(++currentExcel, excelDataCount);
+                    var assetsPath = ExcelSetting.GetAssetsPath(sheetName);
+                    if (File.Exists(assetsPath))
                     {
-                        Debug.Log(assetPath);
-                        AssetDatabase.DeleteAsset(assetPath);
+                        AssetDatabase.DeleteAsset(assetsPath);
                     }
-                    
-                    var tableName = ParseSetting.GetTableFullName(sheetName);
+
+                    var tableName = ExcelSetting.GetTableFullName(sheetName);
                     var tableData = ScriptableObject.CreateInstance(tableName);
                     if (tableData == null)
                     {
@@ -198,8 +207,8 @@ namespace JFramework
                         continue;
                     }
 
-                    var dataName = ParseSetting.GetDataFullName(sheetName);
-                    var dataType = ParseSetting.GetTypeByString(dataName);
+                    var dataName = ExcelSetting.GetDataFullName(sheetName);
+                    var dataType = ExcelSetting.GetTypeByString(dataName);
                     var constructor = dataType.GetConstructor(new[] { typeof(string[,]), typeof(int), typeof(int) });
                     if (constructor == null) return;
                     var length = sheetData.GetLength(0);
@@ -212,12 +221,19 @@ namespace JFramework
                         ((IDataTable)tableData).AddData(data);
                     }
 
-                    var soSavePath = ParseSetting.GetAssetsPath(sheetName);
+                    var soSavePath = ExcelSetting.GetAssetsPath(sheetName);
                     AssetDatabase.CreateAsset(tableData, soSavePath);
                 }
-
+            }
+            catch (Exception e)
+            {
+                Debug.LogError(e.ToString());
+                ExcelSetting.RemoveProgress();
                 AssetDatabase.Refresh();
             }
+
+            ExcelSetting.RemoveProgress();
+            AssetDatabase.Refresh();
         }
 
         private static List<(string, string[,])> GetExcelData(string excelPath)
@@ -260,7 +276,7 @@ namespace JFramework
             }
         }
 
-        private static int[] Array(int start, int end)
+        private static IEnumerable<int> Array(int start, int end)
         {
             var array = new int[end];
             for (int i = 0; i < end; i++)

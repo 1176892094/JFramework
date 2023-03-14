@@ -10,7 +10,7 @@ namespace JFramework
 
         public ParseNormal(string name, string type)
         {
-            isKey = ParseSetting.IsKeyField(name, type);
+            isKey = ExcelSetting.IsKeyField(name, type);
             this.name = isKey ? name.Split(':')[0].Trim() : name.Trim();
             this.type = type.Trim().ToLower();
             if (this.type is Const.Vector2 or Const.Vector3)

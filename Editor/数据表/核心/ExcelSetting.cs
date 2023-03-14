@@ -2,12 +2,11 @@ using System;
 using System.IO;
 using System.Linq;
 using UnityEditor;
-using UnityEditor.Callbacks;
 using UnityEngine;
 
 namespace JFramework
 {
-    public static class ParseSetting
+    public static class ExcelSetting
     {
         private static string LoadPath => PathDataKey.IsEmpty() ? Environment.CurrentDirectory : PathDataKey;
 
@@ -16,6 +15,8 @@ namespace JFramework
             get => EditorPrefs.GetString("PathData");
             private set => EditorPrefs.SetString("PathData", value);
         }
+        
+        private static bool IsCompleted;
 
         [MenuItem("Tools/JFramework/ExcelToAssets", false, 102)]
         public static void ExcelToScripts()
@@ -23,7 +24,7 @@ namespace JFramework
             var filePath = EditorUtility.OpenFolderPanel(default, LoadPath, "");
             if (filePath.IsEmpty()) return;
             PathDataKey = filePath;
-            ParseGenerator.GenerateScripts();
+            ExcelGenerator.GenerateScripts();
             FrameworkEditorAsset.Instance.LoadAddressableGroup();
         }
         
@@ -87,6 +88,29 @@ namespace JFramework
             }
 
             return dataType;
+        }
+
+        public static void UpdateProgress(int curProgress, int maxProgress)
+        {
+            var title = "数据导入进度 [" + curProgress + " / " + maxProgress + "]";
+            var value = curProgress / (float)maxProgress;
+            EditorUtility.DisplayProgressBar(title, "", value);
+            IsCompleted = true;
+        }
+
+        public static void RemoveProgress()
+        {
+            if (!IsCompleted) return;
+            try
+            {
+                EditorUtility.ClearProgressBar();
+            }
+            catch (Exception e)
+            {
+                Debug.LogError(e.ToString());
+            }
+
+            IsCompleted = false;
         }
 
         private static bool IsNormal(string type) => Const.Array.Any(type.Equals);
