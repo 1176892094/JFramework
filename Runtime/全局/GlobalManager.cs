@@ -49,7 +49,7 @@ namespace JFramework
         /// <param name="entity">传入实体</param>
         public void Listen(IEntity entity)
         {
-            UpdateAction += entity.OnUpdate;
+            UpdateAction += entity.Update;
         }
 
         /// <summary>
@@ -58,7 +58,7 @@ namespace JFramework
         /// <param name="entity">传入实体</param>
         public void Remove(IEntity entity)
         {
-            UpdateAction -= entity.OnUpdate;
+            UpdateAction -= entity.Update;
         }
 
         private static void Singleton()

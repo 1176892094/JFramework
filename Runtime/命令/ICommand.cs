@@ -8,7 +8,7 @@ namespace JFramework.Interface
         /// <summary>
         /// 执行命令
         /// </summary>
-        /// <param name="values">传入的参数</param>
-        void OnExecute(params object[] values);
+        /// <param name="value">传入的参数</param>
+        void OnExecute(params object[] value);
     }
 }

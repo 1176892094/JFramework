@@ -13,12 +13,12 @@ namespace JFramework
 
         protected virtual void Enable() { }
         
-        protected virtual void Start(params object[] values) { }
+        protected virtual void Start(params object[] value) { }
 
         protected virtual void Start() { }
         
-        [Obsolete("请使用OnUpdate来代替Update管理生命周期", true)]
-        private void Update() { }
+        // [Obsolete("请使用OnUpdate来代替Update管理生命周期", true)]
+        // private void FiexUpdate() { }
         
         protected virtual void OnUpdate() { }
         
@@ -40,8 +40,8 @@ namespace JFramework
             Disable();
         }
         
-        void IEntity.Start(params object[] values) => Start(values);
+        void IEntity.Start(params object[] value) => Start(value);
         
-        void IEntity.OnUpdate() => OnUpdate();
+        void IEntity.Update() => OnUpdate();
     }
 }

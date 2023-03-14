@@ -75,8 +75,8 @@ namespace JFramework
         /// 发送事件
         /// </summary>
         /// <param name="id">事件唯一标识</param>
-        /// <param name="args">传入事件的参数</param>
-        public static void Send(int id, params object[] args)
+        /// <param name="value">传入事件的参数</param>
+        public static void Send(int id, params object[] value)
         {
             if (eventDict == null) return;
             if (eventDict.ContainsKey(id))
@@ -86,7 +86,7 @@ namespace JFramework
                     Debug.Log($"{Name.Sky()} 触发 => {eventDict[id]?.Method.ToString().Yellow()} 事件");
                 }
 
-                eventDict[id]?.Invoke(args);
+                eventDict[id]?.Invoke(value);
             }
         }
 

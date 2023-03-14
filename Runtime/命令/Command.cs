@@ -10,13 +10,13 @@ namespace JFramework
         /// <summary>
         /// 执行命令
         /// </summary>
-        /// <param name="values">传入的参数</param>
-        protected abstract void OnExecute(params object[] values);
+        /// <param name="value">传入的参数</param>
+        protected abstract void OnExecute(params object[] value);
 
         /// <summary>
         /// 通过接口执行命令
         /// </summary>
-        /// <param name="values">传入的参数</param>
-        void ICommand.OnExecute(params object[] values) => OnExecute(values);
+        /// <param name="value">传入的参数</param>
+        void ICommand.OnExecute(params object[] value) => OnExecute(value);
     }
 }

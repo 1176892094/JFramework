@@ -56,11 +56,9 @@ namespace JFramework
                     containerDict[type].Add(key, component);
                 }
 
-                switch (component)
+                if (component is Button button)
                 {
-                    case Button button:
-                        button.onClick.AddListener(() => OnButtonClick(key));
-                        break;
+                    button.onClick.AddListener(() => OnButtonClick(key));
                 }
             }
         }

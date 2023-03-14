@@ -12,11 +12,6 @@ namespace JFramework
         private static T instance;
 
         /// <summary>
-        /// 单例名称
-        /// </summary>
-        protected static string Name => typeof(T).Name;
-
-        /// <summary>
         /// 单例的所有者
         /// </summary>
         public static T Instance => instance ??= new T();
