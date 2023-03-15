@@ -99,6 +99,7 @@ namespace JFramework
             builder.Append("using System;\n");
             builder.Append("using UnityEngine;\n\n");
             builder.Append("using JFramework.Interface;\n");
+            builder.Append("using JFramework.Utility;\n");
             builder.AppendFormat("namespace {0}\n", Const.Namespace);
             builder.Append("{\n");
             builder.AppendFormat("\tpublic class {0} : DataTable<{1}> {{ }}\n\n", tableName, dataName);
