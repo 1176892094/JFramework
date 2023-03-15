@@ -1,5 +1,3 @@
-using System;
-
 namespace JFramework.Interface
 {
     /// <summary>
