@@ -26,10 +26,7 @@ namespace JFramework
         /// <summary>
         /// 对象池管理器初始化
         /// </summary>
-        internal static void Awake()
-        {
-            poolDict = new Dictionary<string, IPool>();
-        }
+        internal static void Awake() => poolDict = new Dictionary<string, IPool>();
 
         /// <summary>
         /// 对象池管理器拉取对象
@@ -76,12 +73,11 @@ namespace JFramework
             }
 
             if (obj == null) return;
-            string key = obj.name;
             if (manager == null)
             {
-                manager = new GameObject(nameof(PoolManager));
+                manager = new GameObject(Name);
             }
-
+            var key = obj.name;
             if (poolDict.ContainsKey(key))
             {
                 if (obj == null)

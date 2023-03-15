@@ -18,8 +18,14 @@ namespace JFramework.Core
         /// </summary>
         internal static Dictionary<string, JsonData> jsonDict;
         
+        /// <summary>
+        /// 管理器名称
+        /// </summary>
         private static string Name => nameof(JsonManager);
 
+        /// <summary>
+        /// 管理器醒来
+        /// </summary>
         internal static void Awake() => jsonDict = Load<Dictionary<string, JsonData>>(Name);
 
         /// <summary>

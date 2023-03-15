@@ -15,6 +15,11 @@ namespace JFramework
         /// </summary>
         public string Name;
 
+        /// <summary>
+        /// 初始化数据
+        /// </summary>
+        /// <param name="Id">场景Id</param>
+        /// <param name="Name">场景名称</param>
         public SceneData(int Id, string Name)
         {
             this.Id = Id;

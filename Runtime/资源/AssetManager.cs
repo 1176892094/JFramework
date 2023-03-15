@@ -18,6 +18,9 @@ namespace JFramework.Core
         /// </summary>
         private static Dictionary<string, IEnumerator> assetDict;
         
+        /// <summary>
+        /// 管理器名称
+        /// </summary>
         private static string Name => nameof(AssetManager);
 
         /// <summary>
@@ -41,7 +44,7 @@ namespace JFramework.Core
             var result = Addressables.LoadAssetAsync<T>(name).WaitForCompletion();
             if (DebugManager.IsDebugAsset)
             {
-                Debug.Log($"{Name.Sky()} 加载 => {name.Green()} 成功");
+                Debug.Log($"{Name.Sky()} 加载 => {name.Green()} 资源成功");
             }
             
             return result is GameObject ? Object.Instantiate(result) : result;
@@ -70,7 +73,7 @@ namespace JFramework.Core
                     action(handle.Result is GameObject ? Object.Instantiate(handle.Result) : handle.Result);
                     if (DebugManager.IsDebugAsset)
                     {
-                        Debug.Log($"{Name.Sky()} 加载 => {name.Green()} 成功");
+                        Debug.Log($"{Name.Sky()} 加载 => {name.Green()} 资源成功");
                     }
                 }
                 else
@@ -82,7 +85,7 @@ namespace JFramework.Core
                             action(obj.Result is GameObject ? Object.Instantiate(obj.Result) : obj.Result);
                             if (DebugManager.IsDebugAsset)
                             {
-                                Debug.Log($"{Name.Sky()} 加载 => {name.Green()} 成功");
+                                Debug.Log($"{Name.Sky()} 加载 => {name.Green()} 资源成功");
                             }
                         }
                     };
@@ -99,14 +102,14 @@ namespace JFramework.Core
                     action(obj.Result is GameObject ? Object.Instantiate(obj.Result) : obj.Result);
                     if (DebugManager.IsDebugAsset)
                     {
-                        Debug.Log($"{Name.Sky()} 加载 => {name.Green()} 成功");
+                        Debug.Log($"{Name.Sky()} 加载 => {name.Green()} 资源成功");
                     }
                 }
                 else
                 {
                     if (DebugManager.IsDebugAsset)
                     {
-                        Debug.Log($"{Name.Sky()} 加载 => {name.Red()} 失败");
+                        Debug.Log($"{Name.Sky()} 加载 => {name.Red()} 资源失败");
                     }
                     if (assetDict.ContainsKey(name))
                     {
@@ -136,6 +139,9 @@ namespace JFramework.Core
             assetDict.Remove(name);
         }
 
+        /// <summary>
+        /// 清空管理器
+        /// </summary>
         internal static void Destroy() => assetDict = null;
     }
 }

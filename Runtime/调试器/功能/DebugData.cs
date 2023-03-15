@@ -4,14 +4,11 @@ namespace JFramework
 {
     internal static class DebugData
     {
-        private static GUISkin Skin => GUI.skin;
         public static GUIStyle Box => Skin.box;
         public static GUIStyle Label => Skin.label;
         public static GUIStyle Button => Skin.button;
         public static GUIStyle Window => Skin.window;
         public static GUIStyle TextField => Skin.textField;
-        private static float ScreenWidth => Screen.width;
-        private static float ScreenHeight => Screen.height;
         public static float WindowWidth => ScreenWidth / WindowScale;
         public static float WindowHeight => ScreenHeight / WindowScale;
         public static float WindowScale => ScreenWidth / 1920 + ScreenHeight / 1080;
@@ -22,6 +19,9 @@ namespace JFramework
         public static GUILayoutOption HeightLog => GUILayout.Height(WindowHeight * 0.4f);
         public static GUILayoutOption WindowBox => GUILayout.Height(WindowHeight - 130);
         public static GUILayoutOption SceneBox => GUILayout.Width((WindowWidth - 25) / 2);
+        private static GUISkin Skin => GUI.skin;
+        private static float ScreenWidth => Screen.width;
+        private static float ScreenHeight => Screen.height;
 
         public static Vector3 Vector3Field(Vector3 value)
         {
@@ -116,7 +116,6 @@ namespace JFramework
         public const string FreeMemory = "空闲内存";
         public const string TotalMonoMemory = "全部Mono堆内存";
         public const string UsedMonoMemory = "已用Mono堆内存";
-        public const string UninstallResources = "释放未使用资源";
         public const string GarbageCollections = "垃圾回收";
         public const string DrawCallInformation = "绘制呼叫信息";
         public const string DrawCalls = "绘制呼叫总数";

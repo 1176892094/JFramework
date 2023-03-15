@@ -23,10 +23,7 @@ namespace JFramework
         /// <summary>
         /// 状态机初始化
         /// </summary>
-        protected override void Start()
-        {
-            stateDict = new Dictionary<string, IState>();
-        }
+        protected override void Start() => stateDict = new Dictionary<string, IState>();
 
         /// <summary>
         /// 状态机更新
