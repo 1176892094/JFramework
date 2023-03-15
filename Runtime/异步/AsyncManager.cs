@@ -2,10 +2,11 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Threading;
+using JFramework.Utility;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
-namespace JFramework
+namespace JFramework.Core
 {
     public static class AsyncManager
     {

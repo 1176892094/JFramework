@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using JFramework.Core;
 using JFramework.Interface;
 using Sirenix.OdinInspector;
 using UnityEngine;

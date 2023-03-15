@@ -2,7 +2,7 @@ using System.Text;
 
 namespace JFramework
 {
-    public class ParseStruct : IParser
+    internal class ParseStruct : IParser
     {
         private readonly StructParser custom;
 

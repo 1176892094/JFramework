@@ -12,7 +12,10 @@ namespace JFramework
 {
     public abstract class FrameworkEditor : OdinMenuEditorWindow
     {
-        private static OdinMenuTree EditorWindow;
+        private static OdinMenuTree editorWindow;
+        
+        //[MenuItem("Tools/JFramework/JFrameworkEditor _F1")]
+        private static void JFrameworkEditor() => ShowEditorWindow<FrameworkEditor>();
 
         [MenuItem("Tools/JFramework/CurrentProjectPath")]
         private static void CurrentProjectPath()
@@ -52,12 +55,12 @@ namespace JFramework
         /// <returns></returns>
         protected override OdinMenuTree BuildMenuTree()
         {
-            EditorWindow = new OdinMenuTree(supportsMultiSelect: false);
-            EditorWindow.Add("资源", FrameworkEditorAsset.Instance, EditorIcons.Folder);
-            EditorWindow.Add("主页", FrameworkEditorHouse.Instance, EditorIcons.House);
-            EditorWindow.Add("设置", Resources.FindObjectsOfTypeAll<PlayerSettings>().FirstOrDefault(), EditorIcons.SettingsCog);
-            JFrameworkWindow(EditorWindow);
-            return EditorWindow;
+            editorWindow = new OdinMenuTree(supportsMultiSelect: false);
+            editorWindow.Add("资源", FrameworkAssetEditor.Instance, EditorIcons.Folder);
+            editorWindow.Add("主页", FrameworkHouseEditor.Instance, EditorIcons.House);
+            editorWindow.Add("设置", Resources.FindObjectsOfTypeAll<PlayerSettings>().FirstOrDefault(), EditorIcons.SettingsCog);
+            JFrameworkWindow(editorWindow);
+            return editorWindow;
         }
 
         /// <summary>

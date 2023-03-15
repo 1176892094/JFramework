@@ -1,8 +1,9 @@
 using System.Collections.Generic;
 using JFramework.Interface;
+using JFramework.Utility;
 using UnityEngine;
 
-namespace JFramework
+namespace JFramework.Core
 {
     /// <summary>
     /// 命令管理器
@@ -29,7 +30,7 @@ namespace JFramework
         /// </summary>
         /// <param name="value">传入的参数</param>
         /// <typeparam name="T">传入继承ICommand的对象</typeparam>
-        public static void Execute<T>(IData value) where T : struct, ICommand
+        public static void Execute<T>(params object[] value) where T : struct, ICommand
         {
             if (commandDict == null)
             {

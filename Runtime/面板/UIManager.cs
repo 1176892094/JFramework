@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using JFramework.Utility;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.EventSystems;
@@ -35,7 +36,7 @@ namespace JFramework.Core
         {
             layerGroup = new Transform[5];
             panelDict = new Dictionary<string, UIPanel>();
-            var transform = JFramework.GlobalManager.Instance.transform;
+            var transform = GlobalManager.Instance.transform;
             layerGroup[0] = transform.Find("UICanvas/Layer1");
             layerGroup[1] = transform.Find("UICanvas/Layer2");
             layerGroup[2] = transform.Find("UICanvas/Layer3");

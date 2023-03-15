@@ -3,7 +3,7 @@ namespace JFramework
     /// <summary>
     /// 解析器的抽象类
     /// </summary>
-    public abstract class Parser : IParser
+    internal abstract class Parser : IParser
     {
         /// <summary>
         /// 解析字段名称

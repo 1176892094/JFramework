@@ -2,7 +2,7 @@ using System.Text;
 
 namespace JFramework
 {
-    public class ParseNormal : IParser
+    internal class ParseNormal : IParser
     {
         private readonly bool isKey;
         private readonly string name;

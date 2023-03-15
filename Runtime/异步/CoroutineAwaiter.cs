@@ -1,6 +1,7 @@
 using System;
 using System.Runtime.CompilerServices;
 using System.Runtime.ExceptionServices;
+using JFramework.Core;
 
 namespace JFramework
 {

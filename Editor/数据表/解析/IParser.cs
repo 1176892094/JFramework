@@ -3,7 +3,7 @@ namespace JFramework
     /// <summary>
     /// 解析器接口
     /// </summary>
-    public interface IParser
+    internal interface IParser
     {
         /// <summary>
         /// 获取字段

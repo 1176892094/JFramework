@@ -2,7 +2,7 @@ using System;
 using UnityEngine;
 
 
-namespace JFramework
+namespace JFramework.Utility
 {
     public static class StringExtension
     {

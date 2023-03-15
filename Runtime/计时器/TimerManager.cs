@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using JFramework.Interface;
+using JFramework.Utility;
 using UnityEngine;
 
 namespace JFramework.Core
@@ -32,7 +33,7 @@ namespace JFramework.Core
         {
             timerQueue = new Queue<Timer>();
             timerList = new List<Timer>();
-            JFramework.GlobalManager.Instance.UpdateAction += OnUpdate;
+            GlobalManager.Instance.UpdateAction += OnUpdate;
         }
 
         /// <summary>

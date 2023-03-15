@@ -1,20 +1,10 @@
 using System;
 using System.Collections.Generic;
+using JFramework.Interface;
 using UnityEngine;
 
 namespace JFramework
 {
-    public class KeyAttribute : Attribute { }
-
-    public interface IDataTable
-    {
-        int Count { get; }
-
-        void AddData(object data);
-
-        object GetData(int index);
-    }
-
     public class DataTable<T> : ScriptableObject, IDataTable where T : IData
     {
         [SerializeField] private List<T> dataList = new List<T>();
@@ -24,4 +14,6 @@ namespace JFramework
         void IDataTable.AddData(object data) => AddData((T)data);
         object IDataTable.GetData(int index) => GetData(index);
     }
+    
+    public class KeyAttribute : Attribute { }
 }

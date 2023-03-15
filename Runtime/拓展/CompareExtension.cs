@@ -1,6 +1,6 @@
 using System;
 
-namespace JFramework
+namespace JFramework.Utility
 {
     public static class CompareExtension
     {

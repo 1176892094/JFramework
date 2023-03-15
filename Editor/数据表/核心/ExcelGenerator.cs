@@ -4,13 +4,15 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using JFramework.Core;
+using JFramework.Interface;
+using JFramework.Utility;
 using OfficeOpenXml;
 using UnityEditor;
 using UnityEngine;
 
 namespace JFramework
 {
-    public static class ExcelGenerator
+    internal static class ExcelGenerator
     {
         public static void GenerateScripts()
         {
@@ -96,6 +98,7 @@ namespace JFramework
             var tableName = ExcelSetting.GetTableName(className);
             builder.Append("using System;\n");
             builder.Append("using UnityEngine;\n\n");
+            builder.Append("using JFramework.Interface;\n");
             builder.AppendFormat("namespace {0}\n", Const.Namespace);
             builder.Append("{\n");
             builder.AppendFormat("\tpublic class {0} : DataTable<{1}> {{ }}\n\n", tableName, dataName);

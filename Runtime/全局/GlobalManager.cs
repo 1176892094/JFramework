@@ -1,11 +1,10 @@
 using System;
 using System.Collections.Generic;
-using JFramework.Core;
 using JFramework.Interface;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
-namespace JFramework
+namespace JFramework.Core
 {
     /// <summary>
     /// 全局控制器
@@ -16,7 +15,7 @@ namespace JFramework
         /// 全局实体列表
         /// </summary>
         [ShowInInspector, LabelText("实体管理数据"), FoldoutGroup("实体管理器"), ReadOnly]
-        private static List<IEntity> entityList;
+        private static List<object> entityList;
 
         /// <summary>
         /// 全局管理器名称
@@ -82,7 +81,7 @@ namespace JFramework
         private static void Register()
         {
             Singleton();
-            entityList = new List<IEntity>();
+            entityList = new List<object>();
             CommandManager.Awake();
             AssetManager.Awake();
             EventManager.Awake();

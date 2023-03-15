@@ -1,12 +1,13 @@
 using System;
 using System.IO;
 using System.Linq;
+using JFramework.Utility;
 using UnityEditor;
 using UnityEngine;
 
 namespace JFramework
 {
-    public static class ExcelSetting
+    internal static class ExcelSetting
     {
         private static string LoadPath => PathDataKey.IsEmpty() ? Environment.CurrentDirectory : PathDataKey;
 
@@ -34,7 +35,7 @@ namespace JFramework
             if (filePath.IsEmpty()) return;
             PathDataKey = filePath;
             ExcelGenerator.GenerateAssets();
-            FrameworkEditorAsset.Instance.LoadAddressableGroup();
+            FrameworkAssetEditor.Instance.LoadAddressableGroup();
         }
         
         public static string GetDataName(string sheetName) => sheetName + "Data";

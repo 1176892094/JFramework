@@ -1,13 +1,9 @@
 using System.Collections.Generic;
+using JFramework.Utility;
 using UnityEngine;
 
-namespace JFramework
+namespace JFramework.Core
 {
-    /// <summary>
-    /// 可变长参数委托
-    /// </summary>
-    public delegate void EventData(params object[] args);
-
     /// <summary>
     /// 事件管理器
     /// </summary>

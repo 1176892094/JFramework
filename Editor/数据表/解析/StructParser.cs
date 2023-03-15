@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace JFramework
 {
-    public class StructParser : Parser
+    internal class StructParser : Parser
     {
         public List<Parser> fieldList;
         private bool isArray;

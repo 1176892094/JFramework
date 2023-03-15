@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using System.Linq;
+using JFramework.Utility;
 using Sirenix.OdinInspector;
 using UnityEditor;
 using UnityEditor.AddressableAssets;
@@ -9,9 +10,9 @@ using UnityEngine;
 
 namespace JFramework
 {
-    internal class FrameworkEditorAsset : DataSingleton<FrameworkEditorAsset>
+    internal class FrameworkAssetEditor : SingletonScriptable<FrameworkAssetEditor>
     {
-        private AddressableAssetSettings Settings => AddressableAssetSettingsDefaultObject.Settings;
+        private static AddressableAssetSettings Settings => AddressableAssetSettingsDefaultObject.Settings;
         [ShowInInspector,LabelText("文件夹路径")] private string[] pathList;
         [ShowInInspector,LabelText("文件夹名称")] private string[] nameList;
         private const string filter = "t:Object t:prefab";
@@ -27,31 +28,31 @@ namespace JFramework
                 var index = i;
                 GetAddressableGroup(nameList[i], pathList[i], filter, assetPath =>
                 {
-                    string fileName = Path.GetFileNameWithoutExtension(assetPath);
-                    string dirPath = pathList[index];
-                    string dirName = Path.GetFileNameWithoutExtension(dirPath);
+                    var fileName = Path.GetFileNameWithoutExtension(assetPath);
+                    var dirPath = pathList[index];
+                    var dirName = Path.GetFileNameWithoutExtension(dirPath);
                     return $"{dirName}/{fileName}";
                 });
             }
         }
 
-        private void GetAddressableGroup(string name, string folder, string filter, Func<string, string> getAddress)
+        private static void GetAddressableGroup(string name, string folder, string filter, Func<string, string> getAddress)
         {
             var assets = GetAssets(folder, filter);
-            AddressableAssetGroup group = CreateGroup<AddressableAssetGroup>(name);
+            var group = CreateGroup<AddressableAssetGroup>(name);
 
             foreach (var assetPath in assets)
             {
-                string address = getAddress(assetPath);
+                var address = getAddress(assetPath);
                 AddAssetEntry(group, assetPath, address);
             }
 
             Debug.Log($"可寻址资源文件夹: {name.Orange()} 资源文件数量: {assets.Length.ToString().Green()}");
         }
 
-        private AddressableAssetGroup CreateGroup<T>(string groupName)
+        private static AddressableAssetGroup CreateGroup<T>(string groupName)
         {
-            AddressableAssetGroup group = Settings.FindGroup(groupName);
+            var group = Settings.FindGroup(groupName);
             if (group == null)
             {
                 group = Settings.CreateGroup(groupName, false, false, false, Settings.DefaultGroup.Schemas, typeof(T));
@@ -60,15 +61,14 @@ namespace JFramework
             return group;
         }
 
-        private void AddAssetEntry(AddressableAssetGroup group, string assetPath, string address)
+        private static void AddAssetEntry(AddressableAssetGroup group, string assetPath, string address)
         {
-            string guid = AssetDatabase.AssetPathToGUID(assetPath);
-            AddressableAssetEntry entry = group.entries.LastOrDefault(e => e.guid == guid) ??
-                                          Settings.CreateOrMoveEntry(guid, group, false, false);
+            var guid = AssetDatabase.AssetPathToGUID(assetPath);
+            var entry = group.entries.LastOrDefault(e => e.guid == guid) ?? Settings.CreateOrMoveEntry(guid, group, false, false);
             entry.address = address;
         }
 
-        private string[] GetAssets(string folder, string filter)
+        private static string[] GetAssets(string folder, string filter)
         {
             if (folder.IsEmpty()) return null;
             if (filter.IsEmpty()) return null;

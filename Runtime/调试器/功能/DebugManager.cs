@@ -1,5 +1,4 @@
-﻿using Sirenix.OdinInspector;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace JFramework.Core
 {
@@ -21,14 +20,14 @@ namespace JFramework.Core
         {
             TimerManager.Pop(1).SetLoop(-1, _ =>
             {
-                if (!GlobalManager.Instance.IsDebugPool) return;
+                if (!GlobalManager.Instance.IsDebugTool) return;
                 FPS = (int)(1.0f / Time.deltaTime);
             }).Unscale().SetTarget(gameObject);
         }
 
         private void OnGUI()
         {
-            if (!GlobalManager.Instance.IsDebugPool) return;
+            if (!GlobalManager.Instance.IsDebugTool) return;
             Matrix4x4 cachedMatrix = GUI.matrix;
             GUI.matrix = Matrix4x4.Scale(new Vector3(DebugData.WindowScale, DebugData.WindowScale, 1f));
 

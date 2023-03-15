@@ -1,10 +1,10 @@
 using System;
 using System.Collections.Generic;
-using JFramework.Core;
 using JFramework.Interface;
+using JFramework.Utility;
 using UnityEngine;
 
-namespace JFramework
+namespace JFramework.Core
 {
     public static class PoolManager
     {
