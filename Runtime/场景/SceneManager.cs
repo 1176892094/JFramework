@@ -99,7 +99,6 @@ namespace JFramework
                 {
                     progress = Mathf.Lerp(progress, asyncOperation.progress / 9f * 10f, Time.deltaTime);
                     EventManager.Send(999, progress);
-
                     if (GlobalManager.Instance.IsDebugScene)
                     {
                         Debug.Log($"{Name.Sky()} 加载进度条 => {progress}%");

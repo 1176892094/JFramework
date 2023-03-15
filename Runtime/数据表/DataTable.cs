@@ -4,8 +4,6 @@ using UnityEngine;
 
 namespace JFramework
 {
-    public interface IData { }
-
     public class KeyAttribute : Attribute { }
 
     public interface IDataTable

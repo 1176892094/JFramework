@@ -40,6 +40,9 @@ namespace JFramework
 
         [ShowInInspector, LabelText("字符数据管理"), FoldoutGroup("数据管理器")]
         private Dictionary<Type, Dictionary<string, IData>> strDataDict => DataManager.StrDataDict;
+        
+        [ShowInInspector, LabelText("枚举数据管理"), FoldoutGroup("数据管理器")]
+        private Dictionary<Type, Dictionary<Enum, IData>> enmDataDict => DataManager.EnmDataDict;
 
         [ShowInInspector, LabelText("面板数据管理"), FoldoutGroup("面板管理器")]
         private Dictionary<string, UIPanel> panelDict => UIManager.panelDict;

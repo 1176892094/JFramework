@@ -8,10 +8,8 @@ namespace JFramework.Core
 {
     using IntDataDict = Dictionary<int, IData>;
     using StrDataDict = Dictionary<string, IData>;
+    using EnmDataDict = Dictionary<Enum, IData>;
 
-    /// <summary>
-    /// 数据管理器
-    /// </summary>
     public static class DataManager
     {
         /// <summary>
@@ -23,18 +21,16 @@ namespace JFramework.Core
         /// 存储string为主键的数据字典
         /// </summary>
         internal static Dictionary<Type, StrDataDict> StrDataDict;
-        
+
+        /// <summary>
+        /// 存储enum为主键的数据字典
+        /// </summary>
+        internal static Dictionary<Type, EnmDataDict> EnmDataDict;
+
+        /// <summary>
+        /// 管理器名称
+        /// </summary>
         private static string Name => nameof(DataManager);
-
-        /// <summary>
-        /// 资源路径
-        /// </summary>
-        private const string AssetPath = "DataTable/";
-
-        /// <summary>
-        /// 命名空间名称
-        /// </summary>
-        private const string Namespace = "JFramework.Table";
 
         /// <summary>
         /// 构造函数初始化数据
@@ -43,56 +39,46 @@ namespace JFramework.Core
         {
             IntDataDict = new Dictionary<Type, IntDataDict>();
             StrDataDict = new Dictionary<Type, StrDataDict>();
-            var assembly = GetAssembly(out IEnumerable<Type> types);
+            EnmDataDict = new Dictionary<Type, EnmDataDict>();
+            var assembly = GetAssembly(out var types);
+            if (types == null || types.Length == 0) return;
             foreach (var type in types)
             {
-                try
+                var keyName = type.Name;
+                AssetManager.LoadAsync<ScriptableObject>("DataTable/" + keyName, table =>
                 {
-                    var keyName = type.Name;
-                    AssetManager.LoadAsync<ScriptableObject>(AssetPath + keyName, obj =>
+                    var dataTable = table.As<IDataTable>();
+                    var keyData = GetKeyField(assembly, type);
+                    var keyInfo = GetKeyField(keyData);
+                    if (keyData == null)
                     {
-                        var dataTable = (IDataTable)obj;
-                        var keyData = GetKeyField(assembly, type);
-                        var keyField = GetKeyField(keyData);
+                        Debug.Log($"{Name.Sky()} 缺少主键 => {type.Name.Red()}");
+                        return;
+                    }
 
-                        if (keyData == null)
-                        {
-                            Debug.Log($"{Name.Sky()} 缺少主键 => {type.Name.Red()}");
-                            return;
-                        }
+                    if (GlobalManager.Instance.IsDebugData)
+                    {
+                        Debug.Log($"{Name.Sky()} 加载 => {type.Name.Blue()} 数据表");
+                    }
 
-                        var keyType = keyField.FieldType;
-                        if (keyType == typeof(int))
-                        {
-                            IntDataDict.Add(keyData, Add<int>(keyField, dataTable));
-                        }
-                        else if (keyType == typeof(string))
-                        {
-                            StrDataDict.Add(keyData, Add<string>(keyField, dataTable));
-                        }
-                        else if (keyType.IsEnum)
-                        {
-                            var dataDict = new StrDataDict();
-                            for (var i = 0; i < dataTable.Count; ++i)
-                            {
-                                var data = (IData)dataTable.GetData(i);
-                                var key = keyField.GetValue(data);
-                                dataDict.Add(key.ToString(), data);
-                            }
-
-                            StrDataDict.Add(keyData, dataDict);
-                        }
-
-                        if (GlobalManager.Instance.IsDebugData)
-                        {
-                            Debug.Log($"{Name.Sky()} 加载 => {type.Name.Blue()} 数据成功");
-                        }
-                    });
-                }
-                catch
-                {
-                    Debug.Log($"{Name.Sky()} 加载 => {type.Name.Red()} 数据失败");
-                }
+                    var keyType = keyInfo.FieldType;
+                    if (keyType == typeof(int))
+                    {
+                        IntDataDict.Add(keyData, Add<int>(keyInfo, dataTable));
+                    }
+                    else if (keyType == typeof(string))
+                    {
+                        StrDataDict.Add(keyData, Add<string>(keyInfo, dataTable));
+                    }
+                    else if (keyType.IsEnum)
+                    {
+                        EnmDataDict.Add(keyData, Add<Enum>(keyInfo, dataTable));
+                    }
+                    else
+                    {
+                        Debug.Log($"{Name.Sky()} 加载 => {type.Name.Red()} 数据失败");
+                    }
+                });
             }
         }
 
@@ -188,11 +174,15 @@ namespace JFramework.Core
         public static List<T> GetTable<T>() where T : IData
         {
             var table = GetTable(typeof(T));
-            if (table == null) return null;
-            var dataList = new List<T>();
-            table.ForEach(data => dataList.Add((T)data));
-            return dataList;
+            if (GlobalManager.Instance.IsDebugData && table != null)
+            {
+                Debug.Log($"{Name.Sky()} 获取 => {typeof(T).Name.Blue()} 列表成功");
+            }
+
+            return table?.Cast<T>().ToList();
         }
+
+        //table.ForEach(data => dataList.Add((T)data));
 
         /// <summary>
         /// 通过数据管理器得到数据表
@@ -211,21 +201,29 @@ namespace JFramework.Core
         /// 获取当前程序集中的数据表对象类
         /// </summary>
         /// <returns></returns>
-        private static Assembly GetAssembly(out IEnumerable<Type> types)
+        private static Assembly GetAssembly(out Type[] types)
         {
             var assemblies = AppDomain.CurrentDomain.GetAssemblies();
             foreach (var assembly in assemblies)
             {
-                types = assembly.GetTypes().Where(_ => _.GetInterfaces().Contains(typeof(IDataTable)));
-                var tableTypes = types as Type[] ?? types.ToArray();
-                if (tableTypes.Any())
-                {
-                    return assembly;
-                }
+                var typeList = assembly.GetTypes();
+                types = typeList.Where(IsSupport).ToArray();
+                if (types.Length > 0) return assembly;
             }
 
             types = null;
             return null;
+        }
+
+        /// <summary>
+        /// 是否支持类型
+        /// </summary>
+        /// <param name="type">传入类型</param>
+        /// <returns>返回是否支持</returns>
+        private static bool IsSupport(Type type)
+        {
+            if (!type.GetInterfaces().Contains(typeof(IDataTable))) return false;
+            return type.BaseType != typeof(ScriptableObject);
         }
 
         /// <summary>
@@ -252,7 +250,7 @@ namespace JFramework.Core
         {
             var name = type.Name;
             name = name.Substring(0, name.Length - 5);
-            return assembly.GetType(Namespace + "." + name);
+            return assembly.GetType("JFramework.Table." + name);
         }
 
         /// <summary>

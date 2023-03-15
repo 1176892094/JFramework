@@ -17,7 +17,7 @@ namespace JFramework
         /// <summary>
         /// 管理器名称
         /// </summary>
-        private static string Name => nameof(EventManager);
+        private static string Name => nameof(CommandManager);
 
         /// <summary>
         /// 命令管理器初始化
@@ -29,7 +29,7 @@ namespace JFramework
         /// </summary>
         /// <param name="value">传入的参数</param>
         /// <typeparam name="T">传入继承ICommand的对象</typeparam>
-        public static void Execute<T>(params object[] value) where T : ICommand, new()
+        public static void Execute<T>(IData value) where T : struct, ICommand
         {
             if (commandDict == null)
             {
@@ -53,7 +53,7 @@ namespace JFramework
         /// 移除命令
         /// </summary>
         /// <typeparam name="T"></typeparam>
-        public static void Dispose<T>()
+        public static void Dispose<T>() where T : struct, ICommand
         {
             if (commandDict == null)
             {

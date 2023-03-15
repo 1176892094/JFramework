@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using JFramework.Interface;
 using Sirenix.OdinInspector;
@@ -8,6 +9,7 @@ namespace JFramework
     /// <summary>
     /// 实体的抽象类
     /// </summary>
+    [Serializable]
     public abstract class Entity : MonoBehaviour, IEntity
     {
         [ShowInInspector,LabelText("控制器列表")] private Dictionary<string, IController> controllerDict;
