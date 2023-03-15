@@ -9,6 +9,14 @@ namespace JFramework
 {
     public sealed partial class GlobalManager
     {
+        [ShowInInspector, LabelText("开启Debug调试工具"), FoldoutGroup("调试管理器")] public bool IsDebugTool;
+        [ShowInInspector, LabelText("显示Json加载信息"), FoldoutGroup("调试管理器")] public bool IsDebugJson;
+        [ShowInInspector, LabelText("显示Pool存取信息"), FoldoutGroup("调试管理器")] public bool IsDebugPool;
+        [ShowInInspector, LabelText("显示Data加载信息"), FoldoutGroup("调试管理器")] public bool IsDebugData;
+        [ShowInInspector, LabelText("显示Asset加载信息"), FoldoutGroup("调试管理器")] public bool IsDebugAsset;
+        [ShowInInspector, LabelText("显示Event事件信息"), FoldoutGroup("调试管理器")] public bool IsDebugEvent;
+        [ShowInInspector, LabelText("显示Scene加载信息"), FoldoutGroup("调试管理器")] public bool IsDebugScene;
+        
         [ShowInInspector, LabelText("场景管理数据"), FoldoutGroup("通用管理器")]
         private Dictionary<int, SceneData> sceneList => SceneManager.sceneDict;
 
@@ -40,7 +48,7 @@ namespace JFramework
         private Transform[] layerGroup => UIManager.layerGroup;
 
         [ShowInInspector, LabelText("音乐管理对象"), FoldoutGroup("音效管理器")]
-        private GameObject audioManager => AudioManager.audioSystem;
+        private GameObject audioManager => AudioManager.poolManager;
 
         [ShowInInspector, LabelText("当前背景音乐"), FoldoutGroup("音效管理器")]
         private AudioSource audioSource => AudioManager.audioSource;
@@ -58,7 +66,7 @@ namespace JFramework
         private List<AudioSource> audioList => AudioManager.audioList;
 
         [ShowInInspector, LabelText("对象池管理器"), FoldoutGroup("对象池管理器")]
-        private GameObject poolManager => PoolManager.manager;
+        private GameObject poolManager => PoolManager.poolManager;
 
         [ShowInInspector, LabelText("对象数据管理"), FoldoutGroup("对象池管理器")]
         private Dictionary<string, IPool> poolDict => PoolManager.poolDict;

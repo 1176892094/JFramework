@@ -10,18 +10,13 @@ namespace JFramework
     /// </summary>
     public abstract class Entity : MonoBehaviour, IEntity
     {
-        [ShowInInspector, LabelText("实体控制器列表")]
-        private Dictionary<string, IController> controllerDict = new Dictionary<string, IController>();
+        [ShowInInspector,LabelText("控制器列表")] private Dictionary<string, IController> controllerDict;
 
         protected virtual void Awake()
         {
         }
 
         protected virtual void Enable()
-        {
-        }
-
-        protected virtual void Spawn(params object[] value)
         {
         }
 
@@ -54,40 +49,26 @@ namespace JFramework
             GlobalManager.Instance.Remove(this);
             Disable();
         }
-
-        protected T GetController<T>() where T : ScriptableObject, IController
+        
+        protected virtual void Spawn(params object[] value)
         {
-            var key = typeof(T).Name;
-            if (controllerDict.ContainsKey(key))
-            {
-                return (T)controllerDict[key];
-            }
-
-            Debug.Log($"{key.Red()} 不存在");
-            return null;
+            controllerDict = new Dictionary<string, IController>();
         }
 
-        protected T AddController<T>() where T : ScriptableObject, IController
+        protected T Get<T>() where T : ScriptableObject, IController
         {
             var key = typeof(T).Name;
-            if (!controllerDict.ContainsKey(key))
-            {
-                var controller = ScriptableObject.CreateInstance<T>();
-                controllerDict.Add(key, controller);
-                controller.Start(this);
-                return controller;
-            }
-
-            Debug.Log($"{key.Red()} 已经存在");
-            return (T)controllerDict[key];
+            if (controllerDict.ContainsKey(key)) return (T)controllerDict[key];
+            var controller = ScriptableObject.CreateInstance<T>();
+            controllerDict.Add(key, controller);
+            controller.Start(this);
+            return controller;
         }
 
         void IEntity.Spawn(params object[] value) => Spawn(value);
 
         void IEntity.Update() => OnUpdate();
 
-        T IEntity.GetController<T>() => GetController<T>();
-
-        T IEntity.AddController<T>() => AddController<T>();
+        T IEntity.Get<T>() => Get<T>();
     }
 }

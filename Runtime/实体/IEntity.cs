@@ -19,17 +19,10 @@ namespace JFramework.Interface
         void Update();
 
         /// <summary>
-        /// 实体得到控制器
+        /// 控制器的获取方法
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
-        public T GetController<T>() where T : ScriptableObject, IController;
-
-        /// <summary>
-        /// 实体增加控制器
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <returns></returns>
-        public T AddController<T>() where T : ScriptableObject, IController;
+        T Get<T>() where T : ScriptableObject, IController;
     }
 }

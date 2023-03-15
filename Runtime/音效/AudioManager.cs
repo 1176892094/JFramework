@@ -20,7 +20,7 @@ namespace JFramework
         /// <summary>
         /// 音效挂载系统
         /// </summary>
-        internal static GameObject audioSystem;
+        internal static GameObject poolManager;
 
         /// <summary>
         /// 背景音乐组件
@@ -55,9 +55,9 @@ namespace JFramework
             audioList = new List<AudioSource>();
             audioQueue = new Queue<AudioSource>();
             var transform = GlobalManager.Instance.transform;
-            audioSystem = transform.Find("AudioSystem").gameObject;
+            poolManager = transform.Find("PoolManager").gameObject;
             audioSetting = JsonManager.Load<AudioSetting>(Name, true);
-            audioSource = audioSystem.GetComponent<AudioSource>();
+            audioSource = poolManager.GetComponent<AudioSource>();
             SetSound(audioSetting.soundVolume);
             SetAudio(audioSetting.audioVolume);
         }
@@ -127,7 +127,7 @@ namespace JFramework
                 return;
             }
 
-            var audio = audioQueue.Count > 0 ? audioQueue.Dequeue() : audioSystem.AddComponent<AudioSource>();
+            var audio = audioQueue.Count > 0 ? audioQueue.Dequeue() : poolManager.AddComponent<AudioSource>();
             AssetManager.LoadAsync<AudioClip>(path, clip =>
             {
                 audioList.Add(audio);
@@ -187,7 +187,7 @@ namespace JFramework
         {
             audioList = null;
             audioQueue = null;
-            audioSystem = null;
+            poolManager = null;
             audioSource = null;
             audioSetting = null;
         }

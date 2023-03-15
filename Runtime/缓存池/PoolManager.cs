@@ -12,7 +12,7 @@ namespace JFramework
         /// 存储所有池的字典
         /// </summary>
         internal static Dictionary<string, IPool> poolDict;
-        
+
         /// <summary>
         /// 对象池管理器
         /// </summary>
@@ -21,12 +21,17 @@ namespace JFramework
         /// <summary>
         /// 对象池控制器
         /// </summary>
-        internal static GameObject manager;
+        internal static GameObject poolManager;
 
         /// <summary>
         /// 对象池管理器初始化
         /// </summary>
-        internal static void Awake() => poolDict = new Dictionary<string, IPool>();
+        internal static void Awake()
+        {
+            poolDict = new Dictionary<string, IPool>();
+            var transform = GlobalManager.Instance.transform;
+            poolManager = transform.Find("PoolManager").gameObject;
+        }
 
         /// <summary>
         /// 对象池管理器拉取对象
@@ -46,11 +51,24 @@ namespace JFramework
                 var obj = (GameObject)poolDict[key].Pop();
                 if (obj != null)
                 {
+                    if (GlobalManager.Instance.IsDebugPool)
+                    {
+                        Debug.Log($"{Name.Sky()} 取出 => {key.Pink()} 对象成功");
+                    }
+                    
                     action?.Invoke(obj);
                     return;
                 }
+                
+                if (GlobalManager.Instance.IsDebugPool)
+                {
+                    Debug.Log($"{Name.Sky()} 移除已销毁对象 : {key.Red()}");
+                }
+            }
 
-                poolDict.Remove(key);
+            if (GlobalManager.Instance.IsDebugPool)
+            {
+                Debug.Log($"{Name.Sky()} 创建 => {key.Green()} 对象成功");
             }
 
             AssetManager.LoadAsync<GameObject>(key, o =>
@@ -73,31 +91,38 @@ namespace JFramework
             }
 
             if (obj == null) return;
-            if (manager == null)
-            {
-                manager = new GameObject(Name);
-            }
             var key = obj.name;
+
             if (poolDict.ContainsKey(key))
             {
                 if (obj == null)
                 {
-                    Debug.Log($"{Name.Sky()} <= Push => {key} Failure");
+                    Debug.Log($"{Name.Sky()} 移除已销毁对象 : {key.Red()}");
                     poolDict[key].Pop();
                     return;
+                }
+
+                if (GlobalManager.Instance.IsDebugPool)
+                {
+                    Debug.Log($"{Name.Sky()} 存入 => {key.Pink()} 对象成功");
                 }
 
                 poolDict[key].Push(obj);
             }
             else
             {
-                poolDict.Add(key, new PoolData(obj, manager));
+                if (GlobalManager.Instance.IsDebugPool)
+                {
+                    Debug.Log($"{Name.Sky()} => 创建对象池 : {key.Green()}");
+                }
+                
+                poolDict.Add(key, new PoolData(obj, poolManager));
             }
         }
-        
+
         internal static void Destroy()
         {
-            manager = null;
+            poolManager = null;
             poolDict = null;
         }
     }

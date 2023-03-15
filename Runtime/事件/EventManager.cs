@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using JFramework.Core;
 using UnityEngine;
 
 namespace JFramework
@@ -46,7 +45,7 @@ namespace JFramework
                 eventDict.Add(id, action);
             }
 
-            if (DebugManager.IsDebugEvent)
+            if (GlobalManager.Instance.IsDebugEvent)
             {
                 Debug.Log($"{Name.Sky()} 侦听 => {action.Method.ToString().Yellow()} 事件");
             }
@@ -62,7 +61,7 @@ namespace JFramework
             if (eventDict == null) return;
             if (eventDict.ContainsKey(id))
             {
-                if (DebugManager.IsDebugEvent)
+                if (GlobalManager.Instance.IsDebugEvent)
                 {
                     Debug.Log($"{Name.Sky()} 移除 => {action.Method.ToString().Yellow()} 事件");
                 }
@@ -81,7 +80,7 @@ namespace JFramework
             if (eventDict == null) return;
             if (eventDict.ContainsKey(id))
             {
-                if (DebugManager.IsDebugEvent)
+                if (GlobalManager.Instance.IsDebugEvent)
                 {
                     Debug.Log($"{Name.Sky()} 触发 => {eventDict[id]?.Method.ToString().Yellow()} 事件");
                 }

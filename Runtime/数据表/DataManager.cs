@@ -57,7 +57,7 @@ namespace JFramework.Core
 
                         if (keyData == null)
                         {
-                            Debug.Log($"{Name.Sky()} <= Missing => {keyName.Red()} Key");
+                            Debug.Log($"{Name.Sky()} 缺少主键 => {type.Name.Red()}");
                             return;
                         }
 
@@ -83,15 +83,15 @@ namespace JFramework.Core
                             StrDataDict.Add(keyData, dataDict);
                         }
 
-                        if (DebugManager.IsDebugData)
+                        if (GlobalManager.Instance.IsDebugData)
                         {
-                            Debug.Log($"{Name.Sky()} <= Success => {type.Name.Blue()}");
+                            Debug.Log($"{Name.Sky()} 加载 => {type.Name.Blue()} 数据成功");
                         }
                     });
                 }
                 catch
                 {
-                    Debug.Log($"{Name.Sky()} <= Failure => {type.Name.Red()}");
+                    Debug.Log($"{Name.Sky()} 加载 => {type.Name.Red()} 数据失败");
                 }
             }
         }
@@ -127,11 +127,11 @@ namespace JFramework.Core
             IntDataDict.TryGetValue(typeof(T), out IntDataDict soDict);
             if (soDict == null) return default;
             soDict.TryGetValue(key, out IData data);
-            if (DebugManager.IsDebugData)
+            if (GlobalManager.Instance.IsDebugData)
             {
                 Debug.Log(data != null
-                    ? $"{Name.Sky()} <= Get => {typeof(T).Name.Blue()} : {key.ToString().Green()}"
-                    : $"{Name.Sky()} <= Get => {typeof(T).Name.Red()} : {key.ToString().Green()}");
+                    ? $"{Name.Sky()} 获取 => {typeof(T).Name.Blue()} : {key.ToString().Green()} 数据成功"
+                    : $"{Name.Sky()} 获取 => {typeof(T).Name.Red()} : {key.ToString().Green()} 数据失败");
             }
 
             return (T)data;
@@ -148,11 +148,11 @@ namespace JFramework.Core
             StrDataDict.TryGetValue(typeof(T), out StrDataDict soDict);
             if (soDict == null) return default;
             soDict.TryGetValue(key, out IData data);
-            if (DebugManager.IsDebugData)
+            if (GlobalManager.Instance.IsDebugData)
             {
                 Debug.Log(data != null
-                    ? $"{Name.Sky()} <= Get => {typeof(T).Name.Blue()} : {key.Green()}"
-                    : $"{Name.Sky()} <= Get => {typeof(T).Name.Red()} : {key.Green()}");
+                    ? $"{Name.Sky()} 获取 => {typeof(T).Name.Blue()} : {key.Green()} 数据成功"
+                    : $"{Name.Sky()} 获取 => {typeof(T).Name.Red()} : {key.Green()} 数据失败");
             }
 
             return (T)data;
@@ -169,11 +169,11 @@ namespace JFramework.Core
             StrDataDict.TryGetValue(typeof(T), out StrDataDict soDict);
             if (soDict == null) return default;
             soDict.TryGetValue(key.ToString(), out IData data);
-            if (DebugManager.IsDebugData)
+            if (GlobalManager.Instance.IsDebugData)
             {
                 Debug.Log(data != null
-                    ? $"{Name.Sky()} <= Get => {typeof(T).Name.Blue()} : {key.ToString().Green()}"
-                    : $"{Name.Sky()} <= Get => {typeof(T).Name.Red()} : {key.ToString().Green()}");
+                    ? $"{Name.Sky()} 获取 => {typeof(T).Name.Blue()} : {key.ToString().Green()} 数据成功"
+                    : $"{Name.Sky()} 获取 => {typeof(T).Name.Red()} : {key.ToString().Green()} 数据失败");
             }
 
             return (T)data;

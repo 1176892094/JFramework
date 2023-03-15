@@ -5,20 +5,12 @@ namespace JFramework.Core
 {
     internal sealed partial class DebugManager : MonoBehaviour
     {
-        [ShowInInspector, LabelText("开启Debug调试工具"), BoxGroup("调试选项")] public static bool IsDebugTool;
-        [ShowInInspector, LabelText("显示Json加载信息"), BoxGroup("调试选项")] public static bool IsDebugJson;
-        [ShowInInspector, LabelText("显示Data加载信息"), BoxGroup("调试选项")] public static bool IsDebugData;
-        [ShowInInspector, LabelText("显示Asset加载信息"), BoxGroup("调试选项")] public static bool IsDebugAsset;
-        [ShowInInspector, LabelText("显示Event事件信息"), BoxGroup("调试选项")] public static bool IsDebugEvent;
-        [ShowInInspector, LabelText("显示Scene加载信息"), BoxGroup("调试选项")] public static bool IsDebugScene;
-
         private int FPS;
         private bool IsExtend;
         private Rect minRect;
         private Color FPSColor = Color.white;
         private DebugType debugType;
-
-
+        
         private void Awake()
         {
             InitComponent();
@@ -29,14 +21,14 @@ namespace JFramework.Core
         {
             TimerManager.Pop(1).SetLoop(-1, _ =>
             {
-                if (!IsDebugTool) return;
+                if (!GlobalManager.Instance.IsDebugPool) return;
                 FPS = (int)(1.0f / Time.deltaTime);
             }).Unscale().SetTarget(gameObject);
         }
 
         private void OnGUI()
         {
-            if (!IsDebugTool) return;
+            if (!GlobalManager.Instance.IsDebugPool) return;
             Matrix4x4 cachedMatrix = GUI.matrix;
             GUI.matrix = Matrix4x4.Scale(new Vector3(DebugData.WindowScale, DebugData.WindowScale, 1f));
 

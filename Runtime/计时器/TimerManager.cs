@@ -32,7 +32,7 @@ namespace JFramework.Core
         {
             timerQueue = new Queue<Timer>();
             timerList = new List<Timer>();
-            GlobalManager.Instance.UpdateAction += OnUpdate;
+            JFramework.GlobalManager.Instance.UpdateAction += OnUpdate;
         }
 
         /// <summary>

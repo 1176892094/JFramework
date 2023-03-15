@@ -42,7 +42,7 @@ namespace JFramework.Core
             }
             
             var result = Addressables.LoadAssetAsync<T>(name).WaitForCompletion();
-            if (DebugManager.IsDebugAsset)
+            if (GlobalManager.Instance.IsDebugAsset)
             {
                 Debug.Log($"{Name.Sky()} 加载 => {name.Green()} 资源成功");
             }
@@ -71,7 +71,7 @@ namespace JFramework.Core
                 if (handle.IsDone)
                 {
                     action(handle.Result is GameObject ? Object.Instantiate(handle.Result) : handle.Result);
-                    if (DebugManager.IsDebugAsset)
+                    if (GlobalManager.Instance.IsDebugAsset)
                     {
                         Debug.Log($"{Name.Sky()} 加载 => {name.Green()} 资源成功");
                     }
@@ -83,7 +83,7 @@ namespace JFramework.Core
                         if (obj.Status == AsyncOperationStatus.Succeeded)
                         {
                             action(obj.Result is GameObject ? Object.Instantiate(obj.Result) : obj.Result);
-                            if (DebugManager.IsDebugAsset)
+                            if (GlobalManager.Instance.IsDebugAsset)
                             {
                                 Debug.Log($"{Name.Sky()} 加载 => {name.Green()} 资源成功");
                             }
@@ -100,14 +100,14 @@ namespace JFramework.Core
                 if (obj.Status == AsyncOperationStatus.Succeeded)
                 {
                     action(obj.Result is GameObject ? Object.Instantiate(obj.Result) : obj.Result);
-                    if (DebugManager.IsDebugAsset)
+                    if (GlobalManager.Instance.IsDebugAsset)
                     {
                         Debug.Log($"{Name.Sky()} 加载 => {name.Green()} 资源成功");
                     }
                 }
                 else
                 {
-                    if (DebugManager.IsDebugAsset)
+                    if (GlobalManager.Instance.IsDebugAsset)
                     {
                         Debug.Log($"{Name.Sky()} 加载 => {name.Red()} 资源失败");
                     }

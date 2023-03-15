@@ -46,9 +46,9 @@ namespace JFramework.Core
                     return;
                 }
 
-                if (DebugManager.IsDebugJson)
+                if (GlobalManager.Instance.IsDebugJson)
                 {
-                    Debug.Log($"{Name.Sky()} <= Encrypt => {name.Orange()}");
+                    Debug.Log($"{Name.Sky()} 保存加密 => {name.Orange()} 数据文件");
                 }
 
                 using Aes aes = Aes.Create();
@@ -58,9 +58,9 @@ namespace JFramework.Core
             }
             else
             {
-                if (DebugManager.IsDebugJson)
+                if (GlobalManager.Instance.IsDebugJson)
                 {
-                    Debug.Log($"{Name.Sky()} <= Save => {name.Orange()}");
+                    Debug.Log($"{Name.Sky()} 保存 => {name.Orange()} 数据文件");
                 }
 
                 File.WriteAllText(filePath, saveJson);
@@ -77,7 +77,7 @@ namespace JFramework.Core
             var filePath = GetPath(obj.name);
             if (!File.Exists(filePath))
             {
-                Debug.Log($"{Name.Sky()} <= Create => {obj.name.Orange()}");
+                Debug.Log($"{Name.Sky()} 创建 => {obj.name.Orange()} 数据文件");
                 Save(obj, obj.name, isAes);
             }
 
@@ -89,9 +89,9 @@ namespace JFramework.Core
                     return;
                 }
 
-                if (DebugManager.IsDebugJson)
+                if (GlobalManager.Instance.IsDebugJson)
                 {
-                    Debug.Log($"{Name.Sky()} <= Decrypt => {obj.name.Orange()}");
+                    Debug.Log($"{Name.Sky()} 读取解密 => {obj.name.Orange()} 数据文件");
                 }
 
                 var loadJson = File.ReadAllBytes(filePath);
@@ -104,9 +104,9 @@ namespace JFramework.Core
             }
             else
             {
-                if (DebugManager.IsDebugJson)
+                if (GlobalManager.Instance.IsDebugJson)
                 {
-                    Debug.Log($"{Name.Sky()} <= Load => {Name.Orange()}");
+                    Debug.Log($"{Name.Sky()} 读取 => {Name.Orange()} 数据文件");
                 }
                 
                 var saveJson = File.ReadAllText(filePath);
@@ -126,7 +126,7 @@ namespace JFramework.Core
             var filePath = GetPath(name);
             if (!File.Exists(filePath))
             {
-                Debug.Log($"{Name.Sky()} <= Create => {name.Orange()}");
+                Debug.Log($"{Name.Sky()} 创建 => {name.Orange()} 数据文件");
                 Save(new T(), name, isAes);
             }
 
@@ -138,9 +138,9 @@ namespace JFramework.Core
                     return null;
                 }
                 
-                if (DebugManager.IsDebugJson)
+                if (GlobalManager.Instance.IsDebugJson)
                 {
-                    Debug.Log($"{Name.Sky()} <= Decrypt => {name.Orange()}");
+                    Debug.Log($"{Name.Sky()} 读取解密 => {name.Orange()} 数据文件");
                 }
                 
                 var loadJson = File.ReadAllBytes(filePath);
@@ -154,9 +154,9 @@ namespace JFramework.Core
             }
             else
             {
-                if (DebugManager.IsDebugJson)
+                if (GlobalManager.Instance.IsDebugJson)
                 {
-                    Debug.Log($"{Name.Sky()} <= Load => {name.Orange()}");
+                    Debug.Log($"{Name.Sky()} 读取 => {name.Orange()} 数据文件");
                 }
                 
                 var saveJson = File.ReadAllText(filePath);
@@ -170,7 +170,7 @@ namespace JFramework.Core
         /// </summary>
         public static void Clear()
         {
-            if (DebugManager.IsDebugJson)
+            if (GlobalManager.Instance.IsDebugJson)
             {
                 Debug.Log($"{Name.Sky()} <= Clear => {Name.Orange()}");
             }

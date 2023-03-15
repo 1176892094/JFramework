@@ -35,7 +35,7 @@ namespace JFramework.Core
         {
             layerGroup = new Transform[5];
             panelDict = new Dictionary<string, UIPanel>();
-            var transform = GlobalManager.Instance.transform;
+            var transform = JFramework.GlobalManager.Instance.transform;
             layerGroup[0] = transform.Find("UICanvas/Layer1");
             layerGroup[1] = transform.Find("UICanvas/Layer2");
             layerGroup[2] = transform.Find("UICanvas/Layer3");

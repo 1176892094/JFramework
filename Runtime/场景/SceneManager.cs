@@ -1,7 +1,6 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using JFramework.Core;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnitySceneManager = UnityEngine.SceneManagement.SceneManager;
@@ -54,7 +53,7 @@ namespace JFramework
                 return;
             }
 
-            if (DebugManager.IsDebugScene)
+            if (GlobalManager.Instance.IsDebugScene)
             {
                 Debug.Log($"{Name.Sky()} 加载 => {name.Green()}场景");
             }
@@ -75,7 +74,7 @@ namespace JFramework
                 return;
             }
 
-            if (DebugManager.IsDebugScene)
+            if (GlobalManager.Instance.IsDebugScene)
             {
                 Debug.Log($"{Name.Sky()} 异步加载 => {name.Green()}场景");
             }
@@ -101,7 +100,7 @@ namespace JFramework
                     progress = Mathf.Lerp(progress, asyncOperation.progress / 9f * 10f, Time.deltaTime);
                     EventManager.Send(999, progress);
 
-                    if (DebugManager.IsDebugScene)
+                    if (GlobalManager.Instance.IsDebugScene)
                     {
                         Debug.Log($"{Name.Sky()} 加载进度条 => {progress}%");
                     }
@@ -115,7 +114,7 @@ namespace JFramework
 
             action?.Invoke();
 
-            if (DebugManager.IsDebugScene)
+            if (GlobalManager.Instance.IsDebugScene)
             {
                 Debug.Log($"{Name.Sky()} 加载 => {name.Green()}场景完成");
             }
