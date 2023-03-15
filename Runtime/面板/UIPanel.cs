@@ -7,7 +7,7 @@ using UnityEngine.UI;
 
 namespace JFramework
 {
-    using UIContainer = Dictionary<string, UIBehaviour>;
+    using Container = Dictionary<string, UIBehaviour>;
 
     /// <summary>
     /// UI面板的抽象类
@@ -17,14 +17,14 @@ namespace JFramework
         /// <summary>
         /// 视觉容器字典
         /// </summary>
-        [ShowInInspector, LabelText("视觉元素")]
-        private readonly Dictionary<string, UIContainer> containerDict = new Dictionary<string, UIContainer>();
+        [ShowInInspector, LabelText("视觉元素")] private Dictionary<string, Container> containerDict;
 
         /// <summary>
         /// 开始时查找所有控件
         /// </summary>
         protected override void Awake()
         {
+            containerDict = new Dictionary<string, Container>();
             FindComponent<Image>();
             FindComponent<Slider>();
             FindComponent<Button>();
@@ -47,7 +47,7 @@ namespace JFramework
                 var key = component.gameObject.name;
                 if (!containerDict.ContainsKey(type))
                 {
-                    var container = new UIContainer();
+                    var container = new Container();
                     containerDict.Add(type, container);
                     container.Add(key, component);
                 }

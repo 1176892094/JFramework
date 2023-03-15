@@ -7,15 +7,46 @@ namespace JFramework
 {
     public static class AudioManager
     {
+        /// <summary>
+        /// 完成音效队列
+        /// </summary>
         internal static Queue<AudioSource> audioQueue;
+
+        /// <summary>
+        /// 播放音效队列
+        /// </summary>
         internal static List<AudioSource> audioList;
+
+        /// <summary>
+        /// 音效挂载系统
+        /// </summary>
         internal static GameObject audioSystem;
+
+        /// <summary>
+        /// 背景音乐组件
+        /// </summary>
         internal static AudioSource audioSource;
+
+        /// <summary>
+        /// 游戏音效设置
+        /// </summary>
         private static AudioSetting audioSetting;
-        private static string Name => nameof(AssetManager);
+
+        /// <summary>
+        /// 管理器名称
+        /// </summary>
+        private static string Name => nameof(AudioManager);
+
+        /// <summary>
+        /// 背景音乐
+        /// </summary>
         public static float SoundVolume => audioSetting?.soundVolume ?? 0.5f;
+
+        /// <summary>
+        /// 游戏声音
+        /// </summary>
         public static float AudioVolume => audioSetting?.audioVolume ?? 0.5f;
-        
+
         /// <summary>
         /// 音效管理器初始化
         /// </summary>
@@ -23,8 +54,8 @@ namespace JFramework
         {
             audioList = new List<AudioSource>();
             audioQueue = new Queue<AudioSource>();
-            var obj = GlobalManager.Instance.gameObject;
-            audioSystem = obj.transform.Find("AudioSystem").gameObject;
+            var transform = GlobalManager.Instance.transform;
+            audioSystem = transform.Find("AudioSystem").gameObject;
             audioSetting = JsonManager.Load<AudioSetting>(Name, true);
             audioSource = audioSystem.GetComponent<AudioSource>();
             SetSound(audioSetting.soundVolume);
@@ -39,7 +70,7 @@ namespace JFramework
         {
             if (audioSource == null)
             {
-                Debug.Log("音乐管理器没有初始化!");
+                Debug.Log($"{Name.Red()} 没有初始化");
                 return;
             }
 
@@ -58,6 +89,12 @@ namespace JFramework
         /// <param name="soundVolume">音量的大小</param>
         public static void SetSound(float soundVolume)
         {
+            if (audioSource == null)
+            {
+                Debug.Log($"{Name.Red()} 没有初始化");
+                return;
+            }
+
             audioSetting.soundVolume = soundVolume;
             audioSource.volume = soundVolume;
             JsonManager.Save(audioSetting, Name, true);
@@ -70,7 +107,7 @@ namespace JFramework
         {
             if (audioSource == null)
             {
-                Debug.Log("音乐管理器没有初始化!");
+                Debug.Log($"{Name.Red()} 没有初始化");
                 return;
             }
 
@@ -84,9 +121,9 @@ namespace JFramework
         /// <param name="action">获取音效的回调</param>
         public static void PlayAudio(string path, Action<AudioSource> action = null)
         {
-            if (audioList == null)
+            if (audioSource == null)
             {
-                Debug.Log("音乐管理器没有初始化!");
+                Debug.Log($"{Name.Red()} 没有初始化");
                 return;
             }
 
@@ -97,8 +134,8 @@ namespace JFramework
                 audio.volume = audioSetting.audioVolume;
                 audio.clip = clip;
                 audio.Play();
-                TimerManager.Pop(clip.length, () => StopAudio(audio));
                 action?.Invoke(audio);
+                TimerManager.Pop(clip.length, () => StopAudio(audio));
             });
         }
 
@@ -108,6 +145,12 @@ namespace JFramework
         /// <param name="audioVolume">传入音量大小</param>
         public static void SetAudio(float audioVolume)
         {
+            if (audioSource == null)
+            {
+                Debug.Log($"{Name.Red()} 没有初始化");
+                return;
+            }
+
             audioSetting.audioVolume = audioVolume;
             foreach (var audio in audioList)
             {
@@ -123,6 +166,12 @@ namespace JFramework
         /// <param name="audioSource">传入音效数据</param>
         public static void StopAudio(AudioSource audioSource)
         {
+            if (audioSource == null)
+            {
+                Debug.Log($"{Name.Red()} 没有初始化");
+                return;
+            }
+
             if (audioList.Contains(audioSource))
             {
                 audioSource.Stop();
@@ -131,6 +180,9 @@ namespace JFramework
             }
         }
 
+        /// <summary>
+        /// 释放管理器
+        /// </summary>
         internal static void Destroy()
         {
             audioList = null;
@@ -139,7 +191,7 @@ namespace JFramework
             audioSource = null;
             audioSetting = null;
         }
-        
+
         /// <summary>
         /// 音效数据
         /// </summary>

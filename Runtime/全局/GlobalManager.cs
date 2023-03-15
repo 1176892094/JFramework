@@ -50,6 +50,7 @@ namespace JFramework
         public void Listen(IEntity entity)
         {
             UpdateAction += entity.Update;
+            entityList.Add(entity);
         }
 
         /// <summary>
@@ -59,8 +60,12 @@ namespace JFramework
         public void Remove(IEntity entity)
         {
             UpdateAction -= entity.Update;
+            entityList.Remove(entity);
         }
 
+        /// <summary>
+        /// 设置全局单例
+        /// </summary>
         private static void Singleton()
         {
             if (Instance != null) return;

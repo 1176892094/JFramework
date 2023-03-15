@@ -17,6 +17,11 @@ namespace JFramework.Core
         /// 存储所有UI的字典
         /// </summary>
         internal static Dictionary<string, UIPanel> panelDict;
+        
+        /// <summary>
+        /// 管理器名称
+        /// </summary>
+        private static string Name => nameof(UIManager);
 
         /// <summary>
         /// UI层级数组
@@ -30,12 +35,12 @@ namespace JFramework.Core
         {
             layerGroup = new Transform[5];
             panelDict = new Dictionary<string, UIPanel>();
-            var obj = GlobalManager.Instance.gameObject;
-            layerGroup[0] = obj.transform.Find("UICanvas/Layer1");
-            layerGroup[1] = obj.transform.Find("UICanvas/Layer2");
-            layerGroup[2] = obj.transform.Find("UICanvas/Layer3");
-            layerGroup[3] = obj.transform.Find("UICanvas/Layer4");
-            layerGroup[4] = obj.transform.Find("UICanvas/Layer5");
+            var transform = GlobalManager.Instance.transform;
+            layerGroup[0] = transform.Find("UICanvas/Layer1");
+            layerGroup[1] = transform.Find("UICanvas/Layer2");
+            layerGroup[2] = transform.Find("UICanvas/Layer3");
+            layerGroup[3] = transform.Find("UICanvas/Layer4");
+            layerGroup[4] = transform.Find("UICanvas/Layer5");
         }
 
         /// <summary>
@@ -46,6 +51,12 @@ namespace JFramework.Core
         /// <typeparam name="T">可以使用所有继承IPanel的对象</typeparam>
         private static void LoadPanel<T>(string name, Action<T> action) where T : UIPanel
         {
+            if (panelDict == null)
+            {
+                Debug.Log($"{Name.Red()} 没有初始化");
+                return;
+            }
+            
             AssetManager.LoadAsync<GameObject>("UI/" + name, obj =>
             {
                 if (panelDict.ContainsKey(name)) HidePanel<T>();
@@ -64,9 +75,13 @@ namespace JFramework.Core
         /// <typeparam name="T">可以使用所有继承IPanel的对象</typeparam>
         public static void ShowPanel<T>(Action<T> action = null) where T : UIPanel
         {
-            if (panelDict == null) return;
+            if (panelDict == null)
+            {
+                Debug.Log($"{Name.Red()} 没有初始化");
+                return;
+            }
+            
             var key = typeof(T).Name;
-
             if (panelDict.ContainsKey(key))
             {
                 panelDict[key].Show();
@@ -80,22 +95,21 @@ namespace JFramework.Core
         /// <summary>
         /// UI管理器隐藏UI面板
         /// </summary>
-        /// <param name="type">隐藏UI的方式</param>
         /// <typeparam name="T">可以使用所有继承IPanel的对象</typeparam>
-        public static void HidePanel<T>(UIHideType type = UIHideType.Remove) where T : UIPanel
+        public static void HidePanel<T>() where T : UIPanel
         {
-            if (panelDict == null) return;
+            if (panelDict == null)
+            {
+                Debug.Log($"{Name.Red()} 没有初始化");
+                return;
+            }
+            
             var key = typeof(T).Name;
-
             if (panelDict.ContainsKey(key))
             {
                 panelDict[key].Hide();
-
-                if (type == UIHideType.Remove)
-                {
-                    Object.Destroy(panelDict[key].gameObject);
-                    panelDict.Remove(key);
-                }
+                Object.Destroy(panelDict[key].gameObject);
+                panelDict.Remove(key);
             }
         }
 
@@ -106,9 +120,13 @@ namespace JFramework.Core
         /// <returns>返回获取到的UI面板</returns>
         public static T GetPanel<T>() where T : UIPanel
         {
-            if (panelDict == null) return null;
+            if (panelDict == null)
+            {
+                Debug.Log($"{Name.Red()} 没有初始化");
+                return null;
+            }
+            
             var key = typeof(T).Name;
-
             if (panelDict.ContainsKey(key))
             {
                 return (T)panelDict?[key];
@@ -122,7 +140,7 @@ namespace JFramework.Core
         /// </summary>
         /// <param name="layer">层级的类型</param>
         /// <returns>返回得到的层级</returns>
-        public static Transform GetLayer(UILayerType layer) => panelDict == null ? null : layerGroup[(int)layer];
+        public static Transform GetLayer(UILayerType layer) => panelDict != null ? layerGroup[layer.As<int>()] : null;
 
         /// <summary>
         /// UI管理器侦听UI面板事件
@@ -130,10 +148,13 @@ namespace JFramework.Core
         /// <param name="target">传入的UI对象</param>
         /// <param name="type">事件触发类型</param>
         /// <param name="action">事件触发后的回调</param>
-        public static void Listen(MonoBehaviour target, EventTriggerType type, UnityAction<BaseEventData> action)
+        public static void Listen(Component target, EventTriggerType type, UnityAction<BaseEventData> action)
         {
             var trigger = target.GetComponent<EventTrigger>();
-            if (trigger == null) trigger = target.gameObject.AddComponent<EventTrigger>();
+            if (trigger == null)
+            {
+                trigger = target.gameObject.AddComponent<EventTrigger>();
+            }
             var entry = new EventTrigger.Entry { eventID = type };
             entry.callback.AddListener(action);
             trigger.triggers.Add(entry);
@@ -144,6 +165,12 @@ namespace JFramework.Core
         /// </summary>
         public static void Clear()
         {
+            if (panelDict == null)
+            {
+                Debug.Log($"{Name.Red()} 没有初始化");
+                return;
+            }
+            
             foreach (var key in panelDict.Keys.Where(key => panelDict.ContainsKey(key)))
             {
                 Object.Destroy(panelDict[key].gameObject);
