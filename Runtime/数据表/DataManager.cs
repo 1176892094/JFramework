@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using JFramework.Interface;
+using JFramework.Table;
 using JFramework.Utility;
 using UnityEngine;
 
@@ -237,7 +237,7 @@ namespace JFramework.Core
         {
             var fields = type.GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
             return (from field in fields
-                let attrs = field.GetCustomAttributes(typeof(KeyAttribute), false)
+                let attrs = field.GetCustomAttributes(typeof(KeyFieldAttribute), false)
                 where attrs.Length > 0
                 select field).FirstOrDefault();
         }
