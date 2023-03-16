@@ -1,67 +1,70 @@
+using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
-using Object = UnityEngine.Object;
 
 namespace JFramework
 {
     internal abstract class InspectorEditor
     {
+        private static Type inspector;
+        private static Type Inspector => inspector ??= GetTypeByEditor("InspectorWindow");
+        private static Type GetTypeByEditor(string name) => assembly.GetType("UnityEditor." + name);
+        private static Assembly assembly => Assembly.Load("UnityEditor");
         private List<EditorWindow> failedWindows;
-        private double startTime;
-        
-        protected void Init()
+        private double sinceStartTime;
+
+        protected void Awake()
         {
             failedWindows = new List<EditorWindow>();
-            var windows = Resources.FindObjectsOfTypeAll(Reflection.Type);
-            foreach (var w in windows)
+            var windows = Resources.FindObjectsOfTypeAll(Inspector);
+            foreach (var window in windows)
             {
-                var window = (EditorWindow)w;
-                if (window == null) continue;
-                if (!TryAddMenuItem(window))
+                var editor = (EditorWindow)window;
+                if (editor == null) continue;
+                if (!TryAddMenuItem(editor))
                 {
-                    failedWindows.Add(window);
+                    failedWindows.Add(editor);
                 }
             }
 
-            if (failedWindows.Count > 0)
-            {
-                startTime = EditorApplication.timeSinceStartup;
-                EditorApplication.update += Update;
-            }
+            if (failedWindows.Count <= 0) return;
+            sinceStartTime = EditorApplication.timeSinceStartup;
+            EditorApplication.update += Update;
         }
 
         private void Update()
         {
-            if (EditorApplication.timeSinceStartup - startTime <= 0.5) return;
+            if (EditorApplication.timeSinceStartup - sinceStartTime <= 0.5) return;
             EditorApplication.update -= Update;
             if (failedWindows == null) return;
             GetMenuItem(failedWindows);
             failedWindows = null;
         }
 
-        private void GetMenuItem(List<EditorWindow> windows)
+        private void GetMenuItem(IEnumerable<EditorWindow> windows)
         {
-            foreach (EditorWindow window in windows)
+            foreach (var window in windows.Where(window => window != null))
             {
-                if (window == null) continue;
                 TryAddMenuItem(window);
             }
         }
 
-        private bool TryAddMenuItem(EditorWindow w)
+        private bool TryAddMenuItem(EditorWindow window)
         {
-            var container = GetContainer(w);
+            var container = TryGetVisualElement(window);
             if (container == null) return false;
             if (container.childCount < 2) return false;
             var element = GetVisualElement(container, "unity-inspector-editors-list");
-            return Show(w, element);
+            return InitInspector(window, element);
         }
 
-        private static VisualElement GetContainer(EditorWindow w)
+        private static VisualElement TryGetVisualElement(EditorWindow window)
         {
-            return w != null ? GetVisualElement(w.rootVisualElement, "unity-inspector-main-container") : null;
+            return window != null ? GetVisualElement(window.rootVisualElement, "unity-inspector-main-container") : null;
         }
 
         private static VisualElement GetVisualElement(VisualElement element, string className)
@@ -77,15 +80,18 @@ namespace JFramework
             return null;
         }
 
-        protected abstract bool Show(EditorWindow w, VisualElement element);
+        protected abstract bool InitInspector(EditorWindow w, VisualElement element);
 
         protected void OnMaximizedChanged(EditorWindow w)
         {
-            Object[] windows = Resources.FindObjectsOfTypeAll(Reflection.Type);
-            foreach (var obj in windows)
+            var windows = Resources.FindObjectsOfTypeAll(Inspector);
+            foreach (var window in windows)
             {
-                var window = (EditorWindow)obj;
-                if (window != null) TryAddMenuItem(window);
+                var editor = (EditorWindow)window;
+                if (editor != null)
+                {
+                    TryAddMenuItem(editor);
+                }
             }
         }
     }
