@@ -4,7 +4,7 @@ namespace JFramework
     /// 基于Mono的单例对象
     /// </summary>
     /// <typeparam name="T">所属的单例对象</typeparam>
-    public abstract class SingletonEntity<T> : Entity where T : SingletonEntity<T>
+    public abstract class MonoSingleton<T> : Entity where T : MonoSingleton<T>
     {
         /// <summary>
         /// 所属单例对象

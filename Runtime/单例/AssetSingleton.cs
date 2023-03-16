@@ -10,7 +10,7 @@ namespace JFramework
     /// 单例模式对象
     /// </summary>
     /// <typeparam name="T">所属的单例对象</typeparam>
-    public abstract class SingletonScriptable<T> : ScriptableObject where T : SingletonScriptable<T>
+    public abstract class AssetSingleton<T> : ScriptableObject where T : AssetSingleton<T>
     {
         /// <summary>
         /// 所属单例对象

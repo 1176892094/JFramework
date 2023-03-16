@@ -34,12 +34,12 @@ namespace JFramework.Core
         /// </summary>
         /// <param name="obj">保存的数据</param>
         /// <param name="name">保存的名称</param>
-        /// <param name="isAes">加密</param>
-        public static void Save(object obj, string name, bool isAes = false)
+        /// <param name="encrypt">加密</param>
+        public static void Save(object obj, string name, bool encrypt = false)
         {
             var filePath = GetPath(name);
             var saveJson = obj is ScriptableObject ? JsonUtility.ToJson(obj) : JsonConvert.SerializeObject(obj);
-            if (isAes)
+            if (encrypt)
             {
                 if (jsonDict == null)
                 {
@@ -72,17 +72,17 @@ namespace JFramework.Core
         /// 加载数据
         /// </summary>
         /// <param name="obj">加载的数据</param>
-        /// <param name="isAes">解密</param>
-        public static void Load(ScriptableObject obj, bool isAes = false)
+        /// <param name="decrypt">解密</param>
+        public static void Load(ScriptableObject obj, bool decrypt = false)
         {
             var filePath = GetPath(obj.name);
             if (!File.Exists(filePath))
             {
                 Debug.Log($"{Name.Sky()} 创建 => {obj.name.Orange()} 数据文件");
-                Save(obj, obj.name, isAes);
+                Save(obj, obj.name, decrypt);
             }
 
-            if (isAes)
+            if (decrypt)
             {
                 if (jsonDict == null)
                 {
@@ -119,19 +119,19 @@ namespace JFramework.Core
         /// 加载数据
         /// </summary>
         /// <param name="name">加载的数据名称</param>
-        /// <param name="isAes">解密</param>
+        /// <param name="decrypt">解密</param>
         /// <typeparam name="T">可以使用任何类型</typeparam>
         /// <returns>返回解密的数据</returns>
-        public static T Load<T>(string name, bool isAes = false) where T : class, new()
+        public static T Load<T>(string name, bool decrypt = false) where T : class, new()
         {
             var filePath = GetPath(name);
             if (!File.Exists(filePath))
             {
                 Debug.Log($"{Name.Sky()} 创建 => {name.Orange()} 数据文件");
-                Save(new T(), name, isAes);
+                Save(new T(), name, decrypt);
             }
 
-            if (isAes)
+            if (decrypt)
             {
                 if (jsonDict == null)
                 {

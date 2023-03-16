@@ -10,7 +10,7 @@ using UnityEngine;
 
 namespace JFramework
 {
-    internal class FrameworkAssetEditor : SingletonScriptable<FrameworkAssetEditor>
+    internal class FrameworkAssetEditor : AssetSingleton<FrameworkAssetEditor>
     {
         private static AddressableAssetSettings Settings => AddressableAssetSettingsDefaultObject.Settings;
         [ShowInInspector,LabelText("文件夹路径")] private string[] pathList;

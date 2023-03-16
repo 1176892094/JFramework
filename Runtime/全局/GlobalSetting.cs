@@ -8,7 +8,6 @@ namespace JFramework.Core
 {
     public sealed partial class GlobalManager
     {
-        [ShowInInspector, LabelText("开启Debug调试工具"), FoldoutGroup("调试管理器")] public bool IsDebugTool;
         [ShowInInspector, LabelText("显示Json加载信息"), FoldoutGroup("调试管理器")] public bool IsDebugJson;
         [ShowInInspector, LabelText("显示Pool存取信息"), FoldoutGroup("调试管理器")] public bool IsDebugPool;
         [ShowInInspector, LabelText("显示Data加载信息"), FoldoutGroup("调试管理器")] public bool IsDebugData;

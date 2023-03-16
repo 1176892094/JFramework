@@ -1,6 +1,6 @@
 namespace JFramework
 {
-    internal class FrameworkHouseEditor : SingletonScriptable<FrameworkHouseEditor>
+    internal class FrameworkHouseEditor : AssetSingleton<FrameworkHouseEditor>
     {
 
     }
