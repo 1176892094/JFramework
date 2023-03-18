@@ -1,5 +1,6 @@
 using System.IO;
 using UnityEngine;
+using JFramework.Core;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -38,7 +39,7 @@ namespace JFramework
                 AssetDatabase.CreateAsset(instance, name);
                 AssetDatabase.Refresh();
 #else
-                instance = AssetManager.Instance.Load<T>("Setttngs/"+typeof(T).Name);
+                instance = AssetManager.Load<T>("Setttngs/"+typeof(T).Name);
 #endif
                 return instance;
             }
