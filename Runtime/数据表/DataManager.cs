@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using JFramework.Table;
-using JFramework.Utility;
+using JFramework;
 using UnityEngine;
 
 namespace JFramework.Core

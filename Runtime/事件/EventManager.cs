@@ -1,5 +1,5 @@
 using System.Collections.Generic;
-using JFramework.Utility;
+using JFramework;
 using UnityEngine;
 
 namespace JFramework.Core

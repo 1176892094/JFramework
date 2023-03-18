@@ -1,4 +1,4 @@
-namespace JFramework.Utility
+namespace JFramework
 {
     public static class TextExtension
     {

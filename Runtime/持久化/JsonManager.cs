@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Security.Cryptography;
 using JFramework.Interface;
-using JFramework.Utility;
+using JFramework;
 using Newtonsoft.Json;
 using UnityEngine;
 
