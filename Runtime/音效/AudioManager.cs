@@ -58,7 +58,6 @@ namespace JFramework.Core
             poolManager = transform.Find("PoolManager").gameObject;
             audioSetting = JsonManager.Load<AudioSetting>(Name, true);
             audioSource = poolManager.GetComponent<AudioSource>();
-            audioSetting ??= new AudioSetting();
             SetSound(audioSetting.soundVolume);
             SetAudio(audioSetting.audioVolume);
         }

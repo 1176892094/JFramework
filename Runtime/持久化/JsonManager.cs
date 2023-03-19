@@ -4,7 +4,6 @@ using System.IO;
 using System.Security.Cryptography;
 using JFramework.Interface;
 using JFramework;
-using JFramework.Table;
 using Newtonsoft.Json;
 using UnityEngine;
 
@@ -100,9 +99,8 @@ namespace JFramework.Core
                 var data = GetData(obj.name);
                 var key = data.key;
                 var iv = data.iv;
-                if (key is not { Length: > 0 } || iv is not { Length: > 0 }) return;
+                if (key == null || key.Length <= 0 || iv == null || iv.Length <= 0) return;
                 var saveJson = JsonSetting.Decrypt(loadJson, key, iv);
-                if (saveJson.IsEmpty()) return;
                 JsonUtility.FromJsonOverwrite(saveJson, obj);
             }
             else
@@ -113,7 +111,6 @@ namespace JFramework.Core
                 }
                 
                 var saveJson = File.ReadAllText(filePath);
-                if (saveJson.IsEmpty()) return;
                 JsonUtility.FromJsonOverwrite(saveJson, obj);
             }
         }
@@ -151,9 +148,8 @@ namespace JFramework.Core
                 var json = GetData(name);
                 var key = json.key;
                 var iv = json.iv;
-                if (key is not { Length: > 0 } || iv is not { Length: > 0 }) return new T();
+                if (key == null || key.Length <= 0 || iv == null || iv.Length <= 0) return new T();
                 var saveJson = JsonSetting.Decrypt(loadJson, key, iv);
-                if (saveJson.IsEmpty()) return null;
                 var data = JsonConvert.DeserializeObject<T>(saveJson);
                 return data;
             }
@@ -237,5 +233,22 @@ namespace JFramework.Core
         /// Json管理器清除存档所有数据
         /// </summary>
         internal static void Destroy() => jsonDict = null;
+        
+        /// <summary>
+        /// Json加密数据
+        /// </summary>
+        [Serializable]
+        internal class JsonData
+        {
+            /// <summary>
+            /// 加密数据的键值
+            /// </summary>
+            public byte[] key;
+
+            /// <summary>
+            /// 加密数据的向量
+            /// </summary>
+            public byte[] iv;
+        }
     }
 }

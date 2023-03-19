@@ -26,7 +26,7 @@ namespace JFramework.Core
         private Dictionary<string, ICommand> commandDict => CommandManager.commandDict;
 
         [ShowInInspector, LabelText("加密管理数据"), FoldoutGroup("通用管理器")]
-        private Dictionary<string, JsonData> jsonDict => JsonManager.jsonDict;
+        private Dictionary<string, JsonManager.JsonData> jsonDict => JsonManager.jsonDict;
 
         [ShowInInspector, LabelText("完成计时队列"), FoldoutGroup("计时器管理器")]
         private Queue<Timer> timerQueue => TimerManager.timerQueue;
