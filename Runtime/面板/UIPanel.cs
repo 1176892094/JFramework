@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using Sirenix.OdinInspector;
 using TMPro;
+using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
@@ -79,7 +80,7 @@ namespace JFramework
         /// <param name="key">组件的名称</param>
         /// <typeparam name="T">可以使用任何继承UIBehaviour的组件</typeparam>
         /// <returns>返回查找到的组件</returns>
-        protected T Get<T>(string key) where T : UIBehaviour
+        public T Get<T>(string key) where T : UIBehaviour
         {
             var type = typeof(T).Name;
             if (containerDict.ContainsKey(type))

@@ -1,5 +1,9 @@
+using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Security.Cryptography;
+using JFramework.Core;
+using UnityEngine;
 
 namespace JFramework.Interface
 {
@@ -14,18 +18,28 @@ namespace JFramework.Interface
         /// <returns>返回加密的字节</returns>
         public static byte[] Encrypt(string targetStr, byte[] key, byte[] iv)
         {
-            using Aes aes = Aes.Create();
-            aes.Key = key;
-            aes.IV = iv;
-            ICryptoTransform cryptoTF = aes.CreateEncryptor(aes.Key, aes.IV);
-            using MemoryStream memoryStream = new MemoryStream();
-            using CryptoStream cryptoStream = new CryptoStream(memoryStream, cryptoTF, CryptoStreamMode.Write);
-            using (StreamWriter streamWriter = new StreamWriter(cryptoStream))
+            try
             {
-                streamWriter.Write(targetStr);
+                using Aes aes = Aes.Create();
+                aes.Key = key;
+                aes.IV = iv;
+                ICryptoTransform cryptoTF = aes.CreateEncryptor(aes.Key, aes.IV);
+                using MemoryStream memoryStream = new MemoryStream();
+                using CryptoStream cryptoStream = new CryptoStream(memoryStream, cryptoTF, CryptoStreamMode.Write);
+                using (StreamWriter streamWriter = new StreamWriter(cryptoStream))
+                {
+                    streamWriter.Write(targetStr);
+                }
+
+                return memoryStream.ToArray();
+            }
+            catch (Exception)
+            {
+                Debug.LogWarning($"{nameof(JsonManager).Red()} 存档丢失 => 加密失败!");
+                JsonManager.jsonDict = new Dictionary<string, JsonData>();
             }
 
-            return memoryStream.ToArray();
+            return null;
         }
 
         /// <summary>
@@ -37,14 +51,24 @@ namespace JFramework.Interface
         /// <returns>返回解密的字符串</returns>
         public static string Decrypt(byte[] targetByte, byte[] key, byte[] iv)
         {
-            using Aes aes = Aes.Create();
-            aes.Key = key;
-            aes.IV = iv;
-            ICryptoTransform cryptoTF = aes.CreateDecryptor(aes.Key, aes.IV);
-            using MemoryStream memoryStream = new MemoryStream(targetByte);
-            using CryptoStream cryptoStream = new CryptoStream(memoryStream, cryptoTF, CryptoStreamMode.Read);
-            using StreamReader streamReader = new StreamReader(cryptoStream);
-            return streamReader.ReadToEnd();
+            try
+            {
+                using Aes aes = Aes.Create();
+                aes.Key = key;
+                aes.IV = iv;
+                ICryptoTransform cryptoTF = aes.CreateDecryptor(aes.Key, aes.IV);
+                using MemoryStream memoryStream = new MemoryStream(targetByte);
+                using CryptoStream cryptoStream = new CryptoStream(memoryStream, cryptoTF, CryptoStreamMode.Read);
+                using StreamReader streamReader = new StreamReader(cryptoStream);
+                return streamReader.ReadToEnd();
+            }
+            catch (Exception)
+            {
+                Debug.LogWarning($"{nameof(JsonManager).Red()} 存档丢失 => 解密失败!");
+                JsonManager.jsonDict = new Dictionary<string, JsonData>();
+            }
+
+            return null;
         }
     }
 }
