@@ -119,7 +119,7 @@ namespace JFramework.Core
                 Progress = 0;
                 while (Progress < 0.99f)
                 {
-                    Progress = Mathf.Lerp(Progress, asyncOperation.progress / 9f * 10f, Time.fixedDeltaTime);
+                    Progress = Mathf.Lerp(Progress, asyncOperation.progress / 9f * 10f, Time.fixedDeltaTime * 2);
                     EventManager.Send(999, Progress);
 
                     if (GlobalManager.Instance.IsDebugScene)
