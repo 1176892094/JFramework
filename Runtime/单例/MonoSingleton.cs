@@ -27,7 +27,7 @@ namespace JFramework
         /// <summary>
         /// 醒来时在全局管理器中注册
         /// </summary>
-        protected override void Awake()
+        protected virtual void Awake()
         {
             if (instance == null)
             {
@@ -38,7 +38,7 @@ namespace JFramework
         /// <summary>
         /// 释放时将单例置空
         /// </summary>
-        protected override void OnDestroy()
+        protected virtual void OnDestroy()
         {
             instance = null;
         }

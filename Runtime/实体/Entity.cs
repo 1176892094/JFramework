@@ -13,17 +13,11 @@ namespace JFramework
     [Serializable]
     public abstract class Entity : MonoBehaviour, IEntity
     {
-        [ShowInInspector,LabelText("控制器列表")] private Dictionary<string, IController> controllerDict;
+        [ShowInInspector, LabelText("控制器列表")] private Dictionary<string, IController> controlDict;
 
-        protected virtual void Awake()
-        {
-        }
+        protected virtual void Spawn(params object[] value) => controlDict = new Dictionary<string, IController>();
 
         protected virtual void Enable()
-        {
-        }
-
-        protected virtual void Start()
         {
         }
 
@@ -32,10 +26,6 @@ namespace JFramework
         }
 
         protected virtual void Disable()
-        {
-        }
-
-        protected virtual void OnDestroy()
         {
         }
 
@@ -52,18 +42,13 @@ namespace JFramework
             GlobalManager.Instance.Remove(this);
             Disable();
         }
-        
-        protected virtual void Spawn(params object[] value)
-        {
-            controllerDict = new Dictionary<string, IController>();
-        }
 
         protected T Get<T>() where T : ScriptableObject, IController
         {
             var key = typeof(T).Name;
-            if (controllerDict.ContainsKey(key)) return (T)controllerDict[key];
+            if (controlDict.ContainsKey(key)) return (T)controlDict[key];
             var controller = ScriptableObject.CreateInstance<T>();
-            controllerDict.Add(key, controller);
+            controlDict.Add(key, controller);
             controller.Start(this);
             return controller;
         }

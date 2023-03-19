@@ -22,7 +22,7 @@ namespace JFramework
         /// <summary>
         /// 开始时查找所有控件
         /// </summary>
-        protected override void Awake()
+        protected virtual void Awake()
         {
             containerDict = new Dictionary<string, Container>();
             FindComponent<Image>();
