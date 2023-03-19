@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using UnitySceneManager = UnityEngine.SceneManagement.SceneManager;
+using LoadManager = UnityEngine.SceneManagement.SceneManager;
 
 namespace JFramework.Core
 {
@@ -43,7 +43,7 @@ namespace JFramework.Core
         /// <summary>
         /// 当前场景名称
         /// </summary>
-        public static string Scene => UnitySceneManager.GetActiveScene().name;
+        public static string Scene => LoadManager.GetActiveScene().name;
 
         /// <summary>
         /// 场景管理器初始化
@@ -51,7 +51,7 @@ namespace JFramework.Core
         internal static void Awake()
         {
             sceneDict = new Dictionary<int, SceneData>();
-            for (var i = 0; i < UnitySceneManager.sceneCountInBuildSettings; i++)
+            for (var i = 0; i < LoadManager.sceneCountInBuildSettings; i++)
             {
                 var path = SceneUtility.GetScenePathByBuildIndex(i);
                 var data = path.Split('/');
@@ -76,10 +76,10 @@ namespace JFramework.Core
 
             if (GlobalManager.Instance.IsDebugScene)
             {
-                Debug.Log($"{Name.Sky()} 加载 => {name.Green()}场景");
+                Debug.Log($"{Name.Sky()} 加载 => {name.Green()} 场景");
             }
 
-            UnitySceneManager.LoadScene(name);
+            LoadManager.LoadScene(name);
         }
 
         /// <summary>
@@ -97,7 +97,7 @@ namespace JFramework.Core
 
             if (GlobalManager.Instance.IsDebugScene)
             {
-                Debug.Log($"{Name.Sky()} 异步加载 => {name.Green()}场景");
+                Debug.Log($"{Name.Sky()} 异步加载 => {name.Green()} 场景");
             }
 
             GlobalManager.Instance.StartCoroutine(LoadSceneCompleted(name, action));
@@ -111,32 +111,35 @@ namespace JFramework.Core
         /// <returns>返回场景加载迭代器</returns>
         private static IEnumerator LoadSceneCompleted(string name, Action action)
         {
-            var asyncOperation = UnitySceneManager.LoadSceneAsync(name);
+            var asyncOperation = LoadManager.LoadSceneAsync(name);
             asyncOperation.allowSceneActivation = false;
+            var currentTime = Time.time;
             while (!asyncOperation.isDone)
             {
-                Progress = 0f;
+                Progress = 0;
                 while (Progress < 0.99f)
                 {
-                    Progress = Mathf.Lerp(Progress, asyncOperation.progress / 9f * 10f, Time.deltaTime);
+                    Progress = Mathf.Lerp(Progress, asyncOperation.progress / 9f * 10f, Time.fixedDeltaTime);
                     EventManager.Send(999, Progress);
+
                     if (GlobalManager.Instance.IsDebugScene)
                     {
-                        Debug.Log($"{Name.Sky()} 加载进度 => {progress.ToString("P").Green()}");
+                        Debug.Log($"{Name.Sky()} 加载进度 => {Progress.ToString("P").Green()}");
                     }
 
-                    yield return new WaitForEndOfFrame();
+                    yield return null;
                 }
 
                 asyncOperation.allowSceneActivation = true;
-                yield return null;
+                break;
             }
 
             action?.Invoke();
 
             if (GlobalManager.Instance.IsDebugScene)
             {
-                Debug.Log($"{Name.Sky()} 加载 => {name.Green()} 场景完成");
+                currentTime = Time.time - currentTime;
+                Debug.Log($"{Name.Sky()} 加载 => {name.Green()} 场景完成, 耗时 {currentTime.ToString("F").Yellow()} 秒");
             }
         }
 
