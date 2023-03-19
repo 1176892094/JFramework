@@ -1,7 +1,6 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using JFramework;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnitySceneManager = UnityEngine.SceneManagement.SceneManager;
@@ -14,6 +13,27 @@ namespace JFramework.Core
         /// 场景列表
         /// </summary>
         internal static Dictionary<int, SceneData> sceneDict;
+
+        /// <summary>
+        /// 场景加载进度条
+        /// </summary>
+        private static float progress;
+
+        /// <summary>
+        /// 场景加载进度条
+        /// </summary>
+        private static float Progress
+        {
+            get => progress;
+            set
+            {
+                progress = value;
+                if (progress >= 0.99f)
+                {
+                    progress = 1f;
+                }
+            }
+        }
 
         /// <summary>
         /// 管理器名称
@@ -95,14 +115,14 @@ namespace JFramework.Core
             asyncOperation.allowSceneActivation = false;
             while (!asyncOperation.isDone)
             {
-                var progress = 0f;
-                while (progress < 0.999f)
+                Progress = 0f;
+                while (Progress < 0.99f)
                 {
-                    progress = Mathf.Lerp(progress, asyncOperation.progress / 9f * 10f, Time.deltaTime);
-                    EventManager.Send(999, progress);
+                    Progress = Mathf.Lerp(Progress, asyncOperation.progress / 9f * 10f, Time.deltaTime);
+                    EventManager.Send(999, Progress);
                     if (GlobalManager.Instance.IsDebugScene)
                     {
-                        Debug.Log($"{Name.Sky()} 加载进度条 => {progress}%");
+                        Debug.Log($"{Name.Sky()} 加载进度 => {progress.ToString("P").Green()}");
                     }
 
                     yield return new WaitForEndOfFrame();
@@ -116,7 +136,7 @@ namespace JFramework.Core
 
             if (GlobalManager.Instance.IsDebugScene)
             {
-                Debug.Log($"{Name.Sky()} 加载 => {name.Green()}场景完成");
+                Debug.Log($"{Name.Sky()} 加载 => {name.Green()} 场景完成");
             }
         }
 
