@@ -17,7 +17,7 @@ namespace JFramework.Core
         /// <summary>
         /// 资源存储字典
         /// </summary>
-        private static Dictionary<string, IEnumerator> assetDict;
+        internal static Dictionary<string, IEnumerator> assetDict;
         
         /// <summary>
         /// 管理器名称

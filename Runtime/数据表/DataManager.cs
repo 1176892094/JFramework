@@ -154,9 +154,9 @@ namespace JFramework.Core
         /// <returns>返回一个数据对象</returns>
         public static T Get<T>(Enum key) where T : IData
         {
-            StrDataDict.TryGetValue(typeof(T), out StrDataDict soDict);
+            EnmDataDict.TryGetValue(typeof(T), out EnmDataDict soDict);
             if (soDict == null) return default;
-            soDict.TryGetValue(key.ToString(), out IData data);
+            soDict.TryGetValue(key, out IData data);
             if (GlobalManager.Instance.IsDebugData)
             {
                 Debug.Log(data != null
@@ -195,6 +195,8 @@ namespace JFramework.Core
         {
             IntDataDict.TryGetValue(type, out IntDataDict dictInt);
             if (dictInt != null) return dictInt.Values.ToList();
+            EnmDataDict.TryGetValue(type, out EnmDataDict dictEnm);
+            if (dictEnm != null) return dictEnm.Values.ToList();
             StrDataDict.TryGetValue(type, out StrDataDict dictStr);
             return dictStr?.Values.ToList();
         }
@@ -272,6 +274,7 @@ namespace JFramework.Core
         {
             IntDataDict = null;
             StrDataDict = null;
+            EnmDataDict = null;
         }
     }
 }

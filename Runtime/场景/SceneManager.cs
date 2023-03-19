@@ -127,7 +127,7 @@ namespace JFramework.Core
                         Debug.Log($"{Name.Sky()} 加载进度 => {Progress.ToString("P").Green()}");
                     }
 
-                    yield return null;
+                    yield return new WaitForEndOfFrame();
                 }
 
                 asyncOperation.allowSceneActivation = true;
