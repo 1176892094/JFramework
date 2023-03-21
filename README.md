@@ -57,28 +57,31 @@ public class Test1 : MonoBehaviour
 {
     private void Awake()
     {
-        EventManager.Listen(EventName.EventTrigger, EventTrigger); //监听事件
+        EventManager.Listen(EventName.OnPlayerDeath, OnPlayerDeath); //侦听事件
     }
 
     private void Update()
     {
-        EventManager.Send(EventName.EventTrigger); //发送事件
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            EventManager.Send(EventName.OnPlayerDeath); //发送事件
+        }
     }
 
-    private void EventTrigger() //触发事件调用该方法
+    private void OnPlayerDeath(params object[] value)
     {
-        Debug.Log("触发事件!");
+        Debug.Log("玩家死亡"); //触发事件
     }
 
     private void OnDestroy()
     {
-        EventManager.Remove(EventName.EventTrigger, EventTrigger); //移除事件
+        EventManager.Remove(EventName.OnPlayerDeath, OnPlayerDeath); //移除事件
     }
 }
 
 public struct EventName
 {
-    public const int EventTrigger = 1001; //建议定一个事件的常量
+    public const int OnPlayerDeath = 1001; //建议给事件定一个常量
 }
 ```
 (2)AssetManager（资源加载管理类）
