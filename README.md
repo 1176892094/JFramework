@@ -57,12 +57,12 @@ public class Test1 : MonoBehaviour
 {
     private void Awake()
     {
-        EventManager.Instance.Listen(EventName.EventTrigger, EventTrigger); //监听事件
+        EventManager.Listen(EventName.EventTrigger, EventTrigger); //监听事件
     }
 
     private void Update()
     {
-        EventManager.Instance.Send(EventName.EventTrigger); //发送事件
+        EventManager.Send(EventName.EventTrigger); //发送事件
     }
 
     private void EventTrigger() //触发事件调用该方法
@@ -72,13 +72,13 @@ public class Test1 : MonoBehaviour
 
     private void OnDestroy()
     {
-        EventManager.Instance.Remove(EventName.EventTrigger, EventTrigger); //移除事件
+        EventManager.Remove(EventName.EventTrigger, EventTrigger); //移除事件
     }
 }
 
 public struct EventName
 {
-    public const string EventTrigger = "EventTrigger"; //建议定一个事件的常量
+    public const int EventTrigger = 1001; //建议定一个事件的常量
 }
 ```
 (2)AssetManager（资源加载管理类）
@@ -87,14 +87,14 @@ public class Test2 : MonoBehaviour
 {
     private void LoadAsync() //异步加载
     {
-        AssetManager.Instance.LoadAsync<GameObject>(ResPath.Player, obj =>
+        AssetManager.LoadAsync<GameObject>(AssetPath.Player, obj =>
         {
             Player player = obj.GetComponent<Player>();
         });
     }
 }
 
-public struct ResPath
+public struct AssetPath
 {
     public const string Player = "Prefabs/Player"; //Player预制的体真实路径是：Assets/AddressableResources/Prefabs/Player
 }
@@ -109,7 +109,7 @@ public class Test3 : MonoBehaviour
 {
     private void SaveAndLoad1()
     {
-        AssetManager.Instance.LoadAsync<ScriptableObject>("玩家数据", playerData =>
+        AssetManager.LoadAsync<ScriptableObject>("玩家数据", playerData =>
         {
             JsonManager.Instance.Save(playerData, "玩家数据"); //保存SO文件,名称为"玩家数据"
             JsonManager.Instance.Load(playerData); //读取该SO文件
@@ -118,18 +118,18 @@ public class Test3 : MonoBehaviour
 
     private void SaveAndLoad2()
     {
-        AssetManager.Instance.LoadAsync<ScriptableObject>("玩家数据", playerData =>
+        AssetManager.LoadAsync<ScriptableObject>("玩家数据", playerData =>
         {
-            JsonManager.Instance.Save(playerData, "玩家数据", true); //储存数据并加密
-            JsonManager.Instance.Load(playerData, true); //解析加密数据并读取
+            JsonManager.Save(playerData, "玩家数据", true); //储存数据并加密
+            JsonManager.Load(playerData, true); //解析加密数据并读取
         });        
     }
 
     private void SaveAndLoad3()
     {
         List<string> playerNameList = new List<string>();
-        JsonManager.Instance.Save(playerNameList, "strList"); //储存playerNameList
-        playerNameList = JsonManager.Instance.Load<List<string>>("strList"); //读取playerNameList
+        JsonManager.Save(playerNameList, "strList"); //储存playerNameList
+        playerNameList = JsonManager.Load<List<string>>("strList"); //读取playerNameList
     }
 }
 ```
@@ -140,14 +140,14 @@ public class Test4: MonoBehaviour
     private GameObject bullet;
     private async void Start()
     {
-        PoolManager.Instance.Pop(PoolPath.Bullet, obj =>
+        PoolManager.Pop(PoolPath.Bullet, obj =>
         {
             bullet = obj;//从对象池中取出Bullet
             obj.transform.position = transform.position;//设置生成的子弹位置在自身位置
         });
 
         await new WaitForSeconds(5);//等待5秒
-        PoolManager.Instance.Push(bullet.name, bullet);//将物体放入对象池
+        PoolManager.Push(bullet.name, bullet);//将物体放入对象池
     }
 }
 
@@ -164,20 +164,20 @@ public class Test5 : MonoBehaviour
 
     private void BGMusic()
     {
-        AudioManager.Instance.PlaySound(AudioPath.BGMusic); //播放背景音乐
-        AudioManager.Instance.StopSound(); //停止背景音乐
-        AudioManager.Instance.SetSound(0); //改变背景音乐大小为0
+        AudioManager.PlaySound(AudioPath.BGMusic); //播放背景音乐
+        AudioManager.StopSound(); //停止背景音乐
+        AudioManager.SetSound(0); //改变背景音乐大小为0
     }
 
     private void GameAudio()
     {
-        AudioManager.Instance.PlayAudio(AudioPath.BTClick); //播放该音效
-        AudioManager.Instance.PlayAudio(AudioPath.BTClick, audio =>
+        AudioManager.PlayAudio(AudioPath.BTClick); //播放该音效
+        AudioManager.PlayAudio(AudioPath.BTClick, audio =>
         {
             audioSource = audio; //播放并获取该音效
         });
-        AudioManager.Instance.StopAudio(audioSource); //停止该音效
-        AudioManager.Instance.SetAudio(0); //改变游戏音效大小为0
+        AudioManager.StopAudio(audioSource); //停止该音效
+        AudioManager.SetAudio(0); //改变游戏音效大小为0
     }
 }
 
@@ -193,9 +193,9 @@ public class Test7: MonoBehaviour
 {
     private void ShowPanel()
     {
-        UIManager.Instance.ShowPanel<LoginPanel>(); //加载LoginPanel(可以重复加载，但只有一个实例)
-        UIManager.Instance.ShowPanel<LoginPanel>();//设置层级
-        UIManager.Instance.ShowPanel<LoginPanel>(panel =>
+        UIManager.ShowPanel<LoginPanel>(); //加载LoginPanel(可以重复加载，但只有一个实例)
+        UIManager.ShowPanel<LoginPanel>();//设置层级
+        UIManager.ShowPanel<LoginPanel>(panel =>
         {
             panel.SetUseruame("JINYIJIE");//设置属性
             panel.SetPassword("123456");//设置属性
@@ -204,25 +204,25 @@ public class Test7: MonoBehaviour
     
     private void HidePanel()
     {
-        UIManager.Instance.HidePanel<LoginPanel>(); //隐藏LoginPane
+        UIManager.HidePanel<LoginPanel>(); //隐藏LoginPane
     }
 
     private void GetPanel()
     {
-        LoginPanel panel = UIManager.Instance.GetPanel<LoginPanel>();//得到面板
+        LoginPanel panel = UIManager.GetPanel<LoginPanel>();//得到面板
         panel.SetUsername("JINYIJIE");//设置属性
         panel.SetPassword("123456");//设置属性
     }
 
     private void GetLayer()
     {
-        UIManager.Instance.GetLayer(UILayerType.Bottom);//得到层级
-        Transform common = UIManager.Instance.GetLayer(UILayerType.Height);
+        UIManager.GetLayer(UILayerType.Bottom);//得到层级
+        Transform common = UIManager.GetLayer(UILayerType.Height);
     }
 
     private void Clear()
     {
-        UIManager.Instance.Clear();//清除并销毁所有面板
+        UIManager.Clear();//清除并销毁所有面板
     }
 }
 
@@ -247,17 +247,17 @@ public class Test8 : MonoBehaviour
 
     private void Awake()
     {
-        EventManager.Instance.Listen("LoadSceneAsync", LoadSceneAsync); //侦听场景异步加载进度
+        EventManager.Listen(999, LoadSceneAsync); //侦听场景异步加载进度
     }
 
     private void LoadScene()
     {
-        LoadManager.Instance.Load("SceneName");
+        LoadManager.Load("SceneName");
     }
 
     private void LoadSceneAsync()
     {
-        LoadManager.Instance.LoadAsync("SceneName", () =>
+        LoadManager.LoadAsync("SceneName", () =>
         {
             //异步加载完成后执行
         });
@@ -271,7 +271,7 @@ public class Test8 : MonoBehaviour
 
     private void OnDestroy()
     {
-        EventManager.Instance.Remove("LoadSceneAsync", LoadSceneAsync); //移除场景异步加载进度
+        EventManager.Remove(999, LoadSceneAsync); //移除场景异步加载进度
     }
 }
 ```
@@ -279,22 +279,22 @@ public class Test8 : MonoBehaviour
 ```csharp
 public class Test9 : MonoBehaviour
 {
-    private TimeTick timer;
+    private ITimer timer;
 
     private void Start()
     {
-        timer = TimerManager.Instance.Listen(5, () =>
+        timer = TimerManager.Pop(5, () =>
         {
             Debug.Log("不循环/间隔5秒的计时器完成");
         });
 
-        TimerManager.Instance.Listen(5, () =>
+        TimerManager.Pop(5, () =>
         {
             Debug.Log("不循环/间隔5秒的不受TimeScale影响的计时器完成");
         }).Unscale();
 
         int count = 0;
-        TimerManager.Instance.Listen(1, () =>
+        TimerManager.Pop(1, () =>
         {
             Debug.Log("循环5次/间隔1秒的计时器完成");
         }).Unscale().SetLoop(5, () =>
@@ -303,7 +303,7 @@ public class Test9 : MonoBehaviour
             Debug.Log("第" + count + "次循环完成");
         });
         
-        TimerManager.Instance.Listen(10, () =>
+        TimerManager.Pop(10, () =>
         {
             Debug.Log("设置计时器随物体销毁而停止");
         }).SetTarget(gameObject);
@@ -318,15 +318,29 @@ public class Test9 : MonoBehaviour
 ```
 (9)StateMachine(有限状态机)
 ```csharp
-    public class Enemy : Machine //敌人继承状态机
+    public class Enemy : Entity //敌人继承状态机
     {
+        public EnemyMachine machine; //敌人状态机
         public Animator an; //敌人动画组件
 
-        protected override void Awake()
+        private void Start()
         {
-            base.Awake();
-            ListenState("Idle", new EnemyIdle()); //状态机增加Idle状态
-            ListenState("Walk", new EnemyWalk()); //状态机增加Walk状态
+            machine.Enalbe(); //启动敌人状态机
+        }
+    }
+   
+   
+    public class EnemyMachine : Controller<Enemy> //属于敌人的控制器
+    {
+        protected override void Start()
+        {
+            AddState<EnemyIdle>(); //状态机增加Idle状态
+            AddState<EnemyWalk>(); //状态机增加Walk状态
+        }
+        
+        public void Enable()
+        {
+            ChangeState<EnemyIdle>(); //启动后切换到Idle状态
         }
     }
 
@@ -341,7 +355,7 @@ public class Test9 : MonoBehaviour
         protected override void OnEnter()
         {
             owner.an.SetBool("Idle",true); //播放Idle动画
-            owner.ChangeState("Walk",3); //3秒切换到Walk动画
+            owner.machine.ChangeState("Walk",3); //3秒切换到Walk动画
         }
 
         protected override void OnUpdate() //状态更新
@@ -359,7 +373,7 @@ public class Test9 : MonoBehaviour
         protected override void OnEnter()
         {
             owner.an.SetBool("Walk",true); //播放Walk动画
-            owner.ChangeState("Idle",3); //3秒切换到Idle动画
+            owner.machine.ChangeState("Idle",3); //3秒切换到Idle动画
         }
 
         protected override void OnUpdate()
