@@ -415,39 +415,41 @@ public class EnemyWalk : State<Enemy> //设置状态的所有者
 ```
 (10)Entity/Controller(EC实体控制器分离)
 ```csharp
-    public class Player : Entity //玩家继承实体
-    {
-        public BuffController buffCtrl; //效果控制器
-        public SkillController skillCtrl; //技能控制器
-        public AttributeController attrCtrl; //属性控制器
+ public class Player : Entity //玩家继承实体
+{
+    public BuffController buffCtrl => Get<BuffController>(); //效果控制器
+    public SkillController skillCtrl => Get<SkillController>(); //技能控制器
+    public AttributeController attrCtrl => Get<AttributeController>(); //属性控制器
+}
 
-        protected override void Awake()
-        {
-            base.Awake();
-            skillCtrl = ScriptableObject.CreateInstance<SkillController>();
-            buffCtrl = ScriptableObject.CreateInstance<BuffController>();
-            attrCtrl = ScriptableObject.CreateInstance<AttributeController>();
-            skillCtrl.Get<IController>().OnInit(this);
-            attrCtrl.Get<IController>().OnInit(this);
-            buffCtrl.Get<IController>().OnInit(this);
-        }
-    }
+public class SkillController : Controller<Player> //设置控制器的所有者
+{
+    private AttributeController attrCtrl => owner.attrCtrl;
 
-    public class SkillController : Controller<Player> //技能控制器(ScriptableObject)
+    protected override void Start() //初始化方法
     {
-        private AttributeController attrCtrl => owner.attrCtrl;
     }
+}
 
-    public class AttributeController : Controller<Player> //属性控制器(ScriptableObject)
-    {
-        private SkillController skillCtrl => owner.skillCtrl;
-    }
+public class AttributeController : Controller<Player> //设置控制器的所有者
+{
+    private SkillController skillCtrl => owner.skillCtrl;
+    private BuffController buffCtrl => owner.buffCtrl;
 
-    public class BuffController : Controller<Player> //效果控制器(ScriptableObject)
+    protected override void Start() //初始化方法
     {
-        private AttributeController attrCtrl => owner.attrCtrl;
-        private SkillController skillCtrl => owner.skillCtrl;
     }
+}
+
+public class BuffController : Controller<Player> //设置控制器的所有者
+{
+    private AttributeController attrCtrl => owner.attrCtrl;
+    private SkillController skillCtrl => owner.skillCtrl;
+
+    protected override void Start() //初始化方法
+    {
+    }
+}
 ```
 
 (11)AwaitExtensions(异步拓展)
