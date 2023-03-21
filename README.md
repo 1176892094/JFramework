@@ -118,28 +118,37 @@ public class Test3 : MonoBehaviour
 {
     private void SaveAndLoad1()
     {
-        AssetManager.LoadAsync<ScriptableObject>("玩家数据", playerData =>
+        AssetManager.LoadAsync<ScriptableObject>(AssetPath.Data, data =>
         {
-            JsonManager.Instance.Save(playerData, "玩家数据"); //保存SO文件,名称为"玩家数据"
-            JsonManager.Instance.Load(playerData); //读取该SO文件
+            JsonManager.Save(data, data.name); //保存SO文件,名称为"玩家数据"
+            JsonManager.Load(data); //读取该SO文件
         });
     }
 
     private void SaveAndLoad2()
     {
-        AssetManager.LoadAsync<ScriptableObject>("玩家数据", playerData =>
+        AssetManager.LoadAsync<ScriptableObject>(AssetPath.Data, data =>
         {
-            JsonManager.Save(playerData, "玩家数据", true); //储存数据并加密
-            JsonManager.Load(playerData, true); //解析加密数据并读取
-        });        
+            JsonManager.Save(data, "玩家数据", true); //储存数据并加密
+            JsonManager.Load(data, true); //解析加密数据并读取
+        });
     }
 
     private void SaveAndLoad3()
     {
-        List<string> playerNameList = new List<string>();
-        JsonManager.Save(playerNameList, "strList"); //储存playerNameList
-        playerNameList = JsonManager.Load<List<string>>("strList"); //读取playerNameList
+        List<string> bagData = new List<string>();
+        JsonManager.Save(bagData, "BagData"); //储存BagData
+        bagData = JsonManager.Load<List<string>>("BagData"); //读取BagData
     }
+}
+
+public struct AssetPath
+{
+    public const string Data = "Settings/PlayerData"; //PlayerData真实路径是：Assets/AddressableResources/Settings/Data
+}
+
+public class PlayerData : ScriptableObject
+{
 }
 ```
 (4)PoolManager(对象池工具)
