@@ -12,13 +12,12 @@ URL：https://github.com/1176892094/JFramework.git
 
 2.开始
 
-GlobalManager使用：
+(1)在Inspector面板中找到JFramework模块
+(2)在JFramework模块中点击AddressableUpdate
+(3)在弹出的面板中点击Create Addressables Settings
+(4)再次点击JFramework模块中点击AddressableUpdate
+(5)Console打印出AddressableResources即配置成功
 
-(1)GlobalManager负责所有管理的初始化
-
-(2)预制体在框架中的Resources文件夹中
-
-(3)将预制体拖入场景即可
 
 ExcelToAsset使用：
 
