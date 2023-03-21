@@ -14,7 +14,9 @@ namespace JFramework
     {
         private Dictionary<string, IController> controlDict;
 
-        protected virtual void Spawn(params object[] value) => controlDict = new Dictionary<string, IController>();
+        protected virtual void Spawn(params object[] value)
+        {
+        }
 
         protected virtual void Enable()
         {
@@ -45,6 +47,7 @@ namespace JFramework
         public T Get<T>() where T : ScriptableObject, IController
         {
             var key = typeof(T).Name;
+            controlDict ??= new Dictionary<string, IController>();
             if (controlDict.ContainsKey(key)) return (T)controlDict[key];
             var controller = ScriptableObject.CreateInstance<T>();
             controlDict.Add(key, controller);
