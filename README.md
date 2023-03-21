@@ -218,7 +218,7 @@ public class Test7: MonoBehaviour
         UIManager.ShowPanel<LoginPanel>();//设置层级
         UIManager.ShowPanel<LoginPanel>(panel =>
         {
-            panel.SetUseruame("JINYIJIE");//设置属性
+            panel.SetUsername("JINYIJIE");//设置属性
             panel.SetPassword("123456");//设置属性
         });
     }
@@ -237,8 +237,8 @@ public class Test7: MonoBehaviour
 
     private void GetLayer()
     {
-        UIManager.GetLayer(UILayerType.Bottom);//得到层级
-        Transform common = UIManager.GetLayer(UILayerType.Height);
+        UIManager.GetLayer(UILayerType.Layer1);//得到层级
+        Transform common = UIManager.GetLayer(UILayerType.Layer2);
     }
 
     private void Clear()
@@ -249,7 +249,7 @@ public class Test7: MonoBehaviour
 
 public struct UIPanelPath
 {
-    public const string LoginPanel = "UI/LoginPanel";//LoginPanel的真实路径是：Assets/Resources/UI/LoginPanel
+    public const string LoginPanel = "UI/LoginPanel";//LoginPanel的真实路径是：Assets/AddressableResources/UI/LoginPanel
 }
 
 public class LoginPanel : UIPanel //需要管理的UI都要继承BasePanel
