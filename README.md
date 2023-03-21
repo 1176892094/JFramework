@@ -182,15 +182,15 @@ public struct AssetPath
 public class Test5 : MonoBehaviour
 {
     private AudioSource audioSource;
-
-    private void BGMusic()
+    
+    private void Sound()
     {
         AudioManager.PlaySound(AudioPath.BGMusic); //播放背景音乐
         AudioManager.StopSound(); //停止背景音乐
         AudioManager.SetSound(0); //改变背景音乐大小为0
     }
 
-    private void GameAudio()
+    private void Audio()
     {
         AudioManager.PlayAudio(AudioPath.BTClick); //播放该音效
         AudioManager.PlayAudio(AudioPath.BTClick, audio =>
