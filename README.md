@@ -342,74 +342,76 @@ public class Test9 : MonoBehaviour
 ```
 (9)StateMachine(有限状态机)
 ```csharp
-    public class Enemy : Entity //敌人继承状态机
-    {
-        public EnemyMachine machine; //敌人状态机
-        public Animator an; //敌人动画组件
+public class Enemy : Entity //敌人继承状态机
+{
+    public EnemyMachine machine; //敌人状态机
+    public Animator animator; //敌人动画组件
 
-        private void Start()
-        {
-            machine.Enalbe(); //启动敌人状态机
-        }
-    }
-   
-   
-    public class EnemyMachine : Controller<Enemy> //属于敌人的控制器
+    private void Start()
     {
-        protected override void Start()
-        {
-            AddState<EnemyIdle>(); //状态机增加Idle状态
-            AddState<EnemyWalk>(); //状态机增加Walk状态
-        }
-        
-        public void Enable()
-        {
-            ChangeState<EnemyIdle>(); //启动后切换到Idle状态
-        }
+        machine.Enable(); //启动敌人状态机
     }
 
-    public class EnemyIdle : State<Enemy> //设置状态的所有者
+    protected override void OnUpdate()
     {
-        protected override void OnInit(Enemy owner)
-        {
-            base.OnInit(owner); //父类初始化状态
-            //自定义初始化
-        }
+        machine.OnUpdate(); //更新敌人状态机
+    }
+}
 
-        protected override void OnEnter()
-        {
-            owner.an.SetBool("Idle",true); //播放Idle动画
-            owner.machine.ChangeState("Walk",3); //3秒切换到Walk动画
-        }
-
-        protected override void OnUpdate() //状态更新
-        {
-        }
-
-        protected override void OnExit()
-        {
-            owner.an.SetBool("Idle",false); //停止Idle动画
-        }
+public class EnemyMachine : Machine<Enemy> //设置状态机的所有者
+{
+    protected override void Start()
+    {
+        AddState<EnemyIdle>(); //状态机增加Idle状态
+        AddState<EnemyWalk>(); //状态机增加Walk状态
     }
 
-    public class EnemyWalk : State<Enemy> //设置状态的所有者
+    public void Enable()
     {
-        protected override void OnEnter()
-        {
-            owner.an.SetBool("Walk",true); //播放Walk动画
-            owner.machine.ChangeState("Idle",3); //3秒切换到Idle动画
-        }
-
-        protected override void OnUpdate()
-        {
-           
-        }
-
-        protected override void OnExit()
-        {
-            owner.an.SetBool("Walk",false); //停止Walk动画
-        }
+        ChangeState<EnemyIdle>(); //启动后切换到Idle状态
     }
+}
+
+public class EnemyIdle : State<Enemy> //设置状态的所有者
+{
+    protected override void OnAwake()
+    {
+        //创建状态时调用
+    }
+
+    protected override void OnEnter()
+    {
+        owner.animator.SetBool("Idle", true); //播放Idle动画
+        owner.machine.ChangeState<EnemyWalk>(3); //3秒后切换到Walk动画
+    }
+
+    protected override void OnUpdate() //状态更新
+    {
+    }
+
+    protected override void OnExit()
+    {
+        owner.animator.SetBool("Idle", false); //停止Idle动画
+    }
+}
+
+public class EnemyWalk : State<Enemy> //设置状态的所有者
+{
+    protected override void OnEnter()
+    {
+        owner.animator.SetBool("Walk", true); //播放Walk动画
+        owner.machine.ChangeState<EnemyIdle>(3); //3秒后切换到Idle动画
+    }
+
+    protected override void OnUpdate()
+    {
+    }
+
+    protected override void OnExit()
+    {
+        owner.animator.SetBool("Walk", false); //停止Walk动画
+    }
+}
 ```
 (10)Entity/Controller(EC实体控制器分离)
 ```csharp
