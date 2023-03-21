@@ -149,6 +149,7 @@ public struct AssetPath
 
 public class PlayerData : ScriptableObject
 {
+    public string Name;
 }
 ```
 (4)PoolManager(对象池工具)
