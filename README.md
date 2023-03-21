@@ -260,7 +260,7 @@ public class LoginPanel : UIPanel //需要管理的UI都要继承BasePanel
     public void SetPassword(string password) => this.password = password;
 }
 ```
-(7)LoadManager(场景加载管理)
+(7)SceneManager(场景加载管理)
 ```csharp
 public class Test8 : MonoBehaviour
 {
