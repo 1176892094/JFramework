@@ -88,21 +88,27 @@ public struct EventName
 ```csharp
 public class Test2 : MonoBehaviour
 {
+    private void Load() //同步加载
+    {
+        GameObject obj = AssetManager.Load<GameObject>(AssetPath.Player);
+        Player player = obj.GetComponent<Player>();
+    }
+
     private void LoadAsync() //异步加载
     {
         AssetManager.LoadAsync<GameObject>(AssetPath.Player, obj =>
         {
-            Player player = obj.GetComponent<Player>();
+            Player player = obj.GetComponent<Player>(); //obj为加载出来的GameObject预制体，可以从obj中获取玩家的组件
         });
+    }
+
+    public struct AssetPath
+    {
+        public const string Player = "Prefabs/Player"; //Player预制的体真实路径是：Assets/AddressableResources/Prefabs/Player
     }
 }
 
-public struct AssetPath
-{
-    public const string Player = "Prefabs/Player"; //Player预制的体真实路径是：Assets/AddressableResources/Prefabs/Player
-}
-
-public class Player: MonoBehaviour
+public class Player : MonoBehaviour
 {
 }
 ```
