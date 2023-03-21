@@ -154,25 +154,27 @@ public class PlayerData : ScriptableObject
 ```
 (4)PoolManager(对象池工具)
 ```csharp
-public class Test4: MonoBehaviour
+public class Test4 : MonoBehaviour
 {
-    private GameObject bullet;
-    private async void Start()
+    private void Update()
     {
-        PoolManager.Pop(PoolPath.Bullet, obj =>
+        if (Input.GetKeyDown(KeyCode.Space))
         {
-            bullet = obj;//从对象池中取出Bullet
-            obj.transform.position = transform.position;//设置生成的子弹位置在自身位置
-        });
-
-        await new WaitForSeconds(5);//等待5秒
-        PoolManager.Push(bullet.name, bullet);//将物体放入对象池
+            PoolManager.Pop(AssetPath.Bullet, obj =>
+            {
+                obj.transform.position = transform.position; //设置生成的子弹位置在自身位置
+                TimerManager.Pop(3, () => //创建一个3秒的计时器
+                {
+                    PoolManager.Push(obj); //将物体放回对象池
+                });
+            });
+        }
     }
 }
 
-public struct PoolPath
+public struct AssetPath
 {
-    public const string Bullet = "Bullet";//Bullet的真实路径是：Assets/Resources/Bullet
+    public const string Bullet = "Prefabs/Bullet"; //Bullet的真实路径是：Assets/AddressableResources/Prefabs/Bullet
 }
 ```
 (5)AudioManager（游戏声音管理）
