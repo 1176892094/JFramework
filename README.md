@@ -342,7 +342,7 @@ public class Test9 : MonoBehaviour
 ```
 (9)StateMachine(有限状态机)
 ```csharp
-public class Enemy : Entity //敌人继承状态机
+public class Enemy : Entity //敌人继承实体
 {
     public EnemyMachine machine; //敌人状态机
     public Animator animator; //敌人动画组件
