@@ -28,17 +28,23 @@ URL：https://github.com/1176892094/JFramework.git
 
 (8)点击运行Unity，没有问题，即配置成功
 
+(9)CurrentProjectPath为当前项目路径
+
+(10)PersistentDataPath中含有游戏的各种存档文件
+
+(11)StreamingAssetPath在Build以后会原封不动的保留
+
+3.功能
+
+Excel To Scripts使用：
+
+(1)等待教程视频
+
 Excel To Asset使用：
 
-(1)在上方工具栏找到Tools/JFramework/ExcelToAsset
+(1)等待教程视频
 
-(2)或者在JFrameworkInspector中找到ExcelToAsset
-
-(3)找到存放Excel的文件夹，点击确定即可转化成ScriptableObject
-
-(4)配合AddressableAsset工具使用
-
-3.注意
+4.注意
 
 (1)所有的Entity都会被加入到GlobalManager的生命周期中
 
@@ -46,7 +52,7 @@ Excel To Asset使用：
 
 (2)请使用OnUpdate来代替Update
 
-4.使用
+5.使用
 
 (1)EventManager（事件管理类）
 
