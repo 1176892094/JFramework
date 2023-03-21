@@ -13,13 +13,22 @@ URL：https://github.com/1176892094/JFramework.git
 2.开始
 
 (1)在Inspector面板中找到JFramework模块
+
 (2)在JFramework模块中点击AddressableUpdate
+
 (3)在弹出的面板中点击Create Addressables Settings
+
 (4)再次点击JFramework模块中点击AddressableUpdate
+
 (5)Console打印出AddressableResources即配置成功
 
+(6)找到JFramework的Resources文件夹将GlobalManager放入场景中
 
-ExcelToAsset使用：
+(7)点击GlobalManager找到调试管理器，将所有选项勾选
+
+(8)点击运行Unity，没有问题，即配置成功
+
+Excel To Asset使用：
 
 (1)在上方工具栏找到Tools/JFramework/ExcelToAsset
 
@@ -28,16 +37,6 @@ ExcelToAsset使用：
 (3)找到存放Excel的文件夹，点击确定即可转化成ScriptableObject
 
 (4)配合AddressableAsset工具使用
-
-Addressable使用：
-
-(1)第一次请在上方工具栏找到Window/AssetManagement/Addressable/Groups创建组
-
-(2)在JFrameworkInspector中找到JFrameworkEditor并点击
-
-(3)或者按F1呼出快捷菜单，点击Addressable资源生成
-
-(4)在Addressables Groups面板中可查看资源生成的情况
 
 3.注意
 
