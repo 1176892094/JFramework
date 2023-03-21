@@ -264,35 +264,38 @@ public class LoginPanel : UIPanel //需要管理的UI都要继承BasePanel
 ```csharp
 public class Test8 : MonoBehaviour
 {
-    private float progress; //场景加载进度[0,1]之间
-
     private void Awake()
     {
-        EventManager.Listen(999, LoadSceneAsync); //侦听场景异步加载进度
+        EventManager.Listen(EventName.LoadProgress, LoadProgress); //侦听场景异步加载进度
     }
 
     private void LoadScene()
     {
-        LoadManager.Load("SceneName");
+        SceneManager.LoadScene("SceneName");
     }
 
     private void LoadSceneAsync()
     {
-        LoadManager.LoadAsync("SceneName", () =>
+        SceneManager.LoadSceneAsync("SceneName", () =>
         {
-            //异步加载完成后执行
+            //异步加载完成后执行的方法
         });
     }
 
-    private void LoadSceneAsync(params object[] args) //获取异步加载进度
+    private void LoadProgress(params object[] value) //获取异步加载进度
     {
-        progress = (float)args[0]; //获取当前加载进度
+        var progress = (float)value[0]; //获取当前加载进度
         Debug.Log(progress);
     }
 
     private void OnDestroy()
     {
-        EventManager.Remove(999, LoadSceneAsync); //移除场景异步加载进度
+        EventManager.Remove(EventName.LoadProgress, LoadProgress); //移除场景异步加载进度
+    }
+
+    public struct EventName
+    {
+        public const int LoadProgress = 999; //固定为999号事件
     }
 }
 ```
