@@ -5,18 +5,18 @@ namespace JFramework
     /// <summary>
     /// 状态的抽象类
     /// </summary>
-    public abstract class State<T> : IState where T : IEntity
+    public abstract class State<TEntity> : IState where TEntity : IEntity
     {
         /// <summary>
         /// 状态的所有者
         /// </summary>
-        protected T owner;
+        protected TEntity owner;
 
         /// <summary>
         /// 状态醒来
         /// </summary>
         /// <param name="owner">传入状态的所有者</param>
-        private void OnAwake(T owner)
+        private void OnAwake(TEntity owner)
         {
             this.owner = owner;
             OnAwake();
@@ -46,7 +46,7 @@ namespace JFramework
         /// 受保护的状态醒来方法
         /// </summary>
         /// <param name="owner">传入状态的所有者</param>
-        void IState.OnAwake(IEntity owner) => OnAwake((T)owner);
+        void IState.OnAwake(IEntity owner) => OnAwake((TEntity)owner);
 
         /// <summary>
         /// 受保护的状态进入方法

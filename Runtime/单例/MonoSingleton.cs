@@ -38,8 +38,9 @@ namespace JFramework
         /// <summary>
         /// 释放时将单例置空
         /// </summary>
-        protected virtual void OnDestroy()
+        protected override void OnDestroy()
         {
+            base.OnDestroy();
             instance = null;
         }
     }

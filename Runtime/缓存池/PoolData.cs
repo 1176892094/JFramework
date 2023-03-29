@@ -9,7 +9,7 @@ namespace JFramework
     /// 游戏物体对象池
     /// </summary>
     [Serializable]
-    internal class PoolData : Pool<GameObject>
+    internal sealed class PoolData : Pool<GameObject>
     {
         /// <summary>
         /// 游戏物体组
@@ -43,7 +43,7 @@ namespace JFramework
         /// 对象池拉取对象
         /// </summary>
         /// <returns>返回拉取的游戏物体</returns>
-        protected sealed override GameObject Pop()
+        protected override GameObject Pop()
         {
             GameObject obj = stack.Pop();
             if (obj == null) return null;
@@ -56,7 +56,7 @@ namespace JFramework
         /// 对象池推入对象
         /// </summary>
         /// <param name="obj">推出的游戏物体</param>
-        protected sealed override void Push(GameObject obj)
+        protected override void Push(GameObject obj)
         {
             stack.Push(obj);
             if (pool != null) obj.transform.SetParent(pool.transform);

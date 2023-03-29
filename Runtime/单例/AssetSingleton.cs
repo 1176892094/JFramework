@@ -39,7 +39,11 @@ namespace JFramework
                 AssetDatabase.CreateAsset(instance, name);
                 AssetDatabase.Refresh();
 #else
-                instance = AssetManager.Load<T>("Setttngs/"+typeof(T).Name);
+                instance = AssetManager.Load<T>("Settings/"+typeof(T).Name);
+                if (instance == null)
+                {
+                    Debug.LogWarning($"请将{typeof(T).Name}放入AddressableResources/Settings/文件夹中！");
+                }
 #endif
                 return instance;
             }

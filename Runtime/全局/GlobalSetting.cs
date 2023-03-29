@@ -10,13 +10,27 @@ namespace JFramework.Core
 {
     public sealed partial class GlobalManager
     {
-        [ShowInInspector, LabelText("显示Json加载信息"), FoldoutGroup("调试管理器")] public bool IsDebugJson;
-        [ShowInInspector, LabelText("显示Pool存取信息"), FoldoutGroup("调试管理器")] public bool IsDebugPool;
-        [ShowInInspector, LabelText("显示Data加载信息"), FoldoutGroup("调试管理器")] public bool IsDebugData;
-        [ShowInInspector, LabelText("显示Asset加载信息"), FoldoutGroup("调试管理器")] public bool IsDebugAsset;
-        [ShowInInspector, LabelText("显示Event事件信息"), FoldoutGroup("调试管理器")] public bool IsDebugEvent;
-        [ShowInInspector, LabelText("显示Scene加载信息"), FoldoutGroup("调试管理器")] public bool IsDebugScene;
+        [ShowInInspector, LabelText("显示Json加载信息"), FoldoutGroup("调试管理器")]
+        public bool IsDebugJson;
+
+        [ShowInInspector, LabelText("显示Pool存取信息"), FoldoutGroup("调试管理器")]
+        public bool IsDebugPool;
+
+        [ShowInInspector, LabelText("显示Data加载信息"), FoldoutGroup("调试管理器")]
+        public bool IsDebugData;
+
+        [ShowInInspector, LabelText("显示Asset加载信息"), FoldoutGroup("调试管理器")]
+        public bool IsDebugAsset;
+
+        [ShowInInspector, LabelText("显示Event事件信息"), FoldoutGroup("调试管理器")]
+        public bool IsDebugEvent;
+
+        [ShowInInspector, LabelText("显示Scene加载信息"), FoldoutGroup("调试管理器")]
+        public bool IsDebugScene;
         
+        [ShowInInspector, LabelText("当前时间"), FoldoutGroup("日期管理器")]
+        public string dateTime => DateTime.Now.ToString("yyyy:HH:mm:ss");
+
         [ShowInInspector, LabelText("场景管理数据"), FoldoutGroup("通用管理器")]
         private Dictionary<int, SceneData> sceneList => SceneManager.sceneDict;
 
@@ -43,7 +57,7 @@ namespace JFramework.Core
 
         [ShowInInspector, LabelText("字符数据管理"), FoldoutGroup("数据管理器")]
         private Dictionary<Type, Dictionary<string, IData>> strDataDict => DataManager.StrDataDict;
-        
+
         [ShowInInspector, LabelText("枚举数据管理"), FoldoutGroup("数据管理器")]
         private Dictionary<Type, Dictionary<Enum, IData>> enmDataDict => DataManager.EnmDataDict;
 

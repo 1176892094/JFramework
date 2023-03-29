@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using JFramework.Interface;
-using JFramework;
 using UnityEngine;
 
 namespace JFramework.Core

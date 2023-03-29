@@ -15,6 +15,11 @@ namespace JFramework.Core
         internal static Dictionary<int, SceneData> sceneDict;
 
         /// <summary>
+        /// 场景事件
+        /// </summary>
+        public const int OnSceneChanged = 999;
+
+        /// <summary>
         /// 场景加载进度条
         /// </summary>
         private static float progress;
@@ -57,8 +62,7 @@ namespace JFramework.Core
                 var data = path.Split('/');
                 var name = data[^1];
                 data = name.Split('.');
-                name = data[0];
-                sceneDict.Add(i, new SceneData(i, name));
+                sceneDict.Add(i, new SceneData() { Id = i, Name = data[0] });
             }
         }
 
@@ -120,7 +124,7 @@ namespace JFramework.Core
                 while (Progress < 0.99f)
                 {
                     Progress = Mathf.Lerp(Progress, asyncOperation.progress / 9f * 10f, Time.fixedDeltaTime * 2);
-                    EventManager.Send(999, Progress);
+                    EventManager.Send(OnSceneChanged, Progress);
 
                     if (GlobalManager.Instance.IsDebugScene)
                     {

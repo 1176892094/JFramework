@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using JFramework.Core;
 using JFramework.Interface;
 using Sirenix.OdinInspector;
 using UnityEngine;
@@ -67,11 +68,24 @@ namespace JFramework.Core
         /// </summary>
         private static void Singleton()
         {
+            entityList = new List<object>();
             if (Instance != null) return;
             Instance = FindObjectOfType<GlobalManager>();
             if (Instance != null) return;
             var obj = Resources.Load<GameObject>(Name);
             Instance = Instantiate(obj).GetComponent<GlobalManager>();
+        }
+        
+        /// <summary>
+        /// 从后台切换到前台
+        /// </summary>
+        /// <param name="pauseStatus"></param>
+        private void OnApplicationPause(bool pauseStatus)
+        {
+            if (!pauseStatus)
+            {
+                EventManager.Send(DateSetting.OnDateChanged);
+            }
         }
 
         /// <summary>
@@ -81,19 +95,19 @@ namespace JFramework.Core
         private static void Register()
         {
             Singleton();
-            entityList = new List<object>();
             CommandManager.Awake();
             AssetManager.Awake();
             EventManager.Awake();
             TimerManager.Awake();
             JsonManager.Awake();
+            DateManager.Awake();
             AudioManager.Awake();
             PoolManager.Awake();
             SceneManager.Awake();
             DataManager.Awake();
             UIManager.Awake();
         }
-
+        
         /// <summary>
         /// 当程序退出
         /// </summary>
@@ -101,9 +115,10 @@ namespace JFramework.Core
         {
             UIManager.Destroy();
             PoolManager.Destroy();
-            SceneManager.Destroy();
             DataManager.Destroy();
+            DateManager.Destroy();
             JsonManager.Destroy();
+            SceneManager.Destroy();
             TimerManager.Destroy();
             AudioManager.Destroy();
             AssetManager.Destroy();

@@ -125,7 +125,7 @@ namespace JFramework.Core
         /// <param name="decrypt">解密</param>
         /// <typeparam name="T">可以使用任何类型</typeparam>
         /// <returns>返回解密的数据</returns>
-        public static T Load<T>(string name, bool decrypt = false) where T : class, new()
+        public static T Load<T>(string name, bool decrypt = false) where T :  new()
         {
             var filePath = GetPath(name);
             if (!File.Exists(filePath))
@@ -139,7 +139,7 @@ namespace JFramework.Core
                 if (jsonDict == null)
                 {
                     Debug.Log($"{Name.Red()} 没有初始化!");
-                    return null;
+                    return default;
                 }
                 
                 if (GlobalManager.Instance.IsDebugJson)
@@ -153,7 +153,7 @@ namespace JFramework.Core
                 var iv = json.iv;
                 if (key is not { Length: > 0 } || iv is not { Length: > 0 }) return new T();
                 var saveJson = JsonSetting.Decrypt(loadJson, key, iv);
-                if (saveJson.IsEmpty()) return null;
+                if (saveJson.IsEmpty()) return default;
                 var data = JsonConvert.DeserializeObject<T>(saveJson);
                 return data;
             }
@@ -165,7 +165,7 @@ namespace JFramework.Core
                 }
                 
                 var saveJson = File.ReadAllText(filePath);
-                if (saveJson.IsEmpty()) return null;
+                if (saveJson.IsEmpty()) return default;
                 var data = JsonConvert.DeserializeObject<T>(saveJson);
                 return data;
             }

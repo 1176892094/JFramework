@@ -10,5 +10,10 @@ namespace JFramework.Interface
         /// </summary>
         /// <param name="owner">控制器的所有者</param>
         void Start(IEntity owner);
+
+        /// <summary>
+        /// 控制器清除
+        /// </summary>
+        void Clear();
     }
 }

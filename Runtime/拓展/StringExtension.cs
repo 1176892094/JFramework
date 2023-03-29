@@ -1,6 +1,6 @@
 namespace JFramework
 {
-    public static class TextExtension
+    public static class StringExtension
     {
         public static string Green(this string s) => s.SetColor(TextColor.Green);
         public static string White(this string s) => s.SetColor(TextColor.White);

@@ -38,12 +38,10 @@ namespace JFramework
         public void AddState<TState>(IState state = null) where TState : IState, new()
         {
             var key = typeof(TState).Name;
-            if (!stateDict.ContainsKey(key))
-            {
-                state ??= new TState();
-                stateDict.Add(key, state);
-                state.OnAwake(owner);
-            }
+            if (stateDict.ContainsKey(key)) return;
+            state ??= new TState();
+            stateDict.Add(key, state);
+            state.OnAwake(owner);
         }
 
         /// <summary>
@@ -52,9 +50,8 @@ namespace JFramework
         /// <typeparam name="TState">可传入任何继承IState的对象</typeparam>
         public void ChangeState<TState>() where TState : IState
         {
-            var key = typeof(TState).Name;
             state?.OnExit();
-            state = stateDict[key];
+            state = stateDict[typeof(TState).Name];
             state?.OnEnter();
         }
 

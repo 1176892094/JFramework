@@ -1,4 +1,5 @@
 using System;
+using UnityEngine;
 
 namespace JFramework
 {
@@ -13,13 +14,14 @@ namespace JFramework
         public static T As<T>(this object obj) => (T)obj;
 
         /// <summary>
-        /// 将int值转为enum值
+        /// 基于强制转换的拓展，方便查找引用
         /// </summary>
-        /// <param name="value">int的值</param>
-        /// <typeparam name="T">转换的enum值</typeparam>
-        /// <returns>返回枚举对象</returns>
-        public static T As<T>(this int value) where T : Enum => (T)Enum.ToObject(typeof(T), value);
-
+        /// <param name="obj">任何对象</param>
+        /// <param name="index">对象组索引</param>
+        /// <typeparam name="T">可转换为任何对象</typeparam>
+        /// <returns>返回转换的对象类型</returns>
+        public static T As<T>(this object[] obj, int index) => (T)obj[index];
+        
         /// <summary>
         /// 比较int和enum的值是否相等
         /// </summary>
