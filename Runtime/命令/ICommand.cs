@@ -9,6 +9,6 @@ namespace JFramework.Interface
         /// 执行命令
         /// </summary>
         /// <param name="value">传入的参数</param>
-        void OnExecute(params  object[] value);
+        void OnExecute(params object[] value);
     }
 }

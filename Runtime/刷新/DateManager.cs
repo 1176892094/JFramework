@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace JFramework.Core
 {
-    public static class DateManager
+    internal static class DateManager
     {
         /// <summary>
         /// 管理器名称
