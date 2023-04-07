@@ -66,11 +66,11 @@ namespace JFramework.Core
         }
 
         /// <summary>
-        /// 发送事件
+        /// 调用事件
         /// </summary>
         /// <param name="id">事件唯一标识</param>
         /// <param name="value">传入事件的参数</param>
-        public static void Send(int id, params object[] value)
+        public static void Invoke(int id, params object[] value)
         {
             if (eventDict == null) return;
             if (eventDict.ContainsKey(id))

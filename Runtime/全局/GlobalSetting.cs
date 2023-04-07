@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Globalization;
 using JFramework.Interface;
 using JFramework.Table;
 using Sirenix.OdinInspector;
@@ -11,25 +12,28 @@ namespace JFramework.Core
     public sealed partial class GlobalManager
     {
         [ShowInInspector, LabelText("显示Json加载信息"), FoldoutGroup("调试管理器")]
-        public bool IsDebugJson;
+        internal bool IsDebugJson;
 
         [ShowInInspector, LabelText("显示Pool存取信息"), FoldoutGroup("调试管理器")]
-        public bool IsDebugPool;
+        internal bool IsDebugPool;
 
         [ShowInInspector, LabelText("显示Data加载信息"), FoldoutGroup("调试管理器")]
-        public bool IsDebugData;
+        internal bool IsDebugData;
 
         [ShowInInspector, LabelText("显示Asset加载信息"), FoldoutGroup("调试管理器")]
-        public bool IsDebugAsset;
+        internal bool IsDebugAsset;
 
         [ShowInInspector, LabelText("显示Event事件信息"), FoldoutGroup("调试管理器")]
-        public bool IsDebugEvent;
+        internal bool IsDebugEvent;
 
         [ShowInInspector, LabelText("显示Scene加载信息"), FoldoutGroup("调试管理器")]
-        public bool IsDebugScene;
+        internal bool IsDebugScene;
         
-        [ShowInInspector, LabelText("当前时间"), FoldoutGroup("日期管理器")]
-        public string dateTime => DateTime.Now.ToString("yyyy:HH:mm:ss");
+        [ShowInInspector, LabelText("当前日期时间"), FoldoutGroup("日期管理器")]
+        private string dateTime => DateTime.Now.ToString("yyyy-M-d / hh:mm:ss");
+
+        [ShowInInspector, LabelText("下次刷新时间"), FoldoutGroup("日期管理器")]
+        private string refreshTime => DateManager.tomorrow.ToString("yyyy-M-d / hh:mm:ss");
 
         [ShowInInspector, LabelText("场景管理数据"), FoldoutGroup("通用管理器")]
         private Dictionary<int, SceneData> sceneList => SceneManager.sceneDict;
@@ -86,7 +90,7 @@ namespace JFramework.Core
         private List<AudioSource> audioList => AudioManager.audioList;
 
         [ShowInInspector, LabelText("对象池管理器"), FoldoutGroup("对象池管理器")]
-        private GameObject poolManager => PoolManager.poolManager;
+        private Transform poolManager => PoolManager.poolManager;
 
         [ShowInInspector, LabelText("对象数据管理"), FoldoutGroup("对象池管理器")]
         private Dictionary<string, IPool> poolDict => PoolManager.poolDict;

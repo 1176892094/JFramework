@@ -20,7 +20,7 @@ namespace JFramework.Core
         /// <summary>
         /// 对象池控制器
         /// </summary>
-        internal static GameObject poolManager;
+        internal static Transform poolManager;
 
         /// <summary>
         /// 对象池管理器初始化
@@ -28,8 +28,7 @@ namespace JFramework.Core
         internal static void Awake()
         {
             poolDict = new Dictionary<string, IPool>();
-            var transform = GlobalManager.Instance.transform;
-            poolManager = transform.Find("PoolManager").gameObject;
+            poolManager = GlobalManager.Instance.transform.Find("PoolManager");
         }
 
         /// <summary>

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using JFramework.Core;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
@@ -14,7 +15,7 @@ namespace JFramework
         /// <summary>
         /// 游戏物体组
         /// </summary>
-        [ShowInInspector, LabelText("对象池组")] private readonly GameObject pool;
+        [ShowInInspector, LabelText("对象池组")] private readonly Transform pool;
 
         /// <summary>
         /// 游戏物体栈
@@ -30,12 +31,12 @@ namespace JFramework
         /// 构造函数初始化数据
         /// </summary>
         /// <param name="pool">推入的游戏对象</param>
-        /// <param name="stack">池中的游戏对象栈</param>
-        public PoolData(GameObject pool, GameObject stack)
+        /// <param name="parent">池中的游戏对象栈</param>
+        public PoolData(GameObject pool, Transform parent)
         {
-            this.stack = new Stack<GameObject>();
-            this.pool = new GameObject(pool.name + "Group");
-            this.pool.transform.SetParent(stack.transform);
+            stack = new Stack<GameObject>();
+            this.pool = new GameObject(pool.name + "Pool").transform;
+            this.pool.SetParent(parent);
             Push(pool);
         }
 

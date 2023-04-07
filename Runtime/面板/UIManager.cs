@@ -17,7 +17,7 @@ namespace JFramework.Core
         /// 存储所有UI的字典
         /// </summary>
         internal static Dictionary<string, UIPanel> panelDict;
-        
+
         /// <summary>
         /// 管理器名称
         /// </summary>
@@ -56,7 +56,7 @@ namespace JFramework.Core
                 Debug.Log($"{Name.Red()} 没有初始化");
                 return;
             }
-            
+
             AssetManager.LoadAsync<GameObject>("UI/" + name, obj =>
             {
                 if (panelDict.ContainsKey(name)) HidePanel<T>();
@@ -80,7 +80,7 @@ namespace JFramework.Core
                 Debug.Log($"{Name.Red()} 没有初始化");
                 return;
             }
-            
+
             var key = typeof(T).Name;
             if (panelDict.ContainsKey(key))
             {
@@ -103,13 +103,21 @@ namespace JFramework.Core
                 Debug.Log($"{Name.Red()} 没有初始化");
                 return;
             }
-            
+
             var key = typeof(T).Name;
             if (panelDict.ContainsKey(key))
             {
                 panelDict[key].Hide();
-                Object.Destroy(panelDict[key].gameObject);
-                panelDict.Remove(key);
+                switch (panelDict[key].hideType)
+                {
+                    case UIHideType.Destroy:
+                        Object.Destroy(panelDict[key].gameObject);
+                        panelDict.Remove(key);
+                        break;
+                    case UIHideType.Remove:
+                        panelDict.Remove(key);
+                        break;
+                }
             }
         }
 
@@ -125,7 +133,7 @@ namespace JFramework.Core
                 Debug.Log($"{Name.Red()} 没有初始化");
                 return null;
             }
-            
+
             var key = typeof(T).Name;
             if (panelDict.ContainsKey(key))
             {
@@ -155,6 +163,7 @@ namespace JFramework.Core
             {
                 trigger = target.gameObject.AddComponent<EventTrigger>();
             }
+
             var entry = new EventTrigger.Entry { eventID = type };
             entry.callback.AddListener(action);
             trigger.triggers.Add(entry);
@@ -170,13 +179,12 @@ namespace JFramework.Core
                 Debug.Log($"{Name.Red()} 没有初始化");
                 return;
             }
-            
-            foreach (var key in panelDict.Keys.Where(key => panelDict.ContainsKey(key)))
+
+            foreach (var key in panelDict.Keys.ToList().Where(key => panelDict.ContainsKey(key) && panelDict[key].hideType != UIHideType.Ignore))
             {
                 Object.Destroy(panelDict[key].gameObject);
+                panelDict.Remove(key);
             }
-
-            panelDict.Clear();
         }
 
         /// <summary>

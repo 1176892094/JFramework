@@ -20,6 +20,11 @@ namespace JFramework.Core
         /// </summary>
         private static DateTime dateTime => DateTime.Now;
 
+        /// <summary>
+        /// 明天
+        /// </summary>
+        internal static DateTime tomorrow;
+
         private static int lastDayOfYear
         {
             get => JsonManager.Load<int>(Name,true);
@@ -31,8 +36,9 @@ namespace JFramework.Core
         /// </summary>
         internal static void Awake()
         {
-            lastCheckTime = Time.realtimeSinceStartup;
+            lastCheckTime = -5;
             GlobalManager.Instance.UpdateAction += OnUpdate;
+            tomorrow = DateTime.Today.Add(new TimeSpan(1, DateSetting.RefreshHour, 0, 0));
         }
 
         /// <summary>
@@ -52,7 +58,7 @@ namespace JFramework.Core
                         if (dateTime.DayOfYear - lastDayOfYear >= 2)
                         {
                             lastDayOfYear = dateTime.DayOfYear;
-                            EventManager.Send(DateSetting.OnDateChanged);
+                            EventManager.Invoke(DateSetting.OnDateChanged);
                         }
                         //只有一天未登陆
                         else
@@ -60,7 +66,7 @@ namespace JFramework.Core
                             if (dateTime.Hour >= DateSetting.RefreshHour)
                             {
                                 lastDayOfYear = dateTime.DayOfYear;
-                                EventManager.Send(DateSetting.OnDateChanged);
+                                EventManager.Invoke(DateSetting.OnDateChanged);
                             }
                         }
                     }
@@ -73,7 +79,7 @@ namespace JFramework.Core
                         if (lastYearTotalDays + dateTime.DayOfYear - lastDayOfYear >= 2)
                         {
                             lastDayOfYear = dateTime.DayOfYear;
-                            EventManager.Send(DateSetting.OnDateChanged);
+                            EventManager.Invoke(DateSetting.OnDateChanged);
                         }
                         //一天未登陆并且到达刷新时间
                         else
@@ -81,7 +87,7 @@ namespace JFramework.Core
                             if (dateTime.Hour >= DateSetting.RefreshHour)
                             {
                                 lastDayOfYear = dateTime.DayOfYear;
-                                EventManager.Send(DateSetting.OnDateChanged);
+                                EventManager.Invoke(DateSetting.OnDateChanged);
                             }
                         }
                     }

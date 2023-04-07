@@ -83,7 +83,7 @@ namespace JFramework.Core
         {
             if (!pauseStatus)
             {
-                EventManager.Send(DateSetting.OnDateChanged);
+                EventManager.Invoke(DateSetting.OnDateChanged);
             }
         }
 

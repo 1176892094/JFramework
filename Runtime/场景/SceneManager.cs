@@ -124,7 +124,7 @@ namespace JFramework.Core
                 while (Progress < 0.99f)
                 {
                     Progress = Mathf.Lerp(Progress, asyncOperation.progress / 9f * 10f, Time.fixedDeltaTime * 2);
-                    EventManager.Send(OnSceneChanged, Progress);
+                    EventManager.Invoke(OnSceneChanged, Progress);
 
                     if (GlobalManager.Instance.IsDebugScene)
                     {

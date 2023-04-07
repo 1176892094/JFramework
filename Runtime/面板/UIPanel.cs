@@ -20,6 +20,11 @@ namespace JFramework
         [ShowInInspector, LabelText("视觉元素")] private Dictionary<string, Container> containerDict;
 
         /// <summary>
+        /// UI隐藏类型
+        /// </summary>
+        [LabelText("隐藏类型")] public UIHideType hideType;
+
+        /// <summary>
         /// 开始时查找所有控件
         /// </summary>
         protected virtual void Awake()
