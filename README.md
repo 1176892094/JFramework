@@ -68,7 +68,7 @@ public class Test1 : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.Space))
         {
-            EventManager.Send(EventName.OnPlayerDeath); //发送事件
+            EventManager.Invoke(EventName.OnPlayerDeath); //发送事件
         }
     }
 
