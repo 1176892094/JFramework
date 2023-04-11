@@ -53,6 +53,10 @@ namespace JFramework
             state?.OnExit();
             state = stateDict[typeof(TState).Name];
             state?.OnEnter();
+            if (owner.name=="32001Enemy")
+            {
+                Debug.Log(owner.name+"-----"+state);
+            }
         }
 
         /// <summary>
