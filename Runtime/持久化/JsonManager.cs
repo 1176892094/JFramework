@@ -1,9 +1,7 @@
-using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Security.Cryptography;
 using JFramework.Interface;
-using JFramework;
 using JFramework.Table;
 using Newtonsoft.Json;
 using UnityEngine;

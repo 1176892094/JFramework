@@ -1,9 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Globalization;
 using JFramework.Interface;
-using JFramework.Table;
 using Sirenix.OdinInspector;
 using UnityEngine;
 

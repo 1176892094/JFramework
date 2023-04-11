@@ -20,7 +20,7 @@ namespace JFramework
         /// <param name="index">对象组索引</param>
         /// <typeparam name="T">可转换为任何对象</typeparam>
         /// <returns>返回转换的对象类型</returns>
-        public static T As<T>(this object[] obj, int index) => (T)obj[index];
+        public static T As<T>(this object[] obj, int index = 0) => (T)obj[index];
         
         /// <summary>
         /// 比较int和enum的值是否相等

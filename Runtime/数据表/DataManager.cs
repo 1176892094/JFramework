@@ -2,8 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using JFramework.Interface;
 using JFramework.Table;
-using JFramework;
 using UnityEngine;
 
 namespace JFramework.Core
