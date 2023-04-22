@@ -47,40 +47,43 @@ namespace JFramework.Core
             foreach (var type in types)
             {
                 var keyName = type.Name;
-                AssetManager.LoadAsync<ScriptableObject>("DataTable/" + keyName, table =>
+                try
                 {
-                    var dataTable = table.As<IDataTable>();
-                    var keyData = GetKeyField(assembly, type);
-                    var keyInfo = GetKeyField(keyData);
-                    if (keyData == null)
+                    AssetManager.LoadAsync<ScriptableObject>("DataTable/" + keyName, table =>
                     {
-                        Debug.Log($"{Name.Sky()} 缺少主键 => {type.Name.Red()}");
-                        return;
-                    }
+                        var dataTable = table.As<IDataTable>();
+                        var keyData = GetKeyField(assembly, type);
+                        var keyInfo = GetKeyField(keyData);
+                        if (keyData == null)
+                        {
+                            Debug.Log($"{Name.Sky()} 缺少主键 => {type.Name.Red()}");
+                            return;
+                        }
 
-                    if (GlobalManager.Instance.IsDebugData)
-                    {
-                        Debug.Log($"{Name.Sky()} 加载 => {type.Name.Blue()} 数据表");
-                    }
+                        if (GlobalManager.Instance.IsDebugData)
+                        {
+                            Debug.Log($"{Name.Sky()} 加载 => {type.Name.Blue()} 数据表");
+                        }
 
-                    var keyType = keyInfo.FieldType;
-                    if (keyType == typeof(int))
-                    {
-                        IntDataDict.Add(keyData, Add<int>(keyInfo, dataTable));
-                    }
-                    else if (keyType == typeof(string))
-                    {
-                        StrDataDict.Add(keyData, Add<string>(keyInfo, dataTable));
-                    }
-                    else if (keyType.IsEnum)
-                    {
-                        EnmDataDict.Add(keyData, Add<Enum>(keyInfo, dataTable));
-                    }
-                    else
-                    {
-                        Debug.Log($"{Name.Sky()} 加载 => {type.Name.Red()} 数据失败");
-                    }
-                });
+                        var keyType = keyInfo.FieldType;
+                        if (keyType == typeof(int))
+                        {
+                            IntDataDict.Add(keyData, Add<int>(keyInfo, dataTable));
+                        }
+                        else if (keyType == typeof(string))
+                        {
+                            StrDataDict.Add(keyData, Add<string>(keyInfo, dataTable));
+                        }
+                        else if (keyType.IsEnum)
+                        {
+                            EnmDataDict.Add(keyData, Add<Enum>(keyInfo, dataTable));
+                        }
+                    });
+                }
+                catch (Exception)
+                {
+                    Debug.Log($"{Name.Sky()} 加载 => {type.Name.Red()} 数据失败");
+                }
             }
         }
 

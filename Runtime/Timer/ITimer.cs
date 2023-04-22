@@ -26,12 +26,6 @@ namespace JFramework.Interface
         ITimer Unscale();
 
         /// <summary>
-        /// 计时器随目标销毁而停止
-        /// </summary>
-        /// <returns>返回自身</returns>
-        ITimer SetTarget(object obj);
-
-        /// <summary>
         /// 计时器循环
         /// </summary>
         /// <param name="count">循环次数</param>

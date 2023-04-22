@@ -94,7 +94,16 @@ namespace JFramework.Core
                 return;
             }
 
-            handle = Addressables.LoadAssetAsync<T>(name);
+            try
+            {
+                handle = Addressables.LoadAssetAsync<T>(name);
+            }
+            catch (Exception)
+            {
+                Debug.Log($"{Name.Sky()} 加载 => {name.Red()} 资源失败");
+                return;
+            }
+
             handle.Completed += obj =>
             {
                 if (obj.Status == AsyncOperationStatus.Succeeded)

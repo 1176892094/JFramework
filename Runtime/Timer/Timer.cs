@@ -20,37 +20,27 @@ namespace JFramework
         /// 最大循环次数
         /// </summary>
         private int maxCount;
-
-        /// <summary>
-        /// 是否受TimeScale影响
-        /// </summary>
-        private bool unscaled;
-
-        /// <summary>
-        /// 是否随单位死亡而停止
-        /// </summary>
-        private bool followed;
-
+        
         /// <summary>
         /// 持续时间
         /// </summary>
         private float keepTime;
+        
+        /// <summary>
+        /// 是否受TimeScale影响
+        /// </summary>
+        [ShowInInspector] private bool unscaled;
 
         /// <summary>
         /// 当前时间+持续时间
         /// </summary>
-        private float waitTime;
+        [ShowInInspector] private float waitTime;
 
         /// <summary>
         /// 计时器的状态
         /// </summary>
         [ShowInInspector] private TimerState state;
-
-        /// <summary>
-        /// 跟随单位
-        /// </summary>
-        [ShowInInspector] private object target;
-
+        
         /// <summary>
         /// 循环时执行的事件
         /// </summary>
@@ -71,7 +61,6 @@ namespace JFramework
             count = 0;
             maxCount = 1;
             unscaled = false;
-            followed = false;
             state = TimerState.Run;
             this.keepTime = keepTime;
             this.OnFinish = OnFinish;
@@ -86,13 +75,21 @@ namespace JFramework
         {
             if (waitTime < time)
             {
-                count++;
-                waitTime += keepTime;
-                OnLoop?.Invoke(this);
-                if (maxCount < 0) return;
-                if (count < maxCount) return;
-                OnFinish?.Invoke();
-                TimerManager.Push(this);
+                try
+                {
+                    count++;
+                    waitTime += keepTime;
+                    OnLoop?.Invoke(this);
+                    if (maxCount < 0) return;
+                    if (count < maxCount) return;
+                    OnFinish?.Invoke();
+                    TimerManager.Push(this);
+                }
+                catch (Exception)
+                {
+                    Debug.Log($"{nameof(TimerManager).Sky()} => 停止正在运行的计时器");
+                    TimerManager.Push(this);
+                }
             }
         }
 
@@ -102,12 +99,6 @@ namespace JFramework
         public void OnUpdate()
         {
             if (state != TimerState.Run) return;
-            if (followed && target == null)
-            {
-                TimerManager.Push(this);
-                return;
-            }
-
             OnUpdate(unscaled ? Time.unscaledTime : Time.time);
         }
 
@@ -156,26 +147,13 @@ namespace JFramework
         }
 
         /// <summary>
-        /// 设置随目标死亡而停止
-        /// </summary>
-        /// <param name="target">绑定传入的目标</param>
-        public ITimer SetTarget(object target)
-        {
-            followed = true;
-            this.target = target;
-            return this;
-        }
-
-        /// <summary>
         /// 关闭计时器
         /// </summary>
         public void Close()
         {
-            target = null;
             OnLoop = null;
             OnFinish = null;
             unscaled = false;
-            followed = false;
             state = TimerState.Finish;
         }
     }

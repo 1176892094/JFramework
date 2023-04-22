@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using JFramework.Core;
 using JFramework.Interface;
@@ -12,7 +13,7 @@ namespace JFramework
         /// 存储状态的字典
         /// </summary>
         [ShowInInspector, LabelText("持有状态")] 
-        private Dictionary<string, IState> stateDict;
+        private Dictionary<Type, IState> stateDict;
 
         /// <summary>
         /// 状态的接口
@@ -23,7 +24,7 @@ namespace JFramework
         /// <summary>
         /// 状态机初始化
         /// </summary>
-        protected override void Start() => stateDict = new Dictionary<string, IState>();
+        protected override void Start() => stateDict = new Dictionary<Type, IState>();
 
         /// <summary>
         /// 状态机更新
@@ -37,7 +38,7 @@ namespace JFramework
         /// <typeparam name="TState">可传入任何继承IState的对象</typeparam>
         public void AddState<TState>(IState state = null) where TState : IState, new()
         {
-            var key = typeof(TState).Name;
+            var key = typeof(TState);
             if (stateDict.ContainsKey(key)) return;
             state ??= new TState();
             stateDict.Add(key, state);
@@ -51,12 +52,8 @@ namespace JFramework
         public void ChangeState<TState>() where TState : IState
         {
             state?.OnExit();
-            state = stateDict[typeof(TState).Name];
+            state = stateDict[typeof(TState)];
             state?.OnEnter();
-            if (owner.name=="32001Enemy")
-            {
-                Debug.Log(owner.name+"-----"+state);
-            }
         }
 
         /// <summary>
@@ -67,19 +64,6 @@ namespace JFramework
         public void ChangeState<TState>(float time) where TState : IState
         {
             TimerManager.Pop(time, ChangeState<TState>);
-        }
-
-        /// <summary>
-        /// 移除状态
-        /// </summary>
-        /// <typeparam name="TState">可传入任何继承IState的对象</typeparam>
-        public void RemoveState<TState>() where TState : IState
-        {
-            var key = typeof(TState).Name;
-            if (stateDict.ContainsKey(key))
-            {
-                stateDict.Remove(key);
-            }
         }
     }
 }

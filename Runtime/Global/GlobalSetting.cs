@@ -43,7 +43,7 @@ namespace JFramework.Core
         private Dictionary<int, EventData> eventDict => EventManager.eventDict;
 
         [ShowInInspector, LabelText("命令管理数据"), FoldoutGroup("通用管理器")]
-        private Dictionary<string, ICommand> commandDict => CommandManager.commandDict;
+        private Dictionary<Type, ICommand> commandDict => CommandManager.commandDict;
 
         [ShowInInspector, LabelText("加密管理数据"), FoldoutGroup("通用管理器")]
         private Dictionary<string, JsonData> jsonDict => JsonManager.jsonDict;
@@ -64,7 +64,7 @@ namespace JFramework.Core
         private Dictionary<Type, Dictionary<Enum, IData>> enmDataDict => DataManager.EnmDataDict;
 
         [ShowInInspector, LabelText("面板数据管理"), FoldoutGroup("面板管理器")]
-        private Dictionary<string, UIPanel> panelDict => UIManager.panelDict;
+        private Dictionary<Type, UIPanel> panelDict => UIManager.panelDict;
 
         [ShowInInspector, LabelText("面板层级配置"), FoldoutGroup("面板管理器")]
         private Transform[] layerGroup => UIManager.layerGroup;

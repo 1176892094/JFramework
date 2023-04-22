@@ -16,7 +16,7 @@ namespace JFramework.Core
         /// <summary>
         /// 存储所有UI的字典
         /// </summary>
-        internal static Dictionary<string, UIPanel> panelDict;
+        internal static Dictionary<Type, UIPanel> panelDict;
 
         /// <summary>
         /// 管理器名称
@@ -34,7 +34,7 @@ namespace JFramework.Core
         internal static void Awake()
         {
             layerGroup = new Transform[5];
-            panelDict = new Dictionary<string, UIPanel>();
+            panelDict = new Dictionary<Type, UIPanel>();
             var transform = GlobalManager.Instance.transform;
             layerGroup[0] = transform.Find("UICanvas/Layer1");
             layerGroup[1] = transform.Find("UICanvas/Layer2");
@@ -46,7 +46,7 @@ namespace JFramework.Core
         /// <summary>
         /// UI管理器加载面板
         /// </summary>
-        /// <param name="name">加载UI面板的名称</param>
+        /// <param name="name">传入面板的名称</param>
         /// <param name="action">显示面板的回调</param>
         /// <typeparam name="T">可以使用所有继承IPanel的对象</typeparam>
         private static void LoadPanel<T>(string name, Action<T> action) where T : UIPanel
@@ -57,13 +57,15 @@ namespace JFramework.Core
                 return;
             }
 
+            var key = typeof(T);
             AssetManager.LoadAsync<GameObject>("UI/" + name, obj =>
             {
-                if (panelDict.ContainsKey(name)) HidePanel<T>();
+                if (panelDict.ContainsKey(key)) HidePanel<T>();
                 obj.transform.SetParent(layerGroup[0], false);
                 var panel = obj.GetComponent<T>();
-                panelDict.Add(name, panel);
+                panelDict.Add(key, panel);
                 panel.Show();
+                panel.name = name;
                 action?.Invoke(panel);
             });
         }
@@ -81,7 +83,7 @@ namespace JFramework.Core
                 return;
             }
 
-            var key = typeof(T).Name;
+            var key = typeof(T);
             if (panelDict.ContainsKey(key))
             {
                 panelDict[key].Show();
@@ -89,7 +91,7 @@ namespace JFramework.Core
                 return;
             }
 
-            LoadPanel(key, action);
+            LoadPanel(key.Name, action);
         }
 
         /// <summary>
@@ -104,7 +106,7 @@ namespace JFramework.Core
                 return;
             }
 
-            var key = typeof(T).Name;
+            var key = typeof(T);
             if (panelDict.ContainsKey(key))
             {
                 panelDict[key].Hide();
@@ -134,7 +136,7 @@ namespace JFramework.Core
                 return null;
             }
 
-            var key = typeof(T).Name;
+            var key = typeof(T);
             if (panelDict.ContainsKey(key))
             {
                 return (T)panelDict?[key];

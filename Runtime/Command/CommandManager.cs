@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using JFramework.Interface;
 using UnityEngine;
@@ -12,7 +13,7 @@ namespace JFramework.Core
         /// <summary>
         /// 命令存储字典
         /// </summary>
-        internal static Dictionary<string, ICommand> commandDict;
+        internal static Dictionary<Type, ICommand> commandDict;
 
         /// <summary>
         /// 管理器名称
@@ -22,7 +23,7 @@ namespace JFramework.Core
         /// <summary>
         /// 命令管理器初始化
         /// </summary>
-        internal static void Awake() => commandDict = new Dictionary<string, ICommand>();
+        internal static void Awake() => commandDict = new Dictionary<Type, ICommand>();
 
         /// <summary>
         /// 执行命令
@@ -37,7 +38,7 @@ namespace JFramework.Core
                 return;
             }
 
-            var key = typeof(T).Name;
+            var key = typeof(T);
             if (!commandDict.ContainsKey(key))
             {
                 var command = new T();
@@ -61,7 +62,7 @@ namespace JFramework.Core
                 return;
             }
 
-            var key = typeof(T).Name;
+            var key = typeof(T);
             if (commandDict.ContainsKey(key))
             {
                 commandDict.Remove(key);
