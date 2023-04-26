@@ -17,7 +17,7 @@ namespace JFramework.Core
         /// 资源存储字典
         /// </summary>
         internal static Dictionary<string, IEnumerator> assetDict;
-        
+
         /// <summary>
         /// 管理器名称
         /// </summary>
@@ -40,16 +40,22 @@ namespace JFramework.Core
                 Debug.Log($"{Name.Red()} 没有初始化");
                 return null;
             }
-            
+
             var result = Addressables.LoadAssetAsync<T>(name).WaitForCompletion();
-            if (GlobalManager.Instance.IsDebugAsset)
+            if (result == null)
+            {
+                Debug.Log($"{Name.Sky()} 加载 => {name.Red()} 资源失败");
+                return null;
+            }
+
+            if (GlobalManager.IsDebugAsset)
             {
                 Debug.Log($"{Name.Sky()} 加载 => {name.Green()} 资源成功");
             }
-            
+
             return result is GameObject ? Object.Instantiate(result) : result;
         }
-        
+
         /// <summary>
         /// 通过资源加载管理器异步加载资源
         /// </summary>
@@ -63,70 +69,54 @@ namespace JFramework.Core
                 Debug.Log($"{Name.Red()} 没有初始化");
                 return;
             }
-            
+
             AsyncOperationHandle<T> handle;
             if (assetDict.ContainsKey(name))
             {
                 handle = (AsyncOperationHandle<T>)assetDict[name];
                 if (handle.IsDone)
                 {
-                    action(handle.Result is GameObject ? Object.Instantiate(handle.Result) : handle.Result);
-                    if (GlobalManager.Instance.IsDebugAsset)
-                    {
-                        Debug.Log($"{Name.Sky()} 加载 => {name.Green()} 资源成功");
-                    }
+                    LoadSuccess(handle.Result, action);
                 }
                 else
                 {
-                    handle.Completed += obj =>
-                    {
-                        if (obj.Status == AsyncOperationStatus.Succeeded)
-                        {
-                            action(obj.Result is GameObject ? Object.Instantiate(obj.Result) : obj.Result);
-                            if (GlobalManager.Instance.IsDebugAsset)
-                            {
-                                Debug.Log($"{Name.Sky()} 加载 => {name.Green()} 资源成功");
-                            }
-                        }
-                    };
+                    handle.Completed -= LoadCompleted;
+                    handle.Completed += LoadCompleted;
                 }
 
                 return;
             }
 
-            try
-            {
-                handle = Addressables.LoadAssetAsync<T>(name);
-            }
-            catch (Exception)
-            {
-                Debug.Log($"{Name.Sky()} 加载 => {name.Red()} 资源失败");
-                return;
-            }
-
-            handle.Completed += obj =>
+            handle = Addressables.LoadAssetAsync<T>(name);
+            handle.Completed += LoadCompleted;
+            assetDict.Add(name, handle);
+            
+            void LoadCompleted(AsyncOperationHandle<T> obj)
             {
                 if (obj.Status == AsyncOperationStatus.Succeeded)
                 {
-                    action(obj.Result is GameObject ? Object.Instantiate(obj.Result) : obj.Result);
-                    if (GlobalManager.Instance.IsDebugAsset)
-                    {
-                        Debug.Log($"{Name.Sky()} 加载 => {name.Green()} 资源成功");
-                    }
+                    LoadSuccess(obj.Result, action);
                 }
                 else
                 {
-                    if (GlobalManager.Instance.IsDebugAsset)
-                    {
-                        Debug.Log($"{Name.Sky()} 加载 => {name.Red()} 资源失败");
-                    }
                     if (assetDict.ContainsKey(name))
                     {
                         assetDict.Remove(name);
                     }
+
+                    Debug.Log($"{Name.Sky()} 加载 => {name.Red()} 资源失败");
                 }
-            };
-            assetDict.Add(name, handle);
+            }
+            
+            void LoadSuccess(T result, Action<T> callback)
+            {
+                if (GlobalManager.IsDebugAsset)
+                {
+                    Debug.Log($"{Name.Sky()} 加载 => {result.name.Green()} 资源成功");
+                }
+
+                callback(result is GameObject ? Object.Instantiate(result) : result);
+            }
         }
 
         /// <summary>
@@ -141,7 +131,7 @@ namespace JFramework.Core
                 Debug.Log($"{Name.Red()} 没有初始化");
                 return;
             }
-            
+
             if (!assetDict.ContainsKey(name)) return;
             var handle = (AsyncOperationHandle<T>)assetDict[name];
             Addressables.Release(handle);

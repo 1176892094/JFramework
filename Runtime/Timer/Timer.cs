@@ -27,20 +27,25 @@ namespace JFramework
         private float keepTime;
         
         /// <summary>
-        /// 是否受TimeScale影响
-        /// </summary>
-        [ShowInInspector] private bool unscaled;
-
-        /// <summary>
         /// 当前时间+持续时间
         /// </summary>
-        [ShowInInspector] private float waitTime;
+        private float waitTime;
+        
+        /// <summary>
+        /// 是否受TimeScale影响
+        /// </summary>
+        private bool unscaled;
+        
+        /// <summary>
+        /// 计时器的所有者
+        /// </summary>
+        [ShowInInspector] private object target => OnFinish.Target;
 
         /// <summary>
         /// 计时器的状态
         /// </summary>
         [ShowInInspector] private TimerState state;
-        
+
         /// <summary>
         /// 循环时执行的事件
         /// </summary>
@@ -85,9 +90,9 @@ namespace JFramework
                     OnFinish?.Invoke();
                     TimerManager.Push(this);
                 }
-                catch (Exception)
+                catch (Exception e)
                 {
-                    Debug.Log($"{nameof(TimerManager).Sky()} => 停止正在运行的计时器");
+                    Debug.Log($"{nameof(TimerManager).Sky()} => 停止计时器\n" + e);
                     TimerManager.Push(this);
                 }
             }

@@ -9,11 +9,11 @@ namespace JFramework.Interface
         /// 控制器初始化
         /// </summary>
         /// <param name="owner">控制器的所有者</param>
-        void Start(IEntity owner);
+        void Spawn(IEntity owner);
 
         /// <summary>
         /// 控制器清除
         /// </summary>
-        void Clear();
+        void Despawn();
     }
 }

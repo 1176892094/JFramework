@@ -46,7 +46,7 @@ namespace JFramework.Core
                     return;
                 }
 
-                if (GlobalManager.Instance.IsDebugJson)
+                if (GlobalManager.IsDebugJson)
                 {
                     Debug.Log($"{Name.Sky()} 保存加密 => {name.Orange()} 数据文件");
                 }
@@ -58,7 +58,7 @@ namespace JFramework.Core
             }
             else
             {
-                if (GlobalManager.Instance.IsDebugJson)
+                if (GlobalManager.IsDebugJson && name != Name)
                 {
                     Debug.Log($"{Name.Sky()} 保存 => {name.Orange()} 数据文件");
                 }
@@ -89,7 +89,7 @@ namespace JFramework.Core
                     return;
                 }
 
-                if (GlobalManager.Instance.IsDebugJson)
+                if (GlobalManager.IsDebugJson)
                 {
                     Debug.Log($"{Name.Sky()} 读取解密 => {obj.name.Orange()} 数据文件");
                 }
@@ -105,7 +105,7 @@ namespace JFramework.Core
             }
             else
             {
-                if (GlobalManager.Instance.IsDebugJson)
+                if (GlobalManager.IsDebugJson)
                 {
                     Debug.Log($"{Name.Sky()} 读取 => {Name.Orange()} 数据文件");
                 }
@@ -140,7 +140,7 @@ namespace JFramework.Core
                     return default;
                 }
                 
-                if (GlobalManager.Instance.IsDebugJson)
+                if (GlobalManager.IsDebugJson)
                 {
                     Debug.Log($"{Name.Sky()} 读取解密 => {name.Orange()} 数据文件");
                 }
@@ -157,7 +157,7 @@ namespace JFramework.Core
             }
             else
             {
-                if (GlobalManager.Instance.IsDebugJson)
+                if (GlobalManager.IsDebugJson)
                 {
                     Debug.Log($"{Name.Sky()} 读取 => {name.Orange()} 数据文件");
                 }
@@ -174,7 +174,7 @@ namespace JFramework.Core
         /// </summary>
         public static void Clear()
         {
-            if (GlobalManager.Instance.IsDebugJson)
+            if (GlobalManager.IsDebugJson)
             {
                 Debug.Log($"{Name.Sky()} <= Clear => {Name.Orange()}");
             }

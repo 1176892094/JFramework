@@ -50,9 +50,9 @@ namespace JFramework.Interface
 
                 return memoryStream.ToArray();
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                Debug.LogWarning($"{nameof(JsonManager).Red()} 存档丢失 => 加密失败!");
+                Debug.LogWarning($"{nameof(JsonManager).Red()} 存档丢失 => 加密失败!\n" + e);
                 JsonManager.jsonDict = new Dictionary<string, JsonData>();
             }
 
@@ -79,9 +79,9 @@ namespace JFramework.Interface
                 using StreamReader streamReader = new StreamReader(cryptoStream);
                 return streamReader.ReadToEnd();
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                Debug.LogWarning($"{nameof(JsonManager).Red()} 存档丢失 => 解密失败!");
+                Debug.LogWarning($"{nameof(JsonManager).Red()} 存档丢失 => 解密失败!\n" + e);
                 JsonManager.jsonDict = new Dictionary<string, JsonData>();
             }
 

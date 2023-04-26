@@ -22,23 +22,23 @@ namespace JFramework
         private void Start(TEntity owner)
         {
             this.owner = owner;
-            Start();
+            Spawn();
         }
 
         /// <summary>
         /// 控制器初始化
         /// </summary>
-        protected abstract void Start();
+        protected virtual void Spawn() { }
 
         /// <summary>
         /// 通过接口初始化控制器
         /// </summary>
         /// <param name="owner">控制器的所有者</param>
-        void IController.Start(IEntity owner) => Start((TEntity)owner);
-        
+        void IController.Spawn(IEntity owner) => Start((TEntity)owner);
+
         /// <summary>
         /// 控制器清除
         /// </summary>
-        void IController.Clear() => Destroy(this);
+        void IController.Despawn() => Destroy(this);
     }
 }

@@ -59,7 +59,7 @@ namespace JFramework
         /// <param name="obj">推出的游戏物体</param>
         protected override void Push(GameObject obj)
         {
-            stack.Push(obj);
+            if (!stack.Contains(obj)) stack.Push(obj);
             if (pool != null) obj.transform.SetParent(pool.transform);
             obj.SetActive(false);
         }

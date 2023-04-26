@@ -19,7 +19,7 @@ namespace JFramework.Core
         /// 存储正在执行的计时器
         /// </summary>
         internal static List<Timer> timerList;
-        
+
         /// <summary>
         /// 计时器管理名称
         /// </summary>
@@ -32,7 +32,7 @@ namespace JFramework.Core
         {
             timerQueue = new Queue<Timer>();
             timerList = new List<Timer>();
-            GlobalManager.Instance.UpdateAction += OnUpdate;
+            GlobalManager.Instance.UpdateEvent += OnUpdate;
         }
 
         /// <summary>

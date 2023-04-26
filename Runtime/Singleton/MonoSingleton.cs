@@ -1,3 +1,5 @@
+using JFramework.Interface;
+
 namespace JFramework
 {
     /// <summary>
@@ -34,13 +36,13 @@ namespace JFramework
                 instance = (T)this;
             }
         }
-
+        
+  
         /// <summary>
         /// 释放时将单例置空
         /// </summary>
-        protected override void OnDestroy()
+        public override void Despawn()
         {
-            base.OnDestroy();
             instance = null;
         }
     }

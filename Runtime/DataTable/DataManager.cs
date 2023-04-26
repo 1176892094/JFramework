@@ -60,7 +60,7 @@ namespace JFramework.Core
                             return;
                         }
 
-                        if (GlobalManager.Instance.IsDebugData)
+                        if (GlobalManager.IsDebugData)
                         {
                             Debug.Log($"{Name.Sky()} 加载 => {type.Name.Blue()} 数据表");
                         }
@@ -118,7 +118,7 @@ namespace JFramework.Core
             IntDataDict.TryGetValue(typeof(T), out IntDataDict soDict);
             if (soDict == null) return default;
             soDict.TryGetValue(key, out IData data);
-            if (GlobalManager.Instance.IsDebugData)
+            if (GlobalManager.IsDebugData)
             {
                 Debug.Log(data != null
                     ? $"{Name.Sky()} 获取 => {typeof(T).Name.Blue()} : {key.ToString().Green()} 数据成功"
@@ -139,7 +139,7 @@ namespace JFramework.Core
             StrDataDict.TryGetValue(typeof(T), out StrDataDict soDict);
             if (soDict == null) return default;
             soDict.TryGetValue(key, out IData data);
-            if (GlobalManager.Instance.IsDebugData)
+            if (GlobalManager.IsDebugData)
             {
                 Debug.Log(data != null
                     ? $"{Name.Sky()} 获取 => {typeof(T).Name.Blue()} : {key.Green()} 数据成功"
@@ -160,7 +160,7 @@ namespace JFramework.Core
             EnmDataDict.TryGetValue(typeof(T), out EnmDataDict soDict);
             if (soDict == null) return default;
             soDict.TryGetValue(key, out IData data);
-            if (GlobalManager.Instance.IsDebugData)
+            if (GlobalManager.IsDebugData)
             {
                 Debug.Log(data != null
                     ? $"{Name.Sky()} 获取 => {typeof(T).Name.Blue()} : {key.ToString().Green()} 数据成功"
@@ -179,7 +179,7 @@ namespace JFramework.Core
         public static List<T> GetTable<T>() where T : IData
         {
             var table = GetTable(typeof(T));
-            if (GlobalManager.Instance.IsDebugData && table != null)
+            if (GlobalManager.IsDebugData && table != null)
             {
                 Debug.Log($"{Name.Sky()} 获取 => {typeof(T).Name.Blue()} 列表成功");
             }
@@ -258,16 +258,6 @@ namespace JFramework.Core
             var name = type.Name;
             name = name.Substring(0, name.Length - 5);
             return assembly.GetType("JFramework.Table." + name);
-        }
-
-        /// <summary>
-        /// 获取数据的键值
-        /// </summary>
-        /// <returns>返回数据的主键</returns>
-        public static object GetKeyField(IData data)
-        {
-            var key = GetKeyField(data.GetType());
-            return key == null ? null : key.GetValue(data);
         }
 
         /// <summary>

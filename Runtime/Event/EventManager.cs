@@ -40,7 +40,7 @@ namespace JFramework.Core
                 eventDict.Add(id, action);
             }
 
-            if (GlobalManager.Instance.IsDebugEvent)
+            if (GlobalManager.IsDebugEvent)
             {
                 Debug.Log($"{Name.Sky()} 侦听 => {action.Method.ToString().Yellow()} 事件");
             }
@@ -56,7 +56,7 @@ namespace JFramework.Core
             if (eventDict == null) return;
             if (eventDict.ContainsKey(id))
             {
-                if (GlobalManager.Instance.IsDebugEvent)
+                if (GlobalManager.IsDebugEvent)
                 {
                     Debug.Log($"{Name.Sky()} 移除 => {action.Method.ToString().Yellow()} 事件");
                 }
@@ -75,7 +75,7 @@ namespace JFramework.Core
             if (eventDict == null) return;
             if (eventDict.ContainsKey(id))
             {
-                if (GlobalManager.Instance.IsDebugEvent)
+                if (GlobalManager.IsDebugEvent)
                 {
                     Debug.Log($"{Name.Sky()} 触发 => {eventDict[id]?.Method.ToString().Yellow()} 事件");
                 }

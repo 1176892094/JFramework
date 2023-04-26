@@ -6,6 +6,7 @@ using UnityEngine.Events;
 using UnityEngine.EventSystems;
 using Object = UnityEngine.Object;
 
+// ReSharper disable All
 namespace JFramework.Core
 {
     /// <summary>
@@ -93,11 +94,11 @@ namespace JFramework.Core
 
             LoadPanel(key.Name, action);
         }
+        
 
         /// <summary>
         /// UI管理器隐藏UI面板
         /// </summary>
-        /// <typeparam name="T">可以使用所有继承IPanel的对象</typeparam>
         public static void HidePanel<T>() where T : UIPanel
         {
             if (panelDict == null)
@@ -128,29 +129,20 @@ namespace JFramework.Core
         /// </summary>
         /// <typeparam name="T">可以使用所有继承IPanel的对象</typeparam>
         /// <returns>返回获取到的UI面板</returns>
-        public static T GetPanel<T>() where T : UIPanel
-        {
-            if (panelDict == null)
-            {
-                Debug.Log($"{Name.Red()} 没有初始化");
-                return null;
-            }
+        public static T GetPanel<T>() where T : UIPanel => (T)GetPanel(typeof(T));
 
-            var key = typeof(T);
-            if (panelDict.ContainsKey(key))
-            {
-                return (T)panelDict?[key];
-            }
-
-            return null;
-        }
+        /// <summary>
+        /// UI管理器得到UI面板
+        /// </summary>
+        /// <returns>返回获取到的UI面板</returns>
+        public static UIPanel GetPanel(Type key) => panelDict.ContainsKey(key) ? panelDict?[key] : null;
 
         /// <summary>
         /// UI管理器得到层级
         /// </summary>
         /// <param name="layer">层级的类型</param>
         /// <returns>返回得到的层级</returns>
-        public static Transform GetLayer(UILayerType layer) => panelDict != null ? layerGroup[layer.As<int>()] : null;
+        public static Transform GetLayer(UILayerType layer) => panelDict != null ? layerGroup[(int)layer] : null;
 
         /// <summary>
         /// UI管理器侦听UI面板事件
@@ -158,21 +150,17 @@ namespace JFramework.Core
         /// <param name="target">传入的UI对象</param>
         /// <param name="type">事件触发类型</param>
         /// <param name="action">事件触发后的回调</param>
-        public static void Listen(Component target, EventTriggerType type, UnityAction<BaseEventData> action)
+        public static void Listen<T>(Component target, EventTriggerType type, UnityAction<T> action) where T : BaseEventData
         {
             var trigger = target.GetComponent<EventTrigger>();
-            if (trigger == null)
-            {
-                trigger = target.gameObject.AddComponent<EventTrigger>();
-            }
-
+            if (trigger == null) trigger = target.gameObject.AddComponent<EventTrigger>();
             var entry = new EventTrigger.Entry { eventID = type };
-            entry.callback.AddListener(action);
+            entry.callback.AddListener(eventData => action?.Invoke((T)eventData));
             trigger.triggers.Add(entry);
         }
 
         /// <summary>
-        /// UI管理器清除所有面板
+        /// UI管理器清除可销毁的面板
         /// </summary>
         public static void Clear()
         {
@@ -182,7 +170,7 @@ namespace JFramework.Core
                 return;
             }
 
-            foreach (var key in panelDict.Keys.ToList().Where(key => panelDict.ContainsKey(key) && panelDict[key].hideType != UIHideType.Ignore))
+            foreach (var key in panelDict.Keys.Where(key => panelDict.ContainsKey(key) && panelDict[key].hideType != UIHideType.Ignore))
             {
                 Object.Destroy(panelDict[key].gameObject);
                 panelDict.Remove(key);

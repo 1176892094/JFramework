@@ -1,3 +1,4 @@
+using System;
 using JFramework.Interface;
 
 namespace JFramework
@@ -5,6 +6,7 @@ namespace JFramework
     /// <summary>
     /// 状态的抽象类
     /// </summary>
+    [Serializable]
     public abstract class State<TEntity> : IState where TEntity : IEntity
     {
         /// <summary>
@@ -25,7 +27,9 @@ namespace JFramework
         /// <summary>
         /// 状态初始化
         /// </summary>
-        protected virtual void OnAwake() { }
+        protected virtual void OnAwake()
+        {
+        }
 
         /// <summary>
         /// 进入状态

@@ -5,9 +5,10 @@ using JFramework.Interface;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
+// ReSharper disable All
 namespace JFramework
 {
-    public class Machine<T> : Controller<T> where T : MonoBehaviour, IEntity
+    public abstract class StateMachine<T> : Controller<T> where T : MonoBehaviour, IEntity
     {
         /// <summary>
         /// 存储状态的字典
@@ -22,9 +23,10 @@ namespace JFramework
         protected IState state;
 
         /// <summary>
-        /// 状态机初始化
+        /// 状态机启动
         /// </summary>
-        protected override void Start() => stateDict = new Dictionary<Type, IState>();
+        /// <typeparam name="TState">可传入任何继承IState的对象</typeparam>
+        public void Enable<TState>() where TState : IState, new() => ChangeState<TState>();
 
         /// <summary>
         /// 状态机更新
@@ -39,6 +41,7 @@ namespace JFramework
         public void AddState<TState>(IState state = null) where TState : IState, new()
         {
             var key = typeof(TState);
+            stateDict ??= new Dictionary<Type, IState>();
             if (stateDict.ContainsKey(key)) return;
             state ??= new TState();
             stateDict.Add(key, state);
@@ -65,5 +68,10 @@ namespace JFramework
         {
             TimerManager.Pop(time, ChangeState<TState>);
         }
+        
+        /// <summary>
+        /// 状态机禁用
+        /// </summary>
+        public void Disable() => state = null;
     }
 }

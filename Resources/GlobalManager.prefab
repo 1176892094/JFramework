@@ -124,12 +124,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b750b66b07a8348e08d53030fdb40e6c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  IsDebugJson: 0
-  IsDebugPool: 0
-  IsDebugData: 0
-  IsDebugAsset: 0
-  IsDebugEvent: 0
-  IsDebugScene: 0
+  isDebugJson: 0
+  isDebugPool: 0
+  isDebugData: 0
+  isDebugAsset: 0
+  isDebugEvent: 0
+  isDebugScene: 0
+  key: 
+  chat: "\u83B7\u53D6\u5730\u5740: https://platform.openai.com/account/api-keys"
 --- !u!114 &778044560079173824
 MonoBehaviour:
   m_ObjectHideFlags: 0

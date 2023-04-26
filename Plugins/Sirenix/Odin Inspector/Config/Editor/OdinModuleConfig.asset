@@ -15,9 +15,5 @@ MonoBehaviour:
   configurations:
   - ID: Unity.Mathematics
     ActivationSettings: 0
-  - ID: Unity.Localization
-    ActivationSettings: 0
-  - ID: Unity.Entities
-    ActivationSettings: 0
   ModuleTogglingSettings: 2
   ModuleUpdateSettings: 0

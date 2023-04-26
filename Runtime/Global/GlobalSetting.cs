@@ -9,29 +9,41 @@ namespace JFramework.Core
 {
     public sealed partial class GlobalManager
     {
-        [ShowInInspector, LabelText("显示Json加载信息"), FoldoutGroup("调试管理器")]
-        internal bool IsDebugJson;
+        [FoldoutGroup("设置管理器")] 
+        [TabGroup("设置管理器/Setting", "Setting"), SerializeField, LabelText("显示Json加载信息")]
+        private bool isDebugJson;
 
-        [ShowInInspector, LabelText("显示Pool存取信息"), FoldoutGroup("调试管理器")]
-        internal bool IsDebugPool;
+        [TabGroup("设置管理器/Setting", "Setting"), SerializeField, LabelText("显示Pool存取信息")]
+        private bool isDebugPool;
 
-        [ShowInInspector, LabelText("显示Data加载信息"), FoldoutGroup("调试管理器")]
-        internal bool IsDebugData;
+        [TabGroup("设置管理器/Setting", "Setting"), SerializeField, LabelText("显示Data加载信息")]
+        private bool isDebugData;
 
-        [ShowInInspector, LabelText("显示Asset加载信息"), FoldoutGroup("调试管理器")]
-        internal bool IsDebugAsset;
+        [TabGroup("设置管理器/Setting", "Setting"), SerializeField, LabelText("显示Asset加载信息")]
+        private bool isDebugAsset;
 
-        [ShowInInspector, LabelText("显示Event事件信息"), FoldoutGroup("调试管理器")]
-        internal bool IsDebugEvent;
+        [TabGroup("设置管理器/Setting", "Setting"), SerializeField, LabelText("显示Event事件信息")]
+        private bool isDebugEvent;
 
-        [ShowInInspector, LabelText("显示Scene加载信息"), FoldoutGroup("调试管理器")]
-        internal bool IsDebugScene;
+        [TabGroup("设置管理器/Setting", "Setting"), SerializeField, LabelText("显示Scene加载信息")]
+        private bool isDebugScene;
+
+        [Required("请在此输入ChatGPT的密钥!")]
+        [TabGroup("设置管理器/Setting", "OpenAI"), SerializeField, LabelText("")]
+        internal string key = "";
         
-        [ShowInInspector, LabelText("当前日期时间"), FoldoutGroup("日期管理器")]
-        private string dateTime => DateTime.Now.ToString("yyyy-M-d / hh:mm:ss");
+        [TabGroup("设置管理器/Setting", "OpenAI"), SerializeField, LabelText("输入文本:"), TextArea(4,10)]
+        internal string chat = "获取地址: https://platform.openai.com/account/api-keys";
 
-        [ShowInInspector, LabelText("下次刷新时间"), FoldoutGroup("日期管理器")]
-        private string refreshTime => DateManager.tomorrow.ToString("yyyy-M-d / hh:mm:ss");
+        [Button("发送"), TabGroup("设置管理器/Setting", "OpenAI")]
+        public void SendRequest() => ChatGPT.SendData();
+
+        internal static bool IsDebugJson => Instance.isDebugJson;
+        internal static bool IsDebugPool => Instance.isDebugPool;
+        internal static bool IsDebugData => Instance.isDebugData;
+        internal static bool IsDebugAsset => Instance.isDebugAsset;
+        internal static bool IsDebugEvent => Instance.isDebugEvent;
+        internal static bool IsDebugScene => Instance.isDebugScene;
 
         [ShowInInspector, LabelText("场景管理数据"), FoldoutGroup("通用管理器")]
         private Dictionary<int, SceneData> sceneList => SceneManager.sceneDict;
@@ -76,10 +88,10 @@ namespace JFramework.Core
         private AudioSource audioSource => AudioManager.audioSource;
 
         [ShowInInspector, LabelText("背景音乐大小"), FoldoutGroup("音效管理器")]
-        private float soundVolume => AudioManager.SoundVolume;
+        private float soundVolume => AudioManager.soundVolume;
 
         [ShowInInspector, LabelText("游戏音乐大小"), FoldoutGroup("音效管理器")]
-        private float audioVolume => AudioManager.AudioVolume;
+        private float audioVolume => AudioManager.sudioVolume;
 
         [ShowInInspector, LabelText("完成音效队列"), FoldoutGroup("音效管理器")]
         private Queue<AudioSource> audioQueue => AudioManager.audioQueue;

@@ -1,3 +1,5 @@
+using Sirenix.OdinInspector;
+
 namespace JFramework
 {
     /// <summary>
@@ -8,16 +10,16 @@ namespace JFramework
         /// <summary>
         /// 运行状态
         /// </summary>
-        Run = 0,
+        [LabelText("运行")] Run = 0,
 
         /// <summary>
         /// 暂停状态
         /// </summary>
-        Stop = 1,
+        [LabelText("停止")] Stop = 1,
 
         /// <summary>
         /// 完成状态
         /// </summary>
-        Finish = 2,
+        [LabelText("完成")] Finish = 2,
     }
 }

@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using JFramework.Core;
 using JFramework.Interface;
 using UnityEngine;
@@ -13,24 +12,20 @@ namespace JFramework
     public abstract class Entity : MonoBehaviour, IEntity
     {
         /// <summary>
-        /// 控制器容器
-        /// </summary>
-        private Dictionary<string, IController> controllerDict;
-
-        /// <summary>
         /// 实体生成
         /// </summary>
         /// <param name="value">传入生成参数</param>
-        public virtual void Spawn(params object[] value)
-        {
-        }
+        public virtual void Spawn(params object[] value) { }
 
         /// <summary>
         /// 实体更新
         /// </summary>
-        protected virtual void OnUpdate()
-        {
-        }
+        protected virtual void OnUpdate() { }
+
+        /// <summary>
+        /// 实体销毁
+        /// </summary>
+        public virtual void Despawn() { }
 
         /// <summary>
         /// 实体启用
@@ -53,29 +48,17 @@ namespace JFramework
         /// <summary>
         /// 实体销毁
         /// </summary>
-        protected virtual void OnDestroy()
+        protected void OnDestroy()
         {
-            if (controllerDict == null) return;
-            foreach (var controller in controllerDict.Values)
+            try
             {
-                controller.Clear();
+                Despawn();
             }
-        }
-
-        /// <summary>
-        /// 获取控制器
-        /// </summary>
-        /// <typeparam name="T">可使用任何继承IController的对象</typeparam>
-        /// <returns>返回控制器对象</returns>
-        public T Get<T>() where T : ScriptableObject, IController
-        {
-            var key = typeof(T).Name;
-            controllerDict ??= new Dictionary<string, IController>();
-            if (controllerDict.ContainsKey(key)) return (T)controllerDict[key];
-            var controller = ScriptableObject.CreateInstance<T>();
-            controllerDict.Add(key, controller);
-            controller.Start(this);
-            return controller;
+            catch (Exception e)
+            {
+                Debug.LogWarning(e);
+                throw;
+            }
         }
 
         /// <summary>

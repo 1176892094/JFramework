@@ -5,6 +5,7 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using LoadManager = UnityEngine.SceneManagement.SceneManager;
 
+
 namespace JFramework.Core
 {
     public static class SceneManager
@@ -15,9 +16,9 @@ namespace JFramework.Core
         internal static Dictionary<int, SceneData> sceneDict;
 
         /// <summary>
-        /// 场景事件
+        /// 场景加载事件(进度条)
         /// </summary>
-        public const int OnSceneChanged = 999;
+        public static event Action<float> ProgressEvent;
 
         /// <summary>
         /// 场景加载进度条
@@ -48,7 +49,7 @@ namespace JFramework.Core
         /// <summary>
         /// 当前场景名称
         /// </summary>
-        public static string Scene => LoadManager.GetActiveScene().name;
+        public static string name => LoadManager.GetActiveScene().name;
 
         /// <summary>
         /// 场景管理器初始化
@@ -60,8 +61,8 @@ namespace JFramework.Core
             {
                 var path = SceneUtility.GetScenePathByBuildIndex(i);
                 var data = path.Split('/');
-                var name = data[^1];
-                data = name.Split('.');
+                var last = data[^1];
+                data = last.Split('.');
                 sceneDict.Add(i, new SceneData() { Id = i, Name = data[0] });
             }
         }
@@ -78,7 +79,7 @@ namespace JFramework.Core
                 return;
             }
 
-            if (GlobalManager.Instance.IsDebugScene)
+            if (GlobalManager.IsDebugScene)
             {
                 Debug.Log($"{Name.Sky()} 加载 => {name.Green()} 场景");
             }
@@ -99,7 +100,7 @@ namespace JFramework.Core
                 return;
             }
 
-            if (GlobalManager.Instance.IsDebugScene)
+            if (GlobalManager.IsDebugScene)
             {
                 Debug.Log($"{Name.Sky()} 异步加载 => {name.Green()} 场景");
             }
@@ -124,9 +125,9 @@ namespace JFramework.Core
                 while (Progress < 0.99f)
                 {
                     Progress = Mathf.Lerp(Progress, asyncOperation.progress / 9f * 10f, Time.fixedDeltaTime * 2);
-                    EventManager.Invoke(OnSceneChanged, Progress);
+                    ProgressEvent?.Invoke(Progress);
 
-                    if (GlobalManager.Instance.IsDebugScene)
+                    if (GlobalManager.IsDebugScene)
                     {
                         Debug.Log($"{Name.Sky()} 加载进度 => {Progress.ToString("P").Green()}");
                     }
@@ -140,7 +141,7 @@ namespace JFramework.Core
 
             action?.Invoke();
 
-            if (GlobalManager.Instance.IsDebugScene)
+            if (GlobalManager.IsDebugScene)
             {
                 currentTime = Time.time - currentTime;
                 Debug.Log($"{Name.Sky()} 加载 => {name.Green()} 场景完成, 耗时 {currentTime.ToString("F").Yellow()} 秒");

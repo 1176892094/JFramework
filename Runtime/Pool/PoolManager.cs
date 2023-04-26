@@ -47,9 +47,10 @@ namespace JFramework.Core
             if (poolDict.ContainsKey(key) && poolDict[key].Count > 0)
             {
                 var obj = (GameObject)poolDict[key].Pop();
+
                 if (obj != null)
                 {
-                    if (GlobalManager.Instance.IsDebugPool)
+                    if (GlobalManager.IsDebugPool)
                     {
                         Debug.Log($"{Name.Sky()} 取出 => {key.Pink()} 对象成功");
                     }
@@ -58,13 +59,13 @@ namespace JFramework.Core
                     return;
                 }
                 
-                if (GlobalManager.Instance.IsDebugPool)
+                if (GlobalManager.IsDebugPool)
                 {
                     Debug.Log($"{Name.Sky()} 移除已销毁对象 : {key.Red()}");
                 }
             }
 
-            if (GlobalManager.Instance.IsDebugPool)
+            if (GlobalManager.IsDebugPool)
             {
                 Debug.Log($"{Name.Sky()} 创建 => {key.Green()} 对象成功");
             }
@@ -100,16 +101,16 @@ namespace JFramework.Core
                     return;
                 }
 
-                if (GlobalManager.Instance.IsDebugPool)
+                if (GlobalManager.IsDebugPool)
                 {
                     Debug.Log($"{Name.Sky()} 存入 => {key.Pink()} 对象成功");
                 }
-
+                
                 poolDict[key].Push(obj);
             }
             else
             {
-                if (GlobalManager.Instance.IsDebugPool)
+                if (GlobalManager.IsDebugPool)
                 {
                     Debug.Log($"{Name.Sky()} => 创建对象池 : {key.Green()}");
                 }

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
+// ReSharper disable All
 namespace JFramework.Core
 {
     public static class AudioManager
@@ -39,12 +40,12 @@ namespace JFramework.Core
         /// <summary>
         /// 背景音乐
         /// </summary>
-        public static float SoundVolume => audioSetting?.soundVolume ?? 0.5f;
+        public static float soundVolume => audioSetting?.soundVolume ?? 0.5f;
 
         /// <summary>
         /// 游戏声音
         /// </summary>
-        public static float AudioVolume => audioSetting?.audioVolume ?? 0.5f;
+        public static float sudioVolume => audioSetting?.audioVolume ?? 0.5f;
 
         /// <summary>
         /// 音效管理器初始化

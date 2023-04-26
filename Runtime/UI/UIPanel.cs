@@ -7,7 +7,7 @@ using UnityEngine.UI;
 
 namespace JFramework
 {
-    using Container = Dictionary<string, UIBehaviour>;
+    using Component = Dictionary<string, UIBehaviour>;
 
     /// <summary>
     /// UI面板的抽象类
@@ -17,7 +17,7 @@ namespace JFramework
         /// <summary>
         /// 视觉容器字典
         /// </summary>
-        [ShowInInspector, LabelText("视觉元素")] private Dictionary<string, Container> containerDict;
+        [ShowInInspector, LabelText("视觉元素")] private Dictionary<string, Component> componentDict;
 
         /// <summary>
         /// UI隐藏类型
@@ -29,7 +29,7 @@ namespace JFramework
         /// </summary>
         protected virtual void Awake()
         {
-            containerDict = new Dictionary<string, Container>();
+            componentDict = new Dictionary<string, Component>();
             FindComponent<Image>();
             FindComponent<Slider>();
             FindComponent<Button>();
@@ -50,15 +50,15 @@ namespace JFramework
             foreach (var component in components)
             {
                 var key = component.gameObject.name;
-                if (!containerDict.ContainsKey(type))
+                if (!componentDict.ContainsKey(type))
                 {
-                    var container = new Container();
-                    containerDict.Add(type, container);
+                    var container = new Component();
+                    componentDict.Add(type, container);
                     container.Add(key, component);
                 }
-                else if (!containerDict[type].ContainsKey(key))
+                else if (!componentDict[type].ContainsKey(key))
                 {
-                    containerDict[type].Add(key, component);
+                    componentDict[type].Add(key, component);
                 }
 
                 if (component is Button button)
@@ -87,9 +87,9 @@ namespace JFramework
         public T Get<T>(string key) where T : UIBehaviour
         {
             var type = typeof(T).Name;
-            if (containerDict.ContainsKey(type))
+            if (componentDict.ContainsKey(type))
             {
-                return (T)containerDict[type][key];
+                return (T)componentDict[type][key];
             }
 
             return null;

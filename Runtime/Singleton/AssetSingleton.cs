@@ -1,17 +1,15 @@
 using System.IO;
 using UnityEngine;
 using JFramework.Core;
-#if UNITY_EDITOR
-using UnityEditor;
-#endif
+using Sirenix.Utilities;
 
 namespace JFramework
 {
     /// <summary>
-    /// 单例模式对象
+    /// 基于ScriptableObject的单例对象
     /// </summary>
     /// <typeparam name="T">所属的单例对象</typeparam>
-    public abstract class AssetSingleton<T> : ScriptableObject where T : AssetSingleton<T>
+    public class AssetSingleton<T> : ScriptableObject where T : AssetSingleton<T>
     {
         /// <summary>
         /// 所属单例对象
@@ -28,7 +26,7 @@ namespace JFramework
                 if (instance != null) return instance;
 #if UNITY_EDITOR
                 var name = $"Assets/Editor/{typeof(T).Name}.asset";
-                instance = AssetDatabase.LoadAssetAtPath<T>(name);
+                instance = UnityEditor.AssetDatabase.LoadAssetAtPath<T>(name);
                 if (instance != null) return instance;
                 instance = CreateInstance<T>();
                 if (!Directory.Exists("Assets/Editor"))
@@ -36,8 +34,8 @@ namespace JFramework
                     Directory.CreateDirectory("Assets/Editor");
                 }
 
-                AssetDatabase.CreateAsset(instance, name);
-                AssetDatabase.Refresh();
+                UnityEditor.AssetDatabase.CreateAsset(instance, name);
+                UnityEditor.AssetDatabase.Refresh();
 #else
                 instance = AssetManager.Load<T>("Settings/"+typeof(T).Name);
                 if (instance == null)
