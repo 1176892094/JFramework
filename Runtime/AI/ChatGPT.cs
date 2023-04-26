@@ -11,9 +11,19 @@ using UnityEngine.Networking;
 // ReSharper disable All
 internal static class ChatGPT
 {
+    /// <summary>
+    /// ChatGPT的密钥
+    /// </summary>
     internal static string key => GlobalManager.Instance.key;
-    internal static string chat=> GlobalManager.Instance.chat;
 
+    /// <summary>
+    /// 发送的文本
+    /// </summary>
+    internal static string chat => GlobalManager.Instance.chat;
+
+    /// <summary>
+    /// 发送数据
+    /// </summary>
     public static void SendData()
     {
         if (chat.IsEmpty()) return;
@@ -21,6 +31,11 @@ internal static class ChatGPT
         GlobalManager.Instance.chat = "";
     }
 
+    /// <summary>
+    /// 通过携程发送请求
+    /// </summary>
+    /// <param name="prompt"></param>
+    /// <returns></returns>
     private static IEnumerator Request(string prompt)
     {
         using var request = new UnityWebRequest(ChatConst.Url, "POST");
@@ -67,6 +82,9 @@ internal static class ChatGPT
         }
     }
 
+    /// <summary>
+    /// 一些常量
+    /// </summary>
     private struct ChatConst
     {
         public const string Url = "https://api.openai.com/v1/completions";
@@ -79,6 +97,9 @@ internal static class ChatGPT
         public const string Stop = "\\n";
     }
 
+    /// <summary>
+    /// 提交的数据
+    /// </summary>
     public struct PostData
     {
         public string model;
@@ -91,6 +112,9 @@ internal static class ChatGPT
         public string stop;
     }
 
+    /// <summary>
+    /// 返回的响应文本
+    /// </summary>
     public class TextResponse
     {
         public string id;
@@ -101,6 +125,9 @@ internal static class ChatGPT
         public List<Choice> choices;
     }
 
+    /// <summary>
+    /// 文本的选项
+    /// </summary>
     public struct Choice
     {
         public Message message;
@@ -108,12 +135,18 @@ internal static class ChatGPT
         public int index;
     }
 
+    /// <summary>
+    /// 文本的消息
+    /// </summary>
     public struct Message
     {
         public string role;
         public string content;
     }
 
+    /// <summary>
+    /// 返回的用户
+    /// </summary>
     public struct Usage
     {
         public string prompt_tokens;
