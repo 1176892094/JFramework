@@ -1,7 +1,5 @@
 using System.IO;
 using UnityEngine;
-using JFramework.Core;
-using Sirenix.Utilities;
 
 namespace JFramework
 {
