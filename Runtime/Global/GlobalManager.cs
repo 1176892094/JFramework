@@ -1,5 +1,4 @@
 using System;
-using JFramework.Interface;
 using UnityEngine;
 
 namespace JFramework.Core
@@ -13,6 +12,9 @@ namespace JFramework.Core
         /// 全局管理器名称
         /// </summary>
         private static string Name => nameof(GlobalManager);
+
+        private static ChatGPT chatGpt;
+        private static ChatGPT ChatGpt => chatGpt ??= new ChatGPT();
 
         /// <summary>
         /// 全局管理器单例

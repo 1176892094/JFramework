@@ -35,19 +35,23 @@ namespace JFramework.Core
         [TabGroup("设置管理器/Setting", "OpenAI"), SerializeField, LabelText("")]
         internal string key = "";
         
-        [TabGroup("设置管理器/Setting", "OpenAI"), SerializeField, LabelText("输入文本:"), TextArea(4,10)]
-        internal string chat = "获取地址: https://platform.openai.com/account/api-keys";
+        [TabGroup("设置管理器/Setting", "OpenAI"), ShowInInspector, LabelText("输入文本:"), TextArea(4,10)]
+        internal static string chat = "获取地址: https://platform.openai.com/account/api-keys";
 
         [Button("发送"), TabGroup("设置管理器/Setting", "OpenAI")]
-        private void SendRequest() => ChatGPT.SendData();
-
+        private void SendRequest()
+        {
+            if (chat.Equals("")) return;
+            StartCoroutine(ChatGPT.Request(key, chat));
+            chat = "";
+        }
+        
         internal static bool IsDebugJson => Instance.isDebugJson;
         internal static bool IsDebugPool => Instance.isDebugPool;
         internal static bool IsDebugData => Instance.isDebugData;
         internal static bool IsDebugAsset => Instance.isDebugAsset;
         internal static bool IsDebugEvent => Instance.isDebugEvent;
         internal static bool IsDebugScene => Instance.isDebugScene;
-   
 
         [ShowInInspector, LabelText("场景管理数据"), FoldoutGroup("通用管理器")]
         private Dictionary<int, SceneData> sceneList => SceneManager.sceneDict;
