@@ -91,7 +91,7 @@ namespace JFramework.Core
         private float soundVolume => AudioManager.soundVolume;
 
         [ShowInInspector, LabelText("游戏音乐大小"), FoldoutGroup("音效管理器")]
-        private float audioVolume => AudioManager.sudioVolume;
+        private float audioVolume => AudioManager.audioVolume;
 
         [ShowInInspector, LabelText("完成音效队列"), FoldoutGroup("音效管理器")]
         private Queue<AudioSource> audioQueue => AudioManager.audioQueue;
