@@ -20,9 +20,19 @@ namespace JFramework.Core
         public static GlobalManager Instance;
 
         /// <summary>
+        /// Awake醒来事件
+        /// </summary>
+        public static event Action OnStart;
+
+        /// <summary>
         /// Update更新事件
         /// </summary>
-        internal event Action UpdateEvent;
+        public static event Action OnUpdate;
+        
+        /// <summary>
+        /// Destroy销毁事件
+        /// </summary>
+        public static event Action OnDestroy;
 
         /// <summary>
         /// 全局管理器醒来
@@ -30,21 +40,14 @@ namespace JFramework.Core
         private void Awake() => DontDestroyOnLoad(gameObject);
 
         /// <summary>
+        /// 全局管理器开始
+        /// </summary>
+        private void Start() => OnStart?.Invoke();
+
+        /// <summary>
         /// 全局Update更新
         /// </summary>
-        private void Update() => UpdateEvent?.Invoke();
-
-        /// <summary>
-        /// 添加实体到管理器
-        /// </summary>
-        /// <param name="entity">传入实体</param>
-        public void Listen(IEntity entity) => UpdateEvent += entity.Update;
-
-        /// <summary>
-        /// 移除实体到管理器
-        /// </summary>
-        /// <param name="entity">传入实体</param>
-        public void Remove(IEntity entity) => UpdateEvent -= entity.Update;
+        private void Update() => OnUpdate?.Invoke();
 
         /// <summary>
         /// 设置全局单例
@@ -83,6 +86,7 @@ namespace JFramework.Core
         /// </summary>
         private void OnApplicationQuit()
         {
+            OnDestroy?.Invoke();
             UIManager.Destroy();
             PoolManager.Destroy();
             DataManager.Destroy();
@@ -95,7 +99,9 @@ namespace JFramework.Core
             EventManager.Destroy();
             CommandManager.Destroy();
             Instance = null;
-            UpdateEvent = null;
+            OnStart = null;
+            OnUpdate = null;
+            OnDestroy = null;
         }
     }
 }

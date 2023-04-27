@@ -32,7 +32,7 @@ namespace JFramework.Core
         {
             timerQueue = new Queue<Timer>();
             timerList = new List<Timer>();
-            GlobalManager.Instance.UpdateEvent += OnUpdate;
+            GlobalManager.OnUpdate += OnUpdate;
         }
 
         /// <summary>
@@ -72,12 +72,6 @@ namespace JFramework.Core
         /// <param name="timer">传入需要移除的计时器</param>
         public static void Push(ITimer timer)
         {
-            if (timerList == null)
-            {
-                Debug.Log($"{Name.Red()} 没有初始化!");
-                return;
-            }
-
             var tick = (Timer)timer;
             if (timerList.Contains(tick))
             {

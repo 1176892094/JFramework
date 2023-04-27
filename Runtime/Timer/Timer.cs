@@ -39,7 +39,7 @@ namespace JFramework
         /// <summary>
         /// 计时器的所有者
         /// </summary>
-        [ShowInInspector] private object target => OnFinish.Target;
+        [ShowInInspector] private object target => OnFinish?.Target;
 
         /// <summary>
         /// 计时器的状态
@@ -92,7 +92,11 @@ namespace JFramework
                 }
                 catch (Exception e)
                 {
-                    Debug.Log($"{nameof(TimerManager).Sky()} => 停止计时器\n" + e);
+                    if (GlobalManager.IsDebugDestroy)
+                    {
+                        Debug.Log($"{nameof(TimerManager).Sky()} => 作用对象被销毁，自动停止计时器。\n" + e);
+                    }
+                   
                     TimerManager.Push(this);
                 }
             }

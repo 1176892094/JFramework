@@ -18,7 +18,7 @@ namespace JFramework.Core
         /// <summary>
         /// 场景加载事件(进度条)
         /// </summary>
-        public static event Action<float> ProgressEvent;
+        public static event Action<float> OnLoadScene;
 
         /// <summary>
         /// 场景加载进度条
@@ -125,7 +125,7 @@ namespace JFramework.Core
                 while (Progress < 0.99f)
                 {
                     Progress = Mathf.Lerp(Progress, asyncOperation.progress / 9f * 10f, Time.fixedDeltaTime * 2);
-                    ProgressEvent?.Invoke(Progress);
+                    OnLoadScene?.Invoke(Progress);
 
                     if (GlobalManager.IsDebugScene)
                     {
@@ -151,6 +151,10 @@ namespace JFramework.Core
         /// <summary>
         /// 清空场景管理器
         /// </summary>
-        internal static void Destroy() => sceneDict = null;
+        internal static void Destroy()
+        {
+            sceneDict = null;
+            OnLoadScene = null;
+        }
     }
 }

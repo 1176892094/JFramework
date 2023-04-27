@@ -6,7 +6,7 @@ namespace JFramework.Core
 {
     public static class DailyManager
     {
-        public static event Action UpdateEvent;
+        public static event Action OnUpdate;
         /// <summary>
         /// 每日刷新时间
         /// </summary>
@@ -43,14 +43,14 @@ namespace JFramework.Core
         /// </summary>
         internal static void Awake()
         {
-            GlobalManager.Instance.UpdateEvent += OnUpdate;
+            GlobalManager.OnUpdate += Update;
             tomorrow = DateTime.Today.Add(new TimeSpan(1, RefreshTime, 0, 0));
         }
 
         /// <summary>
         /// 管理器更新
         /// </summary>
-        private static void OnUpdate()
+        private static void Update()
         {
             if (Time.realtimeSinceStartup - lastCheckTime > 5)
             {
@@ -64,7 +64,7 @@ namespace JFramework.Core
                         if (dateTime.DayOfYear - lastDayOfYear >= 2)
                         {
                             lastDayOfYear = dateTime.DayOfYear;
-                            UpdateEvent?.Invoke();
+                            OnUpdate?.Invoke();
                         }
                         //只有一天未登陆
                         else
@@ -72,7 +72,7 @@ namespace JFramework.Core
                             if (dateTime.Hour >= RefreshTime)
                             {
                                 lastDayOfYear = dateTime.DayOfYear;
-                                UpdateEvent?.Invoke();
+                                OnUpdate?.Invoke();
                             }
                         }
                     }
@@ -85,7 +85,7 @@ namespace JFramework.Core
                         if (lastYearTotalDays + dateTime.DayOfYear - lastDayOfYear >= 2)
                         {
                             lastDayOfYear = dateTime.DayOfYear;
-                            UpdateEvent?.Invoke();
+                            OnUpdate?.Invoke();
                         }
                         //一天未登陆并且到达刷新时间
                         else
@@ -93,7 +93,7 @@ namespace JFramework.Core
                             if (dateTime.Hour >= RefreshTime)
                             {
                                 lastDayOfYear = dateTime.DayOfYear;
-                                UpdateEvent?.Invoke();
+                                OnUpdate?.Invoke();
                             }
                         }
                     }
@@ -106,6 +106,7 @@ namespace JFramework.Core
         /// </summary>
         internal static void Destroy()
         {
+            OnUpdate = null;
         }
     }
 }

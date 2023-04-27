@@ -28,6 +28,9 @@ namespace JFramework.Core
         [TabGroup("设置管理器/Setting", "Setting"), SerializeField, LabelText("显示Scene加载信息")]
         private bool isDebugScene;
 
+        [TabGroup("设置管理器/Setting", "Setting"), ShowInInspector, LabelText("显示Destroy异常信息")]
+        public static bool IsDebugDestroy;
+
         [Required("请在此输入ChatGPT的密钥!")]
         [TabGroup("设置管理器/Setting", "OpenAI"), SerializeField, LabelText("")]
         internal string key = "";
@@ -36,7 +39,7 @@ namespace JFramework.Core
         internal string chat = "获取地址: https://platform.openai.com/account/api-keys";
 
         [Button("发送"), TabGroup("设置管理器/Setting", "OpenAI")]
-        public void SendRequest() => ChatGPT.SendData();
+        private void SendRequest() => ChatGPT.SendData();
 
         internal static bool IsDebugJson => Instance.isDebugJson;
         internal static bool IsDebugPool => Instance.isDebugPool;
@@ -44,6 +47,7 @@ namespace JFramework.Core
         internal static bool IsDebugAsset => Instance.isDebugAsset;
         internal static bool IsDebugEvent => Instance.isDebugEvent;
         internal static bool IsDebugScene => Instance.isDebugScene;
+   
 
         [ShowInInspector, LabelText("场景管理数据"), FoldoutGroup("通用管理器")]
         private Dictionary<int, SceneData> sceneList => SceneManager.sceneDict;

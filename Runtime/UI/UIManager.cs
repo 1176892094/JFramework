@@ -170,7 +170,7 @@ namespace JFramework.Core
                 return;
             }
 
-            foreach (var key in panelDict.Keys.Where(key => panelDict.ContainsKey(key) && panelDict[key].hideType != UIHideType.Ignore))
+            foreach (var key in panelDict.Keys.ToList().Where(key => panelDict.ContainsKey(key) && panelDict[key].hideType != UIHideType.Ignore))
             {
                 Object.Destroy(panelDict[key].gameObject);
                 panelDict.Remove(key);

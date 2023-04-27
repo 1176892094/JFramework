@@ -33,7 +33,7 @@ namespace JFramework
         protected virtual void OnEnable()
         {
             if (!GlobalManager.Instance) return;
-            GlobalManager.Instance.Listen(this);
+            GlobalManager.OnUpdate += OnUpdate;
         }
 
         /// <summary>
@@ -42,7 +42,7 @@ namespace JFramework
         protected virtual void OnDisable()
         {
             if (!GlobalManager.Instance) return;
-            GlobalManager.Instance.Remove(this);
+            GlobalManager.OnUpdate -= OnUpdate;
         }
 
         /// <summary>
@@ -56,8 +56,10 @@ namespace JFramework
             }
             catch (Exception e)
             {
-                Debug.LogWarning(e);
-                throw;
+                if (GlobalManager.IsDebugDestroy)
+                {
+                    Debug.Log($"{name.Sky()} => {nameof(OnDestroy).Green()} 发生异常\n" + e);
+                }
             }
         }
 
