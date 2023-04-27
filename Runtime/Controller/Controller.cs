@@ -19,7 +19,7 @@ namespace JFramework
         /// 控制器初始化
         /// </summary>
         /// <param name="owner">传入控制器的所有者</param>
-        private void Start(TEntity owner)
+        private void Spawn(TEntity owner)
         {
             this.owner = owner;
             Spawn();
@@ -34,7 +34,7 @@ namespace JFramework
         /// 通过接口初始化控制器
         /// </summary>
         /// <param name="owner">控制器的所有者</param>
-        void IController.Spawn(IEntity owner) => Start((TEntity)owner);
+        void IController.Spawn(IEntity owner) => Spawn((TEntity)owner);
 
         /// <summary>
         /// 控制器清除
