@@ -45,7 +45,7 @@ namespace JFramework.Core
         /// <summary>
         /// 游戏声音
         /// </summary>
-        public static float sudioVolume => audioSetting?.audioVolume ?? 0.5f;
+        public static float audioVolume => audioSetting?.audioVolume ?? 0.5f;
 
         /// <summary>
         /// 音效管理器初始化
