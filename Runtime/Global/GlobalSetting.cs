@@ -36,7 +36,7 @@ namespace JFramework.Core
         internal string key = "";
         
         [TabGroup("设置管理器/Setting", "OpenAI"), ShowInInspector, LabelText("输入文本:"), TextArea(4,10)]
-        internal static string chat = "获取地址: https://platform.openai.com/account/api-keys";
+        internal string chat = "获取地址: https://platform.openai.com/account/api-keys";
 
         [Button("发送"), TabGroup("设置管理器/Setting", "OpenAI")]
         private void SendRequest()
