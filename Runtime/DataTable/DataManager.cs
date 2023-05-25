@@ -53,10 +53,11 @@ namespace JFramework.Core
             foreach (var type in types)
             {
                 var keyName = type.Name;
-                AssetManager.LoadAsync<ScriptableObject>("DataTable/" + keyName, table =>
+                try
                 {
-                    try
+                    AssetManager.LoadAsync<ScriptableObject>("DataTable/" + keyName, table =>
                     {
+
                         var dataTable = table.As<IDataTable>();
                         var keyData = GetKeyField(assembly, type);
                         FieldInfo keyInfo = GetKeyField(keyData);
@@ -84,18 +85,18 @@ namespace JFramework.Core
                         {
                             EnmDataDict.Add(keyData, Add<Enum>(keyInfo, dataTable));
                         }
-                        
+
                         if (types.Length == ++tableIndex)
                         {
                             OnCompleted?.Invoke();
                             Debug.Log($"{Name.Sky()} 所有数据加载完成");
                         }
-                    }
-                    catch (Exception)
-                    {
-                        Debug.Log($"{Name.Sky()} 加载 => {type.Name.Red()} 数据失败");
-                    }
-                });
+                    });
+                }
+                catch (Exception)
+                {
+                    Debug.Log($"{Name.Sky()} 加载 => {type.Name.Red()} 数据失败");
+                }
             }
         }
 
@@ -119,7 +120,7 @@ namespace JFramework.Core
                 }
                 else
                 {
-                    Debug.LogWarning($"{key} has be added in {table.GetType()}");
+                    Debug.Log($"{Name.Sky()} 加载 => {table.GetType().ToString().Orange()} 已经存在 {key.ToString().Red()} 键值!");
                 }
             }
 
@@ -205,8 +206,6 @@ namespace JFramework.Core
 
             return table?.Cast<T>().ToList();
         }
-
-        //table.ForEach(data => dataList.Add((T)data));
 
         /// <summary>
         /// 通过数据管理器得到数据表

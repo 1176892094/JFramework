@@ -5,6 +5,7 @@ using TMPro;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
+// ReSharper disable All
 namespace JFramework
 {
     using Component = Dictionary<string, UIBehaviour>;

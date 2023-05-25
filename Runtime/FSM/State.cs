@@ -16,7 +16,7 @@ namespace JFramework
         protected TEntity owner;
 
         /// <summary>
-        /// 状态机
+        /// 状态机的接口
         /// </summary>
         protected IStateMachine machine;
 
