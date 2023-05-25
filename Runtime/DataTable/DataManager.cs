@@ -33,6 +33,11 @@ namespace JFramework.Core
         /// 管理器名称
         /// </summary>
         private static string Name => nameof(DataManager);
+        
+        /// <summary>
+        /// 数据加载完成的回调
+        /// </summary>
+        public static event Action OnCompleted;
 
         /// <summary>
         /// 构造函数初始化数据
@@ -44,16 +49,17 @@ namespace JFramework.Core
             EnmDataDict = new Dictionary<Type, EnmDataDict>();
             var assembly = GetAssembly(out var types);
             if (types == null || types.Length == 0) return;
+            var tableIndex = 0;
             foreach (var type in types)
             {
                 var keyName = type.Name;
-                try
+                AssetManager.LoadAsync<ScriptableObject>("DataTable/" + keyName, table =>
                 {
-                    AssetManager.LoadAsync<ScriptableObject>("DataTable/" + keyName, table =>
+                    try
                     {
                         var dataTable = table.As<IDataTable>();
                         var keyData = GetKeyField(assembly, type);
-                        var keyInfo = GetKeyField(keyData);
+                        FieldInfo keyInfo = GetKeyField(keyData);
                         if (keyData == null)
                         {
                             Debug.Log($"{Name.Sky()} 缺少主键 => {type.Name.Red()}");
@@ -78,12 +84,18 @@ namespace JFramework.Core
                         {
                             EnmDataDict.Add(keyData, Add<Enum>(keyInfo, dataTable));
                         }
-                    });
-                }
-                catch (Exception)
-                {
-                    Debug.Log($"{Name.Sky()} 加载 => {type.Name.Red()} 数据失败");
-                }
+                        
+                        if (types.Length == ++tableIndex)
+                        {
+                            OnCompleted?.Invoke();
+                            Debug.Log($"{Name.Sky()} 所有数据加载完成");
+                        }
+                    }
+                    catch (Exception)
+                    {
+                        Debug.Log($"{Name.Sky()} 加载 => {type.Name.Red()} 数据失败");
+                    }
+                });
             }
         }
 
@@ -101,7 +113,14 @@ namespace JFramework.Core
             {
                 var data = (IData)table.GetData(i);
                 var key = (T)field.GetValue(data);
-                dataDict.Add(key, data);
+                if (!dataDict.ContainsKey(key))
+                {
+                    dataDict.Add(key, data);
+                }
+                else
+                {
+                    Debug.LogWarning($"{key} has be added in {table.GetType()}");
+                }
             }
 
             return dataDict;
@@ -268,6 +287,7 @@ namespace JFramework.Core
             IntDataDict = null;
             StrDataDict = null;
             EnmDataDict = null;
+            OnCompleted = null;
         }
     }
 }

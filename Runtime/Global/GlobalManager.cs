@@ -13,7 +13,14 @@ namespace JFramework.Core
         /// </summary>
         private static string Name => nameof(GlobalManager);
 
+        /// <summary>
+        /// 受保护的ChatGPT类
+        /// </summary>
         private static ChatGPT chatGpt;
+        
+        /// <summary>
+        /// 公开的ChatGPT类
+        /// </summary>
         private static ChatGPT ChatGpt => chatGpt ??= new ChatGPT();
 
         /// <summary>

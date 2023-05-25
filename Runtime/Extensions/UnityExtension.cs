@@ -36,5 +36,20 @@ namespace JFramework
         /// <param name="type">enum的类型</param>
         /// <returns>返回字符串是否相等</returns>
         public static bool Compare(this string value, Enum type) => value == type.ToString();
+
+        /// <summary>
+        /// 将当前枚举切换到下一枚举
+        /// 若当前为最后一个，则循环至第一个
+        /// </summary>
+        /// <param name="current">当前枚举的拓展</param>
+        /// <typeparam name="T">传入任何枚举类型</typeparam>
+        /// <returns>返回当前枚举的下一个值</returns>
+        public static T ToNext<T>(this T current) where T : Enum
+        {
+            var enumArray = (T[])Enum.GetValues(typeof(T));
+            var currIndex = Array.IndexOf(enumArray, current);
+            var nextIndex = (currIndex + 1) % enumArray.Length;
+            return enumArray[nextIndex];
+        }
     }
 }

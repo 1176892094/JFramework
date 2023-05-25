@@ -1,5 +1,6 @@
 using System;
 using JFramework.Interface;
+using UnityEngine;
 
 namespace JFramework
 {
@@ -7,7 +8,7 @@ namespace JFramework
     /// 状态的抽象类
     /// </summary>
     [Serializable]
-    public abstract class State<TEntity> : IState where TEntity : IEntity
+    public abstract class State<TEntity> : IState where TEntity : MonoBehaviour, IEntity
     {
         /// <summary>
         /// 状态的所有者
@@ -15,12 +16,19 @@ namespace JFramework
         protected TEntity owner;
 
         /// <summary>
+        /// 状态机
+        /// </summary>
+        protected IStateMachine machine;
+
+        /// <summary>
         /// 状态醒来
         /// </summary>
         /// <param name="owner">传入状态的所有者</param>
-        private void OnAwake(TEntity owner)
+        /// <param name="machine">传入状态机</param>
+        private void OnAwake(TEntity owner, IStateMachine machine)
         {
             this.owner = owner;
+            this.machine = machine;
             OnAwake();
         }
 
@@ -50,7 +58,8 @@ namespace JFramework
         /// 受保护的状态醒来方法
         /// </summary>
         /// <param name="owner">传入状态的所有者</param>
-        void IState.OnAwake(IEntity owner) => OnAwake((TEntity)owner);
+        /// <param name="machine">传入状态机</param>
+        void IState.OnAwake(IEntity owner, IStateMachine machine) => OnAwake((TEntity)owner, machine);
 
         /// <summary>
         /// 受保护的状态进入方法

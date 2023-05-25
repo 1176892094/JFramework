@@ -8,25 +8,19 @@ using UnityEngine;
 // ReSharper disable All
 namespace JFramework
 {
-    public abstract class StateMachine<T> : Controller<T> where T : MonoBehaviour, IEntity
+    public abstract class StateMachine<T> : Controller<T>, IStateMachine where T : MonoBehaviour, IEntity
     {
         /// <summary>
         /// 存储状态的字典
         /// </summary>
-        [ShowInInspector, LabelText("持有状态")] 
-        private Dictionary<Type, IState> stateDict;
+        [ShowInInspector, LabelText("持有状态")]
+        private readonly Dictionary<Type, IState> stateDict = new Dictionary<Type, IState>();
 
         /// <summary>
         /// 状态的接口
         /// </summary>
         [ShowInInspector, LabelText("当前状态"), SerializeField]
         protected IState state;
-
-        /// <summary>
-        /// 状态机启动
-        /// </summary>
-        /// <typeparam name="TState">可传入任何继承IState的对象</typeparam>
-        public void Enable<TState>() where TState : IState, new() => ChangeState<TState>();
 
         /// <summary>
         /// 状态机更新
@@ -36,16 +30,27 @@ namespace JFramework
         /// <summary>
         /// 状态机添加状态
         /// </summary>
-        /// <param name="state">添加的状态类型</param>
         /// <typeparam name="TState">可传入任何继承IState的对象</typeparam>
-        public void AddState<TState>(IState state = null) where TState : IState, new()
+        public void AddState<TState>() where TState : IState, new()
         {
             var key = typeof(TState);
-            stateDict ??= new Dictionary<Type, IState>();
             if (stateDict.ContainsKey(key)) return;
-            state ??= new TState();
+            state = new TState();
             stateDict.Add(key, state);
-            state.OnAwake(owner);
+            state.OnAwake(owner, this);
+        }
+
+        /// <summary>
+        /// 状态机添加状态
+        /// </summary>
+        /// <param name="state">添加的状态类型</param>
+        /// <typeparam name="TState">可传入任何继承IState的对象</typeparam>
+        public void AddState<TState>(IState state) where TState : IState
+        {
+            var key = typeof(TState);
+            if (stateDict.ContainsKey(key)) return;
+            stateDict.Add(key, state);
+            state.OnAwake(owner, this);
         }
 
         /// <summary>
@@ -68,10 +73,5 @@ namespace JFramework
         {
             TimerManager.Pop(time, ChangeState<TState>);
         }
-        
-        /// <summary>
-        /// 状态机禁用
-        /// </summary>
-        public void Disable() => state = null;
     }
 }

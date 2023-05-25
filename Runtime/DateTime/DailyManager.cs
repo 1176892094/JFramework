@@ -6,21 +6,25 @@ namespace JFramework.Core
 {
     public static class DailyManager
     {
-        public static event Action OnUpdate;
         /// <summary>
         /// 每日刷新时间
         /// </summary>
         private const int RefreshTime = 5;
         
         /// <summary>
-        /// 管理器名称
-        /// </summary>
-        private static string Name => nameof(DailyManager);
-
-        /// <summary>
         /// 上一次检测时间
         /// </summary>
         private static float lastCheckTime;
+        
+        /// <summary>
+        /// 管理器名称
+        /// </summary>
+        private static string Name => nameof(DailyManager);
+        
+        /// <summary>
+        /// 日期更新事件
+        /// </summary>
+        public static event Action OnUpdate;
 
         /// <summary>
         /// 当前日期
