@@ -47,7 +47,7 @@ namespace JFramework.Core
             IntDataDict = new Dictionary<Type, IntDataDict>();
             StrDataDict = new Dictionary<Type, StrDataDict>();
             EnmDataDict = new Dictionary<Type, EnmDataDict>();
-            var assembly = GetAssembly(out var types);
+            var (assembly,types) = GetAssembly<IDataTable>();
             if (types == null || types.Length == 0) return;
             var tableIndex = 0;
             foreach (var type in types)
@@ -60,7 +60,7 @@ namespace JFramework.Core
 
                         var dataTable = table.As<IDataTable>();
                         var keyData = GetKeyField(assembly, type);
-                        FieldInfo keyInfo = GetKeyField(keyData);
+                        var keyInfo = GetKeyField<KeyFieldAttribute>(keyData);
                         if (keyData == null)
                         {
                             Debug.Log($"{Name.Sky()} 缺少主键 => {type.Name.Red()}");
@@ -89,7 +89,7 @@ namespace JFramework.Core
                         if (types.Length == ++tableIndex)
                         {
                             OnCompleted?.Invoke();
-                            Debug.Log($"{Name.Sky()} 所有数据加载完成");
+                            Debug.Log($"{Name.Sky()} 加载 => 所有数据完成");
                         }
                     });
                 }
@@ -226,43 +226,41 @@ namespace JFramework.Core
         /// 获取当前程序集中的数据表对象类
         /// </summary>
         /// <returns></returns>
-        private static Assembly GetAssembly(out Type[] types)
+        private static (Assembly, Type[]) GetAssembly<T>() where T : class
         {
             var assemblies = AppDomain.CurrentDomain.GetAssemblies();
             foreach (var assembly in assemblies)
             {
-                var typeList = assembly.GetTypes();
-                types = typeList.Where(IsSupport).ToArray();
-                if (types.Length > 0) return assembly;
+                var types = GetTypes<T>(assembly);
+                if (types.Length > 0) return (assembly, types);
             }
 
-            types = null;
-            return null;
+            return (null, null);
         }
-
-        /// <summary>
-        /// 是否支持类型
-        /// </summary>
-        /// <param name="type">传入类型</param>
-        /// <returns>返回是否支持</returns>
-        private static bool IsSupport(Type type)
-        {
-            if (!type.GetInterfaces().Contains(typeof(IDataTable))) return false;
-            return type.BaseType != typeof(ScriptableObject);
-        }
-
+        
         /// <summary>
         /// 获取数据的主键
         /// </summary>
         /// <param name="type">传入的数据类型</param>
         /// <returns>返回字段的信息</returns>
-        private static FieldInfo GetKeyField(Type type)
+        private static FieldInfo GetKeyField<T>(Type type) where T : class
         {
             var fields = type.GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
             return (from field in fields
-                let attrs = field.GetCustomAttributes(typeof(KeyFieldAttribute), false)
+                let attrs = field.GetCustomAttributes(typeof(T), false)
                 where attrs.Length > 0
                 select field).FirstOrDefault();
+        }
+        
+        /// <summary>
+        /// 获取程序集中的类型
+        /// </summary>
+        /// <param name="assembly"></param>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
+        private static Type[] GetTypes<T>(Assembly assembly)
+        {
+            return assembly.GetTypes().Where(type => type.GetInterfaces().Contains(typeof(T)) && type.BaseType != typeof(ScriptableObject)).ToArray();
         }
 
         /// <summary>
@@ -273,9 +271,7 @@ namespace JFramework.Core
         /// <returns></returns>
         private static Type GetKeyField(Assembly assembly, Type type)
         {
-            var name = type.Name;
-            name = name.Substring(0, name.Length - 5);
-            return assembly.GetType("JFramework.Table." + name);
+            return assembly.GetType("JFramework.Table." + type.Name[..^5]);
         }
 
         /// <summary>
