@@ -4,7 +4,7 @@ using UnityEngine;
 // ReSharper disable All
 namespace JFramework.Core
 {
-    public static class DailyManager
+    public static class DateManager
     {
         /// <summary>
         /// 每日刷新时间
@@ -19,7 +19,7 @@ namespace JFramework.Core
         /// <summary>
         /// 管理器名称
         /// </summary>
-        private static string Name => nameof(DailyManager);
+        private static string Name => nameof(DateManager);
         
         /// <summary>
         /// 日期更新事件

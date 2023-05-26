@@ -82,7 +82,7 @@ namespace JFramework.Core
             EventManager.Awake();
             TimerManager.Awake();
             JsonManager.Awake();
-            DailyManager.Awake();
+            DateManager.Awake();
             AudioManager.Awake();
             PoolManager.Awake();
             SceneManager.Awake();
@@ -99,7 +99,7 @@ namespace JFramework.Core
             UIManager.Destroy();
             PoolManager.Destroy();
             DataManager.Destroy();
-            DailyManager.Destroy();
+            DateManager.Destroy();
             JsonManager.Destroy();
             SceneManager.Destroy();
             TimerManager.Destroy();
