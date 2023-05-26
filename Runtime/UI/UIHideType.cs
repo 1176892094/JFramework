@@ -14,7 +14,7 @@ namespace JFramework
         /// HidePanel => 移除不销毁
         /// Clear => 移除并销毁
         /// </summary>
-        [LabelText("仅隐藏")] Remove = 1,
+        [LabelText("仅移除")] Remove = 1,
 
         /// <summary>
         /// HidePanel => 不移除不销毁

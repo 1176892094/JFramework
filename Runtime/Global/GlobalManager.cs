@@ -29,7 +29,7 @@ namespace JFramework.Core
         public static GlobalManager Instance;
 
         /// <summary>
-        /// Awake醒来事件
+        /// Start开始事件
         /// </summary>
         public static event Action OnStart;
 

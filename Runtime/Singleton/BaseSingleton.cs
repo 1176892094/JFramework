@@ -1,10 +1,10 @@
 namespace JFramework
 {
     /// <summary>
-    /// 单例的抽象类
+    /// 调用单例后自动创建一个单例对象
     /// </summary>
     /// <typeparam name="T">传入单例的所有者</typeparam>
-    public abstract class Singleton<T> where T : Singleton<T>, new()
+    public abstract class BaseSingleton<T> where T : BaseSingleton<T>, new()
     {
         /// <summary>
         /// 单例自身
@@ -12,18 +12,18 @@ namespace JFramework
         private static T instance;
 
         /// <summary>
-        /// 单例的所有者
+        /// 实现安全的单例调用
         /// </summary>
         public static T Instance => instance ??= new T();
 
         /// <summary>
         /// 单例初始化
         /// </summary>
-        internal virtual void Awake() => instance ??= (T)this;
+        protected virtual void Awake() => instance ??= (T)this;
 
         /// <summary>
-        /// 单例清除
+        /// 销毁时将单例置空
         /// </summary>
-        internal virtual void Destroy() => instance = default;
+        public virtual void Destroy() => instance = default;
     }
 }
