@@ -45,13 +45,13 @@ namespace JFramework.Core
             StartCoroutine(ChatGPT.Request(key, chat));
             chat = "";
         }
-        
-        internal static bool IsDebugJson => Instance.isDebugJson;
-        internal static bool IsDebugPool => Instance.isDebugPool;
-        internal static bool IsDebugData => Instance.isDebugData;
-        internal static bool IsDebugAsset => Instance.isDebugAsset;
-        internal static bool IsDebugEvent => Instance.isDebugEvent;
-        internal static bool IsDebugScene => Instance.isDebugScene;
+
+        internal static bool IsDebugJson => Instance != null && Instance.isDebugJson;
+        internal static bool IsDebugPool => Instance != null && Instance.isDebugPool;
+        internal static bool IsDebugData => Instance != null && Instance.isDebugData;
+        internal static bool IsDebugAsset => Instance != null && Instance.isDebugAsset;
+        internal static bool IsDebugEvent => Instance != null && Instance.isDebugEvent;
+        internal static bool IsDebugScene => Instance != null && Instance.isDebugScene;
 
         [ShowInInspector, LabelText("场景管理数据"), FoldoutGroup("通用管理器")]
         private Dictionary<int, SceneData> sceneList => SceneManager.sceneDict;
