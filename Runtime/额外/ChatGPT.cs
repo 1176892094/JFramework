@@ -6,7 +6,7 @@ using JFramework;
 using UnityEngine;
 using UnityEngine.Networking;
 
-internal class ChatGPT
+internal static class ChatGPT
 {
     /// <summary>
     /// 通过携程发送请求

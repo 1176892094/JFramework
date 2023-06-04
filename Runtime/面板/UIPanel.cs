@@ -88,12 +88,7 @@ namespace JFramework
         public T Get<T>(string key) where T : UIBehaviour
         {
             var type = typeof(T).Name;
-            if (componentDict.ContainsKey(type))
-            {
-                return (T)componentDict[type][key];
-            }
-
-            return null;
+            return componentDict.ContainsKey(type) ? (T)componentDict[type][key] : null;
         }
 
         /// <summary>
