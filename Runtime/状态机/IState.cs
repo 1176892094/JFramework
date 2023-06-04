@@ -9,8 +9,8 @@ namespace JFramework.Interface
         /// 状态的初始化方法
         /// </summary>
         /// <param name="owner">状态的所有者</param>
-        /// <param name="machine">状态机</param>
-        void OnAwake(IEntity owner, IStateMachine machine);
+        /// <param name="stateMachine">状态机</param>
+        void OnAwake(IEntity owner, IStateMachine stateMachine);
 
         /// <summary>
         /// 进入该状态的方法

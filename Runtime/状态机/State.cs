@@ -18,17 +18,17 @@ namespace JFramework
         /// <summary>
         /// 状态机的接口
         /// </summary>
-        protected IStateMachine machine;
+        protected IStateMachine stateMachine;
 
         /// <summary>
         /// 状态醒来
         /// </summary>
         /// <param name="owner">传入状态的所有者</param>
-        /// <param name="machine">传入状态机</param>
-        private void OnAwake(TEntity owner, IStateMachine machine)
+        /// <param name="stateMachine">传入状态机</param>
+        private void OnAwake(TEntity owner, IStateMachine stateMachine)
         {
             this.owner = owner;
-            this.machine = machine;
+            this.stateMachine = stateMachine;
             OnAwake();
         }
 
@@ -58,8 +58,8 @@ namespace JFramework
         /// 受保护的状态醒来方法
         /// </summary>
         /// <param name="owner">传入状态的所有者</param>
-        /// <param name="machine">传入状态机</param>
-        void IState.OnAwake(IEntity owner, IStateMachine machine) => OnAwake((TEntity)owner, machine);
+        /// <param name="stateMachine">传入状态机</param>
+        void IState.OnAwake(IEntity owner, IStateMachine stateMachine) => OnAwake((TEntity)owner, stateMachine);
 
         /// <summary>
         /// 受保护的状态进入方法
