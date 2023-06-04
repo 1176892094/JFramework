@@ -33,13 +33,10 @@ namespace JFramework
                 {
                     lock (locked)
                     {
-                        if (instance == null)
-                        {
-                            instance ??= FindObjectOfType<T>();
-                        }
-
-                        instance.Awake();
+                        instance ??= FindObjectOfType<T>();
                     }
+
+                    instance.Awake();
                 }
 
                 return instance;

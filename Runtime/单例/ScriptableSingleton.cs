@@ -30,13 +30,10 @@ namespace JFramework
                 {
                     lock (locked)
                     {
-                        if (instance == null)
-                        {
-                            instance ??= AssetManager.Load<T>("Settings/" + typeof(T).Name);
-                        }
-
-                        instance.Awake();
+                        instance ??= AssetManager.Load<T>("Settings/" + typeof(T).Name);
                     }
+
+                    instance.Awake();
                 }
 
                 return instance;

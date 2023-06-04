@@ -32,18 +32,11 @@ namespace JFramework
                 {
                     lock (locked)
                     {
-                        if (instance == null)
-                        {
-                            instance ??= FindObjectOfType<T>();
-                        }
-
-                        if (instance == null)
-                        {
-                            instance = new GameObject(typeof(T).Name).AddComponent<T>();
-                        }
-
-                        instance.Awake();
+                        instance ??= FindObjectOfType<T>();
+                        instance ??= new GameObject(typeof(T).Name).AddComponent<T>();
                     }
+
+                    instance.Awake();
                 }
 
                 return instance;
