@@ -10,7 +10,7 @@ namespace JFramework
 
         /// <summary>
         /// HidePanel => 不移除不销毁
-        /// Clear =》 移除并销毁
+        /// Clear => 移除并销毁
         /// </summary>
         Freeze = 1,
 
