@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using JFramework.Core;
 using UnityEngine;
 
 // ReSharper disable All
@@ -28,18 +29,13 @@ namespace JFramework.AStar
     /// <summary>
     /// AStar管理器
     /// </summary>
-    public class AStarManager
+    public class AStarManager: Singleton<AStarManager>
     {
         /// <summary>
         /// 初始化地图的事件
         /// </summary>
         public event AStarDelegate OnInitMap;
-        
-        /// <summary>
-        /// 寻路类型
-        /// </summary>
-        public AStarType findType;
-        
+
         /// <summary>
         /// 开启列表
         /// </summary>
@@ -119,7 +115,7 @@ namespace JFramework.AStar
                 FindNode(startNode.x - 1, startNode.y, 1, startNode, endNode);
                 FindNode(startNode.x + 1, startNode.y, 1, startNode, endNode);
                 FindNode(startNode.x, startNode.y + 1, 1, startNode, endNode);
-                if (findType == AStarType.EightDirection)
+                if (GlobalManager.Instance.pathfinding == AStarType.EightDirection)
                 {
                     FindNode(startNode.x - 1, startNode.y - 1, 1.4f, startNode, endNode);
                     FindNode(startNode.x + 1, startNode.y - 1, 1.4f, startNode, endNode);
