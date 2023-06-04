@@ -70,7 +70,7 @@ namespace JFramework.Core
         public static void PlaySound(string path)
         {
             if (!GlobalManager.Runtime) return;
-            GlobalManager.Logger(DebugOption.Audio,$"播放背景音乐: {path}");
+            GlobalManager.Logger(DebugOption.Audio,$"播放背景音乐: {path.Green()}");
             AssetManager.LoadAsync<AudioClip>(path, clip =>
             {
                 audioSource.volume = audioSetting.soundVolume;
@@ -110,7 +110,7 @@ namespace JFramework.Core
         public static void PlayAudio(string path, Action<AudioSource> action = null)
         {
             if (!GlobalManager.Runtime) return;
-            GlobalManager.Logger(DebugOption.Audio,$"播放音效: {path}");
+            GlobalManager.Logger(DebugOption.Audio,$"播放音效: {path.Blue()}");
             var audio = audioQueue.Count > 0 ? audioQueue.Dequeue() : poolManager.AddComponent<AudioSource>();
             AssetManager.LoadAsync<AudioClip>(path, clip =>
             {
@@ -146,7 +146,7 @@ namespace JFramework.Core
         public static void StopAudio(AudioSource audioSource)
         {
             if (!GlobalManager.Runtime) return;
-            GlobalManager.Logger(DebugOption.Audio,$"停止音效: {audioSource.clip.name}");
+            GlobalManager.Logger(DebugOption.Audio,$"停止音效: {audioSource.clip.name.Orange()}");
             if (audioList.Contains(audioSource))
             {
                 audioSource.Stop();

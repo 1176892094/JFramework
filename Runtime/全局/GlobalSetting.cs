@@ -7,21 +7,6 @@ using UnityEngine;
 
 namespace JFramework.Core
 {
-    [Flags]
-    public enum DebugOption
-    {
-        None = 0,
-        Json = 1,
-        Pool = 2,
-        Data = 4,
-        Scene = 8,
-        Asset = 16,
-        Audio = 32,
-        Event = 64,
-        Timer = 128,
-        Custom = 256,
-    }
-
     public sealed partial class GlobalManager
     {
         private static readonly Dictionary<DebugOption, string> debugDict = new Dictionary<DebugOption, string>()
@@ -33,7 +18,7 @@ namespace JFramework.Core
         };
 
         [FoldoutGroup("设置管理器")]
-        [TabGroup("设置管理器/Setting", "Setting"), SerializeField, LabelText("日志输出选项")]
+        [TabGroup("设置管理器/Setting", "Setting"), SerializeField, LabelText("控制台输出选项")]
         private DebugOption debugOption;
 
         [Required("请在此输入ChatGPT的密钥!")]
@@ -51,7 +36,7 @@ namespace JFramework.Core
             chat = "";
         }
 
-        public static void Logger(DebugOption option, string message)
+        internal static void Logger(DebugOption option, string message)
         {
             if (!Runtime || (Instance.debugOption & option) == 0) return;
             Debug.Log(debugDict.ContainsKey(option) ? debugDict[option].Sky() + message : message);

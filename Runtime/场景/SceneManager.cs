@@ -113,7 +113,7 @@ namespace JFramework.Core
 
             action?.Invoke();
             var totalTime = (Time.time - currentTime).ToString("F");
-            GlobalManager.Logger(DebugOption.Scene, $"加载 => {name.Green()} 场景完成, 耗时 {totalTime.Yellow()} 秒");
+            GlobalManager.Logger(DebugOption.Scene, $"异步加载 => {name.Green()} 场景完成, 耗时 {totalTime.Yellow()} 秒");
         }
 
         /// <summary>

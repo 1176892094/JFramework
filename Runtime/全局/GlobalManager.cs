@@ -123,4 +123,19 @@ namespace JFramework.Core
             OnDestroy = null;
         }
     }
+    
+    [Flags]
+    internal enum DebugOption
+    {
+        None = 0,
+        Json = 1,
+        Pool = 2,
+        Data = 4,
+        Scene = 8,
+        Asset = 16,
+        Audio = 32,
+        Event = 64,
+        Timer = 128,
+        Custom = 256,
+    }
 }
