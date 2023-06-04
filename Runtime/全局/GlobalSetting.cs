@@ -7,35 +7,40 @@ using UnityEngine;
 
 namespace JFramework.Core
 {
+    [Flags]
+    public enum DebugOption
+    {
+        None = 0,
+        Json = 1,
+        Pool = 2,
+        Data = 4,
+        Scene = 8,
+        Asset = 16,
+        Audio = 32,
+        Event = 64,
+        Timer = 128,
+        Custom = 256,
+    }
+
     public sealed partial class GlobalManager
     {
-        [FoldoutGroup("设置管理器")] 
-        [TabGroup("设置管理器/Setting", "Setting"), SerializeField, LabelText("显示Json加载信息")]
-        private bool isDebugJson;
+        private static readonly Dictionary<DebugOption, string> debugDict = new Dictionary<DebugOption, string>()
+        {
+            { DebugOption.Json, "JsonManager " }, { DebugOption.Pool, "PoolManager " },
+            { DebugOption.Data, "DataManager " }, { DebugOption.Scene, "SceneManager " },
+            { DebugOption.Asset, "AssetManager " }, { DebugOption.Audio, "AudioManager " },
+            { DebugOption.Event, "EventManager " }, { DebugOption.Timer, "TimerManager " },
+        };
 
-        [TabGroup("设置管理器/Setting", "Setting"), SerializeField, LabelText("显示Pool存取信息")]
-        private bool isDebugPool;
-
-        [TabGroup("设置管理器/Setting", "Setting"), SerializeField, LabelText("显示Data加载信息")]
-        private bool isDebugData;
-
-        [TabGroup("设置管理器/Setting", "Setting"), SerializeField, LabelText("显示Asset加载信息")]
-        private bool isDebugAsset;
-
-        [TabGroup("设置管理器/Setting", "Setting"), SerializeField, LabelText("显示Event事件信息")]
-        private bool isDebugEvent;
-
-        [TabGroup("设置管理器/Setting", "Setting"), SerializeField, LabelText("显示Scene加载信息")]
-        private bool isDebugScene;
-
-        [TabGroup("设置管理器/Setting", "Setting"), ShowInInspector, LabelText("显示Destroy异常信息")]
-        public static bool IsDebugDestroy;
+        [FoldoutGroup("设置管理器")]
+        [TabGroup("设置管理器/Setting", "Setting"), SerializeField, LabelText("日志输出选项")]
+        private DebugOption debugOption;
 
         [Required("请在此输入ChatGPT的密钥!")]
         [TabGroup("设置管理器/Setting", "OpenAI"), SerializeField, LabelText("")]
         internal string key = "";
-        
-        [TabGroup("设置管理器/Setting", "OpenAI"), ShowInInspector, LabelText("输入文本:"), TextArea(4,10)]
+
+        [TabGroup("设置管理器/Setting", "OpenAI"), ShowInInspector, LabelText("输入文本:"), TextArea(4, 10)]
         internal string chat = "获取地址: https://platform.openai.com/account/api-keys";
 
         [Button("发送"), TabGroup("设置管理器/Setting", "OpenAI")]
@@ -46,12 +51,11 @@ namespace JFramework.Core
             chat = "";
         }
 
-        internal static bool IsDebugJson => Instance != null && Instance.isDebugJson;
-        internal static bool IsDebugPool => Instance != null && Instance.isDebugPool;
-        internal static bool IsDebugData => Instance != null && Instance.isDebugData;
-        internal static bool IsDebugAsset => Instance != null && Instance.isDebugAsset;
-        internal static bool IsDebugEvent => Instance != null && Instance.isDebugEvent;
-        internal static bool IsDebugScene => Instance != null && Instance.isDebugScene;
+        public static void Logger(DebugOption option, string message)
+        {
+            if (!Runtime || (Instance.debugOption & option) == 0) return;
+            Debug.Log(debugDict.ContainsKey(option) ? debugDict[option].Sky() + message : message);
+        }
 
         [ShowInInspector, LabelText("场景管理数据"), FoldoutGroup("通用管理器")]
         private Dictionary<int, SceneData> sceneList => SceneManager.sceneDict;
@@ -60,13 +64,10 @@ namespace JFramework.Core
         private Dictionary<string, IEnumerator> assetList => AssetManager.assetDict;
 
         [ShowInInspector, LabelText("事件管理数据"), FoldoutGroup("通用管理器")]
-        private Dictionary<int, EventData> eventDict => EventManager.eventDict;
+        private Dictionary<int, EventHandler> eventDict => EventManager.eventDict;
 
         [ShowInInspector, LabelText("命令管理数据"), FoldoutGroup("通用管理器")]
         private Dictionary<Type, ICommand> commandDict => CommandManager.commandDict;
-
-        [ShowInInspector, LabelText("加密管理数据"), FoldoutGroup("通用管理器")]
-        private Dictionary<string, JsonData> jsonDict => JsonManager.jsonDict;
 
         [ShowInInspector, LabelText("完成计时队列"), FoldoutGroup("计时器管理器")]
         private Queue<Timer> timerQueue => TimerManager.timerQueue;

@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using JFramework.Interface;
 using Sirenix.OdinInspector;
@@ -13,7 +14,7 @@ namespace JFramework
         /// 控制器容器
         /// </summary>
         [ShowInInspector, LabelText("控制器容器"), SerializeField]
-        private readonly Dictionary<string, IController> controllerDict = new Dictionary<string, IController>();
+        private readonly Dictionary<Type, IController> controllerDict = new Dictionary<Type, IController>();
 
         /// <summary>
         /// 获取控制器
@@ -22,7 +23,7 @@ namespace JFramework
         /// <returns>返回控制器对象</returns>
         public T Get<T>() where T : ScriptableObject, IController
         {
-            var key = typeof(T).Name;
+            var key = typeof(T);
             if (controllerDict.ContainsKey(key)) return (T)controllerDict[key];
             var controller = ScriptableObject.CreateInstance<T>();
             controllerDict.Add(key, controller);

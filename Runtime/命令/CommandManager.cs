@@ -16,11 +16,6 @@ namespace JFramework.Core
         internal static Dictionary<Type, ICommand> commandDict;
 
         /// <summary>
-        /// 管理器名称
-        /// </summary>
-        private static string Name => nameof(CommandManager);
-
-        /// <summary>
         /// 命令管理器初始化
         /// </summary>
         internal static void Awake() => commandDict = new Dictionary<Type, ICommand>();
@@ -28,45 +23,21 @@ namespace JFramework.Core
         /// <summary>
         /// 执行命令
         /// </summary>
-        /// <param name="value">传入的参数</param>
+        /// <param name="args">传入的参数</param>
         /// <typeparam name="T">传入继承ICommand的对象</typeparam>
-        public static void Execute<T>(params object[] value) where T : struct, ICommand
+        public static void Execute<T>(params object[] args) where T : struct, ICommand
         {
-            if (commandDict == null)
-            {
-                Debug.Log($"{Name.Red()} 没有初始化!");
-                return;
-            }
-
+            if (!GlobalManager.Runtime) return;
             var key = typeof(T);
             if (!commandDict.ContainsKey(key))
             {
                 var command = new T();
                 commandDict.Add(key, command);
-                command.OnExecute(value);
+                command.OnExecute(args);
                 return;
             }
 
-            commandDict[key].OnExecute(value);
-        }
-
-        /// <summary>
-        /// 移除命令
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        public static void Dispose<T>() where T : struct, ICommand
-        {
-            if (commandDict == null)
-            {
-                Debug.Log($"{Name.Red()} 没有初始化!");
-                return;
-            }
-
-            var key = typeof(T);
-            if (commandDict.ContainsKey(key))
-            {
-                commandDict.Remove(key);
-            }
+            commandDict[key].OnExecute(args);
         }
 
         /// <summary>

@@ -56,7 +56,7 @@ namespace JFramework.Core
             audioQueue = new Queue<AudioSource>();
             var transform = GlobalManager.Instance.transform;
             poolManager = transform.Find("PoolManager").gameObject;
-            audioSetting = JsonManager.Load<AudioSetting>(Name, true);
+            audioSetting = JsonManager.Decrypt<AudioSetting>(Name);
             audioSource = poolManager.GetComponent<AudioSource>();
             audioSetting ??= new AudioSetting();
             SetSound(audioSetting.soundVolume);
@@ -69,12 +69,8 @@ namespace JFramework.Core
         /// <param name="path">背景音乐的路径</param>
         public static void PlaySound(string path)
         {
-            if (audioSource == null)
-            {
-                Debug.Log($"{Name.Red()} 没有初始化");
-                return;
-            }
-
+            if (!GlobalManager.Runtime) return;
+            GlobalManager.Logger(DebugOption.Audio,$"播放背景音乐: {path}");
             AssetManager.LoadAsync<AudioClip>(path, clip =>
             {
                 audioSource.volume = audioSetting.soundVolume;
@@ -90,15 +86,10 @@ namespace JFramework.Core
         /// <param name="soundVolume">音量的大小</param>
         public static void SetSound(float soundVolume)
         {
-            if (audioSource == null)
-            {
-                Debug.Log($"{Name.Red()} 没有初始化");
-                return;
-            }
-
+            if (!GlobalManager.Runtime) return;
             audioSetting.soundVolume = soundVolume;
             audioSource.volume = soundVolume;
-            JsonManager.Save(audioSetting, Name, true);
+            JsonManager.Encrypt(audioSetting, Name);
         }
 
         /// <summary>
@@ -106,12 +97,8 @@ namespace JFramework.Core
         /// </summary>
         public static void StopSound()
         {
-            if (audioSource == null)
-            {
-                Debug.Log($"{Name.Red()} 没有初始化");
-                return;
-            }
-
+            if (!GlobalManager.Runtime) return;
+            GlobalManager.Logger(DebugOption.Audio,$"停止背景音乐");
             audioSource.Pause();
         }
 
@@ -122,12 +109,8 @@ namespace JFramework.Core
         /// <param name="action">获取音效的回调</param>
         public static void PlayAudio(string path, Action<AudioSource> action = null)
         {
-            if (audioSource == null)
-            {
-                Debug.Log($"{Name.Red()} 没有初始化");
-                return;
-            }
-
+            if (!GlobalManager.Runtime) return;
+            GlobalManager.Logger(DebugOption.Audio,$"播放音效: {path}");
             var audio = audioQueue.Count > 0 ? audioQueue.Dequeue() : poolManager.AddComponent<AudioSource>();
             AssetManager.LoadAsync<AudioClip>(path, clip =>
             {
@@ -146,19 +129,14 @@ namespace JFramework.Core
         /// <param name="audioVolume">传入音量大小</param>
         public static void SetAudio(float audioVolume)
         {
-            if (audioSource == null)
-            {
-                Debug.Log($"{Name.Red()} 没有初始化");
-                return;
-            }
-
+            if (!GlobalManager.Runtime) return;
             audioSetting.audioVolume = audioVolume;
             foreach (var audio in audioList)
             {
                 audio.volume = audioVolume;
             }
 
-            JsonManager.Save(audioSetting, Name, true);
+            JsonManager.Encrypt(audioSetting, Name);
         }
 
         /// <summary>
@@ -167,12 +145,8 @@ namespace JFramework.Core
         /// <param name="audioSource">传入音效数据</param>
         public static void StopAudio(AudioSource audioSource)
         {
-            if (audioSource == null)
-            {
-                Debug.Log($"{Name.Red()} 没有初始化");
-                return;
-            }
-
+            if (!GlobalManager.Runtime) return;
+            GlobalManager.Logger(DebugOption.Audio,$"停止音效: {audioSource.clip.name}");
             if (audioList.Contains(audioSource))
             {
                 audioSource.Stop();

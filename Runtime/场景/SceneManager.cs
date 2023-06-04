@@ -40,16 +40,11 @@ namespace JFramework.Core
                 }
             }
         }
-
-        /// <summary>
-        /// 管理器名称
-        /// </summary>
-        private static string Name => nameof(SceneManager);
-
+        
         /// <summary>
         /// 当前场景名称
         /// </summary>
-        public static string name => LoadManager.GetActiveScene().name;
+        public static string scene => LoadManager.GetActiveScene().name;
 
         /// <summary>
         /// 场景管理器初始化
@@ -73,17 +68,8 @@ namespace JFramework.Core
         /// <param name="name">场景名称</param>
         public static void LoadScene(string name)
         {
-            if (sceneDict == null)
-            {
-                Debug.Log($"{Name.Red()} 没有初始化!");
-                return;
-            }
-
-            if (GlobalManager.IsDebugScene)
-            {
-                Debug.Log($"{Name.Sky()} 加载 => {name.Green()} 场景");
-            }
-
+            if (!GlobalManager.Runtime) return;
+            GlobalManager.Logger(DebugOption.Scene, $"同步加载 => {name.Green()} 场景");
             LoadManager.LoadScene(name);
         }
 
@@ -94,17 +80,8 @@ namespace JFramework.Core
         /// <param name="action">场景加载完成的回调</param>
         public static void LoadSceneAsync(string name, Action action)
         {
-            if (sceneDict == null)
-            {
-                Debug.Log($"{Name.Red()} 没有初始化!");
-                return;
-            }
-
-            if (GlobalManager.IsDebugScene)
-            {
-                Debug.Log($"{Name.Sky()} 异步加载 => {name.Green()} 场景");
-            }
-
+            if (!GlobalManager.Runtime) return;
+            GlobalManager.Logger(DebugOption.Scene, $"异步加载 => {name.Green()} 场景");
             GlobalManager.Instance.StartCoroutine(LoadSceneCompleted(name, action));
         }
 
@@ -126,12 +103,7 @@ namespace JFramework.Core
                 {
                     Progress = Mathf.Lerp(Progress, asyncOperation.progress / 9f * 10f, Time.fixedDeltaTime * 2);
                     OnLoadScene?.Invoke(Progress);
-
-                    if (GlobalManager.IsDebugScene)
-                    {
-                        Debug.Log($"{Name.Sky()} 加载进度 => {Progress.ToString("P").Green()}");
-                    }
-
+                    GlobalManager.Logger(DebugOption.Scene, $"加载进度 => {Progress.ToString("P").Green()}");
                     yield return new WaitForEndOfFrame();
                 }
 
@@ -140,12 +112,8 @@ namespace JFramework.Core
             }
 
             action?.Invoke();
-
-            if (GlobalManager.IsDebugScene)
-            {
-                currentTime = Time.time - currentTime;
-                Debug.Log($"{Name.Sky()} 加载 => {name.Green()} 场景完成, 耗时 {currentTime.ToString("F").Yellow()} 秒");
-            }
+            var totalTime = (Time.time - currentTime).ToString("F");
+            GlobalManager.Logger(DebugOption.Scene, $"加载 => {name.Green()} 场景完成, 耗时 {totalTime.Yellow()} 秒");
         }
 
         /// <summary>

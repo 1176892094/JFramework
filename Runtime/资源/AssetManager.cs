@@ -35,12 +35,7 @@ namespace JFramework.Core
         /// <typeparam name="T">可以使用任何继承Object的对象</typeparam>
         public static T Load<T>(string name) where T : Object
         {
-            if (assetDict == null)
-            {
-                Debug.Log($"{Name.Red()} 没有初始化");
-                return null;
-            }
-
+            if (!GlobalManager.Runtime) return null;
             var result = Addressables.LoadAssetAsync<T>(name).WaitForCompletion();
             if (result == null)
             {
@@ -48,11 +43,7 @@ namespace JFramework.Core
                 return null;
             }
 
-            if (GlobalManager.IsDebugAsset)
-            {
-                Debug.Log($"{Name.Sky()} 加载 => {name.Green()} 资源成功");
-            }
-
+            GlobalManager.Logger(DebugOption.Asset, $"加载 => {result.name.Green()} 资源成功");
             return result is GameObject ? Object.Instantiate(result) : result;
         }
 
@@ -64,12 +55,7 @@ namespace JFramework.Core
         /// <typeparam name="T">可以使用任何继承Object的对象</typeparam>
         public static void LoadAsync<T>(string name, Action<T> action) where T : Object
         {
-            if (assetDict == null)
-            {
-                Debug.Log($"{Name.Red()} 没有初始化");
-                return;
-            }
-
+            if (!GlobalManager.Runtime) return;
             AsyncOperationHandle<T> handle;
             if (assetDict.ContainsKey(name))
             {
@@ -110,11 +96,7 @@ namespace JFramework.Core
             
             void LoadSuccess(T result, Action<T> callback)
             {
-                if (GlobalManager.IsDebugAsset)
-                {
-                    Debug.Log($"{Name.Sky()} 加载 => {result.name.Green()} 资源成功");
-                }
-
+                GlobalManager.Logger(DebugOption.Asset, $"加载 => {result.name.Green()} 资源成功");
                 callback(result is GameObject ? Object.Instantiate(result) : result);
             }
         }
@@ -126,12 +108,7 @@ namespace JFramework.Core
         /// <typeparam name="T">可以使用任何继承Object的对象</typeparam>
         public static void Dispose<T>(string name)
         {
-            if (assetDict == null)
-            {
-                Debug.Log($"{Name.Red()} 没有初始化");
-                return;
-            }
-
+            if (!GlobalManager.Runtime) return;
             if (!assetDict.ContainsKey(name)) return;
             var handle = (AsyncOperationHandle<T>)assetDict[name];
             Addressables.Release(handle);

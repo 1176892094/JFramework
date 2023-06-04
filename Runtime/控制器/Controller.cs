@@ -33,14 +33,14 @@ namespace JFramework
         protected virtual void Spawn()
         {
         }
-        
+
         /// <summary>
         /// 控制器销毁
         /// </summary>
         protected virtual void Despawn()
         {
         }
-        
+
         /// <summary>
         /// 控制器销毁
         /// </summary>
@@ -52,10 +52,7 @@ namespace JFramework
             }
             catch (Exception e)
             {
-                if (GlobalManager.IsDebugDestroy)
-                {
-                    Debug.Log($"{name.Sky()} => {nameof(OnDestroy).Green()} 发生异常\n" + e);
-                }
+                GlobalManager.Logger(DebugOption.Custom, $"{name.Sky()} => {nameof(OnDestroy).Green()} 发生异常\n{e}");
             }
         }
 

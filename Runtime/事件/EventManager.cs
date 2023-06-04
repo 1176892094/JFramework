@@ -4,6 +4,11 @@ using UnityEngine;
 namespace JFramework.Core
 {
     /// <summary>
+    /// 可变长参数委托
+    /// </summary>
+    public delegate void EventHandler(params object[] args);
+
+    /// <summary>
     /// 事件管理器
     /// </summary>
     public static class EventManager
@@ -11,26 +16,21 @@ namespace JFramework.Core
         /// <summary>
         /// 事件字典
         /// </summary>
-        internal static Dictionary<int, EventData> eventDict;
-
-        /// <summary>
-        /// 管理器名称
-        /// </summary>
-        private static string Name => nameof(EventManager);
+        internal static Dictionary<int, EventHandler> eventDict;
 
         /// <summary>
         /// 事件管理器醒来
         /// </summary>
-        internal static void Awake() => eventDict = new Dictionary<int, EventData>();
+        internal static void Awake() => eventDict = new Dictionary<int, EventHandler>();
 
         /// <summary>
         /// 侦听事件
         /// </summary>
         /// <param name="id">事件唯一标识</param>
         /// <param name="action">传入侦听的事件</param>
-        public static void Listen(int id, EventData action)
+        public static void Listen(int id, EventHandler action)
         {
-            if (eventDict == null) return;
+            if (!GlobalManager.Runtime) return;
             if (eventDict.ContainsKey(id))
             {
                 eventDict[id] += action;
@@ -40,10 +40,7 @@ namespace JFramework.Core
                 eventDict.Add(id, action);
             }
 
-            if (GlobalManager.IsDebugEvent)
-            {
-                Debug.Log($"{Name.Sky()} 侦听 => {action.Method.ToString().Yellow()} 事件");
-            }
+            GlobalManager.Logger(DebugOption.Event, $"侦听 => {action.Method.ToString().Yellow()} 事件");
         }
 
         /// <summary>
@@ -51,16 +48,12 @@ namespace JFramework.Core
         /// </summary>
         /// <param name="id">事件唯一标识</param>
         /// <param name="action">传入移除的事件</param>
-        public static void Remove(int id, EventData action)
+        public static void Remove(int id, EventHandler action)
         {
-            if (eventDict == null) return;
+            if (!GlobalManager.Runtime) return;
             if (eventDict.ContainsKey(id))
             {
-                if (GlobalManager.IsDebugEvent)
-                {
-                    Debug.Log($"{Name.Sky()} 移除 => {action.Method.ToString().Yellow()} 事件");
-                }
-
+                GlobalManager.Logger(DebugOption.Event, $"移除 => {action.Method.ToString().Yellow()} 事件");
                 eventDict[id] -= action;
             }
         }
@@ -72,14 +65,10 @@ namespace JFramework.Core
         /// <param name="value">传入事件的参数</param>
         public static void Invoke(int id, params object[] value)
         {
-            if (eventDict == null) return;
+            if (!GlobalManager.Runtime) return;
             if (eventDict.ContainsKey(id))
             {
-                if (GlobalManager.IsDebugEvent)
-                {
-                    Debug.Log($"{Name.Sky()} 触发 => {eventDict[id]?.Method.ToString().Yellow()} 事件");
-                }
-
+                GlobalManager.Logger(DebugOption.Event, $"触发 => {eventDict[id]?.Method.ToString().Yellow()} 事件");
                 eventDict[id]?.Invoke(value);
             }
         }

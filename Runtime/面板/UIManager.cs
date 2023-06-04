@@ -52,12 +52,6 @@ namespace JFramework.Core
         /// <typeparam name="T">可以使用所有继承IPanel的对象</typeparam>
         private static void LoadPanel<T>(string name, Action<T> action) where T : UIPanel
         {
-            if (panelDict == null)
-            {
-                Debug.Log($"{Name.Red()} 没有初始化");
-                return;
-            }
-
             var key = typeof(T);
             AssetManager.LoadAsync<GameObject>("UI/" + name, obj =>
             {
@@ -78,12 +72,7 @@ namespace JFramework.Core
         /// <typeparam name="T">可以使用所有继承IPanel的对象</typeparam>
         public static void ShowPanel<T>(Action<T> action = null) where T : UIPanel
         {
-            if (panelDict == null)
-            {
-                Debug.Log($"{Name.Red()} 没有初始化");
-                return;
-            }
-
+            if (!GlobalManager.Runtime) return;
             var key = typeof(T);
             if (panelDict.ContainsKey(key))
             {
@@ -101,25 +90,21 @@ namespace JFramework.Core
         /// </summary>
         public static void HidePanel<T>() where T : UIPanel
         {
-            if (panelDict == null)
-            {
-                Debug.Log($"{Name.Red()} 没有初始化");
-                return;
-            }
-
+            if (!GlobalManager.Runtime) return;
             var key = typeof(T);
             if (panelDict.ContainsKey(key))
             {
-                panelDict[key].Hide();
-                switch (panelDict[key].hideType)
+                if (panelDict[key].stateType == UIStateType.Freeze)
                 {
-                    case UIHideType.Destroy:
-                        Object.Destroy(panelDict[key].gameObject);
-                        panelDict.Remove(key);
-                        break;
-                    case UIHideType.Remove:
-                        panelDict.Remove(key);
-                        break;
+                    Debug.LogWarning($"{key}处于冻结状态，无法通过UIManager隐藏！");
+                    return;
+                }
+
+                panelDict[key].Hide();
+                if (panelDict[key].stateType == UIStateType.Common)
+                {
+                    Object.Destroy(panelDict[key].gameObject);
+                    panelDict.Remove(key);
                 }
             }
         }
@@ -164,13 +149,8 @@ namespace JFramework.Core
         /// </summary>
         public static void Clear()
         {
-            if (panelDict == null)
-            {
-                Debug.Log($"{Name.Red()} 没有初始化");
-                return;
-            }
-
-            foreach (var key in panelDict.Keys.ToList().Where(key => panelDict.ContainsKey(key) && panelDict[key].hideType != UIHideType.Ignore))
+            if (!GlobalManager.Runtime) return;
+            foreach (var key in panelDict.Keys.ToList().Where(key => panelDict.ContainsKey(key) && panelDict[key].stateType != UIStateType.Ignore))
             {
                 Object.Destroy(panelDict[key].gameObject);
                 panelDict.Remove(key);

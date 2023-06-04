@@ -1,0 +1,92 @@
+using System;
+using JFramework.Core;
+using UnityEngine;
+
+namespace JFramework
+{
+    /// <summary>
+    /// 调用后会在场景中寻找相应的游戏对象
+    /// </summary>
+    /// <typeparam name="T">所属的单例对象</typeparam>
+    public abstract class GlobalSingleton<T> : MonoBehaviour, IDisposable where T : GlobalSingleton<T>
+    {
+        /// <summary>
+        /// 线程锁
+        /// </summary>
+        private static readonly object locked = typeof(T);
+
+        /// <summary>
+        /// 单例自身
+        /// </summary>
+        private static T instance;
+
+        /// <summary>
+        /// 安全的单例调用
+        /// </summary>
+        public static T Instance
+        {
+            get
+            {
+                if (!GlobalManager.Runtime) return null;
+                if (instance == null)
+                {
+                    lock (locked)
+                    {
+                        if (instance == null)
+                        {
+                            instance ??= FindObjectOfType<T>();
+                        }
+
+                        if (instance == null)
+                        {
+                            instance = new GameObject(typeof(T).Name).AddComponent<T>();
+                        }
+
+                        instance.Awake();
+                    }
+                }
+
+                return instance;
+            }
+        }
+
+        /// <summary>
+        /// 单例初始化
+        /// </summary>
+        protected virtual void Awake()
+        {
+            if (instance == null)
+            {
+                instance = (T)this;
+                DontDestroyOnLoad(gameObject);
+            }
+            else if (instance != this)
+            {
+                Destroy(this);
+            }
+        }
+
+        /// <summary>
+        /// 销毁单例
+        /// </summary>
+        private void OnDestroy()
+        {
+            try
+            {
+                instance = null;
+                Dispose();
+            }
+            catch (Exception e)
+            {
+                Debug.Log(e);
+            }
+        }
+
+        /// <summary>
+        /// 释放内存
+        /// </summary>
+        public virtual void Dispose()
+        {
+        }
+    }
+}

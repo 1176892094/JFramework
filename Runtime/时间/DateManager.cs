@@ -38,8 +38,8 @@ namespace JFramework.Core
 
         private static int lastDayOfYear
         {
-            get => JsonManager.Load<int>(Name,true);
-            set => JsonManager.Save(value, Name,true);
+            get => JsonManager.Decrypt<int>(Name);
+            set => JsonManager.Encrypt(value, Name);
         }
 
         /// <summary>

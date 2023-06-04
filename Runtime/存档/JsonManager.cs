@@ -1,23 +1,22 @@
 using System.Collections.Generic;
 using System.IO;
-using System.Security.Cryptography;
-using JFramework.Interface;
 using JFramework.Table;
 using Newtonsoft.Json;
 using UnityEngine;
 
+// ReSharper disable All
 namespace JFramework.Core
 {
     /// <summary>
     /// Json管理器
     /// </summary>
-    public static class JsonManager
+    public static partial class JsonManager
     {
         /// <summary>
         /// 存储Json的字典
         /// </summary>
-        internal static Dictionary<string, JsonData> jsonDict;
-        
+        private static Dictionary<string, JsonData> jsonDict;
+
         /// <summary>
         /// 管理器名称
         /// </summary>
@@ -27,158 +26,65 @@ namespace JFramework.Core
         /// 管理器醒来
         /// </summary>
         internal static void Awake() => jsonDict = Load<Dictionary<string, JsonData>>(Name);
-
+        
         /// <summary>
         /// 存储数据
         /// </summary>
         /// <param name="obj">保存的数据</param>
         /// <param name="name">保存的名称</param>
-        /// <param name="encrypt">加密</param>
-        public static void Save(object obj, string name, bool encrypt = false)
+        public static void Save(object obj, string name)
         {
             var filePath = GetPath(name);
             var saveJson = obj is ScriptableObject ? JsonUtility.ToJson(obj) : JsonConvert.SerializeObject(obj);
-            if (encrypt)
-            {
-                if (jsonDict == null)
-                {
-                    Debug.Log($"{Name.Red()} 没有初始化!");
-                    return;
-                }
-
-                if (GlobalManager.IsDebugJson)
-                {
-                    Debug.Log($"{Name.Sky()} 保存加密 => {name.Orange()} 数据文件");
-                }
-
-                using Aes aes = Aes.Create();
-                SetData(name, aes.Key, aes.IV);
-                var data = JsonSetting.Encrypt(saveJson, aes.Key, aes.IV);
-                File.WriteAllBytes(filePath, data);
-            }
-            else
-            {
-                if (GlobalManager.IsDebugJson && name != Name)
-                {
-                    Debug.Log($"{Name.Sky()} 保存 => {name.Orange()} 数据文件");
-                }
-
-                File.WriteAllText(filePath, saveJson);
-            }
+            File.WriteAllText(filePath, saveJson);
+            GlobalManager.Logger(DebugOption.Json,$"保存 => {name.Orange()} 数据文件");
         }
-
+        
         /// <summary>
         /// 加载数据
         /// </summary>
         /// <param name="obj">加载的数据</param>
-        /// <param name="decrypt">解密</param>
-        public static void Load(ScriptableObject obj, bool decrypt = false)
+        public static void Load(ScriptableObject obj)
         {
             var filePath = GetPath(obj.name);
             if (!File.Exists(filePath))
             {
                 Debug.Log($"{Name.Sky()} 创建 => {obj.name.Orange()} 数据文件");
-                Save(obj, obj.name, decrypt);
+                Save(obj, obj.name);
             }
 
-            if (decrypt)
-            {
-                if (jsonDict == null)
-                {
-                    Debug.Log($"{Name.Red()} 没有初始化!");
-                    return;
-                }
-
-                if (GlobalManager.IsDebugJson)
-                {
-                    Debug.Log($"{Name.Sky()} 读取解密 => {obj.name.Orange()} 数据文件");
-                }
-
-                var loadJson = File.ReadAllBytes(filePath);
-                var data = GetData(obj.name);
-                var key = data.key;
-                var iv = data.iv;
-                if (key is not { Length: > 0 } || iv is not { Length: > 0 }) return;
-                var saveJson = JsonSetting.Decrypt(loadJson, key, iv);
-                if (saveJson.IsEmpty()) return;
-                JsonUtility.FromJsonOverwrite(saveJson, obj);
-            }
-            else
-            {
-                if (GlobalManager.IsDebugJson)
-                {
-                    Debug.Log($"{Name.Sky()} 读取 => {Name.Orange()} 数据文件");
-                }
-                
-                var saveJson = File.ReadAllText(filePath);
-                if (saveJson.IsEmpty()) return;
-                JsonUtility.FromJsonOverwrite(saveJson, obj);
-            }
+            GlobalManager.Logger(DebugOption.Json,$"读取 => {obj.name.Orange()} 数据文件");
+            var saveJson = File.ReadAllText(filePath);
+            if (saveJson.IsEmpty()) return;
+            JsonUtility.FromJsonOverwrite(saveJson, obj);
         }
-
+        
         /// <summary>
         /// 加载数据
         /// </summary>
         /// <param name="name">加载的数据名称</param>
-        /// <param name="decrypt">解密</param>
         /// <typeparam name="T">可以使用任何类型</typeparam>
-        /// <returns>返回解密的数据</returns>
-        public static T Load<T>(string name, bool decrypt = false) where T :  new()
+        /// <returns>返回加载的数据</returns>
+        public static T Load<T>(string name) where T : new()
         {
             var filePath = GetPath(name);
             if (!File.Exists(filePath))
             {
                 Debug.Log($"{Name.Sky()} 创建 => {name.Orange()} 数据文件");
-                Save(new T(), name, decrypt);
+                Save(new T(), name);
             }
 
-            if (decrypt)
-            {
-                if (jsonDict == null)
-                {
-                    Debug.Log($"{Name.Red()} 没有初始化!");
-                    return default;
-                }
-                
-                if (GlobalManager.IsDebugJson)
-                {
-                    Debug.Log($"{Name.Sky()} 读取解密 => {name.Orange()} 数据文件");
-                }
-                
-                var loadJson = File.ReadAllBytes(filePath);
-                var json = GetData(name);
-                var key = json.key;
-                var iv = json.iv;
-                if (key is not { Length: > 0 } || iv is not { Length: > 0 }) return new T();
-                var saveJson = JsonSetting.Decrypt(loadJson, key, iv);
-                if (saveJson.IsEmpty()) return default;
-                var data = JsonConvert.DeserializeObject<T>(saveJson);
-                return data;
-            }
-            else
-            {
-                if (GlobalManager.IsDebugJson)
-                {
-                    Debug.Log($"{Name.Sky()} 读取 => {name.Orange()} 数据文件");
-                }
-                
-                var saveJson = File.ReadAllText(filePath);
-                if (saveJson.IsEmpty()) return default;
-                var data = JsonConvert.DeserializeObject<T>(saveJson);
-                return data;
-            }
+            GlobalManager.Logger(DebugOption.Json,$"读取 => {name.Orange()} 数据文件");
+
+            var saveJson = File.ReadAllText(filePath);
+            return !saveJson.IsEmpty() ? JsonConvert.DeserializeObject<T>(saveJson) : default;
         }
-
+        
         /// <summary>
         /// 清空管理器
         /// </summary>
         public static void Clear()
         {
-            if (GlobalManager.IsDebugJson)
-            {
-                Debug.Log($"{Name.Sky()} <= Clear => {Name.Orange()}");
-            }
-
             jsonDict.Clear();
             Save(jsonDict, Name);
         }

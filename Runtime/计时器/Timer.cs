@@ -92,11 +92,7 @@ namespace JFramework
                 }
                 catch (Exception e)
                 {
-                    if (GlobalManager.IsDebugDestroy)
-                    {
-                        Debug.Log($"{nameof(TimerManager).Sky()} => 作用对象被销毁，自动停止计时器。\n" + e);
-                    }
-                   
+                    GlobalManager.Logger(DebugOption.Timer, $"=> 作用对象被销毁，自动停止计时器。\n{e}");
                     TimerManager.Push(this);
                 }
             }

@@ -9,24 +9,35 @@ namespace JFramework.Core
     public sealed partial class GlobalManager : MonoBehaviour
     {
         /// <summary>
+        /// 全局管理器单例
+        /// </summary>
+        public static GlobalManager Instance;
+        
+        /// <summary>
         /// 全局管理器名称
         /// </summary>
         private static string Name => nameof(GlobalManager);
 
         /// <summary>
-        /// 受保护的ChatGPT类
+        /// 是否在运行
         /// </summary>
-        private static ChatGPT chatGpt;
+        private static bool runtime;
         
         /// <summary>
-        /// 公开的ChatGPT类
+        /// 打印Runtime信息
         /// </summary>
-        private static ChatGPT ChatGpt => chatGpt ??= new ChatGPT();
+        public static bool Runtime
+        {
+            get
+            {
+                if (!runtime)
+                {
+                    Debug.Log($"{Name.Red()} 没有初始化！");
+                }
 
-        /// <summary>
-        /// 全局管理器单例
-        /// </summary>
-        public static GlobalManager Instance;
+                return runtime;
+            }
+        }
 
         /// <summary>
         /// Start开始事件
@@ -37,7 +48,7 @@ namespace JFramework.Core
         /// Update更新事件
         /// </summary>
         public static event Action OnUpdate;
-        
+
         /// <summary>
         /// Destroy销毁事件
         /// </summary>
@@ -63,11 +74,9 @@ namespace JFramework.Core
         /// </summary>
         private static void Singleton()
         {
-            if (Instance != null) return;
-            Instance = FindObjectOfType<GlobalManager>();
-            if (Instance != null) return;
-            var obj = Resources.Load<GameObject>(Name);
-            Instance = Instantiate(obj).GetComponent<GlobalManager>();
+            runtime = true;
+            Instance ??= FindObjectOfType<GlobalManager>();
+            Instance ??= Instantiate(Resources.Load<GlobalManager>(Name));
         }
 
         /// <summary>
@@ -95,6 +104,7 @@ namespace JFramework.Core
         /// </summary>
         private void OnApplicationQuit()
         {
+            runtime = false;
             OnDestroy?.Invoke();
             UIManager.Destroy();
             PoolManager.Destroy();

@@ -9,7 +9,7 @@ namespace JFramework
     /// 实体的抽象类
     /// </summary>
     [Serializable]
-    public abstract class Entity : MonoBehaviour, IEntity
+    public abstract class Entity : MonoBehaviour, IEntity,IUpdate
     {
         /// <summary>
         /// 实体生成
@@ -56,16 +56,13 @@ namespace JFramework
             }
             catch (Exception e)
             {
-                if (GlobalManager.IsDebugDestroy)
-                {
-                    Debug.Log($"{name.Sky()} => {nameof(OnDestroy).Green()} 发生异常\n" + e);
-                }
+                GlobalManager.Logger(DebugOption.Custom, $"{name.Sky()} => {nameof(OnDestroy).Green()} 发生异常\n{e}");
             }
         }
 
         /// <summary>
         /// 实体接口调用实体更新方法
         /// </summary>
-        void IEntity.Update() => OnUpdate();
+        void IUpdate.Update() => OnUpdate();
     }
 }

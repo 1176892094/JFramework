@@ -23,7 +23,7 @@ namespace JFramework
         /// <summary>
         /// UI隐藏类型
         /// </summary>
-        [LabelText("隐藏类型")] public UIHideType hideType;
+        [LabelText("面板状态")] public UIStateType stateType;
 
         /// <summary>
         /// 开始时查找所有控件

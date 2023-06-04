@@ -33,7 +33,7 @@ namespace JFramework.Core
         /// 管理器名称
         /// </summary>
         private static string Name => nameof(DataManager);
-        
+
         /// <summary>
         /// 数据加载完成的回调
         /// </summary>
@@ -47,7 +47,7 @@ namespace JFramework.Core
             IntDataDict = new Dictionary<Type, IntDataDict>();
             StrDataDict = new Dictionary<Type, StrDataDict>();
             EnmDataDict = new Dictionary<Type, EnmDataDict>();
-            var (assembly,types) = GetAssembly<IDataTable>();
+            var (assembly, types) = GetAssembly<IDataTable>();
             if (types == null || types.Length == 0) return;
             var tableIndex = 0;
             foreach (var type in types)
@@ -57,7 +57,6 @@ namespace JFramework.Core
                 {
                     AssetManager.LoadAsync<ScriptableObject>("DataTable/" + keyName, table =>
                     {
-
                         var dataTable = table.As<IDataTable>();
                         var keyData = GetKeyField(assembly, type);
                         var keyInfo = GetKeyField<KeyFieldAttribute>(keyData);
@@ -67,11 +66,7 @@ namespace JFramework.Core
                             return;
                         }
 
-                        if (GlobalManager.IsDebugData)
-                        {
-                            Debug.Log($"{Name.Sky()} 加载 => {type.Name.Blue()} 数据表");
-                        }
-
+                        GlobalManager.Logger(DebugOption.Data, $"加载 => {type.Name.Blue()} 数据表");
                         var keyType = keyInfo.FieldType;
                         if (keyType == typeof(int))
                         {
@@ -105,22 +100,22 @@ namespace JFramework.Core
         /// </summary>
         /// <param name="field"></param>
         /// <param name="table"></param>
-        /// <typeparam name="T"></typeparam>
+        /// <typeparam name="TKey"></typeparam>
         /// <returns>返回数据字典</returns>
-        private static Dictionary<T, IData> Add<T>(FieldInfo field, IDataTable table)
+        private static Dictionary<TKey, IData> Add<TKey>(FieldInfo field, IDataTable table)
         {
-            var dataDict = new Dictionary<T, IData>();
+            var dataDict = new Dictionary<TKey, IData>();
             for (var i = 0; i < table.Count; ++i)
             {
                 var data = (IData)table.GetData(i);
-                var key = (T)field.GetValue(data);
+                var key = (TKey)field.GetValue(data);
                 if (!dataDict.ContainsKey(key))
                 {
                     dataDict.Add(key, data);
                 }
                 else
                 {
-                    Debug.Log($"{Name.Sky()} 加载 => {table.GetType().ToString().Orange()} 已经存在 {key.ToString().Red()} 键值!");
+                    Debug.Log($"{Name.Sky()} 加载 => {table.GetType().Name.Orange()} 已经存在 {key.ToString().Red()} 键值!");
                 }
             }
 
@@ -138,13 +133,9 @@ namespace JFramework.Core
             IntDataDict.TryGetValue(typeof(T), out IntDataDict soDict);
             if (soDict == null) return default;
             soDict.TryGetValue(key, out IData data);
-            if (GlobalManager.IsDebugData)
-            {
-                Debug.Log(data != null
-                    ? $"{Name.Sky()} 获取 => {typeof(T).Name.Blue()} : {key.ToString().Green()} 数据成功"
-                    : $"{Name.Sky()} 获取 => {typeof(T).Name.Red()} : {key.ToString().Green()} 数据失败");
-            }
-
+            GlobalManager.Logger(DebugOption.Data, data != null
+                ? $"获取 => {typeof(T).Name.Blue()} : {key.ToString().Green()} 数据成功"
+                : $"获取 => {typeof(T).Name.Red()} : {key.ToString().Green()} 数据失败");
             return (T)data;
         }
 
@@ -159,13 +150,9 @@ namespace JFramework.Core
             StrDataDict.TryGetValue(typeof(T), out StrDataDict soDict);
             if (soDict == null) return default;
             soDict.TryGetValue(key, out IData data);
-            if (GlobalManager.IsDebugData)
-            {
-                Debug.Log(data != null
-                    ? $"{Name.Sky()} 获取 => {typeof(T).Name.Blue()} : {key.Green()} 数据成功"
-                    : $"{Name.Sky()} 获取 => {typeof(T).Name.Red()} : {key.Green()} 数据失败");
-            }
-
+            GlobalManager.Logger(DebugOption.Data, data != null
+                ? $"获取 => {typeof(T).Name.Blue()} : {key.Green()} 数据成功"
+                : $"获取 => {typeof(T).Name.Red()} : {key.Green()} 数据失败");
             return (T)data;
         }
 
@@ -180,13 +167,9 @@ namespace JFramework.Core
             EnmDataDict.TryGetValue(typeof(T), out EnmDataDict soDict);
             if (soDict == null) return default;
             soDict.TryGetValue(key, out IData data);
-            if (GlobalManager.IsDebugData)
-            {
-                Debug.Log(data != null
-                    ? $"{Name.Sky()} 获取 => {typeof(T).Name.Blue()} : {key.ToString().Green()} 数据成功"
-                    : $"{Name.Sky()} 获取 => {typeof(T).Name.Red()} : {key.ToString().Green()} 数据失败");
-            }
-
+            GlobalManager.Logger(DebugOption.Data, data != null
+                ? $"获取 => {typeof(T).Name.Blue()} : {key.ToString().Green()} 数据成功"
+                : $"获取 => {typeof(T).Name.Red()} : {key.ToString().Green()} 数据失败");
             return (T)data;
         }
 
@@ -199,11 +182,7 @@ namespace JFramework.Core
         public static List<T> GetTable<T>() where T : IData
         {
             var table = GetTable(typeof(T));
-            if (GlobalManager.IsDebugData && table != null)
-            {
-                Debug.Log($"{Name.Sky()} 获取 => {typeof(T).Name.Blue()} 列表成功");
-            }
-
+            GlobalManager.Logger(DebugOption.Data, $"获取 => {typeof(T).Name.Blue()} 列表成功");
             return table?.Cast<T>().ToList();
         }
 
@@ -237,7 +216,7 @@ namespace JFramework.Core
 
             return (null, null);
         }
-        
+
         /// <summary>
         /// 获取数据的主键
         /// </summary>
@@ -251,7 +230,7 @@ namespace JFramework.Core
                 where attrs.Length > 0
                 select field).FirstOrDefault();
         }
-        
+
         /// <summary>
         /// 获取程序集中的类型
         /// </summary>
