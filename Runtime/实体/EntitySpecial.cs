@@ -8,7 +8,7 @@ using UnityEngine;
 // ReSharper disable All
 namespace JFramework
 {
-    public class EntitySpecial : Entity
+    public abstract class EntitySpecial : Entity
     {
         /// <summary>
         /// 控制器容器

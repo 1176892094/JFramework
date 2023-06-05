@@ -1,7 +1,6 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using JFramework.AStar;
 using JFramework.Interface;
 using Sirenix.OdinInspector;
 using UnityEngine;
@@ -22,9 +21,6 @@ namespace JFramework.Core
         [TabGroup("设置管理器/Setting", "Setting"), SerializeField, LabelText("控制台输出选项")]
         private DebugOption debugOption;
         
-        [TabGroup("设置管理器/Setting", "Setting"), SerializeField, LabelText("寻路选项设置")]
-        internal AStarType pathfinding;
-
         [Required("请在此输入ChatGPT的密钥!")]
         [TabGroup("设置管理器/Setting", "OpenAI"), SerializeField, LabelText("")]
         internal string key = "";

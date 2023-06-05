@@ -4,8 +4,9 @@ using UnityEngine;
 namespace JFramework.Core
 {
     /// <summary>
-    /// 全局控制器
+    /// 全局管理器(禁止添加)
     /// </summary>
+    [AddComponentMenu("")]
     public sealed partial class GlobalManager : MonoBehaviour
     {
         /// <summary>
