@@ -133,8 +133,8 @@ public class Test3 : MonoBehaviour
     {
         AssetManager.LoadAsync<ScriptableObject>(AssetPath.Data, data =>
         {
-            JsonManager.Save(data, "玩家数据", true); //储存数据并加密
-            JsonManager.Load(data, true); //解析加密数据并读取
+            JsonManager.Encrypt(data, "玩家数据"); //储存数据并加密
+            JsonManager.Decrypt(data); //解析加密数据并读取
         });
     }
 
@@ -270,7 +270,7 @@ public class Test8 : MonoBehaviour
 {
     private void Awake()
     {
-        EventManager.Listen(EventName.LoadProgress, LoadProgress); //侦听场景异步加载进度
+        SceneManager.OnLoadScene += LoadProgress;
     }
 
     private void LoadScene()
@@ -286,20 +286,14 @@ public class Test8 : MonoBehaviour
         });
     }
 
-    private void LoadProgress(params object[] value) //获取异步加载进度
+    private void LoadProgress(float progress) //获取异步加载进度
     {
-        var progress = (float)value[0]; //获取当前加载进度
-        Debug.Log(progress);
+        Debug.Log(progress); //获取当前加载进度
     }
 
     private void OnDestroy()
     {
-        EventManager.Remove(EventName.LoadProgress, LoadProgress); //移除场景异步加载进度
-    }
-
-    public struct EventName
-    {
-        public const int LoadProgress = 999; //固定为999号事件
+        SceneManager.OnLoadScene -= LoadProgress;
     }
 }
 ```
@@ -330,11 +324,6 @@ public class Test9 : MonoBehaviour
             count++;
             Debug.Log("第" + count + "次循环完成");
         });
-        
-        TimerManager.Pop(10, () =>
-        {
-            Debug.Log("设置计时器随物体销毁而停止");
-        }).SetTarget(gameObject);
     }
 
     private void Update()
@@ -362,7 +351,7 @@ public class Enemy : Entity //敌人继承实体
     }
 }
 
-public class EnemyMachine : Machine<Enemy> //设置状态机的所有者
+public class EnemyMachine : StateMachine<Enemy> //设置状态机的所有者
 {
     protected override void Start()
     {
@@ -419,7 +408,7 @@ public class EnemyWalk : State<Enemy> //设置状态的所有者
 ```
 (10)Entity/Controller(EC实体控制器分离)
 ```csharp
- public class Player : Entity //玩家继承实体
+ public class Player : EntitySpecial //玩家继承实体
 {
     public BuffController buffCtrl => Get<BuffController>(); //效果控制器
     public SkillController skillCtrl => Get<SkillController>(); //技能控制器
@@ -452,6 +441,62 @@ public class BuffController : Controller<Player> //设置控制器的所有者
 
     protected override void Start() //初始化方法
     {
+    }
+}
+```
+
+(11)AStarManager(基于JobSystem的A星寻路)
+```csharp
+ public class Pathfinding : MonoBehaviour
+{
+    public int mapW;
+    public int mapH;
+
+    private void Start()
+    {
+        var map = new bool[mapW, mapH];
+        for (int i = 0; i < mapW; i++)
+        {
+            for (int j = 0; j < mapH; j++)
+            {
+                map[i, j] = Random.Range(0, 100) > 20; //设置大于20为可行走区域
+            }
+        }
+
+        AStarManager.InitMap(map); //初始化可行走的地图
+    }
+
+    private void Update()
+    {
+        if (Input.GetMouseButtonDown(0)) //按下鼠标
+        {
+            //起点位置
+            var start = new AStarNode(0, 0);
+            //鼠标点击位置
+            var position = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+            //终点位置
+            var end = new AStarNode((int)position.x, (int)position.y);
+            //返回节点列表
+            var nodeList = AStarManager.FindPath(start, end);
+            StartCoroutine(MoveToNextNode(nodeList));
+        }
+    }
+
+    private IEnumerator MoveToNextNode(List<AStarNode> nodeList)
+    {
+        var nodeIndex = 0;
+        while (nodeIndex < nodeList.Count)
+        {
+            var nextNode = nodeList[nodeIndex];
+            var position = new Vector3(nextNode.x, nextNode.y);
+            while (transform.position != position)// 移动到下一个节点
+            {
+                transform.position = Vector3.MoveTowards(transform.position, position, Time.deltaTime);
+                yield return null;
+            }
+
+            nodeIndex++;
+        }
     }
 }
 ```
