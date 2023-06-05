@@ -501,7 +501,7 @@ public class BuffController : Controller<Player> //设置控制器的所有者
 }
 ```
 
-(11)AwaitExtensions(异步拓展)
+(12)AwaitExtensions(异步拓展)
 ```csharp
   private async void Start()
     {
