@@ -445,62 +445,6 @@ public class BuffController : Controller<Player> //设置控制器的所有者
 }
 ```
 
-(11)AStarManager(基于JobSystem的A星寻路)
-```csharp
- public class Pathfinding : MonoBehaviour
-{
-    public int mapW;
-    public int mapH;
-
-    private void Start()
-    {
-        var map = new bool[mapW, mapH];
-        for (int i = 0; i < mapW; i++)
-        {
-            for (int j = 0; j < mapH; j++)
-            {
-                map[i, j] = Random.Range(0, 100) > 20; //设置大于20为可行走区域
-            }
-        }
-
-        AStarManager.InitMap(map); //初始化可行走的地图
-    }
-
-    private void Update()
-    {
-        if (Input.GetMouseButtonDown(0)) //按下鼠标
-        {
-            //起点位置
-            var start = new AStarNode(0, 0);
-            //鼠标点击位置
-            var position = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-            //终点位置
-            var end = new AStarNode((int)position.x, (int)position.y);
-            //返回节点列表
-            var nodeList = AStarManager.FindPath(start, end);
-            StartCoroutine(MoveToNextNode(nodeList));
-        }
-    }
-
-    private IEnumerator MoveToNextNode(List<AStarNode> nodeList)
-    {
-        var nodeIndex = 0;
-        while (nodeIndex < nodeList.Count)
-        {
-            var nextNode = nodeList[nodeIndex];
-            var position = new Vector3(nextNode.x, nextNode.y);
-            while (transform.position != position)// 移动到下一个节点
-            {
-                transform.position = Vector3.MoveTowards(transform.position, position, Time.deltaTime);
-                yield return null;
-            }
-
-            nodeIndex++;
-        }
-    }
-}
-```
-
 (12)AwaitExtensions(异步拓展)
 ```csharp
   private async void Start()
