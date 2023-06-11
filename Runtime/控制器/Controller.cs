@@ -52,7 +52,7 @@ namespace JFramework
             }
             catch (Exception e)
             {
-                GlobalManager.Logger(DebugOption.Custom, $"{name.Sky()} => {nameof(OnDestroy).Green()} 发生异常\n{e}");
+                Log.Info(DebugOption.Custom, $"{name.Sky()} => {nameof(OnDestroy).Green()} 发生异常\n{e}");
             }
         }
 

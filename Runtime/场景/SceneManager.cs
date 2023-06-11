@@ -69,7 +69,7 @@ namespace JFramework.Core
         public static void LoadScene(string name)
         {
             if (!GlobalManager.Runtime) return;
-            GlobalManager.Logger(DebugOption.Scene, $"同步加载 => {name.Green()} 场景");
+            Log.Info(DebugOption.Scene, $"同步加载 => {name.Green()} 场景");
             LoadManager.LoadScene(name);
         }
 
@@ -81,7 +81,7 @@ namespace JFramework.Core
         public static void LoadSceneAsync(string name, Action action)
         {
             if (!GlobalManager.Runtime) return;
-            GlobalManager.Logger(DebugOption.Scene, $"异步加载 => {name.Green()} 场景");
+            Log.Info(DebugOption.Scene, $"异步加载 => {name.Green()} 场景");
             GlobalManager.Instance.StartCoroutine(LoadSceneCompleted(name, action));
         }
 
@@ -103,7 +103,7 @@ namespace JFramework.Core
                 {
                     Progress = Mathf.Lerp(Progress, asyncOperation.progress / 9f * 10f, Time.fixedDeltaTime * 2);
                     OnLoadScene?.Invoke(Progress);
-                    GlobalManager.Logger(DebugOption.Scene, $"加载进度 => {Progress.ToString("P").Green()}");
+                    Log.Info(DebugOption.Scene, $"加载进度 => {Progress.ToString("P").Green()}");
                     yield return new WaitForEndOfFrame();
                 }
 
@@ -113,7 +113,7 @@ namespace JFramework.Core
 
             action?.Invoke();
             var totalTime = (Time.time - currentTime).ToString("F");
-            GlobalManager.Logger(DebugOption.Scene, $"异步加载 => {name.Green()} 场景完成, 耗时 {totalTime.Yellow()} 秒");
+            Log.Info(DebugOption.Scene, $"异步加载 => {name.Green()} 场景完成, 耗时 {totalTime.Yellow()} 秒");
         }
 
         /// <summary>

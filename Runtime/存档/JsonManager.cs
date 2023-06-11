@@ -11,21 +11,10 @@ namespace JFramework.Core
     /// </summary>
     public static partial class JsonManager
     {
-        /// <summary>
-        /// 存储Json的字典
-        /// </summary>
         private static Dictionary<string, JsonData> jsonDict;
+        internal static void Awake() => jsonDict = Load<Dictionary<string, JsonData>>(nameof(JsonManager));
+        internal static void Destroy() => jsonDict = null;
 
-        /// <summary>
-        /// 管理器名称
-        /// </summary>
-        private static string Name => nameof(JsonManager);
-
-        /// <summary>
-        /// 管理器醒来
-        /// </summary>
-        internal static void Awake() => jsonDict = Load<Dictionary<string, JsonData>>(Name);
-        
         /// <summary>
         /// 存储数据
         /// </summary>
@@ -36,9 +25,9 @@ namespace JFramework.Core
             var filePath = GetPath(name);
             var saveJson = obj is ScriptableObject ? JsonUtility.ToJson(obj) : JsonConvert.SerializeObject(obj);
             File.WriteAllText(filePath, saveJson);
-            GlobalManager.Logger(DebugOption.Json,$"保存 => {name.Orange()} 数据文件");
+            Log.Info(DebugOption.Json, $"保存 => {name.Orange()} 数据文件");
         }
-        
+
         /// <summary>
         /// 加载数据
         /// </summary>
@@ -48,16 +37,16 @@ namespace JFramework.Core
             var filePath = GetPath(obj.name);
             if (!File.Exists(filePath))
             {
-                Debug.Log($"{Name.Sky()} 创建 => {obj.name.Orange()} 数据文件");
+                Log.Warn($"{nameof(JsonManager).Sky()} 创建 => {obj.name.Orange()} 数据文件");
                 Save(obj, obj.name);
             }
 
-            GlobalManager.Logger(DebugOption.Json,$"读取 => {obj.name.Orange()} 数据文件");
+            Log.Info(DebugOption.Json, $"读取 => {obj.name.Orange()} 数据文件");
             var saveJson = File.ReadAllText(filePath);
             if (saveJson.IsEmpty()) return;
             JsonUtility.FromJsonOverwrite(saveJson, obj);
         }
-        
+
         /// <summary>
         /// 加载数据
         /// </summary>
@@ -69,23 +58,22 @@ namespace JFramework.Core
             var filePath = GetPath(name);
             if (!File.Exists(filePath))
             {
-                Debug.Log($"{Name.Sky()} 创建 => {name.Orange()} 数据文件");
+                Log.Warn($"{nameof(JsonManager).Sky()} 创建 => {name.Orange()} 数据文件");
                 Save(new T(), name);
             }
 
-            GlobalManager.Logger(DebugOption.Json,$"读取 => {name.Orange()} 数据文件");
-
+            Log.Info(DebugOption.Json, $"读取 => {name.Orange()} 数据文件");
             var saveJson = File.ReadAllText(filePath);
             return !saveJson.IsEmpty() ? JsonConvert.DeserializeObject<T>(saveJson) : default;
         }
-        
+
         /// <summary>
         /// 清空管理器
         /// </summary>
         public static void Clear()
         {
             jsonDict.Clear();
-            Save(jsonDict, Name);
+            Save(jsonDict, nameof(JsonManager));
         }
 
         /// <summary>
@@ -103,7 +91,7 @@ namespace JFramework.Core
 
             jsonDict[id].key = key;
             jsonDict[id].iv = iv;
-            Save(jsonDict, Name);
+            Save(jsonDict, nameof(JsonManager));
         }
 
         /// <summary>
@@ -128,18 +116,13 @@ namespace JFramework.Core
         /// <returns>返回的到的路径</returns>
         private static string GetPath(string name)
         {
-            var filePath = Application.streamingAssetsPath + "/" + name + ".json";
+            string filePath = Path.Combine(Application.streamingAssetsPath, $"{name}.json");
             if (!File.Exists(filePath))
             {
-                filePath = Application.persistentDataPath + "/" + name + ".json";
+                filePath = Path.Combine(Application.persistentDataPath, $"{name}.json");
             }
 
             return filePath;
         }
-
-        /// <summary>
-        /// Json管理器清除存档所有数据
-        /// </summary>
-        internal static void Destroy() => jsonDict = null;
     }
 }

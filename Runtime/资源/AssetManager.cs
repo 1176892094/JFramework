@@ -8,20 +8,11 @@ using Object = UnityEngine.Object;
 
 namespace JFramework.Core
 {
-    /// <summary>
-    /// 资源管理器
-    /// </summary>
     public static class AssetManager
     {
-        /// <summary>
-        /// 资源存储字典
-        /// </summary>
         internal static Dictionary<string, IEnumerator> assetDict;
-
-        /// <summary>
-        /// 资源管理器初始化
-        /// </summary>
         internal static void Awake() => assetDict = new Dictionary<string, IEnumerator>();
+        internal static void Destroy() => assetDict = null;
 
         /// <summary>
         /// 通过资源管理器加载资源 (同步)
@@ -34,11 +25,11 @@ namespace JFramework.Core
             var result = Addressables.LoadAssetAsync<T>(path).WaitForCompletion();
             if (result == null)
             {
-                Debug.Log($"{nameof(AssetManager).Sky()} 加载 => {path.Red()} 资源失败");
+                Log.Info($"{nameof(AssetManager).Sky()} 加载 => {path.Red()} 资源失败");
                 return null;
             }
 
-            return LoadSuccess(result);
+            return LoadCompleted(result);
         }
 
         /// <summary>
@@ -55,7 +46,7 @@ namespace JFramework.Core
             {
                 handle = (AsyncOperationHandle<T>)assetDict[path];
                 if (!handle.IsDone) await handle.Task;
-                return LoadSuccess(handle.Result);
+                return LoadCompleted(handle.Result);
             }
 
             handle = Addressables.LoadAssetAsync<T>(path);
@@ -64,7 +55,7 @@ namespace JFramework.Core
 
             if (handle.Status == AsyncOperationStatus.Succeeded)
             {
-                return LoadSuccess(handle.Result);
+                return LoadCompleted(handle.Result);
             }
 
             if (assetDict.ContainsKey(path)) //资源加载失败
@@ -72,14 +63,8 @@ namespace JFramework.Core
                 assetDict.Remove(path);
             }
 
-            Debug.Log($"{nameof(AssetManager).Sky()} 加载 => {path.Red()} 资源失败");
+            Log.Info($"{nameof(AssetManager).Sky()} 加载 => {path.Red()} 资源失败");
             return null;
-        }
-
-        private static T LoadSuccess<T>(T result) where T : Object
-        {
-            GlobalManager.Logger(DebugOption.Asset, $"加载 => {result.name.Green()} 资源成功");
-            return result is GameObject ? Object.Instantiate(result) : result;
         }
 
         /// <summary>
@@ -95,10 +80,17 @@ namespace JFramework.Core
             Addressables.Release(handle);
             assetDict.Remove(name);
         }
-
+        
         /// <summary>
-        /// 清空管理器
+        /// 资源加载完成
         /// </summary>
-        internal static void Destroy() => assetDict = null;
+        /// <param name="result">传入返回的结果</param>
+        /// <typeparam name="T">可以使用任何继承Object的对象</typeparam>
+        /// <returns>返回资源的类型</returns>
+        private static T LoadCompleted<T>(T result) where T : Object
+        {
+            Log.Info(DebugOption.Asset, $"加载 => {result.name.Green()} 资源成功");
+            return result is GameObject ? Object.Instantiate(result) : result;
+        }
     }
 }

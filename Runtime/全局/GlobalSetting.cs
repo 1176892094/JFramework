@@ -9,37 +9,24 @@ namespace JFramework.Core
 {
     public sealed partial class GlobalManager
     {
-        private static readonly Dictionary<DebugOption, string> debugDict = new Dictionary<DebugOption, string>()
+#if UNITY_EDITOR
+        [FoldoutGroup("设置管理器"), ShowInInspector, LabelText("编辑器运行模式")]
+        private UnityEditor.EnterPlayModeOptions playModeOptions
         {
-            { DebugOption.Json, "JsonManager " }, { DebugOption.Pool, "PoolManager " },
-            { DebugOption.Data, "DataManager " }, { DebugOption.Scene, "SceneManager " },
-            { DebugOption.Asset, "AssetManager " }, { DebugOption.Audio, "AudioManager " },
-            { DebugOption.Event, "EventManager " }, { DebugOption.Timer, "TimerManager " },
-        };
+            get => UnityEditor.EditorSettings.enterPlayModeOptions;
+            set
+            {
+                if (!UnityEditor.EditorSettings.enterPlayModeOptionsEnabled)
+                {
+                    UnityEditor.EditorSettings.enterPlayModeOptionsEnabled = true;
+                }
 
-        [FoldoutGroup("设置管理器"), TabGroup("设置管理器/Setting", "Setting"), SerializeField, LabelText("控制台输出选项")]
-        private DebugOption debugOption;
-
-        [Required("请在此输入ChatGPT的密钥!")] 
-        [TabGroup("设置管理器/Setting", "OpenAI"), SerializeField, LabelText("")]
-        internal string key = "";
-
-        [TabGroup("设置管理器/Setting", "OpenAI"), ShowInInspector, LabelText("输入文本:"), TextArea(4, 10)]
-        internal string chat = "获取地址: https://platform.openai.com/account/api-keys";
-
-        [Button("发送"), TabGroup("设置管理器/Setting", "OpenAI")]
-        private void SendRequest()
-        {
-            if (chat.Equals("")) return;
-            StartCoroutine(ChatGPT.Request(key, chat));
-            chat = "";
+                UnityEditor.EditorSettings.enterPlayModeOptions = value;
+            }
         }
-
-        internal static void Logger(DebugOption option, string message)
-        {
-            if (!Runtime || (Instance.debugOption & option) == 0) return;
-            Debug.Log(debugDict.ContainsKey(option) ? debugDict[option].Sky() + message : message);
-        }
+#endif
+        [FoldoutGroup("设置管理器"), SerializeField, LabelText("控制台输出选项")]
+        internal DebugOption debugOption;
 
         [ShowInInspector, LabelText("场景管理数据"), FoldoutGroup("通用管理器")]
         private Dictionary<int, SceneData> sceneList => SceneManager.sceneDict;
@@ -97,5 +84,52 @@ namespace JFramework.Core
 
         [ShowInInspector, LabelText("对象数据管理"), FoldoutGroup("对象池管理器")]
         private Dictionary<string, IPool> poolDict => PoolManager.poolDict;
+    }
+
+    internal static class Log
+    {
+        private static readonly Dictionary<DebugOption, string> debugDict = new Dictionary<DebugOption, string>()
+        {
+            { DebugOption.Json, "JsonManager " },
+            { DebugOption.Pool, "PoolManager " },
+            { DebugOption.Data, "DataManager " },
+            { DebugOption.Scene, "SceneManager " },
+            { DebugOption.Asset, "AssetManager " },
+            { DebugOption.Audio, "AudioManager " },
+            { DebugOption.Timer, "TimerManager " },
+            { DebugOption.Global, "GlobalManager " },
+        };
+
+
+        public static void Info(DebugOption option, string message)
+        {
+            if (!GlobalManager.Runtime || (GlobalManager.Instance.debugOption & option) == 0) return;
+            Debug.Log(debugDict.ContainsKey(option) ? debugDict[option].Sky() + message : message);
+        }
+
+        public static void Info(string message)
+        {
+            Debug.Log(message);
+        }
+
+        public static void Warn(string message)
+        {
+            Debug.LogWarning(message);
+        }
+    }
+
+    [Flags]
+    internal enum DebugOption
+    {
+        None = 0,
+        Json = 1,
+        Pool = 2,
+        Data = 4,
+        Scene = 8,
+        Asset = 16,
+        Audio = 32,
+        Timer = 64,
+        Global = 128,
+        Custom = 256,
     }
 }

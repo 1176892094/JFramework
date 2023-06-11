@@ -46,6 +46,15 @@ namespace JFramework.Core
         /// </summary>
         /// <param name="time">持续时间</param>
         /// <param name="action">完成回调</param>
+        public static ITimer Pop(float time, Action action = null)
+        {
+            if (!GlobalManager.Runtime) return null;
+            Timer tick = timerQueue.Count > 0 ? timerQueue.Dequeue() : new Timer();
+            tick.Open(time, action);
+            timerList.Add(tick);
+            return tick;
+        }
+        
         public static ITimer Pop(float time, Action<ITimer> action = null)
         {
             if (!GlobalManager.Runtime) return null;

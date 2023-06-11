@@ -17,11 +17,6 @@ namespace JFramework.Core
         private static float lastCheckTime;
         
         /// <summary>
-        /// 管理器名称
-        /// </summary>
-        private static string Name => nameof(DateManager);
-        
-        /// <summary>
         /// 日期更新事件
         /// </summary>
         public static event Action OnUpdate;
@@ -38,8 +33,8 @@ namespace JFramework.Core
 
         private static int lastDayOfYear
         {
-            get => JsonManager.Decrypt<int>(Name);
-            set => JsonManager.Encrypt(value, Name);
+            get => JsonManager.Decrypt<int>(nameof(DateManager));
+            set => JsonManager.Encrypt(value, nameof(DateManager));
         }
 
         /// <summary>

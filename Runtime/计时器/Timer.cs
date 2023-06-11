@@ -14,12 +14,12 @@ namespace JFramework
         /// <summary>
         /// 剩余循环次数
         /// </summary>
-        private int loopCount;
+        private int count;
 
         /// <summary>
         /// 持续时间
         /// </summary>
-        private float keepTime;
+        private float duration;
 
         /// <summary>
         /// 当前时间+持续时间
@@ -34,7 +34,8 @@ namespace JFramework
         /// <summary>
         /// 计时器的所有者
         /// </summary>
-        [ShowInInspector] private object target => OnFinish?.Target;
+        [ShowInInspector]
+        private object target => OnFinish?.Target;
 
         /// <summary>
         /// 计时器的状态
@@ -44,21 +45,36 @@ namespace JFramework
         /// <summary>
         /// 完成时执行的事件
         /// </summary>
-        private Action<ITimer> OnFinish;
+        private Action OnFinish;
 
         /// <summary>
         /// 计时器初始化时调用
         /// </summary>
-        /// <param name="keepTime">持续时间</param>
+        /// <param name="duration">间隙</param>
         /// <param name="OnFinish">完成时执行的事件</param>
-        public void Open(float keepTime, Action<ITimer> OnFinish)
+        public void Open(float duration, Action OnFinish)
         {
-            loopCount = 1;
+            count = 1;
             unscaled = false;
             state = TimerState.Run;
-            this.keepTime = keepTime;
+            this.duration = duration;
             this.OnFinish = OnFinish;
-            waitTime = Time.time + keepTime;
+            waitTime = Time.time + duration;
+        }
+
+        /// <summary>
+        /// 计时器初始化时调用
+        /// </summary>
+        /// <param name="duration">持续时间</param>
+        /// <param name="OnFinish">完成时执行的事件</param>
+        public void Open(float duration, Action<ITimer> OnFinish)
+        {
+            count = 1;
+            unscaled = false;
+            state = TimerState.Run;
+            this.duration = duration;
+            this.OnFinish = () => OnFinish(this);
+            waitTime = Time.time + duration;
         }
 
         /// <summary>
@@ -67,22 +83,22 @@ namespace JFramework
         /// <param name="currTime">传入的游戏时间</param>
         private void OnUpdate(float currTime)
         {
-            if (currTime < waitTime)
+            if (currTime > waitTime)
             {
                 try
                 {
-                    loopCount--;
-                    OnFinish?.Invoke(this);
-                    waitTime += keepTime;
-                    if (loopCount == 0)
+                    count--;
+                    OnFinish?.Invoke();
+                    waitTime += duration;
+                    if (count == 0)
                     {
-                        TimerManager.Push(this);
+                        this.Push();
                     }
                 }
                 catch (Exception e)
                 {
-                    GlobalManager.Logger(DebugOption.Timer, $"=> 计时器抛出异常，自动回收计时器。\n{e}");
-                    TimerManager.Push(this);
+                    Log.Info(DebugOption.Timer, $"=> 计时器抛出异常，自动回收计时器。\n{e}");
+                    this.Push();
                 }
             }
         }
@@ -95,6 +111,11 @@ namespace JFramework
             if (state != TimerState.Run) return;
             OnUpdate(unscaled ? Time.unscaledTime : Time.time);
         }
+
+        /// <summary>
+        /// 剩余循环次数
+        /// </summary>
+        int ITimer.Count => count;
 
         /// <summary>
         /// 计时器开始计时
@@ -121,9 +142,9 @@ namespace JFramework
         /// </summary>
         /// <param name="count">计时器循环次数</param>
         /// <returns>返回自身</returns>
-        public ITimer SetLoop(int count)
+        public ITimer Loop(int count)
         {
-            loopCount = count;
+            this.count = count;
             return this;
         }
 
@@ -134,7 +155,7 @@ namespace JFramework
         public ITimer Unscale()
         {
             unscaled = !unscaled;
-            waitTime = Time.unscaledTime + keepTime;
+            waitTime = Time.unscaledTime + duration;
             return this;
         }
 

@@ -61,11 +61,11 @@ namespace JFramework.Core
                     var keyInfo = GetKeyField<KeyFieldAttribute>(keyData);
                     if (keyData == null)
                     {
-                        Debug.Log($"{Name.Sky()} 缺少主键 => {type.Name.Red()}");
+                        Log.Info($"{Name.Sky()} 缺少主键 => {type.Name.Red()}");
                         return;
                     }
 
-                    GlobalManager.Logger(DebugOption.Data, $"加载 => {type.Name.Blue()} 数据表");
+                    Log.Info(DebugOption.Data, $"加载 => {type.Name.Blue()} 数据表");
                     var keyType = keyInfo.FieldType;
                     if (keyType == typeof(int))
                     {
@@ -83,13 +83,12 @@ namespace JFramework.Core
                     if (types.Length == ++tableIndex)
                     {
                         OnCompleted?.Invoke();
-                        OnCompleted = null;
-                        Debug.Log($"{Name.Sky()} 加载 => 所有数据完成");
+                        Log.Info($"{Name.Sky()} 加载 => 所有数据完成");
                     }
                 }
                 catch (Exception)
                 {
-                    Debug.Log($"{Name.Sky()} 加载 => {type.Name.Red()} 数据失败");
+                    Log.Info($"{Name.Sky()} 加载 => {type.Name.Red()} 数据失败");
                 }
             }
         }
@@ -114,7 +113,7 @@ namespace JFramework.Core
                 }
                 else
                 {
-                    Debug.Log($"{Name.Sky()} 加载 => {table.GetType().Name.Orange()} 已经存在 {key.ToString().Red()} 键值!");
+                    Log.Info($"{Name.Sky()} 加载 => {table.GetType().Name.Orange()} 已经存在 {key.ToString().Red()} 键值!");
                 }
             }
 
@@ -132,7 +131,7 @@ namespace JFramework.Core
             IntDataDict.TryGetValue(typeof(T), out IntDataDict soDict);
             if (soDict == null) return default;
             soDict.TryGetValue(key, out IData data);
-            GlobalManager.Logger(DebugOption.Data, data != null
+            Log.Info(DebugOption.Data, data != null
                 ? $"获取 => {typeof(T).Name.Blue()} : {key.ToString().Green()} 数据成功"
                 : $"获取 => {typeof(T).Name.Red()} : {key.ToString().Green()} 数据失败");
             return (T)data;
@@ -149,7 +148,7 @@ namespace JFramework.Core
             StrDataDict.TryGetValue(typeof(T), out StrDataDict soDict);
             if (soDict == null) return default;
             soDict.TryGetValue(key, out IData data);
-            GlobalManager.Logger(DebugOption.Data, data != null
+            Log.Info(DebugOption.Data, data != null
                 ? $"获取 => {typeof(T).Name.Blue()} : {key.Green()} 数据成功"
                 : $"获取 => {typeof(T).Name.Red()} : {key.Green()} 数据失败");
             return (T)data;
@@ -166,7 +165,7 @@ namespace JFramework.Core
             EnmDataDict.TryGetValue(typeof(T), out EnmDataDict soDict);
             if (soDict == null) return default;
             soDict.TryGetValue(key, out IData data);
-            GlobalManager.Logger(DebugOption.Data, data != null
+            Log.Info(DebugOption.Data, data != null
                 ? $"获取 => {typeof(T).Name.Blue()} : {key.ToString().Green()} 数据成功"
                 : $"获取 => {typeof(T).Name.Red()} : {key.ToString().Green()} 数据失败");
             return (T)data;
@@ -181,7 +180,7 @@ namespace JFramework.Core
         public static List<T> GetTable<T>() where T : IData
         {
             var table = GetTable(typeof(T));
-            GlobalManager.Logger(DebugOption.Data, $"获取 => {typeof(T).Name.Blue()} 列表成功");
+            Log.Info(DebugOption.Data, $"获取 => {typeof(T).Name.Blue()} 列表成功");
             return table?.Cast<T>().ToList();
         }
 

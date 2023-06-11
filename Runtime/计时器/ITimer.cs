@@ -1,5 +1,3 @@
-using System;
-
 namespace JFramework.Interface
 {
     /// <summary>
@@ -7,6 +5,11 @@ namespace JFramework.Interface
     /// </summary>
     public interface ITimer
     {
+        /// <summary>
+        /// 剩余循环次数(每次循环都会减去1)
+        /// </summary>
+        int Count { get; }
+
         /// <summary>
         /// 计时器播放
         /// </summary>
@@ -29,6 +32,6 @@ namespace JFramework.Interface
         /// 计时器循环
         /// </summary>
         /// <param name="count">循环次数</param>
-        ITimer SetLoop(int count);
+        ITimer Loop(int count);
     }
 }

@@ -1,24 +1,14 @@
 using System;
 using System.Collections.Generic;
 using JFramework.Interface;
-using UnityEngine;
 
 namespace JFramework.Core
 {
-    /// <summary>
-    /// 命令管理器
-    /// </summary>
     public static class CommandManager
     {
-        /// <summary>
-        /// 命令存储字典
-        /// </summary>
         internal static Dictionary<Type, ICommand> commandDict;
-
-        /// <summary>
-        /// 命令管理器初始化
-        /// </summary>
         internal static void Awake() => commandDict = new Dictionary<Type, ICommand>();
+        internal static void Destroy() => commandDict = null;
 
         /// <summary>
         /// 执行命令
@@ -39,10 +29,5 @@ namespace JFramework.Core
 
             commandDict[key].OnExecute(args);
         }
-
-        /// <summary>
-        /// 清除命令管理器
-        /// </summary>
-        internal static void Destroy() => commandDict = null;
     }
 }

@@ -21,7 +21,7 @@ namespace JFramework.Core
             if (!GlobalManager.Runtime) return;
             var filePath = GetPath(name);
             var saveJson = obj is ScriptableObject ? JsonUtility.ToJson(obj) : JsonConvert.SerializeObject(obj);
-            GlobalManager.Logger(DebugOption.Json,$"保存加密 => {name.Orange()} 数据文件");
+            Log.Info(DebugOption.Json,$"保存加密 => {name.Orange()} 数据文件");
             using Aes aes = Aes.Create();
             {
                 SetData(name, aes.Key, aes.IV);
@@ -40,11 +40,11 @@ namespace JFramework.Core
             var filePath = GetPath(obj.name);
             if (!File.Exists(filePath))
             {
-                Debug.Log($"{Name.Sky()} 创建 => {obj.name.Orange()} 数据文件");
+                Log.Info($"{nameof(JsonManager)} 创建 => {obj.name.Orange()} 数据文件");
                 Encrypt(obj, obj.name);
             }
             
-            GlobalManager.Logger(DebugOption.Json,$"读取解密 => {obj.name.Orange()} 数据文件");
+            Log.Info(DebugOption.Json,$"读取解密 => {obj.name.Orange()} 数据文件");
             var loadJson = File.ReadAllBytes(filePath);
             var data = GetData(obj.name);
             var key = data.key;
@@ -68,11 +68,11 @@ namespace JFramework.Core
             var filePath = GetPath(name);
             if (!File.Exists(filePath))
             {
-                Debug.Log($"{Name.Sky()} 创建 => {name.Orange()} 数据文件");
+                Log.Info($"{nameof(JsonManager)} 创建 => {name.Orange()} 数据文件");
                 Encrypt(new T(), name);
             }
             
-            GlobalManager.Logger(DebugOption.Json,$"读取解密 => {name.Orange()} 数据文件");
+            Log.Info(DebugOption.Json,$"读取解密 => {name.Orange()} 数据文件");
             var loadJson = File.ReadAllBytes(filePath);
             var json = GetData(name);
             var key = json.key;
@@ -110,7 +110,7 @@ namespace JFramework.Core
                 }
                 catch (Exception e)
                 {
-                    Debug.LogWarning($"{nameof(JsonManager).Red()} 存档丢失 => 加密失败!\n" + e);
+                    Log.Warn($"{nameof(JsonManager).Red()} 存档丢失 => 加密失败!\n" + e);
                     Clear();
                 }
 
@@ -139,7 +139,7 @@ namespace JFramework.Core
                 }
                 catch (Exception e)
                 {
-                    Debug.LogWarning($"{nameof(JsonManager).Red()} 存档丢失 => 解密失败!\n" + e);
+                    Log.Warn($"{nameof(JsonManager).Red()} 存档丢失 => 解密失败!\n" + e);
                     Clear();
                 }
 

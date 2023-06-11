@@ -70,7 +70,7 @@ namespace JFramework
             }
             catch (Exception e)
             {
-                Debug.Log(e);
+                Log.Warn(e.ToString());
             }
         }
 

@@ -55,7 +55,7 @@ namespace JFramework
             }
             else if (instance != this)
             {
-                Debug.Log(typeof(T)+"单例重复！");
+                Log.Warn(typeof(T) + "单例重复！");
                 Destroy(this);
             }
         }
@@ -72,7 +72,7 @@ namespace JFramework
             }
             catch (Exception e)
             {
-                Debug.Log(e);
+                Log.Warn(e.ToString());
             }
         }
 

@@ -21,27 +21,20 @@ namespace JFramework
         /// <typeparam name="T">可转换为任何对象</typeparam>
         /// <returns>返回转换的对象类型</returns>
         public static T As<T>(this object[] obj, int index = 0) => (T)obj[index];
-        
-        
-        /// <summary>
-        /// 判断对象是否为Component类
-        /// </summary>
-        /// <param name="type">对象类型</param>
-        /// <returns>返回是否为组件</returns>
-        public static bool IsComponent(this Type type)
-        {
-            return typeof(Component).IsAssignableFrom(type);
-        }
 
         /// <summary>
         /// 判断对象是否为Component类
         /// </summary>
         /// <param name="type">对象类型</param>
         /// <returns>返回是否为组件</returns>
-        public static bool IsScriptable(this Type type)
-        {
-            return typeof(ScriptableObject).IsAssignableFrom(type);
-        }
+        public static bool IsComponent(this Type type) => typeof(Component).IsAssignableFrom(type);
+
+        /// <summary>
+        /// 判断对象是否为Component类
+        /// </summary>
+        /// <param name="type">对象类型</param>
+        /// <returns>返回是否为组件</returns>
+        public static bool IsScriptable(this Type type) => typeof(ScriptableObject).IsAssignableFrom(type);
 
         /// <summary>
         /// 比较int和enum的值是否相等

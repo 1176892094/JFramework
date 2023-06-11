@@ -3,85 +3,63 @@ using UnityEngine;
 
 namespace JFramework.Core
 {
-    /// <summary>
-    /// 全局管理器(禁止添加)
-    /// </summary>
     [AddComponentMenu("")]
     public sealed partial class GlobalManager : MonoBehaviour
     {
         /// <summary>
-        /// 全局管理器单例
+        /// 全局管理器的单例
         /// </summary>
-        public static GlobalManager Instance;
+        internal static GlobalManager Instance;
         
         /// <summary>
-        /// 是否在运行
+        /// 全局管理器开始事件
         /// </summary>
-        private static bool isRuntime;
+        public static event Action OnStart;
         
         /// <summary>
-        /// 打印Runtime信息
+        /// 全局管理器更新事件
+        /// </summary>
+        public static event Action OnUpdate;
+        
+        /// <summary>
+        /// 全局管理器销毁事件
+        /// </summary>
+        public static event Action OnDestroy;
+        
+        /// <summary>
+        /// 是否在运行模式
+        /// </summary>
+        private static bool runtime;
+
+        /// <summary>
+        /// 进行日志输出
         /// </summary>
         public static bool Runtime
         {
             get
             {
-                if (!isRuntime)
+                if (!runtime)
                 {
-                    Debug.Log($"{nameof(GlobalManager).Red()} 没有初始化！");
+                    Log.Info(DebugOption.Global, "没有初始化！".Red());
                 }
 
-                return isRuntime;
+                return runtime;
             }
         }
 
-        /// <summary>
-        /// Start开始事件
-        /// </summary>
-        public static event Action OnStart;
-
-        /// <summary>
-        /// Update更新事件
-        /// </summary>
-        public static event Action OnUpdate;
-
-        /// <summary>
-        /// Destroy销毁事件
-        /// </summary>
-        public static event Action OnDestroy;
-
-        /// <summary>
-        /// 全局管理器醒来
-        /// </summary>
         private void Awake() => DontDestroyOnLoad(gameObject);
-
-        /// <summary>
-        /// 全局管理器开始
-        /// </summary>
         private void Start() => OnStart?.Invoke();
-
-        /// <summary>
-        /// 全局Update更新
-        /// </summary>
         private void Update() => OnUpdate?.Invoke();
 
         /// <summary>
-        /// 设置全局单例
-        /// </summary>
-        private static void Singleton()
-        {
-            isRuntime = true;
-            Instance ??= FindObjectOfType<GlobalManager>();
-            Instance ??= Instantiate(Resources.Load<GlobalManager>(nameof(GlobalManager)));
-        }
-
-        /// <summary>
-        /// 注册管理器
+        /// 在场景加载之前进行初始化
         /// </summary>
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
         private static void Register()
         {
-            Singleton();
+            runtime = true;
+            Instance ??= FindObjectOfType<GlobalManager>();
+            Instance ??= Instantiate(Resources.Load<GlobalManager>(nameof(GlobalManager)));
             CommandManager.Awake();
             AssetManager.Awake();
             EventManager.Awake();
@@ -96,11 +74,11 @@ namespace JFramework.Core
         }
 
         /// <summary>
-        /// 当程序退出
+        /// 程序退出时执行的方法
         /// </summary>
         private void OnApplicationQuit()
         {
-            isRuntime = false;
+            runtime = false;
             OnDestroy?.Invoke();
             UIManager.Destroy();
             PoolManager.Destroy();
@@ -118,20 +96,5 @@ namespace JFramework.Core
             OnUpdate = null;
             OnDestroy = null;
         }
-    }
-    
-    [Flags]
-    internal enum DebugOption
-    {
-        None = 0,
-        Json = 1,
-        Pool = 2,
-        Data = 4,
-        Scene = 8,
-        Asset = 16,
-        Audio = 32,
-        Event = 64,
-        Timer = 128,
-        Custom = 256,
     }
 }

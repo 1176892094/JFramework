@@ -9,23 +9,29 @@ namespace JFramework
     /// 实体的抽象类
     /// </summary>
     [Serializable]
-    public abstract class Entity : SerializedMonoBehaviour, IEntity,IUpdate
+    public abstract class Entity : SerializedMonoBehaviour, IEntity, IUpdate
     {
         /// <summary>
         /// 实体生成
         /// </summary>
         /// <param name="value">传入生成参数</param>
-        public virtual void Spawn(params object[] value) { }
+        public virtual void Spawn(params object[] value)
+        {
+        }
 
         /// <summary>
         /// 实体更新
         /// </summary>
-        protected virtual void OnUpdate() { }
+        protected virtual void OnUpdate()
+        {
+        }
 
         /// <summary>
         /// 实体销毁
         /// </summary>
-        public virtual void Despawn() { }
+        public virtual void Despawn()
+        {
+        }
 
         /// <summary>
         /// 实体启用
@@ -56,7 +62,7 @@ namespace JFramework
             }
             catch (Exception e)
             {
-                GlobalManager.Logger(DebugOption.Custom, $"{name.Sky()} => {nameof(OnDestroy).Green()} 发生异常\n{e}");
+                Log.Info(DebugOption.Custom, $"{name.Sky()} => {nameof(OnDestroy).Green()} 发生异常\n{e}");
             }
         }
 

@@ -1,5 +1,4 @@
 using System;
-using Sirenix.OdinInspector;
 using UnityEngine;
 
 namespace JFramework
@@ -13,7 +12,7 @@ namespace JFramework
         /// <summary>
         /// 游戏物体组
         /// </summary>
-        [ShowInInspector] private readonly Transform transform;
+        private readonly Transform transform;
 
         /// <summary>
         /// 构造函数初始化数据

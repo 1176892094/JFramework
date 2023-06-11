@@ -92,7 +92,7 @@ namespace JFramework.Core
             {
                 if (panelDict[key].stateType == UIStateType.Freeze)
                 {
-                    Debug.LogWarning($"{key}处于冻结状态，无法通过UIManager隐藏！");
+                    Log.Warn($"{key}处于冻结状态，无法通过UIManager隐藏！");
                     return;
                 }
 
