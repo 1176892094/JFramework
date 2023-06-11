@@ -5,8 +5,6 @@ using UnityEngine;
 using UnityEngine.AddressableAssets;
 using UnityEngine.ResourceManagement.AsyncOperations;
 using UnityEngine.ResourceManagement.ResourceProviders;
-using LoadManager = UnityEngine.SceneManagement.SceneManager;
-
 
 namespace JFramework.Core
 {
@@ -46,7 +44,7 @@ namespace JFramework.Core
         /// <summary>
         /// 当前场景名称
         /// </summary>
-        public static string scene => LoadManager.GetActiveScene().name;
+        public static string scene => UnityEngine.SceneManagement.SceneManager.GetActiveScene().name;
 
         /// <summary>
         /// 场景管理器初始化
