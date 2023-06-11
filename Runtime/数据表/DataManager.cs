@@ -49,7 +49,6 @@ namespace JFramework.Core
             EnmDataDict = new Dictionary<Type, EnmDataDict>();
             var (assembly, types) = GetAssembly<IDataTable>();
             if (types == null || types.Length == 0) return;
-            var tableIndex = 0;
             foreach (var type in types)
             {
                 var keyName = type.Name;
@@ -79,18 +78,15 @@ namespace JFramework.Core
                     {
                         EnmDataDict.Add(keyData, Add<Enum>(keyInfo, dataTable));
                     }
-
-                    if (types.Length == ++tableIndex)
-                    {
-                        OnCompleted?.Invoke();
-                        Log.Info($"{Name.Sky()} 加载 => 所有数据完成");
-                    }
                 }
                 catch (Exception)
                 {
                     Log.Info($"{Name.Sky()} 加载 => {type.Name.Red()} 数据失败");
                 }
             }
+
+            Log.Info($"{Name.Sky()} 加载 => 所有数据完成");
+            OnCompleted?.Invoke();
         }
 
         /// <summary>

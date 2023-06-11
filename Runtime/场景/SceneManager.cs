@@ -1,8 +1,10 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using UnityEngine;
-using UnityEngine.SceneManagement;
+using UnityEngine.AddressableAssets;
+using UnityEngine.ResourceManagement.AsyncOperations;
+using UnityEngine.ResourceManagement.ResourceProviders;
 using LoadManager = UnityEngine.SceneManagement.SceneManager;
 
 
@@ -13,7 +15,7 @@ namespace JFramework.Core
         /// <summary>
         /// 场景列表
         /// </summary>
-        internal static Dictionary<int, SceneData> sceneDict;
+        internal static Dictionary<string, string> sceneDict;
 
         /// <summary>
         /// 场景加载事件(进度条)
@@ -40,7 +42,7 @@ namespace JFramework.Core
                 }
             }
         }
-        
+
         /// <summary>
         /// 当前场景名称
         /// </summary>
@@ -49,71 +51,65 @@ namespace JFramework.Core
         /// <summary>
         /// 场景管理器初始化
         /// </summary>
-        internal static void Awake()
+        internal static async void Awake()
         {
-            sceneDict = new Dictionary<int, SceneData>();
-            for (var i = 0; i < LoadManager.sceneCountInBuildSettings; i++)
+            var handle = Addressables.LoadResourceLocationsAsync("Scene", typeof(SceneInstance));
+            await handle.Task;
+            sceneDict = new Dictionary<string, string>();
+            if (handle.Status == AsyncOperationStatus.Succeeded)
             {
-                var path = SceneUtility.GetScenePathByBuildIndex(i);
-                var data = path.Split('/');
-                var last = data[^1];
-                data = last.Split('.');
-                sceneDict.Add(i, new SceneData() { Id = i, Name = data[0] });
+                foreach (var location in handle.Result)
+                {
+                    sceneDict.Add(location.PrimaryKey.Split('/')[1], location.PrimaryKey);
+                }
             }
-        }
 
-        /// <summary>
-        /// 同步加载场景
-        /// </summary>
-        /// <param name="name">场景名称</param>
-        public static void LoadScene(string name)
-        {
-            if (!GlobalManager.Runtime) return;
-            Log.Info(DebugOption.Scene, $"同步加载 => {name.Green()} 场景");
-            LoadManager.LoadScene(name);
+            Addressables.Release(handle);
         }
 
         /// <summary>
         /// 异步加载场景
         /// </summary>
-        /// <param name="name">场景名称</param>
-        /// <param name="action">场景加载完成的回调</param>
-        public static void LoadSceneAsync(string name, Action action)
+        /// <param name="path">场景名称</param>
+        public static async Task LoadSceneAsync(string path)
         {
             if (!GlobalManager.Runtime) return;
-            Log.Info(DebugOption.Scene, $"异步加载 => {name.Green()} 场景");
-            GlobalManager.Instance.StartCoroutine(LoadSceneCompleted(name, action));
+            Log.Info(DebugOption.Scene, $"异步加载 => {path.Green()} 场景");
+            await OnLoadProgress(path, Time.time);
         }
 
         /// <summary>
-        /// 通过携程异步加载场景
+        /// 异步加载场景的进度条
         /// </summary>
-        /// <param name="name">场景名称</param>
-        /// <param name="action">场景加载完成的回调</param>
+        /// <param name="path">场景名称</param>
+        /// <param name="time">开始加载场景的时间</param>
         /// <returns>返回场景加载迭代器</returns>
-        private static IEnumerator LoadSceneCompleted(string name, Action action)
+        private static async Task OnLoadProgress(string path, float time)
         {
-            var asyncOperation = LoadManager.LoadSceneAsync(name);
-            asyncOperation.allowSceneActivation = false;
-            var currentTime = Time.time;
-            while (!asyncOperation.isDone)
+            var handle = Addressables.LoadSceneAsync(path);
+            while (!handle.IsDone)
             {
                 Progress = 0;
                 while (Progress < 0.99f)
                 {
-                    Progress = Mathf.Lerp(Progress, asyncOperation.progress / 9f * 10f, Time.fixedDeltaTime * 2);
+                    Progress = Mathf.Lerp(Progress, handle.PercentComplete / 9f * 10f, Time.fixedDeltaTime);
                     OnLoadScene?.Invoke(Progress);
                     Log.Info(DebugOption.Scene, $"加载进度 => {Progress.ToString("P").Green()}");
-                    yield return new WaitForEndOfFrame();
+                    await Task.Yield();
                 }
 
-                asyncOperation.allowSceneActivation = true;
-                break;
+                await Task.Yield();
             }
 
-            action?.Invoke();
-            var totalTime = (Time.time - currentTime).ToString("F");
-            Log.Info(DebugOption.Scene, $"异步加载 => {name.Green()} 场景完成, 耗时 {totalTime.Yellow()} 秒");
+            if (handle.Status == AsyncOperationStatus.Succeeded)
+            {
+                var totalTime = (Time.time - time).ToString("F");
+                Log.Info(DebugOption.Scene, $"异步加载 => {path.Green()} 场景完成, 耗时 {totalTime.Yellow()} 秒");
+            }
+            else
+            {
+                Log.Info(DebugOption.Scene, $"异步加载 => {path.Red()} 场景失败");
+            }
         }
 
         /// <summary>
