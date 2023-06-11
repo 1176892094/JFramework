@@ -70,23 +70,23 @@ namespace JFramework.Core
         /// <summary>
         /// 异步加载场景
         /// </summary>
-        /// <param name="path">场景名称</param>
-        public static async Task LoadSceneAsync(string path)
+        /// <param name="key">场景名称</param>
+        public static async Task LoadSceneAsync(string key)
         {
             if (!GlobalManager.Runtime) return;
-            Log.Info(DebugOption.Scene, $"异步加载 => {path.Green()} 场景");
-            await OnLoadProgress(path, Time.time);
+            Log.Info(DebugOption.Scene, $"异步加载 => {sceneDict[key].Green()} 场景");
+            await OnLoadProgress(sceneDict[key], Time.time);
         }
 
         /// <summary>
         /// 异步加载场景的进度条
         /// </summary>
-        /// <param name="path">场景名称</param>
+        /// <param name="key">场景名称</param>
         /// <param name="time">开始加载场景的时间</param>
         /// <returns>返回场景加载迭代器</returns>
-        private static async Task OnLoadProgress(string path, float time)
+        private static async Task OnLoadProgress(string key, float time)
         {
-            var handle = Addressables.LoadSceneAsync(path);
+            var handle = Addressables.LoadSceneAsync(key);
             while (!handle.IsDone)
             {
                 Progress = 0;
@@ -105,11 +105,11 @@ namespace JFramework.Core
             if (handle.Status == AsyncOperationStatus.Succeeded)
             {
                 var totalTime = (Time.time - time).ToString("F");
-                Log.Info(DebugOption.Scene, $"异步加载 => {path.Green()} 场景完成, 耗时 {totalTime.Yellow()} 秒");
+                Log.Info(DebugOption.Scene, $"异步加载 => {key.Green()} 场景完成, 耗时 {totalTime.Yellow()} 秒");
             }
             else
             {
-                Log.Info(DebugOption.Scene, $"异步加载 => {path.Red()} 场景失败");
+                Log.Info(DebugOption.Scene, $"异步加载 => {key.Red()} 场景失败");
             }
         }
 
