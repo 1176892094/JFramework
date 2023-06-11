@@ -29,7 +29,6 @@ namespace JFramework.Interface
         /// 计时器循环
         /// </summary>
         /// <param name="count">循环次数</param>
-        /// <param name="OnLoop">每次循环触发的事件</param>
-        ITimer SetLoop(int count, Action<ITimer> OnLoop);
+        ITimer SetLoop(int count);
     }
 }

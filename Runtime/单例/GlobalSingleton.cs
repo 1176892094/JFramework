@@ -55,6 +55,7 @@ namespace JFramework
             }
             else if (instance != this)
             {
+                Debug.Log(typeof(T)+"单例重复！");
                 Destroy(this);
             }
         }

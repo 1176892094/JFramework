@@ -12,30 +12,25 @@ namespace JFramework
     internal class Timer : ITimer
     {
         /// <summary>
-        /// 当前循环次数
+        /// 剩余循环次数
         /// </summary>
-        private int count;
+        private int loopCount;
 
-        /// <summary>
-        /// 最大循环次数
-        /// </summary>
-        private int maxCount;
-        
         /// <summary>
         /// 持续时间
         /// </summary>
         private float keepTime;
-        
+
         /// <summary>
         /// 当前时间+持续时间
         /// </summary>
         private float waitTime;
-        
+
         /// <summary>
         /// 是否受TimeScale影响
         /// </summary>
         private bool unscaled;
-        
+
         /// <summary>
         /// 计时器的所有者
         /// </summary>
@@ -47,24 +42,18 @@ namespace JFramework
         [ShowInInspector] private TimerState state;
 
         /// <summary>
-        /// 循环时执行的事件
-        /// </summary>
-        private Action<ITimer> OnLoop;
-
-        /// <summary>
         /// 完成时执行的事件
         /// </summary>
-        private Action OnFinish;
-        
+        private Action<ITimer> OnFinish;
+
         /// <summary>
         /// 计时器初始化时调用
         /// </summary>
         /// <param name="keepTime">持续时间</param>
         /// <param name="OnFinish">完成时执行的事件</param>
-        public void Open(float keepTime, Action OnFinish)
+        public void Open(float keepTime, Action<ITimer> OnFinish)
         {
-            count = 0;
-            maxCount = 1;
+            loopCount = 1;
             unscaled = false;
             state = TimerState.Run;
             this.keepTime = keepTime;
@@ -75,24 +64,24 @@ namespace JFramework
         /// <summary>
         /// 当更新时执行的方法
         /// </summary>
-        /// <param name="time">传入的游戏时间</param>
-        private void OnUpdate(float time)
+        /// <param name="currTime">传入的游戏时间</param>
+        private void OnUpdate(float currTime)
         {
-            if (waitTime < time)
+            if (currTime < waitTime)
             {
                 try
                 {
-                    count++;
+                    loopCount--;
+                    OnFinish?.Invoke(this);
                     waitTime += keepTime;
-                    OnLoop?.Invoke(this);
-                    if (maxCount < 0) return;
-                    if (count < maxCount) return;
-                    OnFinish?.Invoke();
-                    TimerManager.Push(this);
+                    if (loopCount == 0)
+                    {
+                        TimerManager.Push(this);
+                    }
                 }
                 catch (Exception e)
                 {
-                    GlobalManager.Logger(DebugOption.Timer, $"=> 作用对象被销毁，自动回收计时器。\n{e}");
+                    GlobalManager.Logger(DebugOption.Timer, $"=> 计时器抛出异常，自动回收计时器。\n{e}");
                     TimerManager.Push(this);
                 }
             }
@@ -131,12 +120,10 @@ namespace JFramework
         /// 设置计时器的循环
         /// </summary>
         /// <param name="count">计时器循环次数</param>
-        /// <param name="OnLoop">循环时执行的事件</param>
         /// <returns>返回自身</returns>
-        public ITimer SetLoop(int count, Action<ITimer> OnLoop)
+        public ITimer SetLoop(int count)
         {
-            maxCount = count;
-            this.OnLoop = OnLoop;
+            loopCount = count;
             return this;
         }
 
@@ -146,7 +133,7 @@ namespace JFramework
         /// <returns>返回自身</returns>
         public ITimer Unscale()
         {
-            unscaled = true;
+            unscaled = !unscaled;
             waitTime = Time.unscaledTime + keepTime;
             return this;
         }
@@ -156,7 +143,6 @@ namespace JFramework
         /// </summary>
         public void Close()
         {
-            OnLoop = null;
             OnFinish = null;
             unscaled = false;
             state = TimerState.Finish;

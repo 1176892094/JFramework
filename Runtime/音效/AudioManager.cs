@@ -67,17 +67,15 @@ namespace JFramework.Core
         /// 播放背景音乐
         /// </summary>
         /// <param name="path">背景音乐的路径</param>
-        public static void PlaySound(string path)
+        public static async void PlaySound(string path)
         {
             if (!GlobalManager.Runtime) return;
             GlobalManager.Logger(DebugOption.Audio,$"播放背景音乐: {path.Green()}");
-            AssetManager.LoadAsync<AudioClip>(path, clip =>
-            {
-                audioSource.volume = audioSetting.soundVolume;
-                audioSource.clip = clip;
-                audioSource.loop = true;
-                audioSource.Play();
-            });
+            var clip = await AssetManager.LoadAsync<AudioClip>(path);
+            audioSource.volume = audioSetting.soundVolume;
+            audioSource.clip = clip;
+            audioSource.loop = true;
+            audioSource.Play();
         }
 
         /// <summary>
@@ -107,20 +105,18 @@ namespace JFramework.Core
         /// </summary>
         /// <param name="path">传入音效路径</param>
         /// <param name="action">获取音效的回调</param>
-        public static void PlayAudio(string path, Action<AudioSource> action = null)
+        public static async void PlayAudio(string path, Action<AudioSource> action = null)
         {
             if (!GlobalManager.Runtime) return;
             GlobalManager.Logger(DebugOption.Audio,$"播放音效: {path.Blue()}");
             var audio = audioQueue.Count > 0 ? audioQueue.Dequeue() : poolManager.AddComponent<AudioSource>();
-            AssetManager.LoadAsync<AudioClip>(path, clip =>
-            {
-                audioList.Add(audio);
-                audio.volume = audioSetting.audioVolume;
-                audio.clip = clip;
-                audio.Play();
-                action?.Invoke(audio);
-                TimerManager.Pop(clip.length, () => StopAudio(audio));
-            });
+            var clip = await AssetManager.LoadAsync<AudioClip>(path);
+            audioList.Add(audio);
+            audio.volume = audioSetting.audioVolume;
+            audio.clip = clip;
+            audio.Play();
+            action?.Invoke(audio);
+            TimerManager.Pop(clip.length, timer => StopAudio(audio));
         }
 
         /// <summary>
@@ -146,9 +142,9 @@ namespace JFramework.Core
         public static void StopAudio(AudioSource audioSource)
         {
             if (!GlobalManager.Runtime) return;
-            GlobalManager.Logger(DebugOption.Audio,$"停止音效: {audioSource.clip.name.Orange()}");
             if (audioList.Contains(audioSource))
             {
+                GlobalManager.Logger(DebugOption.Audio,$"停止音效: {audioSource.clip.name.Orange()}");
                 audioSource.Stop();
                 audioList.Remove(audioSource);
                 audioQueue.Enqueue(audioSource);

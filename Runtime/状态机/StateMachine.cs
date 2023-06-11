@@ -25,7 +25,7 @@ namespace JFramework
         /// <summary>
         /// 状态机更新
         /// </summary>
-        public void OnUpdate() => state?.OnUpdate();
+        public virtual void OnUpdate() => state?.OnUpdate();
 
         /// <summary>
         /// 状态机添加状态
@@ -71,7 +71,7 @@ namespace JFramework
         /// <typeparam name="TState">可传入任何继承IState的对象</typeparam>
         public void ChangeState<TState>(float time) where TState : IState
         {
-            TimerManager.Pop(time, ChangeState<TState>);
+            TimerManager.Pop(time, timer => ChangeState<TState>(time));
         }
     }
 }

@@ -15,14 +15,9 @@ namespace JFramework.Core
         public static GlobalManager Instance;
         
         /// <summary>
-        /// 全局管理器名称
-        /// </summary>
-        private static string Name => nameof(GlobalManager);
-
-        /// <summary>
         /// 是否在运行
         /// </summary>
-        private static bool runtime;
+        private static bool isRuntime;
         
         /// <summary>
         /// 打印Runtime信息
@@ -31,12 +26,12 @@ namespace JFramework.Core
         {
             get
             {
-                if (!runtime)
+                if (!isRuntime)
                 {
-                    Debug.Log($"{Name.Red()} 没有初始化！");
+                    Debug.Log($"{nameof(GlobalManager).Red()} 没有初始化！");
                 }
 
-                return runtime;
+                return isRuntime;
             }
         }
 
@@ -75,9 +70,9 @@ namespace JFramework.Core
         /// </summary>
         private static void Singleton()
         {
-            runtime = true;
+            isRuntime = true;
             Instance ??= FindObjectOfType<GlobalManager>();
-            Instance ??= Instantiate(Resources.Load<GlobalManager>(Name));
+            Instance ??= Instantiate(Resources.Load<GlobalManager>(nameof(GlobalManager)));
         }
 
         /// <summary>
@@ -105,7 +100,7 @@ namespace JFramework.Core
         /// </summary>
         private void OnApplicationQuit()
         {
-            runtime = false;
+            isRuntime = false;
             OnDestroy?.Invoke();
             UIManager.Destroy();
             PoolManager.Destroy();

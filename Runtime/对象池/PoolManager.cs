@@ -1,7 +1,8 @@
-using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using JFramework.Interface;
 using UnityEngine;
+using Object = UnityEngine.Object;
 
 namespace JFramework.Core
 {
@@ -35,30 +36,26 @@ namespace JFramework.Core
         /// 对象池管理器拉取对象
         /// </summary>
         /// <param name="key">拉取对象的名称</param>
-        /// <param name="action">拉取对象的回调</param>
-        public static void Pop(string key, Action<GameObject> action)
+        public static async Task<T> Pop<T>(string key) where T: Object
         {
-            if (!GlobalManager.Runtime) return;
+            if (!GlobalManager.Runtime) return null;
             if (poolDict.ContainsKey(key) && poolDict[key].Count > 0)
             {
-                var obj = (GameObject)poolDict[key].Pop();
+                var poolObj = (T)poolDict[key].Pop();
 
-                if (obj != null)
+                if (poolObj != null)
                 {
                     GlobalManager.Logger(DebugOption.Pool,$"取出 => {key.Pink()} 对象成功");
-                    action?.Invoke(obj);
-                    return;
+                    return poolObj;
                 }
 
                 GlobalManager.Logger(DebugOption.Pool,$"移除已销毁对象 : {key.Red()}");
             }
-            
-            AssetManager.LoadAsync<GameObject>(key, o =>
-            {
-                o.name = key;
-                action?.Invoke(o);
-                GlobalManager.Logger(DebugOption.Pool,$"创建 => {key.Green()} 对象成功");
-            });
+
+            var obj = await AssetManager.LoadAsync<GameObject>(key);
+            obj.name = key;
+            GlobalManager.Logger(DebugOption.Pool, $"创建 => {key.Green()} 对象成功");
+            return obj.GetComponent<T>();
         }
 
         /// <summary>

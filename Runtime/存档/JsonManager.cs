@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using System.IO;
-using JFramework.Table;
 using Newtonsoft.Json;
 using UnityEngine;
 

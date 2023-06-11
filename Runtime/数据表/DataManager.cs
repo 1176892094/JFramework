@@ -42,7 +42,7 @@ namespace JFramework.Core
         /// <summary>
         /// 构造函数初始化数据
         /// </summary>
-        internal static void Awake()
+        internal static async void Awake()
         {
             IntDataDict = new Dictionary<Type, IntDataDict>();
             StrDataDict = new Dictionary<Type, StrDataDict>();
@@ -55,38 +55,37 @@ namespace JFramework.Core
                 var keyName = type.Name;
                 try
                 {
-                    AssetManager.LoadAsync<ScriptableObject>("DataTable/" + keyName, table =>
+                    var table = await AssetManager.LoadAsync<ScriptableObject>("DataTable/" + keyName);
+                    var dataTable = table.As<IDataTable>();
+                    var keyData = GetKeyField(assembly, type);
+                    var keyInfo = GetKeyField<KeyFieldAttribute>(keyData);
+                    if (keyData == null)
                     {
-                        var dataTable = table.As<IDataTable>();
-                        var keyData = GetKeyField(assembly, type);
-                        var keyInfo = GetKeyField<KeyFieldAttribute>(keyData);
-                        if (keyData == null)
-                        {
-                            Debug.Log($"{Name.Sky()} 缺少主键 => {type.Name.Red()}");
-                            return;
-                        }
+                        Debug.Log($"{Name.Sky()} 缺少主键 => {type.Name.Red()}");
+                        return;
+                    }
 
-                        GlobalManager.Logger(DebugOption.Data, $"加载 => {type.Name.Blue()} 数据表");
-                        var keyType = keyInfo.FieldType;
-                        if (keyType == typeof(int))
-                        {
-                            IntDataDict.Add(keyData, Add<int>(keyInfo, dataTable));
-                        }
-                        else if (keyType == typeof(string))
-                        {
-                            StrDataDict.Add(keyData, Add<string>(keyInfo, dataTable));
-                        }
-                        else if (keyType.IsEnum)
-                        {
-                            EnmDataDict.Add(keyData, Add<Enum>(keyInfo, dataTable));
-                        }
+                    GlobalManager.Logger(DebugOption.Data, $"加载 => {type.Name.Blue()} 数据表");
+                    var keyType = keyInfo.FieldType;
+                    if (keyType == typeof(int))
+                    {
+                        IntDataDict.Add(keyData, Add<int>(keyInfo, dataTable));
+                    }
+                    else if (keyType == typeof(string))
+                    {
+                        StrDataDict.Add(keyData, Add<string>(keyInfo, dataTable));
+                    }
+                    else if (keyType.IsEnum)
+                    {
+                        EnmDataDict.Add(keyData, Add<Enum>(keyInfo, dataTable));
+                    }
 
-                        if (types.Length == ++tableIndex)
-                        {
-                            OnCompleted?.Invoke();
-                            Debug.Log($"{Name.Sky()} 加载 => 所有数据完成");
-                        }
-                    });
+                    if (types.Length == ++tableIndex)
+                    {
+                        OnCompleted?.Invoke();
+                        OnCompleted = null;
+                        Debug.Log($"{Name.Sky()} 加载 => 所有数据完成");
+                    }
                 }
                 catch (Exception)
                 {

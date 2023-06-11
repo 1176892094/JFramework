@@ -17,11 +17,10 @@ namespace JFramework.Core
             { DebugOption.Event, "EventManager " }, { DebugOption.Timer, "TimerManager " },
         };
 
-        [FoldoutGroup("设置管理器")]
-        [TabGroup("设置管理器/Setting", "Setting"), SerializeField, LabelText("控制台输出选项")]
+        [FoldoutGroup("设置管理器"), TabGroup("设置管理器/Setting", "Setting"), SerializeField, LabelText("控制台输出选项")]
         private DebugOption debugOption;
-        
-        [Required("请在此输入ChatGPT的密钥!")]
+
+        [Required("请在此输入ChatGPT的密钥!")] 
         [TabGroup("设置管理器/Setting", "OpenAI"), SerializeField, LabelText("")]
         internal string key = "";
 

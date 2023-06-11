@@ -1,7 +1,7 @@
 using System;
 using JFramework.Core;
 using JFramework.Interface;
-using UnityEngine;
+using Sirenix.OdinInspector;
 
 namespace JFramework
 {
@@ -9,7 +9,7 @@ namespace JFramework
     /// 实体的抽象类
     /// </summary>
     [Serializable]
-    public abstract class Entity : MonoBehaviour, IEntity,IUpdate
+    public abstract class Entity : SerializedMonoBehaviour, IEntity,IUpdate
     {
         /// <summary>
         /// 实体生成
@@ -48,7 +48,7 @@ namespace JFramework
         /// <summary>
         /// 实体销毁
         /// </summary>
-        protected void OnDestroy()
+        private void OnDestroy()
         {
             try
             {

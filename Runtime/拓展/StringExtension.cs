@@ -4,6 +4,13 @@ namespace JFramework
     public static class StringExtension
     {
         /// <summary>
+        /// 判断自身是否有文本
+        /// </summary>
+        /// <param name="s">传递自身</param>
+        /// <returns></returns>
+        public static bool IsEmpty(this string s) => string.IsNullOrEmpty(s);
+        
+        /// <summary>
         /// 设置为绿色字符串
         /// </summary>
         public static string Green(this string s) => s.SetColor(TextColor.Green);

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.EventSystems;
@@ -48,40 +49,35 @@ namespace JFramework.Core
         /// UI管理器加载面板
         /// </summary>
         /// <param name="name">传入面板的名称</param>
-        /// <param name="action">显示面板的回调</param>
         /// <typeparam name="T">可以使用所有继承IPanel的对象</typeparam>
-        private static void LoadPanel<T>(string name, Action<T> action) where T : UIPanel
+        private static async Task<T> LoadPanel<T>(string name) where T : UIPanel
         {
             var key = typeof(T);
-            AssetManager.LoadAsync<GameObject>("UI/" + name, obj =>
-            {
-                if (panelDict.ContainsKey(key)) HidePanel<T>();
-                obj.transform.SetParent(layerGroup[0], false);
-                var panel = obj.GetComponent<T>();
-                panelDict.Add(key, panel);
-                panel.Show();
-                panel.name = name;
-                action?.Invoke(panel);
-            });
+            var obj = await AssetManager.LoadAsync<GameObject>("UI/" + name);
+            if (panelDict.ContainsKey(key)) HidePanel<T>();
+            obj.transform.SetParent(layerGroup[0], false);
+            var panel = obj.GetComponent<T>();
+            panelDict.Add(key, panel);
+            panel.Show();
+            panel.name = name;
+            return panel;
         }
 
         /// <summary>
         /// UI管理器显示UI面板
         /// </summary>
-        /// <param name="action">显示面板的回调</param>
         /// <typeparam name="T">可以使用所有继承IPanel的对象</typeparam>
-        public static void ShowPanel<T>(Action<T> action = null) where T : UIPanel
+        public static async Task<T> ShowPanel<T>() where T : UIPanel
         {
-            if (!GlobalManager.Runtime) return;
+            if (!GlobalManager.Runtime) return null;
             var key = typeof(T);
             if (panelDict.ContainsKey(key))
             {
                 panelDict[key].Show();
-                action?.Invoke((T)panelDict[key]);
-                return;
+                return (T)panelDict[key];
             }
 
-            LoadPanel(key.Name, action);
+            return await LoadPanel<T>(key.Name);
         }
         
 
@@ -142,6 +138,18 @@ namespace JFramework.Core
             var entry = new EventTrigger.Entry { eventID = type };
             entry.callback.AddListener(eventData => action?.Invoke((T)eventData));
             trigger.triggers.Add(entry);
+        }
+
+        /// <summary>
+        /// 手动注册到UI管理器
+        /// </summary>
+        public static void Register<T>(UIPanel panel) where T: UIPanel
+        {
+            var key = typeof(T);
+            if (!panelDict.ContainsKey(key))
+            {
+                UIManager.panelDict.Add(key, panel);
+            }
         }
 
         /// <summary>
