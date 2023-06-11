@@ -47,7 +47,7 @@ namespace JFramework
         /// </summary>
         protected virtual void OnDisable()
         {
-            if (!GlobalManager.Instance) return;
+            if (!GlobalManager.Runtime) return;
             GlobalManager.OnUpdate -= OnUpdate;
         }
 

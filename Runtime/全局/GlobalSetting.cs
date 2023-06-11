@@ -9,23 +9,7 @@ namespace JFramework.Core
 {
     public sealed partial class GlobalManager
     {
-#if UNITY_EDITOR
-        [FoldoutGroup("设置管理器"), ShowInInspector, LabelText("编辑器运行模式")]
-        private UnityEditor.EnterPlayModeOptions playModeOptions
-        {
-            get => UnityEditor.EditorSettings.enterPlayModeOptions;
-            set
-            {
-                if (!UnityEditor.EditorSettings.enterPlayModeOptionsEnabled)
-                {
-                    UnityEditor.EditorSettings.enterPlayModeOptionsEnabled = true;
-                }
-
-                UnityEditor.EditorSettings.enterPlayModeOptions = value;
-            }
-        }
-#endif
-        [FoldoutGroup("设置管理器"), SerializeField, LabelText("控制台输出选项")]
+        [FoldoutGroup("设置管理器"), ShowInInspector, LabelText("控制台输出选项")]
         internal DebugOption debugOption;
 
         [ShowInInspector, LabelText("场景管理数据"), FoldoutGroup("通用管理器")]
@@ -97,13 +81,13 @@ namespace JFramework.Core
             { DebugOption.Asset, "AssetManager " },
             { DebugOption.Audio, "AudioManager " },
             { DebugOption.Timer, "TimerManager " },
-            { DebugOption.Global, "GlobalManager " },
         };
 
 
         public static void Info(DebugOption option, string message)
         {
-            if (!GlobalManager.Runtime || (GlobalManager.Instance.debugOption & option) == 0) return;
+            if (!GlobalManager.Runtime) return;
+            if ((GlobalManager.Instance.debugOption & option) == 0) return;
             Debug.Log(debugDict.ContainsKey(option) ? debugDict[option].Sky() + message : message);
         }
 
@@ -129,7 +113,6 @@ namespace JFramework.Core
         Asset = 16,
         Audio = 32,
         Timer = 64,
-        Global = 128,
-        Custom = 256,
+        Custom = 128,
     }
 }

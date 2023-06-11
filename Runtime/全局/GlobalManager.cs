@@ -3,29 +3,43 @@ using UnityEngine;
 
 namespace JFramework.Core
 {
-    [AddComponentMenu("")]
+    [AddComponentMenu(""), DefaultExecutionOrder(-10)]
     public sealed partial class GlobalManager : MonoBehaviour
     {
         /// <summary>
-        /// 全局管理器的单例
+        /// 私有的单例对象
         /// </summary>
-        internal static GlobalManager Instance;
-        
+        private static GlobalManager instance;
+
+        /// <summary>
+        /// 安全的单例调用
+        /// </summary>
+        internal static GlobalManager Instance
+        {
+            get
+            {
+                if (instance != null) return instance;
+                instance ??= FindObjectOfType<GlobalManager>();
+                instance ??= Instantiate(Resources.Load<GlobalManager>(nameof(GlobalManager)));
+                return instance;
+            }
+        }
+
         /// <summary>
         /// 全局管理器开始事件
         /// </summary>
         public static event Action OnStart;
-        
+
         /// <summary>
         /// 全局管理器更新事件
         /// </summary>
         public static event Action OnUpdate;
-        
+
         /// <summary>
         /// 全局管理器销毁事件
         /// </summary>
         public static event Action OnDestroy;
-        
+
         /// <summary>
         /// 是否在运行模式
         /// </summary>
@@ -40,26 +54,18 @@ namespace JFramework.Core
             {
                 if (!runtime)
                 {
-                    Log.Info(DebugOption.Global, "没有初始化！".Red());
+                    Debug.Log($"{nameof(GlobalManager).Red()} 没有初始化！");
                 }
 
                 return runtime;
             }
         }
 
-        private void Awake() => DontDestroyOnLoad(gameObject);
-        private void Start() => OnStart?.Invoke();
-        private void Update() => OnUpdate?.Invoke();
-
-        /// <summary>
-        /// 在场景加载之前进行初始化
-        /// </summary>
-        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
-        private static void Register()
+        private void Awake()
         {
             runtime = true;
-            Instance ??= FindObjectOfType<GlobalManager>();
-            Instance ??= Instantiate(Resources.Load<GlobalManager>(nameof(GlobalManager)));
+            instance ??= this;
+            DontDestroyOnLoad(gameObject);
             CommandManager.Awake();
             AssetManager.Awake();
             EventManager.Awake();
@@ -73,9 +79,9 @@ namespace JFramework.Core
             UIManager.Awake();
         }
 
-        /// <summary>
-        /// 程序退出时执行的方法
-        /// </summary>
+        private void Start() => OnStart?.Invoke();
+        private void Update() => OnUpdate?.Invoke();
+
         private void OnApplicationQuit()
         {
             runtime = false;
@@ -91,7 +97,7 @@ namespace JFramework.Core
             AssetManager.Destroy();
             EventManager.Destroy();
             CommandManager.Destroy();
-            Instance = null;
+            instance = null;
             OnStart = null;
             OnUpdate = null;
             OnDestroy = null;
