@@ -98,6 +98,7 @@ namespace JFramework.Core
                     await Task.Yield();
                 }
 
+                if (!GlobalManager.Runtime) return;
                 await Task.Yield();
             }
 
