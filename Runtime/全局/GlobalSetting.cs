@@ -12,9 +12,6 @@ namespace JFramework.Core
         [FoldoutGroup("设置管理器"), SerializeField, LabelText("控制台输出选项")]
         internal DebugOption debugOption;
 
-        [ShowInInspector, LabelText("场景管理数据"), FoldoutGroup("通用管理器")]
-        private Dictionary<string, string> sceneList => SceneManager.sceneDict;
-
         [ShowInInspector, LabelText("资源管理数据"), FoldoutGroup("通用管理器")]
         private Dictionary<string, IEnumerator> assetList => AssetManager.assetDict;
 
