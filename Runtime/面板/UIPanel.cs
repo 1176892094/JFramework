@@ -75,6 +75,7 @@ namespace JFramework
         /// <param name="key">点击的按钮名称</param>
         private void OnButtonClick(string key)
         {
+            if (stateType == UIStateType.Freeze) return;
             var method = GetType().GetMethod(key, BindingFlags.Instance | BindingFlags.NonPublic);
             method?.Invoke(this, null);
         }
