@@ -35,6 +35,16 @@ namespace JFramework.Core
         private static string Name => nameof(DataManager);
 
         /// <summary>
+        /// 数据数量
+        /// </summary>
+        private static int DataCount;
+        
+        /// <summary>
+        /// 加载进度
+        /// </summary>
+        private static float LoadProgress;
+
+        /// <summary>
         /// 数据加载完成的回调
         /// </summary>
         public static event Action OnCompleted;
@@ -49,6 +59,9 @@ namespace JFramework.Core
             EnmDataDict = new Dictionary<Type, EnmDataDict>();
             var (assembly, types) = GetAssembly<IDataTable>();
             if (types == null || types.Length == 0) return;
+            LoadProgress = 0f;
+            float time = Time.time;
+            DataCount = types.Length;
             foreach (var type in types)
             {
                 var keyName = type.Name;
@@ -64,7 +77,10 @@ namespace JFramework.Core
                         return;
                     }
 
-                    Log.Info(DebugOption.Data, $"加载 => {type.Name.Blue()} 数据表");
+                    LoadProgress += 1f / DataCount;
+                    var progress = (LoadProgress * 100).ToString("F") + "%";
+                    Log.Info(DebugOption.Data, $"加载 => {type.Name.Blue()} 进度: {progress.Green()}");
+                    
                     var keyType = keyInfo.FieldType;
                     if (keyType == typeof(int))
                     {
@@ -85,7 +101,8 @@ namespace JFramework.Core
                 }
             }
 
-            Log.Info($"{Name.Sky()} 加载 => 所有数据完成");
+            var totalTime = (Time.time - time).ToString("F");
+            Log.Info($"{Name.Sky()} 加载 => 所有数据完成, 耗时 {totalTime.Yellow()} 秒");
             OnCompleted?.Invoke();
         }
 
@@ -278,6 +295,8 @@ namespace JFramework.Core
         /// </summary>
         internal static void Destroy()
         {
+            DataCount = 0;
+            LoadProgress = 0;
             IntDataDict = null;
             StrDataDict = null;
             EnmDataDict = null;
