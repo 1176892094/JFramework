@@ -124,13 +124,17 @@ namespace JFramework.Core
         /// <returns>返回一个数据对象</returns>
         public static T Get<T>(int key) where T : IData
         {
-            IntDataDict.TryGetValue(typeof(T), out IntDataDict soDict);
-            if (soDict == null) return default;
-            soDict.TryGetValue(key, out IData data);
-            Log.Info(DebugOption.Data, data != null
-                ? $"获取 => {typeof(T).Name.Blue()} : {key.ToString().Green()} 数据成功"
-                : $"获取 => {typeof(T).Name.Red()} : {key.ToString().Green()} 数据失败");
-            return (T)data;
+            if (IntDataDict.TryGetValue(typeof(T), out IntDataDict soDict))
+            {
+                if (soDict.TryGetValue(key, out IData data))
+                {
+                    Log.Info(DebugOption.Data, $"获取 => {typeof(T).Name.Blue()} : {key.ToString().Green()} 数据成功");
+                    return (T)data;
+                }
+            }
+
+            Log.Info(DebugOption.Data, $"获取 => {typeof(T).Name.Red()} : {key.ToString().Green()} 数据失败");
+            return default;
         }
 
         /// <summary>
@@ -141,13 +145,17 @@ namespace JFramework.Core
         /// <returns>返回一个数据对象</returns>
         public static T Get<T>(string key) where T : IData
         {
-            StrDataDict.TryGetValue(typeof(T), out StrDataDict soDict);
-            if (soDict == null) return default;
-            soDict.TryGetValue(key, out IData data);
-            Log.Info(DebugOption.Data, data != null
-                ? $"获取 => {typeof(T).Name.Blue()} : {key.Green()} 数据成功"
-                : $"获取 => {typeof(T).Name.Red()} : {key.Green()} 数据失败");
-            return (T)data;
+            if (StrDataDict.TryGetValue(typeof(T), out StrDataDict soDict))
+            {
+                if (soDict.TryGetValue(key, out IData data))
+                {
+                    Log.Info(DebugOption.Data, $"获取 => {typeof(T).Name.Blue()} : {key.Green()} 数据成功");
+                    return (T)data;
+                }
+            }
+
+            Log.Info(DebugOption.Data, $"获取 => {typeof(T).Name.Red()} : {key.Green()} 数据失败");
+            return default;
         }
 
         /// <summary>
@@ -158,13 +166,17 @@ namespace JFramework.Core
         /// <returns>返回一个数据对象</returns>
         public static T Get<T>(Enum key) where T : IData
         {
-            EnmDataDict.TryGetValue(typeof(T), out EnmDataDict soDict);
-            if (soDict == null) return default;
-            soDict.TryGetValue(key, out IData data);
-            Log.Info(DebugOption.Data, data != null
-                ? $"获取 => {typeof(T).Name.Blue()} : {key.ToString().Green()} 数据成功"
-                : $"获取 => {typeof(T).Name.Red()} : {key.ToString().Green()} 数据失败");
-            return (T)data;
+            if (EnmDataDict.TryGetValue(typeof(T), out EnmDataDict soDict))
+            {
+                if (soDict.TryGetValue(key, out IData data))
+                {
+                    Log.Info(DebugOption.Data, $"获取 => {typeof(T).Name.Blue()} : {key.ToString().Green()} 数据成功");
+                    return (T)data;
+                }
+            }
+
+            Log.Info(DebugOption.Data, $"获取 => {typeof(T).Name.Red()} : {key.ToString().Green()} 数据失败");
+            return default;
         }
 
 
@@ -176,7 +188,11 @@ namespace JFramework.Core
         public static List<T> GetTable<T>() where T : IData
         {
             var table = GetTable(typeof(T));
-            Log.Info(DebugOption.Data, $"获取 => {typeof(T).Name.Blue()} 列表成功");
+            if (table != default)
+            {
+                Log.Info(DebugOption.Data, $"获取 => {typeof(T).Name.Blue()} 列表成功");
+            }
+
             return table?.Cast<T>().ToList();
         }
 
@@ -187,12 +203,22 @@ namespace JFramework.Core
         /// <returns>返回一个Data的列表</returns>
         private static List<IData> GetTable(Type type)
         {
-            IntDataDict.TryGetValue(type, out IntDataDict dictInt);
-            if (dictInt != null) return dictInt.Values.ToList();
-            EnmDataDict.TryGetValue(type, out EnmDataDict dictEnm);
-            if (dictEnm != null) return dictEnm.Values.ToList();
-            StrDataDict.TryGetValue(type, out StrDataDict dictStr);
-            return dictStr?.Values.ToList();
+            if (IntDataDict.TryGetValue(type, out IntDataDict dictInt))
+            {
+                return dictInt.Values.ToList();
+            }
+
+            if (EnmDataDict.TryGetValue(type, out EnmDataDict dictEnm))
+            {
+                return dictEnm.Values.ToList();
+            }
+
+            if (StrDataDict.TryGetValue(type, out StrDataDict dictStr))
+            {
+                return dictStr?.Values.ToList();
+            }
+
+            return default;
         }
 
         /// <summary>
