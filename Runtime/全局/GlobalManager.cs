@@ -38,7 +38,7 @@ namespace JFramework.Core
         /// <summary>
         /// 全局管理器销毁事件
         /// </summary>
-        public static event Action OnDestroy;
+        public static event Action OnEnd;
 
         /// <summary>
         /// 是否在运行模式
@@ -82,10 +82,10 @@ namespace JFramework.Core
         private void Start() => OnStart?.Invoke();
         private void Update() => OnUpdate?.Invoke();
 
-        private void OnApplicationQuit()
+        private void OnDestroy()
         {
             runtime = false;
-            OnDestroy?.Invoke();
+            OnEnd?.Invoke();
             UIManager.Destroy();
             PoolManager.Destroy();
             DataManager.Destroy();
@@ -100,7 +100,7 @@ namespace JFramework.Core
             instance = null;
             OnStart = null;
             OnUpdate = null;
-            OnDestroy = null;
+            OnEnd = null;
         }
     }
 }
