@@ -75,6 +75,7 @@ namespace JFramework.Core
                 {
                     Progress = Mathf.Lerp(Progress, handle.PercentComplete / 9f * 10f, Time.fixedDeltaTime);
                     OnLoadScene?.Invoke(Progress);
+                    if (!GlobalManager.Runtime) return;
                     await Task.Yield();
                 }
 
