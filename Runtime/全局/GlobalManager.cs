@@ -84,23 +84,33 @@ namespace JFramework.Core
 
         private void OnDestroy()
         {
-            runtime = false;
-            OnQuit?.Invoke();
-            UIManager.Destroy();
-            PoolManager.Destroy();
-            DataManager.Destroy();
-            DateManager.Destroy();
-            JsonManager.Destroy();
-            SceneManager.Destroy();
-            TimerManager.Destroy();
-            AudioManager.Destroy();
-            AssetManager.Destroy();
-            EventManager.Destroy();
-            CommandManager.Destroy();
-            instance = null;
-            OnStart = null;
-            OnUpdate = null;
-            OnQuit = null;
+            try
+            {
+                runtime = false;
+                OnQuit?.Invoke();
+            }
+            catch
+            {
+                // ignored
+            }
+            finally
+            {
+                UIManager.Destroy();
+                PoolManager.Destroy();
+                DataManager.Destroy();
+                DateManager.Destroy();
+                JsonManager.Destroy();
+                SceneManager.Destroy();
+                TimerManager.Destroy();
+                AudioManager.Destroy();
+                AssetManager.Destroy();
+                EventManager.Destroy();
+                CommandManager.Destroy();
+                instance = null;
+                OnStart = null;
+                OnUpdate = null;
+                OnQuit = null;
+            }
         }
     }
 }
