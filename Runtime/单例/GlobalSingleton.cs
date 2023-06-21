@@ -8,7 +8,7 @@ namespace JFramework
     /// 调用后会在场景中寻找相应的游戏对象
     /// </summary>
     /// <typeparam name="T">所属的单例对象</typeparam>
-    public abstract class GlobalSingleton<T> : MonoBehaviour, IDisposable where T : GlobalSingleton<T>
+    public abstract class GlobalSingleton<T> : MonoBehaviour where T : GlobalSingleton<T>
     {
         /// <summary>
         /// 线程锁
@@ -68,7 +68,7 @@ namespace JFramework
             try
             {
                 instance = null;
-                Dispose();
+                Despawn();
             }
             catch (Exception e)
             {
@@ -79,7 +79,7 @@ namespace JFramework
         /// <summary>
         /// 释放内存
         /// </summary>
-        public virtual void Dispose()
+        public virtual void Despawn()
         {
         }
     }
