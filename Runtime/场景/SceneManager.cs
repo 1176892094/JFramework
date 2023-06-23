@@ -73,7 +73,7 @@ namespace JFramework.Core
                 Progress = 0;
                 while (Progress < 0.99f)
                 {
-                    Progress = Mathf.Lerp(Progress, handle.PercentComplete / 9f * 10f, 0.1f);
+                    Progress = Mathf.Lerp(Progress, handle.PercentComplete / 9f * 10f, 0.2f);
                     OnLoadScene?.Invoke(Progress);
                     if (!GlobalManager.Runtime) return;
                     await Task.Yield();

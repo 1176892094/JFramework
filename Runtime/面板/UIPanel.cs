@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using Sirenix.OdinInspector;
 using TMPro;
+using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
@@ -76,7 +77,7 @@ namespace JFramework
         private void OnButtonClick(string key)
         {
             if (stateType == UIStateType.Freeze) return;
-            var method = GetType().GetMethod(key, BindingFlags.Instance | BindingFlags.NonPublic);
+            var method = GetType().GetMethod(key, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
             method?.Invoke(this, null);
         }
 

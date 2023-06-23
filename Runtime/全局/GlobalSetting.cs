@@ -1,9 +1,9 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using JFramework.Interface;
 using Sirenix.OdinInspector;
 using UnityEngine;
+using UnityEngine.ResourceManagement.AsyncOperations;
 
 namespace JFramework.Core
 {
@@ -13,7 +13,7 @@ namespace JFramework.Core
         internal DebugOption debugOption;
 
         [ShowInInspector, LabelText("资源管理数据"), FoldoutGroup("通用管理器")]
-        private Dictionary<string, IEnumerator> assetList => AssetManager.assetDict;
+        private Dictionary<string, AsyncOperationHandle> assetList => AssetManager.assetDict;
 
         [ShowInInspector, LabelText("事件管理数据"), FoldoutGroup("通用管理器")]
         private Dictionary<int, EventHandler> eventDict => EventManager.eventDict;

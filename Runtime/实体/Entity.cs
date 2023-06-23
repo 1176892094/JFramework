@@ -2,6 +2,7 @@ using System;
 using JFramework.Core;
 using JFramework.Interface;
 using Sirenix.OdinInspector;
+using UnityEngine;
 
 namespace JFramework
 {
@@ -9,7 +10,7 @@ namespace JFramework
     /// 实体的抽象类
     /// </summary>
     [Serializable]
-    public abstract class Entity : SerializedMonoBehaviour, IEntity, IUpdate
+    public abstract class Entity : MonoBehaviour, IEntity, IUpdate
     {
         /// <summary>
         /// 实体生成

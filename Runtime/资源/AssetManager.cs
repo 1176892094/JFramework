@@ -1,4 +1,4 @@
-using System.Collections;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using UnityEngine;
@@ -10,8 +10,8 @@ namespace JFramework.Core
 {
     public static class AssetManager
     {
-        internal static Dictionary<string, IEnumerator> assetDict;
-        internal static void Awake() => assetDict = new Dictionary<string, IEnumerator>();
+        internal static Dictionary<string, AsyncOperationHandle> assetDict;
+        internal static void Awake() => assetDict = new Dictionary<string, AsyncOperationHandle>();
         internal static void Destroy() => assetDict = null;
 
         /// <summary>
@@ -44,7 +44,7 @@ namespace JFramework.Core
             AsyncOperationHandle<T> handle;
             if (assetDict.ContainsKey(path))
             {
-                handle = (AsyncOperationHandle<T>)assetDict[path];
+                handle = assetDict[path].Convert<T>();
                 if (!handle.IsDone) await handle.Task;
                 return LoadCompleted(handle.Result);
             }
@@ -76,9 +76,25 @@ namespace JFramework.Core
         {
             if (!GlobalManager.Runtime) return;
             if (!assetDict.ContainsKey(name)) return;
-            var handle = (AsyncOperationHandle<T>)assetDict[name];
+            var handle = assetDict[name].Convert<T>();
             Addressables.Release(handle);
             assetDict.Remove(name);
+        }
+
+        /// <summary>
+        /// 释放所有资源，并开启垃圾回收
+        /// </summary>
+        public static void Clear()
+        {
+            foreach (var handle in assetDict.Values)
+            {
+                Addressables.Release(handle);
+            }
+            
+            assetDict.Clear();
+            AssetBundle.UnloadAllAssetBundles(true);
+            Resources.UnloadUnusedAssets();
+            GC.Collect();
         }
         
         /// <summary>

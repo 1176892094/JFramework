@@ -21,7 +21,7 @@ namespace JFramework
         /// </summary>
         /// <typeparam name="T">可使用任何继承IController的对象</typeparam>
         /// <returns>返回控制器对象</returns>
-        public T Get<T>() where T : ScriptableObject, IController
+        public T GetOrAddCtrl<T>() where T : ScriptableObject, IController
         {
             var key = typeof(T);
             if (controllerDict.ContainsKey(key)) return (T)controllerDict[key];

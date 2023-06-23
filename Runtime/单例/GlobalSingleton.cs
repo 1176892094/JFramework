@@ -79,7 +79,7 @@ namespace JFramework
         /// <summary>
         /// 释放内存
         /// </summary>
-        public virtual void Despawn()
+        protected virtual void Despawn()
         {
         }
     }

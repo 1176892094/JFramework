@@ -66,7 +66,7 @@ namespace JFramework
             try
             {
                 instance = null;
-                Dispose();
+                Despawn();
             }
             catch (Exception e)
             {
@@ -77,7 +77,7 @@ namespace JFramework
         /// <summary>
         /// 释放内存
         /// </summary>
-        public virtual void Dispose()
+        protected virtual void Despawn()
         {
         }
     }

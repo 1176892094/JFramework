@@ -42,6 +42,11 @@ PluginImporter:
       enabled: 1
       settings: {}
   - first:
+      Android: Android
+    second:
+      enabled: 0
+      settings: {}
+  - first:
       Any: 
     second:
       enabled: 0
