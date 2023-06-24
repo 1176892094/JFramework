@@ -57,7 +57,7 @@ namespace JFramework.Core
             IntDataDict = new Dictionary<Type, IntDataDict>();
             StrDataDict = new Dictionary<Type, StrDataDict>();
             EnmDataDict = new Dictionary<Type, EnmDataDict>();
-            var (assembly, types) = GetAssembly<IDataTable>();
+            var (assembly, types) = GetAssemblyAndTypes();
             if (types == null || types.Length == 0) return;
             LoadProgress = 0f;
             float time = Time.time;
@@ -118,7 +118,7 @@ namespace JFramework.Core
             var dataDict = new Dictionary<TKey, IData>();
             for (var i = 0; i < table.Count; ++i)
             {
-                var data = (IData)table.GetData(i);
+                var data = table.GetData(i);
                 var key = (TKey)field.GetValue(data);
                 if (!dataDict.ContainsKey(key))
                 {
@@ -242,16 +242,29 @@ namespace JFramework.Core
         /// 获取当前程序集中的数据表对象类
         /// </summary>
         /// <returns></returns>
-        private static (Assembly, Type[]) GetAssembly<T>() where T : class
+        private static (Assembly, Type[]) GetAssemblyAndTypes()
         {
             var assemblies = AppDomain.CurrentDomain.GetAssemblies();
             foreach (var assembly in assemblies)
             {
-                var types = GetTypes<T>(assembly);
-                if (types.Length > 0) return (assembly, types);
+                var types = GetTypes(assembly);
+                if (types.Length > 0)
+                {
+                    return (assembly, types);
+                }
             }
 
             return (null, null);
+        }
+        
+        /// <summary>
+        /// 获取程序集中的类型
+        /// </summary>
+        /// <param name="assembly"></param>
+        /// <returns></returns>
+        private static Type[] GetTypes(Assembly assembly)
+        {
+            return assembly.GetTypes().Where(type => typeof(IDataTable).IsAssignableFrom(type) && !type.IsAbstract).ToArray();
         }
 
         /// <summary>
@@ -262,21 +275,7 @@ namespace JFramework.Core
         private static FieldInfo GetKeyField<T>(Type type) where T : class
         {
             var fields = type.GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
-            return (from field in fields
-                let attrs = field.GetCustomAttributes(typeof(T), false)
-                where attrs.Length > 0
-                select field).FirstOrDefault();
-        }
-
-        /// <summary>
-        /// 获取程序集中的类型
-        /// </summary>
-        /// <param name="assembly"></param>
-        /// <typeparam name="T"></typeparam>
-        /// <returns></returns>
-        private static Type[] GetTypes<T>(Assembly assembly)
-        {
-            return assembly.GetTypes().Where(type => type.GetInterfaces().Contains(typeof(T)) && type.BaseType != typeof(ScriptableObject)).ToArray();
+            return fields.FirstOrDefault(field => field.GetCustomAttributes(typeof(T), false).Length > 0);
         }
 
         /// <summary>
