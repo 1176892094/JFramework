@@ -53,13 +53,12 @@ namespace JFramework.Core
         private static async Task<T> LoadPanel<T>(string name) where T : UIPanel
         {
             var key = typeof(T);
+            if (panelDict.ContainsKey(key)) return null;
             var obj = await AssetManager.LoadAsync<GameObject>("UI/" + name);
-            if (panelDict.ContainsKey(key)) HidePanel<T>();
             obj.transform.SetParent(layerGroup[0], false);
             var panel = obj.GetComponent<T>();
             panelDict.Add(key, panel);
             panel.Show();
-            panel.name = name;
             return panel;
         }
 

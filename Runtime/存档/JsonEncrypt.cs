@@ -18,7 +18,6 @@ namespace JFramework.Core
         /// <param name="name">保存的名称</param>
         public static void Encrypt(object obj, string name)
         {
-            if (!GlobalManager.Runtime) return;
             var filePath = GetPath(name);
             var saveJson = obj is ScriptableObject ? JsonUtility.ToJson(obj) : JsonConvert.SerializeObject(obj);
             Log.Info(DebugOption.Json,$"保存加密 => {name.Orange()} 数据文件");
@@ -36,7 +35,6 @@ namespace JFramework.Core
         /// <param name="obj">加载的数据</param>
         public static void Decrypt(ScriptableObject obj)
         {
-            if (!GlobalManager.Runtime) return;
             var filePath = GetPath(obj.name);
             if (!File.Exists(filePath))
             {
@@ -64,7 +62,6 @@ namespace JFramework.Core
         /// <returns>返回解密的数据</returns>
         public static T Decrypt<T>(string name) where T : new()
         {
-            if (!GlobalManager.Runtime) return default;
             var filePath = GetPath(name);
             if (!File.Exists(filePath))
             {
