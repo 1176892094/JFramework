@@ -202,7 +202,7 @@ namespace JFramework.Core
         /// </summary>
         /// <typeparam name="T">可以使用所有继承Data类型的对象</typeparam>
         /// <returns>返回泛型列表</returns>
-        public static List<T> GetTable<T>() where T : IData
+        public static T[] GetTable<T>() where T : IData
         {
             var table = GetTable(typeof(T));
             if (table != default)
@@ -210,7 +210,7 @@ namespace JFramework.Core
                 Log.Info(DebugOption.Data, $"获取 => {typeof(T).Name.Blue()} 列表成功");
             }
 
-            return table?.Cast<T>().ToList();
+            return table?.Cast<T>().ToArray();
         }
 
         /// <summary>
@@ -218,21 +218,21 @@ namespace JFramework.Core
         /// </summary>
         /// <param name="type">传入的类型</param>
         /// <returns>返回一个Data的列表</returns>
-        private static List<IData> GetTable(Type type)
+        private static IData[] GetTable(Type type)
         {
             if (IntDataDict.TryGetValue(type, out IntDataDict dictInt))
             {
-                return dictInt.Values.ToList();
+                return dictInt.Values.ToArray();
             }
 
             if (EnmDataDict.TryGetValue(type, out EnmDataDict dictEnm))
             {
-                return dictEnm.Values.ToList();
+                return dictEnm.Values.ToArray();
             }
 
             if (StrDataDict.TryGetValue(type, out StrDataDict dictStr))
             {
-                return dictStr?.Values.ToList();
+                return dictStr?.Values.ToArray();
             }
 
             return default;
