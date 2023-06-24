@@ -172,7 +172,7 @@ public struct AudioPath
     public const string BTClick = "Audio/BTClick"; //BTClick的真实路径是：Assets/Resources/Audio/BTClick
 }
 ```
-(6)UIManager（面板数据请在Resources文件夹中找到名称为UIPanelData的Json文件）
+(6)UIManager（UI面板请放在AddressableResources/UI/...目录下）
 ```csharp
 public class Test7: MonoBehaviour
 {
