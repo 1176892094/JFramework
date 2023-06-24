@@ -196,45 +196,31 @@ namespace JFramework.Core
             return default;
         }
 
-
         /// <summary>
         /// 通过数据管理器得到数据表
         /// </summary>
-        /// <typeparam name="T">可以使用所有继承Data类型的对象</typeparam>
-        /// <returns>返回泛型列表</returns>
-        public static T[] GetTable<T>() where T : IData
+        /// <returns>返回一个Data的列表</returns>
+        private static T[] GetTable<T>()
         {
-            var table = GetTable(typeof(T));
-            if (table != default)
+            if (IntDataDict.TryGetValue(typeof(T), out IntDataDict dictInt))
             {
                 Log.Info(DebugOption.Data, $"获取 => {typeof(T).Name.Blue()} 列表成功");
+                return dictInt.Values.Cast<T>().ToArray();
             }
 
-            return table?.Cast<T>().ToArray();
-        }
-
-        /// <summary>
-        /// 通过数据管理器得到数据表
-        /// </summary>
-        /// <param name="type">传入的类型</param>
-        /// <returns>返回一个Data的列表</returns>
-        private static IData[] GetTable(Type type)
-        {
-            if (IntDataDict.TryGetValue(type, out IntDataDict dictInt))
+            if (EnmDataDict.TryGetValue(typeof(T), out EnmDataDict dictEnm))
             {
-                return dictInt.Values.ToArray();
+                Log.Info(DebugOption.Data, $"获取 => {typeof(T).Name.Blue()} 列表成功");
+                return dictEnm.Values.Cast<T>().ToArray();
             }
 
-            if (EnmDataDict.TryGetValue(type, out EnmDataDict dictEnm))
+            if (StrDataDict.TryGetValue(typeof(T), out StrDataDict dictStr))
             {
-                return dictEnm.Values.ToArray();
+                Log.Info(DebugOption.Data, $"获取 => {typeof(T).Name.Blue()} 列表成功");
+                return dictStr?.Values.Cast<T>().ToArray();
             }
 
-            if (StrDataDict.TryGetValue(type, out StrDataDict dictStr))
-            {
-                return dictStr?.Values.ToArray();
-            }
-
+            Log.Info(DebugOption.Data, $"获取 => {typeof(T).Name.Red()} 列表失败");
             return default;
         }
 
