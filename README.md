@@ -98,12 +98,10 @@ public class Test2 : MonoBehaviour
         Player player = obj.GetComponent<Player>();
     }
 
-    private void LoadAsync() //异步加载
+    private async void LoadAsync() //异步加载
     {
-        AssetManager.LoadAsync<GameObject>(AssetPath.Player, obj =>
-        {
-            Player player = obj.GetComponent<Player>(); //obj为加载出来的GameObject预制体，可以从obj中获取玩家的组件
-        });
+        var obj = await AssetManager.LoadAsync<GameObject>(AssetPath.Player);
+        Player player = obj.GetComponent<Player>(); //obj为加载出来的GameObject预制体，可以从obj中获取玩家的组件
     }
 
     public struct AssetPath
@@ -120,22 +118,18 @@ public class Player : MonoBehaviour
 ```csharp
 public class Test3 : MonoBehaviour
 {
-    private void SaveAndLoad1()
+    private async void SaveAndLoad1()
     {
-        AssetManager.LoadAsync<ScriptableObject>(AssetPath.Data, data =>
-        {
-            JsonManager.Save(data, data.name); //保存SO文件,名称为"玩家数据"
-            JsonManager.Load(data); //读取该SO文件
-        });
+        var data = await AssetManager.LoadAsync<ScriptableObject>(AssetPath.Data);
+        JsonManager.Save(data, data.name); //保存SO文件,名称为"玩家数据"
+        JsonManager.Load(data); //读取该SO文件
     }
 
-    private void SaveAndLoad2()
+    private async void SaveAndLoad2()
     {
-        AssetManager.LoadAsync<ScriptableObject>(AssetPath.Data, data =>
-        {
-            JsonManager.Encrypt(data, "玩家数据"); //储存数据并加密
-            JsonManager.Decrypt(data); //解析加密数据并读取
-        });
+        var data=await AssetManager.LoadAsync<ScriptableObject>(AssetPath.Data;
+        JsonManager.Encrypt(data, "玩家数据"); //储存数据并加密
+        JsonManager.Decrypt(data); //解析加密数据并读取
     }
 
     private void SaveAndLoad3()
@@ -160,17 +154,15 @@ public class PlayerData : ScriptableObject
 ```csharp
 public class Test4 : MonoBehaviour
 {
-    private void Update()
+    private async void Update()
     {
         if (Input.GetKeyDown(KeyCode.Space))
         {
-            PoolManager.Pop(AssetPath.Bullet, obj =>
+            var obj = await PoolManager.Pop<GameObject>(AssetPath.Bullet);
+            obj.transform.position = transform.position; //设置生成的子弹位置在自身位置
+            TimerManager.Pop(3, () => //创建一个3秒的计时器
             {
-                obj.transform.position = transform.position; //设置生成的子弹位置在自身位置
-                TimerManager.Pop(3, () => //创建一个3秒的计时器
-                {
-                    PoolManager.Push(obj); //将物体放回对象池
-                });
+                PoolManager.Push(obj); //将物体放回对象池
             });
         }
     }
@@ -185,7 +177,7 @@ public struct AssetPath
 ```csharp
 public class Test5 : MonoBehaviour
 {
-    private AudioSource audioSource;
+     private AudioSource audioSource;
     
     private void Sound()
     {
@@ -197,10 +189,6 @@ public class Test5 : MonoBehaviour
     private void Audio()
     {
         AudioManager.PlayAudio(AudioPath.BTClick); //播放该音效
-        AudioManager.PlayAudio(AudioPath.BTClick, audio =>
-        {
-            audioSource = audio; //播放并获取该音效
-        });
         AudioManager.StopAudio(audioSource); //停止该音效
         AudioManager.SetAudio(0); //改变游戏音效大小为0
     }
@@ -216,15 +204,12 @@ public struct AudioPath
 ```csharp
 public class Test7: MonoBehaviour
 {
-    private void ShowPanel()
+    private async void ShowPanel()
     {
         UIManager.ShowPanel<LoginPanel>(); //加载LoginPanel(可以重复加载，但只有一个实例)
-        UIManager.ShowPanel<LoginPanel>();//设置层级
-        UIManager.ShowPanel<LoginPanel>(panel =>
-        {
-            panel.SetUsername("JINYIJIE");//设置属性
-            panel.SetPassword("123456");//设置属性
-        });
+        var panel = await UIManager.ShowPanel<LoginPanel>();
+        panel.SetUsername("JINYIJIE");//设置属性
+        panel.SetPassword("123456");//设置属性
     }
     
     private void HidePanel()
@@ -241,7 +226,7 @@ public class Test7: MonoBehaviour
 
     private void GetLayer()
     {
-        UIManager.GetLayer(UILayerType.Layer1);//得到层级
+        UIManager.GetLayer(UILayerType.Layer1);//获取层级
         Transform common = UIManager.GetLayer(UILayerType.Layer2);
     }
 
@@ -273,17 +258,9 @@ public class Test8 : MonoBehaviour
         SceneManager.OnLoadScene += LoadProgress;
     }
 
-    private void LoadScene()
+    private async void LoadSceneAsync()
     {
-        SceneManager.LoadScene("SceneName");
-    }
-
-    private void LoadSceneAsync()
-    {
-        SceneManager.LoadSceneAsync("SceneName", () =>
-        {
-            //异步加载完成后执行的方法
-        });
+        await SceneManager.LoadSceneAsync("SceneName");
     }
 
     private void LoadProgress(float progress) //获取异步加载进度
@@ -302,6 +279,7 @@ public class Test8 : MonoBehaviour
 public class Test9 : MonoBehaviour
 {
     private ITimer timer;
+    private bool isFinish;
 
     private void Start()
     {
@@ -318,12 +296,17 @@ public class Test9 : MonoBehaviour
         int count = 0;
         TimerManager.Pop(1, () =>
         {
-            Debug.Log("循环5次/间隔1秒的计时器完成");
-        }).Unscale().SetLoop(5, () =>
+            Debug.Log($"计时器循环第{++count}次");
+        }).Loop(5);
+
+        
+        TimerManager.Pop(1, timer =>
         {
-            count++;
-            Debug.Log("第" + count + "次循环完成");
-        });
+            if (isFinish)//根据条件回收计时器
+            {
+                timer.Push();//等价于 TimerManager.Push(timer);
+            }
+        }).Loop(-1);//无限循环
     }
 
     private void Update()
@@ -410,9 +393,9 @@ public class EnemyWalk : State<Enemy> //设置状态的所有者
 ```csharp
  public class Player : EntitySpecial //玩家继承实体
 {
-    public BuffController buffCtrl => Get<BuffController>(); //效果控制器
-    public SkillController skillCtrl => Get<SkillController>(); //技能控制器
-    public AttributeController attrCtrl => Get<AttributeController>(); //属性控制器
+    public BuffController buffCtrl => GetOrAddCtrl<BuffController>(); //效果控制器
+    public SkillController skillCtrl => GetOrAddCtrl<SkillController>(); //技能控制器
+    public AttributeController attrCtrl => GetOrAddCtrl<AttributeController>(); //属性控制器
 }
 
 public class SkillController : Controller<Player> //设置控制器的所有者
@@ -443,33 +426,4 @@ public class BuffController : Controller<Player> //设置控制器的所有者
     {
     }
 }
-```
-
-(12)AwaitExtensions(异步拓展)
-```csharp
-  private async void Start()
-    {
-        await new WaitForSeconds(1);//等待一秒
-        await new WaitForSecondsRealtime(1);//等待1秒，不受timeScale影响
-        await new WaitForUpdate();//在Update最后一帧执行
-        await new WaitForFixedUpdate();//在FixedUpdate最后一帧执行
-        await new WaitForEndOfFrame();//等待这一帧结束
-        await new WaitWhile(WaitTime);//等待WaitTime结果，不会挂起异步
-        await new WaitUntil(WaitTime);//等待WaitTime结果，false不会执行后面语句
-        await SceneManager.LoadSceneAsync("SceneName");
-        await Resources.LoadAsync("ResourcesName");
-        AsyncOperation asyncOperation = new AsyncOperation();
-        await asyncOperation;//等待异步操作
-        ResourceRequest request = new ResourceRequest();
-        await request;//等待资源请求
-        AssetBundleRequest bundleRequest = new AssetBundleRequest();
-        await bundleRequest;//等待AB包请求
-        AssetBundleCreateRequest bundleCreateRequest = new AssetBundleCreateRequest();
-        await bundleCreateRequest;//等待AB包创建请求
-    }
-    
-    private bool WaitTime()
-    {
-        return true;
-    }
 ```

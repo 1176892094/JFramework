@@ -104,8 +104,7 @@ namespace JFramework.Core
         /// 播放音效
         /// </summary>
         /// <param name="path">传入音效路径</param>
-        /// <param name="action">获取音效的回调</param>
-        public static async void PlayAudio(string path, Action<AudioSource> action = null)
+        public static async void PlayAudio(string path)
         {
             if (!GlobalManager.Runtime) return;
             Log.Info(DebugOption.Audio,$"播放音效: {path.Blue()}");
@@ -115,7 +114,6 @@ namespace JFramework.Core
             audio.volume = audioSetting.audioVolume;
             audio.clip = clip;
             audio.Play();
-            action?.Invoke(audio);
             TimerManager.Pop(clip.length, () => StopAudio(audio));
         }
 
