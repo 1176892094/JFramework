@@ -2,57 +2,29 @@
 
 JFramework是基于Unity的游戏框架，封装了一些常用的Unity功能。
 
-1.导入
+1.使用教程
 
-(1)克隆下来拖进项目进行导入(需要添加AddressableAsset和NewtonsoftJson包)
+B站：https://www.bilibili.com/video/BV13X4y1Z75g/?spm_id_from=333.999.list.card_archive.click&vd_source=64e481400752df328433068b87764dc5
 
-(2)打开Unity的Package Manager左上角“+”号使用URL方式导入
+3.导表工具和配表
 
-URL：https://github.com/1176892094/JFramework.git
+B站：https://www.bilibili.com/video/BV1f84y1g73U/?spm_id_from=333.999.0.0&vd_source=64e481400752df328433068b87764dc5
 
-2.开始
+4.热更新
 
-(1)在Inspector面板中找到JFramework模块
+B站：https://www.bilibili.com/video/BV1Ct4y1P79J/?spm_id_from=333.999.0.0&vd_source=64e481400752df328433068b87764dc5
 
-(2)在JFramework模块中点击AddressableUpdate
+5.其他拓展
 
-(3)在弹出的面板中点击Create Addressables Settings
+ChatGPT接口：https://github.com/1176892094/ChatGPT-To-Unity
 
-(4)再次点击JFramework模块中点击AddressableUpdate
+基于JobSystem的寻路：https://github.com/1176892094/JFramework-AStar
 
-(5)Console打印出AddressableResources即配置成功
+Async/Await拓展：https://github.com/1176892094/JFramework-Async
 
-(6)找到JFramework的Resources文件夹将GlobalManager放入场景中
+网络同步框架JFramework.Net：还在测试阶段，暂未开放
 
-(7)点击GlobalManager找到调试管理器，将所有选项勾选
-
-(8)点击运行Unity，没有问题，即配置成功
-
-(9)CurrentProjectPath为当前项目路径
-
-(10)PersistentDataPath中含有游戏的各种存档文件
-
-(11)StreamingAssetPath在Build以后会原封不动的保留
-
-3.功能
-
-Excel To Scripts使用：
-
-(1)等待教程视频
-
-Excel To Asset使用：
-
-(1)等待教程视频
-
-4.注意
-
-(1)所有的Entity都会被加入到GlobalManager的生命周期中
-
-(2)为了更好的管理，请使用Entity来代替MonoBehaviour
-
-(2)请使用OnUpdate来代替Update
-
-5.使用
+6.常用管理器
 
 (1)EventManager（事件管理类）
 
