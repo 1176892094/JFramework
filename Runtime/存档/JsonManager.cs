@@ -11,9 +11,12 @@ namespace JFramework.Core
     /// </summary>
     public static partial class JsonManager
     {
-        private static Dictionary<string, JsonData> jsonDict;
-        internal static void Awake() => jsonDict = Load<Dictionary<string, JsonData>>(nameof(JsonManager));
-        internal static void Destroy() => jsonDict = null;
+        private static Dictionary<string, JsonData> jsonDict = new Dictionary<string, JsonData>();
+
+        /// <summary>
+        /// 静态构造函数(第一次使用时加载密钥)
+        /// </summary>
+        static JsonManager() => jsonDict = Load<Dictionary<string, JsonData>>(nameof(JsonManager));
 
         /// <summary>
         /// 存储数据

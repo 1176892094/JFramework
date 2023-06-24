@@ -70,7 +70,6 @@ namespace JFramework.Core
             AssetManager.Awake();
             EventManager.Awake();
             TimerManager.Awake();
-            JsonManager.Awake();
             DateManager.Awake();
             AudioManager.Awake();
             PoolManager.Awake();
@@ -99,7 +98,6 @@ namespace JFramework.Core
                 PoolManager.Destroy();
                 DataManager.Destroy();
                 DateManager.Destroy();
-                JsonManager.Destroy();
                 SceneManager.Destroy();
                 TimerManager.Destroy();
                 AudioManager.Destroy();
@@ -110,6 +108,7 @@ namespace JFramework.Core
                 OnStart = null;
                 OnUpdate = null;
                 OnQuit = null;
+                GC.Collect();
             }
         }
     }
