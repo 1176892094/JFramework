@@ -15,31 +15,10 @@ namespace JFramework.Core
         public static event Action<float> OnLoadScene;
 
         /// <summary>
-        /// 场景加载进度条
-        /// </summary>
-        private static float progress;
-
-        /// <summary>
         /// 当前场景名称
         /// </summary>
         public static string scene => UnitySceneManager.GetActiveScene().name;
-
-        /// <summary>
-        /// 场景加载进度条
-        /// </summary>
-        private static float Progress
-        {
-            get => progress;
-            set
-            {
-                progress = value;
-                if (progress >= 0.99f)
-                {
-                    progress = 1f;
-                }
-            }
-        }
-
+        
         /// <summary>
         /// 管理器醒来
         /// </summary>
@@ -70,15 +49,7 @@ namespace JFramework.Core
             var handle = Addressables.LoadSceneAsync(path);
             while (!handle.IsDone)
             {
-                Progress = 0;
-                while (Progress < 0.99f)
-                {
-                    Progress = Mathf.Lerp(Progress, handle.PercentComplete / 9f * 10f, 0.2f);
-                    OnLoadScene?.Invoke(Progress);
-                    if (!GlobalManager.Runtime) return;
-                    await Task.Yield();
-                }
-
+                OnLoadScene?.Invoke(handle.PercentComplete);
                 if (!GlobalManager.Runtime) return;
                 await Task.Yield();
             }
