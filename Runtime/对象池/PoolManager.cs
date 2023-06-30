@@ -32,11 +32,11 @@ namespace JFramework.Core
             if (!GlobalManager.Runtime) return null;
             if (poolDict.ContainsKey(path) && poolDict[path].Count > 0)
             {
-                var poolObj = (T)poolDict[path].Pop();
+                var poolObj = (GameObject)poolDict[path].Pop();
                 if (poolObj != null)
                 {
                     Log.Info(DebugOption.Pool, $"取出 => {path.Pink()} 对象成功");
-                    return poolObj;
+                    return poolObj.GetComponent<T>();
                 }
 
                 Log.Info(DebugOption.Pool, $"移除已销毁对象 : {path.Red()}");
