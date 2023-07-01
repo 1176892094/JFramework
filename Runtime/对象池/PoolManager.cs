@@ -30,21 +30,22 @@ namespace JFramework.Core
         public static async Task<T> Pop<T>(string path) where T : Object
         {
             if (!GlobalManager.Runtime) return null;
-            if (poolDict.ContainsKey(path) && poolDict[path].Count > 0)
+            var key = path.Substring(path.LastIndexOf('/') + 1);
+            if (poolDict.ContainsKey(key) && poolDict[key].Count > 0)
             {
-                var poolObj = (GameObject)poolDict[path].Pop();
+                var poolObj = (GameObject)poolDict[key].Pop();
                 if (poolObj != null)
                 {
-                    Log.Info(DebugOption.Pool, $"取出 => {path.Pink()} 对象成功");
+                    Log.Info(DebugOption.Pool, $"取出 => {key.Pink()} 对象成功");
                     return poolObj.GetComponent<T>();
                 }
 
-                Log.Info(DebugOption.Pool, $"移除已销毁对象 : {path.Red()}");
+                Log.Info(DebugOption.Pool, $"移除已销毁对象 : {key.Red()}");
             }
 
             var obj = await AssetManager.LoadAsync<GameObject>(path);
-            obj.name = path;
-            Log.Info(DebugOption.Pool, $"创建 => {path.Green()} 对象成功");
+            obj.name = key;
+            Log.Info(DebugOption.Pool, $"创建 => {key.Green()} 对象成功");
             return obj.GetComponent<T>();
         }
 
