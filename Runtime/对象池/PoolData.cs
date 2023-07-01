@@ -34,7 +34,7 @@ namespace JFramework
         /// <returns>返回拉取的游戏物体</returns>
         protected override GameObject Pop()
         {
-            var gameObject = Count > 0 ? stackPool.Pop() : null;
+            var gameObject = stackPool.Count > 0 ? stackPool.Pop() : null;
             if (gameObject == null) return null;
             gameObject.transform.SetParent(null);
             gameObject.SetActive(true);
