@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using JFramework.Interface;
 using Sirenix.OdinInspector;
 
@@ -12,7 +13,7 @@ namespace JFramework
         /// <summary>
         /// 对象池容器
         /// </summary>
-        [ShowInInspector] protected IPool stackPool;
+        [ShowInInspector] protected Stack<TPool> stackPool;
 
         /// <summary>
         /// 对象池物体数量
@@ -28,8 +29,8 @@ namespace JFramework
         /// <summary>
         /// 推入对象
         /// </summary>
-        /// <param name="obj">传入推入的对象</param>
-        protected abstract void Push(TPool obj);
+        /// <param name="gameObject">传入推入的对象</param>
+        protected abstract void Push(TPool gameObject);
 
         /// <summary>
         /// 通过接口取出对象
