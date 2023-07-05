@@ -1,8 +1,5 @@
-using System;
-using JFramework.Core;
 using JFramework.Interface;
 using Sirenix.OdinInspector;
-using UnityEngine;
 
 namespace JFramework
 {
@@ -15,56 +12,37 @@ namespace JFramework
         /// <summary>
         /// 控制器的所有者
         /// </summary>
-        [HideInInspector] public TEntity owner;
+        public TEntity owner;
 
         /// <summary>
         /// 控制器初始化
         /// </summary>
-        /// <param name="owner">传入控制器的所有者</param>
-        private void Spawn(TEntity owner)
+        protected virtual void Spawn() { }
+
+        /// <summary>
+        /// 控制器销毁
+        /// </summary>
+        protected virtual void Despawn() { }
+
+        /// <summary>
+        /// 控制器销毁
+        /// </summary>
+        protected void OnDestroy() => ((IController)this).Destroy();
+        
+        /// <summary>
+        /// 控制器初始化
+        /// </summary>
+        /// <param name="owner">传入所有者</param>
+        IController IController.Spawn(IEntity owner)
         {
-            this.owner = owner;
+            this.owner = (TEntity)owner;
             Spawn();
-        }
-
-        /// <summary>
-        /// 控制器初始化
-        /// </summary>
-        protected virtual void Spawn()
-        {
+            return this;
         }
 
         /// <summary>
         /// 控制器销毁
         /// </summary>
-        protected virtual void Despawn()
-        {
-        }
-
-        /// <summary>
-        /// 控制器销毁
-        /// </summary>
-        protected void OnDestroy()
-        {
-            try
-            {
-                Despawn();
-            }
-            catch (Exception e)
-            {
-                Log.Info(DebugOption.Custom, $"{name.Sky()} => {nameof(OnDestroy).Green()} 发生异常\n{e}");
-            }
-        }
-
-        /// <summary>
-        /// 通过接口初始化控制器
-        /// </summary>
-        /// <param name="owner">控制器的所有者</param>
-        void IController.Spawn(IEntity owner) => Spawn((TEntity)owner);
-
-        /// <summary>
-        /// 控制器清除
-        /// </summary>
-        void IController.Despawn() => Destroy(this);
+        void IController.Despawn() => Despawn();
     }
 }

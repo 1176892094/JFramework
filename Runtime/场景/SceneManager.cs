@@ -18,14 +18,6 @@ namespace JFramework.Core
         /// 当前场景名称
         /// </summary>
         public static string scene => UnitySceneManager.GetActiveScene().name;
-        
-        /// <summary>
-        /// 管理器醒来
-        /// </summary>
-        public static void Awake()
-        {
-            OnLoadScene += value => Log.Info(DebugOption.Scene, $"加载进度 => {value.ToString("P").Green()}");
-        }
 
         /// <summary>
         /// 异步加载场景
@@ -50,6 +42,7 @@ namespace JFramework.Core
             while (!handle.IsDone)
             {
                 OnLoadScene?.Invoke(handle.PercentComplete);
+                Log.Info(DebugOption.Scene, $"加载进度 => {handle.PercentComplete.ToString("P").Green()}");
                 if (!GlobalManager.Runtime) return;
                 await Task.Yield();
             }
@@ -64,7 +57,7 @@ namespace JFramework.Core
                 Log.Info(DebugOption.Scene, $"异步加载 => {path.Red()} 场景失败");
             }
         }
-        
+
         /// <summary>
         /// 管理器销毁
         /// </summary>

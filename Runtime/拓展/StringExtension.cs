@@ -3,7 +3,7 @@ namespace JFramework
 {
     public static class StringExtension
     {
-        internal static bool IsEmpty(this string s) => string.IsNullOrEmpty(s);
+        public static bool IsEmpty(this string s) => string.IsNullOrEmpty(s);
         public static string Green(this string s) => s.SetColor(TextColor.Green);
         public static string White(this string s) => s.SetColor(TextColor.White);
         public static string Purple(this string s) => s.SetColor(TextColor.Purple);

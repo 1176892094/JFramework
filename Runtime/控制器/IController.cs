@@ -1,3 +1,6 @@
+using System;
+using JFramework.Core;
+
 namespace JFramework.Interface
 {
     /// <summary>
@@ -6,14 +9,30 @@ namespace JFramework.Interface
     public interface IController
     {
         /// <summary>
-        /// 控制器初始化
+        /// 控制器生成时调用
         /// </summary>
-        /// <param name="owner">控制器的所有者</param>
-        void Spawn(IEntity owner);
+        /// <param name="owner">传入控制器的拥有者</param>
+        /// <returns></returns>
+        IController Spawn(IEntity owner);
 
         /// <summary>
-        /// 控制器清除
+        /// 控制器销毁
         /// </summary>
         void Despawn();
+        
+        /// <summary>
+        /// 控制器销毁
+        /// </summary>
+        void Destroy()
+        {
+            try
+            {
+                Despawn();
+            }
+            catch (Exception e)
+            {
+                Log.Info(DebugOption.Custom, e.ToString());
+            }
+        }
     }
 }
