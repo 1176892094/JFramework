@@ -8,7 +8,7 @@ using UnityEngine;
 // ReSharper disable All
 namespace JFramework
 {
-    public abstract class Character<TEvent> : Entity<TEvent>, IEntity where TEvent : IEvent
+    public abstract class Character<TEvent> : Entity, IEntity where TEvent : IEvent
     {
         /// <summary>
         /// 控制器容器

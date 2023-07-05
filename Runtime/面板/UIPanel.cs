@@ -13,7 +13,7 @@ namespace JFramework
     /// <summary>
     /// UI面板的抽象类
     /// </summary>
-    public abstract class UIPanel : Entity<IEvent>
+    public abstract class UIPanel : Entity
     {
         /// <summary>
         /// 视觉容器字典

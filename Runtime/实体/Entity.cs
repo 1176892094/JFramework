@@ -8,14 +8,8 @@ namespace JFramework
     /// 实体的抽象类
     /// </summary>
     [Serializable]
-    public abstract class Entity<TEvent> : MonoBehaviour, IEntity<TEvent> where TEvent : IEvent
+    public abstract class Entity : MonoBehaviour, IEntity
     {
-        /// <summary>
-        /// 实体生成
-        /// </summary>
-        /// <param name="data">生成的事件数据</param>
-        public virtual void Spawn(TEvent data) { }
-
         /// <summary>
         /// 实体销毁
         /// </summary>

@@ -17,6 +17,6 @@ namespace JFramework
         /// 事件被广播
         /// </summary>
         /// <param name="message">传入事件数据</param>
-        void OnExecute(TEvent message);
+        void Execute(TEvent message);
     }
 }

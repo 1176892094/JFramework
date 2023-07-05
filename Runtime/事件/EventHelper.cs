@@ -38,7 +38,7 @@ namespace JFramework
         {
             foreach (var observer in observers)
             {
-                ((IEvent<TEvent>)observer)?.OnExecute(message);
+                ((IEvent<TEvent>)observer)?.Execute(message);
             }
         }
     }
