@@ -1,7 +1,0 @@
-namespace JFramework.Table
-{
-    public struct Template
-    {
-//TODO:1
-    }
-}
