@@ -1,0 +1,7 @@
+namespace JFramework.Table
+{
+    public enum Template
+    {
+//TODO:1
+    }
+}
