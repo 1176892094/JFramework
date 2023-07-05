@@ -10,9 +10,7 @@ namespace JFramework.Core
 {
     public static class AssetManager
     {
-        internal static Dictionary<string, AsyncOperationHandle> assetDict;
-        internal static void Awake() => assetDict = new Dictionary<string, AsyncOperationHandle>();
-        internal static void Destroy() => assetDict = null;
+        internal static readonly Dictionary<string, AsyncOperationHandle> assetDict = new Dictionary<string, AsyncOperationHandle>();
 
         /// <summary>
         /// 通过资源管理器加载资源 (同步)
@@ -25,7 +23,7 @@ namespace JFramework.Core
             var result = Addressables.LoadAssetAsync<T>(path).WaitForCompletion();
             if (result == null)
             {
-                Log.Info($"{nameof(AssetManager).Sky()} 加载 => {path.Red()} 资源失败");
+                Debug.Log($"{nameof(AssetManager).Sky()} 加载 => {path.Red()} 资源失败");
                 return null;
             }
 
@@ -63,7 +61,7 @@ namespace JFramework.Core
                 assetDict.Remove(path);
             }
 
-            Log.Info($"{nameof(AssetManager).Sky()} 加载 => {path.Red()} 资源失败");
+            Debug.Log($"{nameof(AssetManager).Sky()} 加载 => {path.Red()} 资源失败");
             return null;
         }
 
@@ -108,5 +106,10 @@ namespace JFramework.Core
             Log.Info(DebugOption.Asset, $"加载 => {result.name.Green()} 资源成功");
             return result is GameObject ? Object.Instantiate(result) : result;
         }
+        
+        /// <summary>
+        /// 管理器销毁
+        /// </summary>
+        internal static void Destroy() => assetDict.Clear();
     }
 }

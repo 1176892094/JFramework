@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -10,12 +9,12 @@ namespace JFramework.Core
         /// <summary>
         /// 完成音效队列
         /// </summary>
-        internal static Queue<AudioSource> audioQueue;
+        internal static readonly Queue<AudioSource> audioQueue = new Queue<AudioSource>();
 
         /// <summary>
         /// 播放音效队列
         /// </summary>
-        internal static List<AudioSource> audioList;
+        internal static readonly List<AudioSource> audioList = new List<AudioSource>();
 
         /// <summary>
         /// 音效挂载系统
@@ -52,8 +51,6 @@ namespace JFramework.Core
         /// </summary>
         internal static void Awake()
         {
-            audioList = new List<AudioSource>();
-            audioQueue = new Queue<AudioSource>();
             var transform = GlobalManager.Instance.transform;
             poolManager = transform.Find("PoolManager").gameObject;
             audioSetting = JsonManager.Decrypt<AudioSetting>(Name);
@@ -154,8 +151,8 @@ namespace JFramework.Core
         /// </summary>
         internal static void Destroy()
         {
-            audioList = null;
-            audioQueue = null;
+            audioList.Clear();
+            audioQueue.Clear();
             poolManager = null;
             audioSource = null;
             audioSetting = null;

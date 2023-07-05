@@ -2,7 +2,6 @@ using System.Collections.Generic;
 using System.Reflection;
 using Sirenix.OdinInspector;
 using TMPro;
-using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
@@ -14,12 +13,13 @@ namespace JFramework
     /// <summary>
     /// UI面板的抽象类
     /// </summary>
-    public abstract class UIPanel : Entity
+    public abstract class UIPanel : Entity<IEvent>
     {
         /// <summary>
         /// 视觉容器字典
         /// </summary>
-        [ShowInInspector, LabelText("视觉元素")] private Dictionary<string, Component> componentDict;
+        [ShowInInspector, LabelText("视觉元素")]
+        private Dictionary<string, Component> componentDict = new Dictionary<string, Component>();
 
         /// <summary>
         /// UI隐藏类型
@@ -31,7 +31,6 @@ namespace JFramework
         /// </summary>
         protected virtual void Awake()
         {
-            componentDict = new Dictionary<string, Component>();
             FindComponent<Image>();
             FindComponent<Slider>();
             FindComponent<Button>();

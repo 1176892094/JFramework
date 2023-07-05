@@ -18,7 +18,12 @@ namespace JFramework.Core
         /// <summary>
         /// 存储所有UI的字典
         /// </summary>
-        internal static Dictionary<Type, UIPanel> panelDict;
+        internal static readonly Dictionary<Type, UIPanel> panelDict = new Dictionary<Type, UIPanel>();
+        
+        /// <summary>
+        /// UI层级数组
+        /// </summary>
+        internal static Transform[] layerGroup = new Transform[5];
 
         /// <summary>
         /// 管理器名称
@@ -26,17 +31,10 @@ namespace JFramework.Core
         private static string Name => nameof(UIManager);
 
         /// <summary>
-        /// UI层级数组
-        /// </summary>
-        internal static Transform[] layerGroup;
-
-        /// <summary>
         /// 界面管理器初始化数据
         /// </summary>
         internal static void Awake()
         {
-            layerGroup = new Transform[5];
-            panelDict = new Dictionary<Type, UIPanel>();
             var transform = GlobalManager.Instance.transform;
             layerGroup[0] = transform.Find("UICanvas/Layer1");
             layerGroup[1] = transform.Find("UICanvas/Layer2");
@@ -91,7 +89,7 @@ namespace JFramework.Core
             {
                 if (panelDict[key].stateType == UIStateType.Freeze)
                 {
-                    Log.Info($"{Name} 隐藏 => {key.Name.Red()} 失败,面板处于冻结状态!");
+                    Debug.Log($"{Name} 隐藏 => {key.Name.Red()} 失败,面板处于冻结状态!");
                     return;
                 }
 
@@ -169,8 +167,8 @@ namespace JFramework.Core
         /// </summary>
         internal static void Destroy()
         {
-            panelDict = null;
-            layerGroup = null;
+            panelDict.Clear();
+            layerGroup = Array.Empty<Transform>();
         }
     }
 }

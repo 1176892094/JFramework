@@ -17,17 +17,17 @@ namespace JFramework.Core
         /// <summary>
         /// 存储int为主键类型的数据字典
         /// </summary>
-        internal static Dictionary<Type, IntDataDict> IntDataDict;
+        internal static readonly Dictionary<Type, IntDataDict> IntDataDict = new Dictionary<Type, IntDataDict>();
 
         /// <summary>
         /// 存储string为主键的数据字典
         /// </summary>
-        internal static Dictionary<Type, StrDataDict> StrDataDict;
+        internal static readonly Dictionary<Type, StrDataDict> StrDataDict = new Dictionary<Type, StrDataDict>();
 
         /// <summary>
         /// 存储enum为主键的数据字典
         /// </summary>
-        internal static Dictionary<Type, EnmDataDict> EnmDataDict;
+        internal static readonly Dictionary<Type, EnmDataDict> EnmDataDict = new Dictionary<Type, EnmDataDict>();
 
         /// <summary>
         /// 管理器名称
@@ -38,7 +38,7 @@ namespace JFramework.Core
         /// 数据数量
         /// </summary>
         private static int DataCount;
-        
+
         /// <summary>
         /// 加载进度
         /// </summary>
@@ -54,9 +54,6 @@ namespace JFramework.Core
         /// </summary>
         internal static async void Awake()
         {
-            IntDataDict = new Dictionary<Type, IntDataDict>();
-            StrDataDict = new Dictionary<Type, StrDataDict>();
-            EnmDataDict = new Dictionary<Type, EnmDataDict>();
             var (assembly, types) = GetAssemblyAndTypes();
             if (types == null || types.Length == 0) return;
             LoadProgress = 0f;
@@ -73,14 +70,14 @@ namespace JFramework.Core
                     var keyInfo = GetKeyField<KeyFieldAttribute>(keyData);
                     if (keyData == null)
                     {
-                        Log.Info($"{Name.Sky()} 缺少主键 => {type.Name.Red()}");
+                        Debug.Log($"{Name.Sky()} 缺少主键 => {type.Name.Red()}");
                         return;
                     }
 
                     LoadProgress += 1f / DataCount;
                     var progress = (LoadProgress * 100).ToString("F") + "%";
                     Log.Info(DebugOption.Data, $"加载 => {type.Name.Blue()} 进度: {progress.Green()}");
-                    
+
                     var keyType = keyInfo.FieldType;
                     if (keyType == typeof(int))
                     {
@@ -97,12 +94,12 @@ namespace JFramework.Core
                 }
                 catch (Exception)
                 {
-                    Log.Info($"{Name.Sky()} 加载 => {type.Name.Red()} 数据失败");
+                    Debug.Log($"{Name.Sky()} 加载 => {type.Name.Red()} 数据失败");
                 }
             }
 
             var totalTime = (Time.time - time).ToString("F");
-            Log.Info($"{Name.Sky()} 加载 => 所有数据完成, 耗时 {totalTime.Yellow()} 秒");
+            Debug.Log($"{Name.Sky()} 加载 => 所有数据完成, 耗时 {totalTime.Yellow()} 秒");
             OnCompleted?.Invoke();
         }
 
@@ -126,7 +123,7 @@ namespace JFramework.Core
                 }
                 else
                 {
-                    Log.Info($"{Name.Sky()} 加载 => {table.GetType().Name.Orange()} 已经存在 {key.ToString().Red()} 键值!");
+                    Debug.Log($"{Name.Sky()} 加载 => {table.GetType().Name.Orange()} 已经存在 {key.ToString().Red()} 键值!");
                 }
             }
 
@@ -200,7 +197,7 @@ namespace JFramework.Core
         /// 通过数据管理器得到数据表
         /// </summary>
         /// <returns>返回一个Data的列表</returns>
-        private static T[] GetTable<T>()
+        public static T[] GetTable<T>()
         {
             if (IntDataDict.TryGetValue(typeof(T), out IntDataDict dictInt))
             {
@@ -242,7 +239,7 @@ namespace JFramework.Core
 
             return (null, null);
         }
-        
+
         /// <summary>
         /// 获取程序集中的类型
         /// </summary>
@@ -282,9 +279,9 @@ namespace JFramework.Core
         {
             DataCount = 0;
             LoadProgress = 0;
-            IntDataDict = null;
-            StrDataDict = null;
-            EnmDataDict = null;
+            IntDataDict.Clear();
+            StrDataDict.Clear();
+            EnmDataDict.Clear();
             OnCompleted = null;
         }
     }
