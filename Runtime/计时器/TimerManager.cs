@@ -12,20 +12,23 @@ namespace JFramework.Core
         /// <summary>
         /// 存储已经完成的计时器
         /// </summary>
-        internal static Queue<Timer> timerQueue;
+        internal static readonly Queue<Timer> timerQueue = new Queue<Timer>();
 
         /// <summary>
         /// 存储正在执行的计时器
         /// </summary>
-        internal static List<Timer> timerList;
-        
+        internal static readonly LinkedList<Timer> timerList = new LinkedList<Timer>();
+
+        /// <summary>
+        /// 当前计时器节点
+        /// </summary>
+        private static LinkedListNode<Timer> currentNode;
+
         /// <summary>
         /// 构造函数初始化数据
         /// </summary>
         internal static void Awake()
         {
-            timerQueue = new Queue<Timer>();
-            timerList = new List<Timer>();
             GlobalManager.OnUpdate += OnUpdate;
         }
 
@@ -34,10 +37,13 @@ namespace JFramework.Core
         /// </summary>
         private static void OnUpdate()
         {
-            if (timerList == null) return;
-            for (int i = timerList.Count - 1; i >= 0; i--)
+            if (timerList.Count <= 0) return;
+            currentNode = timerList.First;
+            while (currentNode != null)
             {
-                timerList[i]?.OnUpdate();
+                var nextNode = currentNode.Next;
+                currentNode.Value?.OnUpdate();
+                currentNode = nextNode;
             }
         }
 
@@ -51,16 +57,16 @@ namespace JFramework.Core
             if (!GlobalManager.Runtime) return null;
             Timer tick = timerQueue.Count > 0 ? timerQueue.Dequeue() : new Timer();
             tick.Open(time, action);
-            timerList.Add(tick);
+            timerList.AddLast(tick);
             return tick;
         }
-        
+
         public static ITimer Pop(float time, Action<ITimer> action = null)
         {
             if (!GlobalManager.Runtime) return null;
             Timer tick = timerQueue.Count > 0 ? timerQueue.Dequeue() : new Timer();
             tick.Open(time, action);
-            timerList.Add(tick);
+            timerList.AddLast(tick);
             return tick;
         }
 
@@ -85,8 +91,8 @@ namespace JFramework.Core
         /// </summary>
         internal static void Destroy()
         {
-            timerQueue = null;
-            timerList = null;
+            timerQueue.Clear();
+            timerList.Clear();
         }
     }
 }

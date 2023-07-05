@@ -32,6 +32,12 @@ namespace JFramework.Interface
         /// 计时器循环
         /// </summary>
         /// <param name="count">循环次数</param>
+        /// <returns>返回自身</returns>
         ITimer Loop(int count);
+
+        /// <summary>
+        /// 计时器推入
+        /// </summary>
+        void Push();
     }
 }

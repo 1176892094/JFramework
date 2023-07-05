@@ -92,13 +92,13 @@ namespace JFramework
                     waitTime += duration;
                     if (count == 0)
                     {
-                        this.Push();
+                        Push();
                     }
                 }
                 catch (Exception e)
                 {
                     Log.Info(DebugOption.Timer, $"=> 计时器抛出异常，自动回收计时器。\n{e}");
-                    this.Push();
+                    Push();
                 }
             }
         }
@@ -147,6 +147,11 @@ namespace JFramework
             this.count = count;
             return this;
         }
+
+        /// <summary>
+        /// 计时器推入
+        /// </summary>
+        public void Push() => TimerManager.Push(this);
 
         /// <summary>
         /// 设置计时器是否受TimeScale影响
