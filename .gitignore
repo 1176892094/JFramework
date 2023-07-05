@@ -8,3 +8,4 @@ Editor/.DS_Store
 Resources/GlobalManager.prefab
 Resources/GlobalManager.prefab
 Runtime/.DS_Store
+*.meta
