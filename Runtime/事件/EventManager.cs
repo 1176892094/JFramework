@@ -26,6 +26,7 @@ namespace JFramework.Core
                 observerDict.Add(typeof(TEvent), EventManager<TEvent>.observers);
             }
 
+            Log.Info(DebugOption.Event, $"侦听 => {observer} " + $"IEvent<{typeof(TEvent).Name}>".Yellow() + " 事件");
             return EventManager<TEvent>.Listen(observer);
         }
 
@@ -37,7 +38,9 @@ namespace JFramework.Core
         /// <returns>返回是否能被移除</returns>
         public static bool Remove<TEvent>(IEvent<TEvent> observer) where TEvent : struct, IEvent
         {
-            return GlobalManager.Runtime && EventManager<TEvent>.Remove(observer);
+            if (!GlobalManager.Runtime) return false;
+            Log.Info(DebugOption.Event, $"移除 => {observer} " + $"IEvent<{typeof(TEvent).Name}>".Yellow() + " 事件");
+            return EventManager<TEvent>.Remove(observer);
         }
 
         /// <summary>
@@ -48,6 +51,7 @@ namespace JFramework.Core
         public static void Invoke<TEvent>(TEvent observer = default) where TEvent : struct, IEvent
         {
             if (!GlobalManager.Runtime) return;
+            Log.Info(DebugOption.Event, $"触发 => {observer} " + $"IEvent<{typeof(TEvent).Name}>".Yellow() + " 事件");
             EventManager<TEvent>.Invoke(observer);
         }
 

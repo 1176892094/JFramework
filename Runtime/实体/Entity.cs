@@ -39,7 +39,7 @@ namespace JFramework
         /// <summary>
         /// 实体销毁
         /// </summary>
-        private void OnDestroy() => ((IEntity<TEvent>)this).Destroy();
+        private void OnDestroy() => ((IEntity)this).Destroy();
 
         /// <summary>
         /// 实体接口调用实体更新方法

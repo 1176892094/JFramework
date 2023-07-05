@@ -65,7 +65,7 @@ namespace JFramework.Core
                 try
                 {
                     var table = await AssetManager.LoadAsync<ScriptableObject>("DataTable/" + keyName);
-                    var dataTable = table.As<IDataTable>();
+                    var dataTable = (IDataTable)table;
                     var keyData = GetKeyField(assembly, type);
                     var keyInfo = GetKeyField<KeyFieldAttribute>(keyData);
                     if (keyData == null)

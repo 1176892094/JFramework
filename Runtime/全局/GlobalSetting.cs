@@ -62,7 +62,7 @@ namespace JFramework.Core
 
         [ShowInInspector, LabelText("游戏对象管理"), FoldoutGroup("对象池管理器")]
         private Dictionary<string, IPool<GameObject>> poolDict => PoolManager.poolDict;
-        
+
         [ShowInInspector, LabelText("数据对象管理"), FoldoutGroup("对象池管理器")]
         private Dictionary<Type, IPool> stackDict => PoolManager.streamDict;
     }
@@ -78,6 +78,7 @@ namespace JFramework.Core
             { DebugOption.Asset, "AssetManager " },
             { DebugOption.Audio, "AudioManager " },
             { DebugOption.Timer, "TimerManager " },
+            { DebugOption.Event, "EventManager " },
         };
 
 
@@ -100,6 +101,7 @@ namespace JFramework.Core
         Asset = 16,
         Audio = 32,
         Timer = 64,
-        Custom = 128,
+        Event = 128,
+        Custom = 256,
     }
 }

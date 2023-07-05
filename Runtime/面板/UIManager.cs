@@ -19,11 +19,11 @@ namespace JFramework.Core
         /// 存储所有UI的字典
         /// </summary>
         internal static readonly Dictionary<Type, UIPanel> panelDict = new Dictionary<Type, UIPanel>();
-        
+
         /// <summary>
         /// UI层级数组
         /// </summary>
-        internal static Transform[] layerGroup = new Transform[5];
+        internal static Transform[] layerGroup = Array.Empty<Transform>();
 
         /// <summary>
         /// 管理器名称
@@ -35,6 +35,7 @@ namespace JFramework.Core
         /// </summary>
         internal static void Awake()
         {
+            layerGroup = new Transform[5];
             var transform = GlobalManager.Instance.transform;
             layerGroup[0] = transform.Find("UICanvas/Layer1");
             layerGroup[1] = transform.Find("UICanvas/Layer2");

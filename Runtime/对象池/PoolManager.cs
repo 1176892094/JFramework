@@ -72,7 +72,7 @@ namespace JFramework.Core
             else
             {
                 Log.Info(DebugOption.Pool, $"创建 => 对象池 : {key.Green()}");
-                poolDict.Add(key, new ObjectPool(obj, poolManager));
+                poolDict.Add(key, new PoolData(obj, poolManager));
             }
         }
 

@@ -10,7 +10,7 @@ namespace JFramework
     /// 游戏物体对象池
     /// </summary>
     [Serializable]
-    internal sealed class ObjectPool : IPool<GameObject>
+    internal sealed class PoolData : IPool<GameObject>
     {
         /// <summary>
         /// 对象池容器
@@ -32,7 +32,7 @@ namespace JFramework
         /// </summary>
         /// <param name="pool">推入的游戏对象</param>
         /// <param name="parent">池中的游戏对象栈</param>
-        public ObjectPool(GameObject pool, Transform parent)
+        public PoolData(GameObject pool, Transform parent)
         {
             stackPool = new Stack<GameObject>();
             transform = new GameObject(pool.name + "-Pool").transform;
@@ -66,6 +66,9 @@ namespace JFramework
             stackPool.Push(obj);
         }
 
+        /// <summary>
+        /// 清空对象池
+        /// </summary>
         public void Clear()
         {
             foreach (var obj in stackPool)

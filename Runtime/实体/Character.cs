@@ -35,26 +35,18 @@ namespace JFramework
         }
 
         /// <summary>
-        /// 销毁字典中的控制器
-        /// </summary>
-        private void Dispose()
-        {
-            foreach (var scriptable in controllerDict.Values)
-            {
-                Destroy(scriptable);
-            }
-
-            controllerDict.Clear();
-        }
-
-        /// <summary>
         /// 实体销毁
         /// </summary>
         void IEntity.Destroy()
         {
             try
             {
-                Dispose();
+                foreach (var scriptable in controllerDict.Values)
+                {
+                    Destroy(scriptable);
+                }
+
+                controllerDict.Clear();
                 Despawn();
             }
             catch (Exception e)
