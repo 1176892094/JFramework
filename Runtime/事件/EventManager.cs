@@ -1,57 +1,67 @@
+using System;
 using System.Collections.Generic;
+
 
 namespace JFramework.Core
 {
     public static class EventManager
     {
-        internal static Dictionary<int, EventHandler> eventDict;
-        internal static void Awake() => eventDict = new Dictionary<int, EventHandler>();
-        internal static void Destroy() => eventDict = null;
+        /// <summary>
+        /// 事件观察字典
+        /// </summary>
+        internal static readonly Dictionary<Type, HashSet<IEvent>> observerDict = new Dictionary<Type, HashSet<IEvent>>();
 
         /// <summary>
-        /// 侦听事件
+        /// 事件管理器侦听事件
         /// </summary>
-        /// <param name="id">事件唯一标识</param>
-        /// <param name="eventHandler">传入侦听的事件</param>
-        public static void Listen(int id, EventHandler eventHandler)
+        /// <param name="observer">传入观察的游戏对象</param>
+        /// <typeparam name="TEvent">事件类型</typeparam>
+        /// <returns>返回是否能被侦听</returns>
+        public static bool Listen<TEvent>(IEvent<TEvent> observer) where TEvent : struct, IEvent
         {
-            if (!GlobalManager.Runtime) return;
-            if (eventDict.ContainsKey(id))
+            if (!GlobalManager.Runtime) return false;
+            if (!observerDict.ContainsKey(typeof(TEvent)))
             {
-                eventDict[id] += eventHandler;
+                EventManager<TEvent>.observers = new HashSet<IEvent>();
+                observerDict.Add(typeof(TEvent), EventManager<TEvent>.observers);
             }
-            else
-            {
-                eventDict.Add(id, eventHandler);
-            }
+
+            return EventManager<TEvent>.Listen(observer);
         }
 
         /// <summary>
-        /// 移除事件
+        /// 事件管理器移除事件
         /// </summary>
-        /// <param name="id">事件唯一标识</param>
-        /// <param name="eventHandler">传入移除的事件</param>
-        public static void Remove(int id, EventHandler eventHandler)
+        /// <param name="observer">传入观察的游戏对象</param>
+        /// <typeparam name="TEvent">事件类型</typeparam>
+        /// <returns>返回是否能被移除</returns>
+        public static bool Remove<TEvent>(IEvent<TEvent> observer) where TEvent : struct, IEvent
         {
-            if (!GlobalManager.Runtime) return;
-            if (eventDict.ContainsKey(id))
-            {
-                eventDict[id] -= eventHandler;
-            }
+            return GlobalManager.Runtime && EventManager<TEvent>.Remove(observer);
         }
 
         /// <summary>
-        /// 调用事件
+        /// 事件管理器广播事件
         /// </summary>
-        /// <param name="id">事件唯一标识</param>
-        /// <param name="handler">传入事件的参数</param>
-        public static void Invoke(int id, params object[] handler)
+        /// <param name="observer">传入观察事件数据</param>
+        /// <typeparam name="TEvent">事件类型</typeparam>
+        public static void Invoke<TEvent>(TEvent observer = default) where TEvent : struct, IEvent
         {
             if (!GlobalManager.Runtime) return;
-            if (eventDict.ContainsKey(id))
+            EventManager<TEvent>.Invoke(observer);
+        }
+
+        /// <summary>
+        /// 事件管理器销毁并释放
+        /// </summary>
+        internal static void Destroy()
+        {
+            foreach (var hashSet in observerDict.Values)
             {
-                eventDict[id]?.Invoke(handler);
+                hashSet.Clear();
             }
+
+            observerDict.Clear();
         }
     }
 }

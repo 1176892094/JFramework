@@ -38,7 +38,7 @@ namespace JFramework.Core
             var filePath = GetPath(obj.name);
             if (!File.Exists(filePath))
             {
-                Log.Info($"{nameof(JsonManager)} 创建 => {obj.name.Orange()} 数据文件");
+                Debug.Log($"{nameof(JsonManager)} 创建 => {obj.name.Orange()} 数据文件");
                 Encrypt(obj, obj.name);
             }
             
@@ -65,7 +65,7 @@ namespace JFramework.Core
             var filePath = GetPath(name);
             if (!File.Exists(filePath))
             {
-                Log.Info($"{nameof(JsonManager)} 创建 => {name.Orange()} 数据文件");
+                Debug.Log($"{nameof(JsonManager)} 创建 => {name.Orange()} 数据文件");
                 Encrypt(new T(), name);
             }
             
@@ -107,7 +107,7 @@ namespace JFramework.Core
                 }
                 catch (Exception e)
                 {
-                    Log.Warn($"{nameof(JsonManager).Red()} 存档丢失 => 加密失败!\n" + e);
+                    Debug.LogWarning($"{nameof(JsonManager).Red()} 存档丢失 => 加密失败!\n" + e);
                     Clear();
                 }
 
@@ -136,7 +136,7 @@ namespace JFramework.Core
                 }
                 catch (Exception e)
                 {
-                    Log.Warn($"{nameof(JsonManager).Red()} 存档丢失 => 解密失败!\n" + e);
+                    Debug.LogWarning($"{nameof(JsonManager).Red()} 存档丢失 => 解密失败!\n" + e);
                     Clear();
                 }
 
