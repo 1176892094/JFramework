@@ -1,47 +1,53 @@
+using System;
 using System.Collections.Generic;
 using JFramework.Interface;
 using Sirenix.OdinInspector;
 
 namespace JFramework
 {
-    /// <summary>
-    /// 对象池的抽象类
-    /// </summary>
-    /// <typeparam name="TPool">传入对象池的对象类型</typeparam>
-    internal abstract class Pool<TPool> : IPool where TPool : class
+    [Serializable]
+    internal sealed class Pool<T> : IPool<T> where T : new()
     {
         /// <summary>
-        /// 对象池容器
+        /// 静态对象池
         /// </summary>
-        [ShowInInspector] protected Stack<TPool> stackPool;
+        [ShowInInspector] internal readonly Stack<T> stackPool = new Stack<T>();
 
         /// <summary>
-        /// 取出对象
+        /// 对象数量
+        /// </summary>
+        public int Count => stackPool.Count;
+
+        /// <summary>
+        /// 创建时推入对象
+        /// </summary>
+        /// <param name="obj">传入泛型对象</param>
+        public Pool(T obj) => Push(obj);
+
+        /// <summary>
+        /// 对象弹出
         /// </summary>
         /// <returns>返回对象</returns>
-        protected abstract TPool Pop();
+        public T Pop()
+        {
+            return stackPool.Count > 0 ? stackPool.Pop() : new T();
+        }
 
         /// <summary>
-        /// 推入对象
+        /// 对象推入
         /// </summary>
-        /// <param name="gameObject">传入推入的对象</param>
-        protected abstract void Push(TPool gameObject);
-        
-        /// <summary>
-        /// 对象池物体数量
-        /// </summary>
-        int IPool.Count => stackPool.Count;
+        /// <param name="obj">推入对象</param>
+        public void Push(T obj)
+        {
+            if (!stackPool.Contains(obj))
+            {
+                stackPool.Push(obj);
+            }
+        }
 
         /// <summary>
-        /// 通过接口取出对象
+        /// 清空对象池
         /// </summary>
-        /// <returns>返回对象</returns>
-        object IPool.Pop() => Pop();
-
-        /// <summary>
-        /// 通过接口推入对象
-        /// </summary>
-        /// <param name="obj">传入推入的对象</param>
-        void IPool.Push(object obj) => Push((TPool)obj);
+        public void Clear() => stackPool.Clear();
     }
 }

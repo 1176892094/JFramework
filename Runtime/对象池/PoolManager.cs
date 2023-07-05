@@ -1,26 +1,24 @@
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using JFramework.Interface;
 using UnityEngine;
+using Object = UnityEngine.Object;
 
 namespace JFramework.Core
 {
     public static class PoolManager
     {
-        internal static Dictionary<string, IPool> poolDict;
+        internal static readonly Dictionary<string, IPool<GameObject>> poolDict = new Dictionary<string, IPool<GameObject>>();
+        
+        internal static readonly Dictionary<Type, IPool> streamDict = new Dictionary<Type, IPool>();
+
         internal static Transform poolManager;
 
         internal static void Awake()
         {
-            poolDict = new Dictionary<string, IPool>();
             var transform = GlobalManager.Instance.transform;
             poolManager = transform.Find("PoolManager");
-        }
-
-        internal static void Destroy()
-        {
-            poolManager = null;
-            poolDict = null;
         }
 
         /// <summary>
@@ -33,7 +31,7 @@ namespace JFramework.Core
             var key = path.Substring(path.LastIndexOf('/') + 1);
             if (poolDict.ContainsKey(key) && poolDict[key].Count > 0)
             {
-                var poolObj = (GameObject)poolDict[key].Pop();
+                var poolObj = poolDict[key].Pop();
                 if (poolObj != null)
                 {
                     Log.Info(DebugOption.Pool, $"取出 => {key.Pink()} 对象成功");
@@ -63,7 +61,7 @@ namespace JFramework.Core
             {
                 if (obj == null)
                 {
-                    Log.Warn($"{nameof(PoolManager).Sky()} 移除已销毁对象 : {key.Red()}");
+                    Debug.LogWarning($"{nameof(PoolManager).Sky()} 移除已销毁对象 : {key.Red()}");
                     poolDict[key].Pop();
                     return;
                 }
@@ -74,8 +72,61 @@ namespace JFramework.Core
             else
             {
                 Log.Info(DebugOption.Pool, $"创建 => 对象池 : {key.Green()}");
-                poolDict.Add(key, new PoolData(obj, poolManager));
+                poolDict.Add(key, new ObjectPool(obj, poolManager));
             }
+        }
+
+        /// <summary>
+        /// 弹出对象池
+        /// </summary>
+        /// <typeparam name="T">任何可以被new的对象</typeparam>
+        /// <returns>返回弹出对象</returns>
+        public static T Pop<T>() where T : new()
+        {
+            var key = typeof(T);
+            if (streamDict.ContainsKey(key) && streamDict[key].Count > 0)
+            {
+                return ((IPool<T>)streamDict[key]).Pop();
+            }
+
+            return new T();
+        }
+
+        /// <summary>
+        /// 推入对象池
+        /// </summary>
+        /// <param name="obj">传入对象</param>
+        /// <typeparam name="T">任何可以被new的对象</typeparam>
+        public static void Push<T>(T obj) where T : new()
+        {
+            var key = typeof(T);
+            if (streamDict.ContainsKey(key))
+            {
+                ((IPool<T>)streamDict[key]).Push(obj);
+                return;
+            }
+            
+            streamDict.Add(key, new Pool<T>(obj));
+        }
+
+        /// <summary>
+        /// 管理器销毁
+        /// </summary>
+        internal static void Destroy()
+        {
+            foreach (var pool in poolDict.Values)
+            {
+                pool.Clear();
+            }
+
+            foreach (var stack in streamDict.Values)
+            {
+                stack.Clear();
+            }
+
+            poolDict.Clear();
+            streamDict.Clear();
+            poolManager = null;
         }
     }
 }
