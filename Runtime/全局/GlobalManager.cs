@@ -66,14 +66,10 @@ namespace JFramework.Core
             runtime = true;
             instance ??= this;
             DontDestroyOnLoad(gameObject);
-            CommandManager.Awake();
-            AssetManager.Awake();
-            EventManager.Awake();
             TimerManager.Awake();
             DateManager.Awake();
             AudioManager.Awake();
             PoolManager.Awake();
-            SceneManager.Awake();
             DataManager.Awake();
             UIManager.Awake();
         }
@@ -88,10 +84,6 @@ namespace JFramework.Core
                 runtime = false;
                 OnQuit?.Invoke();
             }
-            catch
-            {
-                // ignored
-            }
             finally
             {
                 UIManager.Destroy();
@@ -103,7 +95,6 @@ namespace JFramework.Core
                 AudioManager.Destroy();
                 AssetManager.Destroy();
                 EventManager.Destroy();
-                CommandManager.Destroy();
                 instance = null;
                 OnStart = null;
                 OnUpdate = null;

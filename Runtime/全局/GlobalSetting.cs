@@ -13,19 +13,16 @@ namespace JFramework.Core
         internal DebugOption debugOption;
 
         [ShowInInspector, LabelText("资源管理数据"), FoldoutGroup("通用管理器")]
-        private Dictionary<string, AsyncOperationHandle> assetList => AssetManager.assetDict;
+        private Dictionary<string, AsyncOperationHandle> assetDict => AssetManager.assetDict;
 
         [ShowInInspector, LabelText("事件管理数据"), FoldoutGroup("通用管理器")]
-        private Dictionary<int, EventHandler> eventDict => EventManager.eventDict;
-
-        [ShowInInspector, LabelText("命令管理数据"), FoldoutGroup("通用管理器")]
-        private Dictionary<Type, ICommand> commandDict => CommandManager.commandDict;
+        private Dictionary<Type, HashSet<IEvent>> eventDict => EventManager.observerDict;
 
         [ShowInInspector, LabelText("完成计时队列"), FoldoutGroup("计时器管理器")]
         private Queue<Timer> timerQueue => TimerManager.timerQueue;
 
         [ShowInInspector, LabelText("正在计时队列"), FoldoutGroup("计时器管理器")]
-        private List<Timer> timerList => TimerManager.timerList;
+        private LinkedList<Timer> timerList => TimerManager.timerList;
 
         [ShowInInspector, LabelText("整数数据管理"), FoldoutGroup("数据管理器")]
         private Dictionary<Type, Dictionary<int, IData>> intDataDict => DataManager.IntDataDict;
@@ -63,8 +60,11 @@ namespace JFramework.Core
         [ShowInInspector, LabelText("对象池管理器"), FoldoutGroup("对象池管理器")]
         private Transform poolManager => PoolManager.poolManager;
 
-        [ShowInInspector, LabelText("对象数据管理"), FoldoutGroup("对象池管理器")]
-        private Dictionary<string, IPool> poolDict => PoolManager.poolDict;
+        [ShowInInspector, LabelText("游戏对象管理"), FoldoutGroup("对象池管理器")]
+        private Dictionary<string, IPool<GameObject>> poolDict => PoolManager.poolDict;
+        
+        [ShowInInspector, LabelText("数据对象管理"), FoldoutGroup("对象池管理器")]
+        private Dictionary<Type, IPool> stackDict => PoolManager.streamDict;
     }
 
     internal static class Log
@@ -84,18 +84,8 @@ namespace JFramework.Core
         public static void Info(DebugOption option, string message)
         {
             if (!GlobalManager.Runtime) return;
-            if ((GlobalManager.Instance.debugOption & option) == 0) return;
+            if ((GlobalManager.Instance.debugOption & option) == DebugOption.None) return;
             Debug.Log(debugDict.ContainsKey(option) ? debugDict[option].Sky() + message : message);
-        }
-
-        public static void Info(string message)
-        {
-            Debug.Log(message);
-        }
-
-        public static void Warn(string message)
-        {
-            Debug.LogWarning(message);
         }
     }
 
