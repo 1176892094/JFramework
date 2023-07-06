@@ -1,0 +1,50 @@
+using JFramework;
+using JFramework.Core;
+using UnityEngine;
+
+public class Test7: MonoBehaviour
+{
+    private async void ShowPanel()
+    {
+        await UIManager.ShowPanel<LoginPanel>(); //加载LoginPanel(可以重复加载，但只有一个实例)
+        var panel = await UIManager.ShowPanel<LoginPanel>();
+        panel.SetUsername("CHARLOTTE");//设置属性
+        panel.SetPassword("123456");//设置属性
+    }
+    
+    private void HidePanel()
+    {
+        UIManager.HidePanel<LoginPanel>(); //隐藏LoginPane
+    }
+
+    private void GetPanel()
+    {
+        LoginPanel panel = UIManager.GetPanel<LoginPanel>();//得到面板
+        panel.SetUsername("JINYIJIE");//设置属性
+        panel.SetPassword("123456");//设置属性
+    }
+
+    private void GetLayer()
+    {
+        UIManager.GetLayer(UILayerType.Layer1);//获取层级
+        Transform common = UIManager.GetLayer(UILayerType.Layer2);
+    }
+
+    private void Clear()
+    {
+        UIManager.Clear();//清除并销毁所有面板
+    }
+}
+
+public struct UIPanelPath
+{
+    public const string LoginPanel = "UI/LoginPanel";//LoginPanel的真实路径是：Assets/AddressableResources/UI/LoginPanel
+}
+
+public class LoginPanel : UIPanel //需要管理的UI都要继承BasePanel
+{
+    private string username;
+    private string password;
+    public void SetUsername(string username) => this.username = username;
+    public void SetPassword(string password) => this.password = password;
+}

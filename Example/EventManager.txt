@@ -1,0 +1,63 @@
+using System;
+using System.Collections.Generic;
+using JFramework;
+using JFramework.Core;
+using UnityEngine;
+
+namespace Example
+{
+    public class Test1 : MonoBehaviour
+    {
+        private void Awake()
+        {
+            var enemies = new List<Enemy>();
+            for (int i = 0; i < 10; i++)
+            {
+                enemies.Add(new Enemy(i));
+            }
+
+            EventManager.Invoke<SpawnData>();//直接用 EventManager 广播
+
+            foreach (var enemy in enemies)
+            {
+                enemy.Execute(new DespawnData());
+            }
+        }
+    }
+
+    public class Enemy : IEvent<SpawnData>, IEvent<DespawnData>, IDisposable
+    {
+        private readonly int id;
+
+        public Enemy(int id)
+        {
+            this.id = id;
+            EventManager.Listen<SpawnData>(this);
+            EventManager.Listen<DespawnData>(this);
+        }
+
+        public void Execute(SpawnData message)
+        {
+            Debug.Log("Spawn:" + id);
+        }
+
+        public void Execute(DespawnData message)
+        {
+            Debug.Log("Despawn:" + id);
+        }
+
+        public void Dispose()
+        {
+            EventManager.Remove<SpawnData>(this);
+            EventManager.Remove<DespawnData>(this);
+        }
+    }
+
+    public struct SpawnData : IEvent
+    {
+    }
+
+    public struct DespawnData : IEvent
+    {
+    }
+}

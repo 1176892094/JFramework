@@ -1,0 +1,41 @@
+using JFramework.Core;
+using UnityEngine;
+
+public class Test4 : MonoBehaviour
+{
+    private async void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.Q))
+        {
+            var obj = await PoolManager.Pop<GameObject>(AssetPath.Bullet);
+            obj.transform.position = transform.position; //设置生成的子弹位置在自身位置
+            TimerManager.Pop(3, () => //创建一个3秒的计时器
+            {
+                PoolManager.Push(obj); //将物体放回对象池
+            });
+        }
+
+        if (Input.GetKeyDown(KeyCode.Q))
+        {
+            var bullet = PoolManager.Pop<Bullet>();
+            
+            bullet.Push();//调用自身的 Push 方法
+        }
+    }
+
+    public class Bullet // 非 GameObject 对象的使用
+    {
+        public void Push()
+        {
+            TimerManager.Pop(3, () =>
+            {
+                PoolManager.Push(this);
+            });
+        }
+    }
+}
+
+public struct AssetPath
+{
+    public const string Bullet = "Prefabs/Bullet"; //Bullet的真实路径是：Assets/AddressableResources/Prefabs/Bullet
+}

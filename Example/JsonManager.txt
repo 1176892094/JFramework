@@ -1,0 +1,37 @@
+using System.Collections.Generic;
+using JFramework.Core;
+using UnityEngine;
+
+public class Test3 : MonoBehaviour
+{
+    private async void SaveAndLoad1()
+    {
+        var data = await AssetManager.LoadAsync<ScriptableObject>(AssetPath.Data);
+        JsonManager.Save(data, data.name); //保存SO文件,名称为"玩家数据"
+        JsonManager.Load(data); //读取该SO文件
+    }
+
+    private async void SaveAndLoad2()
+    {
+        var data=await AssetManager.LoadAsync<ScriptableObject>(AssetPath.Data;
+        JsonManager.Encrypt(data, "玩家数据"); //储存数据并加密
+        JsonManager.Decrypt(data); //解析加密数据并读取
+    }
+
+    private void SaveAndLoad3()
+    {
+        List<string> bagData = new List<string>();
+        JsonManager.Save(bagData, "BagData"); //储存BagData
+        bagData = JsonManager.Load<List<string>>("BagData"); //读取BagData
+    }
+}
+
+public struct AssetPath
+{
+    public const string Data = "Settings/PlayerData"; //PlayerData真实路径是：Assets/AddressableResources/Settings/Data
+}
+
+public class PlayerData : ScriptableObject
+{
+    public string Name;
+}

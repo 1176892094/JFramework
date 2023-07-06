@@ -1,0 +1,25 @@
+using JFramework.Core;
+using UnityEngine;
+
+public class Test8 : MonoBehaviour
+{
+    private void Awake()
+    {
+        SceneManager.OnLoadScene += LoadProgress;
+    }
+
+    private async void LoadSceneAsync()
+    {
+        await SceneManager.LoadSceneAsync("SceneName");
+    }
+
+    private void LoadProgress(float progress) //获取异步加载进度
+    {
+        Debug.Log(progress); //获取当前加载进度
+    }
+
+    private void OnDestroy()
+    {
+        SceneManager.OnLoadScene -= LoadProgress;
+    }
+}

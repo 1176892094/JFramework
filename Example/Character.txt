@@ -1,0 +1,37 @@
+using JFramework;
+
+public class Player : Character //玩家继承角色 (玩家销毁时自动清除Controller的对象)
+{
+    public BuffController buffCtrl => GetOrAddCtrl<BuffController>(); //效果控制器
+    public SkillController skillCtrl => GetOrAddCtrl<SkillController>(); //技能控制器
+    public AttributeController attrCtrl => GetOrAddCtrl<AttributeController>(); //属性控制器
+}
+
+public class SkillController : Controller<Player> //设置控制器的所有者
+{
+    private AttributeController attrCtrl => owner.attrCtrl;
+
+    protected override void Spawn() //初始化方法
+    {
+    }
+}
+
+public class AttributeController : Controller<Player> //设置控制器的所有者
+{
+    private SkillController skillCtrl => owner.skillCtrl;
+    private BuffController buffCtrl => owner.buffCtrl;
+
+    protected override void Spawn() //初始化方法
+    {
+    }
+}
+
+public class BuffController : Controller<Player> //设置控制器的所有者
+{
+    private AttributeController attrCtrl => owner.attrCtrl;
+    private SkillController skillCtrl => owner.skillCtrl;
+
+    protected override void Spawn() //初始化方法
+    {
+    }
+}

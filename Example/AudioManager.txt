@@ -1,0 +1,27 @@
+using JFramework.Core;
+using UnityEngine;
+
+public class Test5 : MonoBehaviour
+{
+    private AudioSource audioSource;
+    
+    private void Sound()
+    {
+        AudioManager.PlaySound(AudioPath.BGMusic); //播放背景音乐
+        AudioManager.StopSound(); //停止背景音乐
+        AudioManager.SetSound(0); //改变背景音乐大小为0
+    }
+
+    private void Audio()
+    {
+        AudioManager.PlayAudio(AudioPath.BTClick); //播放该音效
+        AudioManager.StopAudio(audioSource); //停止该音效
+        AudioManager.SetAudio(0); //改变游戏音效大小为0
+    }
+}
+
+public struct AudioPath
+{
+    public const string BGMusic = "Audio/BGMusic"; //BGMusic的真实路径是：Assets/Resources/Audio/BGMusic
+    public const string BTClick = "Audio/BTClick"; //BTClick的真实路径是：Assets/Resources/Audio/BTClick
+}
