@@ -1,7 +1,7 @@
 // ReSharper disable All
 namespace JFramework
 {
-    public static class StringExtension
+    public static partial class Extensions
     {
         public static bool IsEmpty(this string s) => string.IsNullOrEmpty(s);
         public static string Green(this string s) => s.SetColor(TextColor.Green);
@@ -13,7 +13,7 @@ namespace JFramework
         public static string Blue(this string s) => s.SetColor(TextColor.Blue);
         public static string Red(this string s) => s.SetColor(TextColor.Red);
         public static string Sky(this string s) => s.SetColor(TextColor.Sky);
-        public static string SetColor(this string s, TextColor type)
+        internal static string SetColor(this string s, TextColor type)
         {
             return type switch
             {
@@ -31,7 +31,7 @@ namespace JFramework
         }
     }
 
-    public enum TextColor
+    internal enum TextColor
     {
         Sky = 0,
         Red = 1,

@@ -1,4 +1,4 @@
-namespace JFramework
+namespace JFramework.Interface
 {
     /// <summary>
     /// 事件接口

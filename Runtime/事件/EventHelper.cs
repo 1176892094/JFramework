@@ -1,4 +1,6 @@
 using System.Collections.Generic;
+using JFramework.Interface;
+
 // ReSharper disable All
 
 namespace JFramework

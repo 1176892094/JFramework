@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace JFramework
 {
-    public static class UnityExtension
+    public static partial class Extensions
     {
         /// <summary>
         /// 判断对象是否为Component类
