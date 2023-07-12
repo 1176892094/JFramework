@@ -1,5 +1,8 @@
+using System;
+
 namespace JFramework.Table
 {
+    [Serializable]
     public struct Template
     {
 //TODO:1
