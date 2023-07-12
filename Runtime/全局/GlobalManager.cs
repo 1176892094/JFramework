@@ -3,8 +3,7 @@ using UnityEngine;
 
 namespace JFramework.Core
 {
-    [AddComponentMenu("")]
-    [DisallowMultipleComponent,DefaultExecutionOrder(-10)]
+    [AddComponentMenu(""), DefaultExecutionOrder(-10)]
     public sealed partial class GlobalManager : MonoBehaviour
     {
         /// <summary>
