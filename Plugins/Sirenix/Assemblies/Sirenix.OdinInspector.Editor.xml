@@ -9158,6 +9158,11 @@
             Whether to automatically set focus on the search bar when the tree is drawn for the first time. True by default.
             </summary>
         </member>
+        <member name="F:Sirenix.OdinInspector.Editor.OdinMenuTreeDrawingConfig.SelectMenuItemsOnMouseDown">
+            <summary>
+            Whether to select menu items on mouse down, or on click. False by default.
+            </summary>
+        </member>
         <member name="F:Sirenix.OdinInspector.Editor.OdinMenuTreeDrawingConfig.ScrollPos">
             <summary>
             The scroll-view position.
