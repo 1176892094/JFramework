@@ -20,7 +20,18 @@ namespace JFramework.Core
         public static string scene => UnitySceneManager.GetActiveScene().name;
 
         /// <summary>
-        /// 异步加载场景
+        /// 异步加载场景 (无视是否加完成)
+        /// </summary>
+        /// <param name="path">场景名称</param>
+        public static async void LoadScene(string path)
+        {
+            if (!GlobalManager.Runtime) return;
+            Log.Info(DebugOption.Scene, $"异步加载 => {path.Green()} 场景");
+            await OnLoadProgress(path, Time.time);
+        }
+        
+        /// <summary>
+        /// 异步加载场景 (能够等待场景加载完成)
         /// </summary>
         /// <param name="path">场景名称</param>
         public static async Task LoadSceneAsync(string path)

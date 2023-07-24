@@ -19,7 +19,7 @@ namespace JFramework
         /// 视觉容器字典
         /// </summary>
         [ShowInInspector, LabelText("视觉元素")]
-        private Dictionary<string, Component> componentDict = new Dictionary<string, Component>();
+        private Dictionary<string, Component> components = new Dictionary<string, Component>();
 
         /// <summary>
         /// UI隐藏类型
@@ -51,15 +51,15 @@ namespace JFramework
             foreach (var component in components)
             {
                 var key = component.gameObject.name;
-                if (!componentDict.ContainsKey(type))
+                if (!this.components.ContainsKey(type))
                 {
                     var container = new Component();
-                    componentDict.Add(type, container);
+                    this.components.Add(type, container);
                     container.Add(key, component);
                 }
-                else if (!componentDict[type].ContainsKey(key))
+                else if (!this.components[type].ContainsKey(key))
                 {
-                    componentDict[type].Add(key, component);
+                    this.components[type].Add(key, component);
                 }
 
                 if (component is Button button)
@@ -89,7 +89,7 @@ namespace JFramework
         public T Get<T>(string key) where T : UIBehaviour
         {
             var type = typeof(T).Name;
-            return componentDict.ContainsKey(type) ? (T)componentDict[type][key] : null;
+            return components.ContainsKey(type) ? (T)components[type][key] : null;
         }
 
         /// <summary>

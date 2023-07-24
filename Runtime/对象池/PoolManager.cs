@@ -22,7 +22,7 @@ namespace JFramework.Core
         }
 
         /// <summary>
-        /// 对象池管理器拉取对象
+        /// 对象池管理器异步获取对象 (生成并返回结果)
         /// </summary>
         /// <param name="path">弹出对象的路径</param>
         public static async Task<T> Pop<T>(string path) where T : Object
@@ -100,9 +100,9 @@ namespace JFramework.Core
         public static void Push<T>(T obj) where T : new()
         {
             var key = typeof(T);
-            if (streamDict.ContainsKey(key))
+            if (streamDict.TryGetValue(key, out var pool))
             {
-                ((IPool<T>)streamDict[key]).Push(obj);
+                ((IPool<T>)pool).Push(obj);
                 return;
             }
             

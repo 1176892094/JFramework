@@ -1,33 +1,44 @@
 namespace JFramework
 {
     /// <summary>
-    /// 用户面板层级类型枚举
+    /// 用户面板层级接口
     /// </summary>
-    public enum UILayerType
+    public interface UILayer
     {
-        /// <summary>
-        /// 最底层
-        /// </summary>
-        Layer1 = 0,
+    }
 
-        /// <summary>
-        /// 较底层
-        /// </summary>
-        Layer2 = 1,
+    /// <summary>
+    /// 最底层
+    /// </summary>
+    public interface UILayer1 : UILayer
+    {
+    }
 
-        /// <summary>
-        /// 中间层
-        /// </summary>
-        Layer3 = 2,
+    /// <summary>
+    /// 较底层
+    /// </summary>
+    public interface UILayer2 : UILayer
+    {
+    }
 
-        /// <summary>
-        /// 较高层
-        /// </summary>
-        Layer4 = 3,
+    /// <summary>
+    /// 中间层
+    /// </summary>
+    public interface UILayer3 : UILayer
+    {
+    }
 
-        /// <summary>
-        /// 最高层 (忽视射线)
-        /// </summary>
-        Layer5 = 4,
+    /// <summary>
+    /// 较高层
+    /// </summary>
+    public interface UILayer4 : UILayer
+    {
+    }
+
+    /// <summary>
+    /// 最高层 (忽视射线)
+    /// </summary>
+    public interface UILayer5 : UILayer
+    {
     }
 }

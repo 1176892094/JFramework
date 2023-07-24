@@ -40,9 +40,9 @@ namespace JFramework.Core
         {
             if (!GlobalManager.Runtime) return null;
             AsyncOperationHandle<T> handle;
-            if (assetDict.ContainsKey(path))
+            if (assetDict.TryGetValue(path, out var asyncHandle))
             {
-                handle = assetDict[path].Convert<T>();
+                handle = asyncHandle.Convert<T>();
                 if (!handle.IsDone) await handle.Task;
                 return LoadCompleted(handle.Result);
             }
