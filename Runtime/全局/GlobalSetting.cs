@@ -37,7 +37,7 @@ namespace JFramework.Core
         private Dictionary<Type, UIPanel> panelDict => UIManager.panelDict;
 
         [ShowInInspector, LabelText("面板层级配置"), FoldoutGroup("面板管理器")]
-        private Transform[] layerGroup => UIManager.layerGroup;
+        private Dictionary<Type, Transform> layerGroup => UIManager.layerDict;
 
         [ShowInInspector, LabelText("音乐管理对象"), FoldoutGroup("音效管理器")]
         private GameObject audioManager => AudioManager.poolManager;
