@@ -1,4 +1,4 @@
-namespace JFramework
+namespace JFramework.Interface
 {
     /// <summary>
     /// 用户面板层级接口
