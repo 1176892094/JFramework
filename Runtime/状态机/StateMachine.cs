@@ -14,7 +14,7 @@ namespace JFramework
         /// 存储状态的字典
         /// </summary>
         [ShowInInspector, LabelText("持有状态")]
-        private readonly Dictionary<Type, IState> stateDict = new Dictionary<Type, IState>();
+        private Dictionary<Type, IState> stateDict = new Dictionary<Type, IState>();
 
         /// <summary>
         /// 状态的接口
