@@ -29,13 +29,13 @@ namespace JFramework.Core
         {
             if (!GlobalManager.Runtime) return null;
             var key = path.Substring(path.LastIndexOf('/') + 1);
-            if (poolDict.ContainsKey(key) && poolDict[key].Count > 0)
+            if (poolDict.TryGetValue(key,out var pool) && pool.Count > 0)
             {
-                var poolObj = poolDict[key].Pop();
-                if (poolObj != null)
+                var o = pool.Pop();
+                if (o != null)
                 {
                     Log.Info(DebugOption.Pool, $"取出 => {key.Pink()} 对象成功");
-                    return poolObj.GetComponent<T>();
+                    return o.GetComponent<T>();
                 }
 
                 Log.Info(DebugOption.Pool, $"移除已销毁对象 : {key.Red()}");
@@ -57,17 +57,17 @@ namespace JFramework.Core
             if (obj == null) return;
             var key = obj.name;
 
-            if (poolDict.ContainsKey(key))
+            if (poolDict.TryGetValue(key,out var pool))
             {
                 if (obj == null)
                 {
                     Debug.LogWarning($"{nameof(PoolManager).Sky()} 移除已销毁对象 : {key.Red()}");
-                    poolDict[key].Pop();
+                    pool.Pop();
                     return;
                 }
 
                 Log.Info(DebugOption.Pool, $"存入 => {key.Pink()} 对象成功");
-                poolDict[key].Push(obj);
+                pool.Push(obj);
             }
             else
             {

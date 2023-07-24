@@ -46,16 +46,14 @@ namespace JFramework.Core
         /// <summary>
         /// UI管理器加载面板
         /// </summary>
-        /// <param name="name">传入面板的名称</param>
         /// <typeparam name="T">可以使用所有继承IPanel的对象</typeparam>
-        private static async Task<T> LoadPanel<T>(string name) where T : UIPanel
+        private static async Task<T> LoadPanel<T>() where T : UIPanel
         {
             var key = typeof(T);
             if (panelDict.ContainsKey(key)) return null;
-            var obj = await AssetManager.LoadAsync<GameObject>("UI/" + name);
-            var layer = obj.GetComponent<UILayer>();
-            obj.transform.SetParent(layerDict[layer != null ? layer.GetType() : typeof(UILayer1)], false);
+            var obj = await AssetManager.LoadAsync<GameObject>("UI/" + key.Name);
             var panel = obj.GetComponent<T>();
+            SetLayer<T>(obj,typeof(UILayer));
             panelDict.Add(key, panel);
             panel.Show();
             return panel;
@@ -65,17 +63,16 @@ namespace JFramework.Core
         /// UI管理器显示UI面板 (有返回值)
         /// </summary>
         /// <typeparam name="T">可以使用所有继承IPanel的对象</typeparam>
-        public static async Task<T> PopPanel<T>() where T : UIPanel
+        public static async Task<T> ShowPanelTask<T>() where T : UIPanel
         {
             if (!GlobalManager.Runtime) return null;
-            var key = typeof(T);
-            if (panelDict.ContainsKey(key))
+            if (panelDict.TryGetValue(typeof(T), out var panel))
             {
-                panelDict[key].Show();
-                return (T)panelDict[key];
+                panel.Show();
+                return (T)panel;
             }
 
-            return await LoadPanel<T>(key.Name);
+            return await LoadPanel<T>();
         }
         
         /// <summary>
@@ -85,13 +82,13 @@ namespace JFramework.Core
         public static async void ShowPanel<T>() where T : UIPanel
         {
             if (!GlobalManager.Runtime) return;
-            var key = typeof(T);
-            if (panelDict.ContainsKey(key))
+            if (panelDict.TryGetValue(typeof(T), out var panel))
             {
-                panelDict[key].Show();
+                panel.Show();
+                return;
             }
 
-            await LoadPanel<T>(key.Name);
+            await LoadPanel<T>();
         }
 
         /// <summary>
@@ -129,7 +126,31 @@ namespace JFramework.Core
         /// UI管理器得到UI面板
         /// </summary>
         /// <returns>返回获取到的UI面板</returns>
-        public static UIPanel GetPanel(Type key) => panelDict.ContainsKey(key) ? panelDict?[key] : null;
+        public static UIPanel GetPanel(Type key) => panelDict.TryGetValue(key, out var panel) ? panel : null;
+
+        /// <summary>
+        /// 设置UI面板层级
+        /// </summary>
+        /// <param name="obj"></param>
+        /// <param name="layer"></param>
+        /// <typeparam name="T"></typeparam>
+        private static void SetLayer<T>(GameObject obj, Type layer) where T : UIPanel
+        {
+            var types = typeof(T).GetInterfaces().Where(t => t != layer && layer.IsAssignableFrom(t)).ToArray();
+            if (types.Length > 0)
+            {
+                foreach (var type in types)
+                {
+                    if (layerDict.TryGetValue(type, out var transform))
+                    {
+                        obj.transform.SetParent(transform, false);
+                        return;
+                    }
+                }
+            }
+
+            obj.transform.SetParent(layerDict[typeof(UILayer1)], false);
+        }
 
         /// <summary>
         /// UI管理器得到层级
