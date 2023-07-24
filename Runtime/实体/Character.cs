@@ -13,8 +13,8 @@ namespace JFramework
         /// <summary>
         /// 控制器容器
         /// </summary>
-        [ShowInInspector, LabelText("控制器容器"), SerializeField]
-        private readonly Dictionary<Type, ScriptableObject> controllerDict = new Dictionary<Type, ScriptableObject>();
+        [ShowInInspector, LabelText("控制器列表"), SerializeField]
+        private readonly Dictionary<Type, ScriptableObject> controllers = new Dictionary<Type, ScriptableObject>();
 
         /// <summary>
         /// 获取控制器
@@ -24,14 +24,14 @@ namespace JFramework
         public T GetOrAddCtrl<T>() where T : ScriptableObject, IController
         {
             var key = typeof(T);
-            if (!controllerDict.ContainsKey(key))
+            if (!controllers.ContainsKey(key))
             {
                 var controller = ScriptableObject.CreateInstance<T>();
-                controllerDict.Add(key, controller);
+                controllers.Add(key, controller);
                 return (T)controller.Spawn(this);
             }
 
-            return (T)controllerDict[key];
+            return (T)controllers[key];
         }
 
         /// <summary>
@@ -41,12 +41,12 @@ namespace JFramework
         {
             try
             {
-                foreach (var scriptable in controllerDict.Values)
+                foreach (var scriptable in controllers.Values)
                 {
                     Destroy(scriptable);
                 }
 
-                controllerDict.Clear();
+                controllers.Clear();
                 Despawn();
             }
             catch (Exception e)

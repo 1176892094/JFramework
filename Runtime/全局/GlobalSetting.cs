@@ -86,7 +86,7 @@ namespace JFramework.Core
         {
             if (!GlobalManager.Runtime) return;
             if ((GlobalManager.Instance.debugOption & option) == DebugOption.None) return;
-            Debug.Log(debugDict.ContainsKey(option) ? debugDict[option].Sky() + message : message);
+            Debug.Log(debugDict.TryGetValue(option, out var value) ? value.Sky() + message : message);
         }
     }
 

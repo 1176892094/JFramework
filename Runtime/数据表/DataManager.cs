@@ -52,7 +52,7 @@ namespace JFramework.Core
         /// <summary>
         /// 构造函数初始化数据
         /// </summary>
-        internal static async void Awake()
+        internal static void Awake()
         {
             var (assembly, types) = GetAssemblyAndTypes();
             if (types == null || types.Length == 0) return;
@@ -64,7 +64,7 @@ namespace JFramework.Core
                 var keyName = type.Name;
                 try
                 {
-                    var table = await AssetManager.LoadAsync<ScriptableObject>("DataTable/" + keyName);
+                    var table = AssetManager.Load<ScriptableObject>("DataTable/" + keyName);
                     var dataTable = (IDataTable)table;
                     var keyData = GetKeyField(assembly, type);
                     var keyInfo = GetKeyField<KeyFieldAttribute>(keyData);
