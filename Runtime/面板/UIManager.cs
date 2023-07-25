@@ -64,7 +64,7 @@ namespace JFramework.Core
         /// UI管理器显示UI面板 (有返回值)
         /// </summary>
         /// <typeparam name="T">可以使用所有继承IPanel的对象</typeparam>
-        public static async Task<T> ShowPanelTask<T>() where T : UIPanel
+        public static async Task<T> ShowPanelAsync<T>() where T : UIPanel
         {
             if (!GlobalManager.Runtime) return null;
             if (panelDict.TryGetValue(typeof(T), out var panel))

@@ -5,13 +5,17 @@ using Sirenix.OdinInspector;
 
 namespace JFramework
 {
+    /// <summary>
+    /// 泛型对象池
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
     [Serializable]
     internal sealed class Pool<T> : IPool<T> where T : new()
     {
         /// <summary>
         /// 静态对象池
         /// </summary>
-        [ShowInInspector] internal readonly Stack<T> stackPool = new Stack<T>();
+        [ShowInInspector] private readonly Stack<T> stackPool = new Stack<T>();
 
         /// <summary>
         /// 对象数量

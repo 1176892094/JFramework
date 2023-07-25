@@ -15,8 +15,8 @@ namespace JFramework
         /// <summary>
         /// 对象池容器
         /// </summary>
-        [ShowInInspector] private Stack<GameObject> stackPool;
-        
+        [ShowInInspector] private readonly Stack<GameObject> stackPool = new Stack<GameObject>();
+
         /// <summary>
         /// 游戏物体组
         /// </summary>
@@ -34,7 +34,6 @@ namespace JFramework
         /// <param name="parent">池中的游戏对象栈</param>
         public PoolData(GameObject pool, Transform parent)
         {
-            stackPool = new Stack<GameObject>();
             transform = new GameObject(pool.name + "-Pool").transform;
             transform.SetParent(parent);
             Push(pool);
@@ -75,7 +74,7 @@ namespace JFramework
             {
                 Push(obj);
             }
-            
+
             stackPool.Clear();
         }
     }

@@ -35,16 +35,6 @@ namespace JFramework.Core
         private static string Name => nameof(DataManager);
 
         /// <summary>
-        /// 数据数量
-        /// </summary>
-        private static int DataCount;
-
-        /// <summary>
-        /// 加载进度
-        /// </summary>
-        private static float LoadProgress;
-
-        /// <summary>
         /// 数据加载完成的回调
         /// </summary>
         public static event Action OnCompleted;
@@ -56,9 +46,9 @@ namespace JFramework.Core
         {
             var (assembly, types) = GetAssemblyAndTypes();
             if (types == null || types.Length == 0) return;
-            LoadProgress = 0f;
             float time = Time.time;
-            DataCount = types.Length;
+            var curProgress = 0f;
+            var maxProgress = types.Length;
             foreach (var type in types)
             {
                 var keyName = type.Name;
@@ -74,10 +64,6 @@ namespace JFramework.Core
                         return;
                     }
 
-                    LoadProgress += 1f / DataCount;
-                    var progress = (LoadProgress * 100).ToString("F") + "%";
-                    Log.Info(DebugOption.Data, $"加载 => {type.Name.Blue()} 进度: {progress.Green()}");
-
                     var keyType = keyInfo.FieldType;
                     if (keyType == typeof(int))
                     {
@@ -91,6 +77,8 @@ namespace JFramework.Core
                     {
                         EnmDataDict.Add(keyData, Add<Enum>(keyInfo, dataTable));
                     }
+
+                    Log.Info(DebugOption.Data, $"加载 => {type.Name.Blue()} 进度: {++curProgress / maxProgress}");
                 }
                 catch (Exception)
                 {
@@ -277,8 +265,6 @@ namespace JFramework.Core
         /// </summary>
         internal static void Destroy()
         {
-            DataCount = 0;
-            LoadProgress = 0;
             IntDataDict.Clear();
             StrDataDict.Clear();
             EnmDataDict.Clear();

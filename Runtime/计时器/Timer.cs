@@ -147,6 +147,40 @@ namespace JFramework
             this.count = count;
             return this;
         }
+        
+        /// <summary>
+        /// 计时器队列
+        /// </summary>
+        /// <param name="duration"></param>
+        /// <param name="OnFinish"></param>
+        /// <returns></returns>
+        public ITimer Pop(float duration, Action OnFinish)
+        {
+            if (count != 1)
+            {
+                Log.Info(DebugOption.Timer, $"=> 计时器队列不能使用循环。");
+                return null;
+            }
+
+            return TimerManager.Pop(this.duration + duration, OnFinish);
+        }
+
+        /// <summary>
+        /// 计时器队列
+        /// </summary>
+        /// <param name="duration"></param>
+        /// <param name="OnFinish"></param>
+        /// <returns></returns>
+        public ITimer Pop(float duration, Action<ITimer> OnFinish)
+        {
+            if (count != 1)
+            {
+                Log.Info(DebugOption.Timer, $"=> 计时器队列不能使用循环。");
+                return null;
+            }
+
+            return TimerManager.Pop(this.duration + duration, OnFinish);
+        }
 
         /// <summary>
         /// 计时器推入

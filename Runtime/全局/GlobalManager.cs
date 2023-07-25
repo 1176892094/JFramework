@@ -38,6 +38,11 @@ namespace JFramework.Core
         }
 
         /// <summary>
+        /// 对象池管理器
+        /// </summary>
+        internal static Transform poolManager;
+
+        /// <summary>
         /// 全局管理器开始事件
         /// </summary>
         public static event Action OnStart;
@@ -77,11 +82,11 @@ namespace JFramework.Core
         {
             runtime = true;
             instance ??= this;
+            transform.Find("PoolManager");
             DontDestroyOnLoad(gameObject);
             TimerManager.Awake();
             DateManager.Awake();
             AudioManager.Awake();
-            PoolManager.Awake();
             DataManager.Awake();
             UIManager.Awake();
         }
@@ -94,7 +99,7 @@ namespace JFramework.Core
             if (!Instance) return;
             entity.Id = idQueue.Count > 0 ? idQueue.Dequeue() : entities.Count + 1;
             OnUpdate += entity.Update;
-            entities.Add(entity.Id, entity);
+            entities[entity.Id] = entity;
         }
 
         public static T Get<T>(int id) where T : IEntity

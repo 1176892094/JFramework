@@ -5,31 +5,31 @@ using JFramework.Interface;
 
 namespace JFramework
 {
-    internal static class EventManager<TEvent> where TEvent : struct, IEvent
+    internal static class Event<TEvent> where TEvent : struct, IEvent
     {
         /// <summary>
         /// 存储事件的哈希表
         /// </summary>
-        public static HashSet<IEvent> observers = new HashSet<IEvent>();
+        public static HashSet<IEvent> events = new HashSet<IEvent>();
 
         /// <summary>
         /// 泛型事件管理器侦听
         /// </summary>
-        /// <param name="observer">传入观察的对象接口</param>
+        /// <param name="event">传入观察的对象接口</param>
         /// <returns>返回是否添加成功</returns>
-        public static bool Listen(IEvent<TEvent> observer)
+        public static bool Listen(IEvent<TEvent> @event)
         {
-            return observers.Add(observer);
+            return events.Add(@event);
         }
 
         /// <summary>
         /// 泛型事件管理器移除
         /// </summary>
-        /// <param name="observer">传入观察的对象接口</param>
+        /// <param name="event">传入观察的对象接口</param>
         /// <returns>返回是否移除成功</returns>
-        public static bool Remove(IEvent<TEvent> observer)
+        public static bool Remove(IEvent<TEvent> @event)
         {
-            return observers.Remove(observer);
+            return events.Remove(@event);
         }
 
         /// <summary>
@@ -38,9 +38,9 @@ namespace JFramework
         /// <param name="message"></param>
         public static void Invoke(TEvent message)
         {
-            foreach (var observer in observers)
+            foreach (var @event in events)
             {
-                ((IEvent<TEvent>)observer)?.Execute(message);
+                ((IEvent<TEvent>)@event)?.Execute(message);
             }
         }
     }

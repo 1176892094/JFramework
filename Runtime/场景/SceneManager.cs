@@ -12,33 +12,28 @@ namespace JFramework.Core
         /// <summary>
         /// 场景加载事件(进度条)
         /// </summary>
-        public static event Action<float> OnLoadScene;
+        public static event Action<float> OnLoadProgress;
+
+        /// <summary>
+        /// 场景加载完成
+        /// </summary>
+        public static event Action<string> OnLoadComplete;
 
         /// <summary>
         /// 当前场景名称
         /// </summary>
-        public static string scene => UnitySceneManager.GetActiveScene().name;
+        public static string localScene => UnitySceneManager.GetActiveScene().name;
 
-        /// <summary>
-        /// 异步加载场景 (无视是否加完成)
-        /// </summary>
-        /// <param name="path">场景名称</param>
-        public static async void LoadScene(string path)
-        {
-            if (!GlobalManager.Runtime) return;
-            Log.Info(DebugOption.Scene, $"异步加载 => {path.Green()} 场景");
-            await OnLoadProgress(path, Time.time);
-        }
-        
         /// <summary>
         /// 异步加载场景 (能够等待场景加载完成)
         /// </summary>
         /// <param name="path">场景名称</param>
-        public static async Task LoadSceneAsync(string path)
+        public static async void LoadSceneAsync(string path)
         {
             if (!GlobalManager.Runtime) return;
             Log.Info(DebugOption.Scene, $"异步加载 => {path.Green()} 场景");
-            await OnLoadProgress(path, Time.time);
+            await OnSceneProgress(path, Time.time);
+            OnLoadComplete?.Invoke(localScene);
         }
 
         /// <summary>
@@ -47,12 +42,12 @@ namespace JFramework.Core
         /// <param name="path">场景名称</param>
         /// <param name="time">开始加载场景的时间</param>
         /// <returns>返回场景加载迭代器</returns>
-        private static async Task OnLoadProgress(string path, float time)
+        private static async Task OnSceneProgress(string path, float time)
         {
             var handle = Addressables.LoadSceneAsync(path);
             while (!handle.IsDone)
             {
-                OnLoadScene?.Invoke(handle.PercentComplete);
+                OnLoadProgress?.Invoke(handle.PercentComplete);
                 Log.Info(DebugOption.Scene, $"加载进度 => {handle.PercentComplete.ToString("P").Green()}");
                 if (!GlobalManager.Runtime) return;
                 await Task.Yield();
@@ -74,7 +69,7 @@ namespace JFramework.Core
         /// </summary>
         internal static void Destroy()
         {
-            OnLoadScene = null;
+            OnLoadProgress = null;
         }
     }
 }

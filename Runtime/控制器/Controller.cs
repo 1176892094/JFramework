@@ -20,29 +20,13 @@ namespace JFramework
         protected virtual void Spawn() { }
 
         /// <summary>
-        /// 控制器销毁
-        /// </summary>
-        protected virtual void Despawn() { }
-
-        /// <summary>
-        /// 控制器销毁
-        /// </summary>
-        protected void OnDestroy() => ((IController)this).Destroy();
-        
-        /// <summary>
         /// 控制器初始化
         /// </summary>
         /// <param name="owner">传入所有者</param>
-        IController IController.Spawn(IEntity owner)
+        void IController.Spawn(IEntity owner)
         {
             this.owner = (TEntity)owner;
             Spawn();
-            return this;
         }
-
-        /// <summary>
-        /// 控制器销毁
-        /// </summary>
-        void IController.Despawn() => Despawn();
     }
 }

@@ -27,10 +27,8 @@ namespace JFramework.Core
         private static DateTime dateTime => DateTime.Now;
 
         /// <summary>
-        /// 明天的早上5点
+        /// 天数
         /// </summary>
-        private static DateTime tomorrow;
-
         private static int lastDayOfYear
         {
             get => JsonManager.Decrypt<int>(nameof(DateManager));
@@ -43,7 +41,6 @@ namespace JFramework.Core
         internal static void Awake()
         {
             GlobalManager.OnUpdate += Update;
-            tomorrow = DateTime.Today.Add(new TimeSpan(1, RefreshTime, 0, 0));
         }
 
         /// <summary>

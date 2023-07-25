@@ -109,9 +109,8 @@ namespace JFramework.Core
                 {
                     Debug.LogWarning($"{nameof(JsonManager).Red()} 存档丢失 => 加密失败!\n" + e);
                     Clear();
+                    return null;
                 }
-
-                return null;
             }
 
             /// <summary>
@@ -138,9 +137,8 @@ namespace JFramework.Core
                 {
                     Debug.LogWarning($"{nameof(JsonManager).Red()} 存档丢失 => 解密失败!\n" + e);
                     Clear();
+                    return null;
                 }
-
-                return null;
             }
         }
     }

@@ -61,7 +61,7 @@ namespace JFramework
             {
                 var controller = ScriptableObject.CreateInstance<T>();
                 controllers.Add(key, controller);
-                return (T)controller.Spawn(this);
+                controller.Spawn(this);
             }
 
             return (T)controllers[key];

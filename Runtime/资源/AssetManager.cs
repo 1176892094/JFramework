@@ -10,7 +10,7 @@ namespace JFramework.Core
 {
     public static class AssetManager
     {
-        internal static readonly Dictionary<string, AsyncOperationHandle> assetDict = new Dictionary<string, AsyncOperationHandle>();
+        internal static readonly Dictionary<string, AsyncOperationHandle> assets = new Dictionary<string, AsyncOperationHandle>();
 
         /// <summary>
         /// 通过资源管理器加载资源 (同步)
@@ -40,7 +40,7 @@ namespace JFramework.Core
         {
             if (!GlobalManager.Runtime) return null;
             AsyncOperationHandle<T> handle;
-            if (assetDict.TryGetValue(path, out var asyncHandle))
+            if (assets.TryGetValue(path, out var asyncHandle))
             {
                 handle = asyncHandle.Convert<T>();
                 if (!handle.IsDone) await handle.Task;
@@ -48,7 +48,7 @@ namespace JFramework.Core
             }
 
             handle = Addressables.LoadAssetAsync<T>(path);
-            assetDict.Add(path, handle);
+            assets.Add(path, handle);
             await handle.Task;
 
             if (handle.Status == AsyncOperationStatus.Succeeded)
@@ -56,9 +56,9 @@ namespace JFramework.Core
                 return LoadCompleted(handle.Result);
             }
 
-            if (assetDict.ContainsKey(path)) //资源加载失败
+            if (assets.ContainsKey(path)) //资源加载失败
             {
-                assetDict.Remove(path);
+                assets.Remove(path);
             }
 
             Debug.Log($"{nameof(AssetManager).Sky()} 加载 => {path.Red()} 资源失败");
@@ -73,10 +73,10 @@ namespace JFramework.Core
         public static void Dispose<T>(string name)
         {
             if (!GlobalManager.Runtime) return;
-            if (!assetDict.ContainsKey(name)) return;
-            var handle = assetDict[name].Convert<T>();
+            if (!assets.ContainsKey(name)) return;
+            var handle = assets[name].Convert<T>();
             Addressables.Release(handle);
-            assetDict.Remove(name);
+            assets.Remove(name);
         }
 
         /// <summary>
@@ -84,12 +84,12 @@ namespace JFramework.Core
         /// </summary>
         public static void Clear()
         {
-            foreach (var handle in assetDict.Values)
+            foreach (var handle in assets.Values)
             {
                 Addressables.Release(handle);
             }
             
-            assetDict.Clear();
+            assets.Clear();
             AssetBundle.UnloadAllAssetBundles(true);
             Resources.UnloadUnusedAssets();
             GC.Collect();
@@ -110,6 +110,6 @@ namespace JFramework.Core
         /// <summary>
         /// 管理器销毁
         /// </summary>
-        internal static void Destroy() => assetDict.Clear();
+        internal static void Destroy() => assets.Clear();
     }
 }

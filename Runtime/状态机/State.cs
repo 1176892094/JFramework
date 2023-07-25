@@ -16,28 +16,26 @@ namespace JFramework
         protected TEntity owner;
 
         /// <summary>
-        /// 状态机的接口
+        /// 基本状态机的接口 (用于转换指定状态机)
         /// </summary>
-        protected IStateMachine stateMachine;
+        protected IStateMachine baseMachine;
 
         /// <summary>
         /// 状态醒来
         /// </summary>
         /// <param name="owner">传入状态的所有者</param>
-        /// <param name="stateMachine">传入状态机</param>
-        private void OnAwake(TEntity owner, IStateMachine stateMachine)
+        /// <param name="baseMachine">传入状态机</param>
+        private void OnAwake(TEntity owner, IStateMachine baseMachine)
         {
             this.owner = owner;
-            this.stateMachine = stateMachine;
+            this.baseMachine = baseMachine;
             OnAwake();
         }
 
         /// <summary>
         /// 状态初始化
         /// </summary>
-        protected virtual void OnAwake()
-        {
-        }
+        protected virtual void OnAwake() { }
 
         /// <summary>
         /// 进入状态

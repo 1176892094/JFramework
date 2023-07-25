@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using JFramework.Interface;
@@ -9,72 +8,7 @@ namespace JFramework.Core
 {
     public static class PoolManager
     {
-        internal static readonly Dictionary<string, IPool<GameObject>> poolDict = new Dictionary<string, IPool<GameObject>>();
-        
-        internal static readonly Dictionary<Type, IPool> streamDict = new Dictionary<Type, IPool>();
-
-        internal static Transform poolManager;
-
-        internal static void Awake()
-        {
-            var transform = GlobalManager.Instance.transform;
-            poolManager = transform.Find("PoolManager");
-        }
-
-        /// <summary>
-        /// 对象池管理器异步获取对象 (生成并返回结果)
-        /// </summary>
-        /// <param name="path">弹出对象的路径</param>
-        public static async Task<T> Pop<T>(string path) where T : Object
-        {
-            if (!GlobalManager.Runtime) return null;
-            var key = path.Substring(path.LastIndexOf('/') + 1);
-            if (poolDict.TryGetValue(key,out var pool) && pool.Count > 0)
-            {
-                var o = pool.Pop();
-                if (o != null)
-                {
-                    Log.Info(DebugOption.Pool, $"取出 => {key.Pink()} 对象成功");
-                    return o.GetComponent<T>();
-                }
-
-                Log.Info(DebugOption.Pool, $"移除已销毁对象 : {key.Red()}");
-            }
-
-            var obj = await AssetManager.LoadAsync<GameObject>(path);
-            obj.name = key;
-            Log.Info(DebugOption.Pool, $"创建 => {key.Green()} 对象成功");
-            return obj.GetComponent<T>();
-        }
-
-        /// <summary>
-        /// 对象池管理器推入对象
-        /// </summary>
-        /// <param name="obj">对象的实例</param>
-        public static void Push(GameObject obj)
-        {
-            if (!GlobalManager.Runtime) return;
-            if (obj == null) return;
-            var key = obj.name;
-
-            if (poolDict.TryGetValue(key,out var pool))
-            {
-                if (obj == null)
-                {
-                    Debug.LogWarning($"{nameof(PoolManager).Sky()} 移除已销毁对象 : {key.Red()}");
-                    pool.Pop();
-                    return;
-                }
-
-                Log.Info(DebugOption.Pool, $"存入 => {key.Pink()} 对象成功");
-                pool.Push(obj);
-            }
-            else
-            {
-                Log.Info(DebugOption.Pool, $"创建 => 对象池 : {key.Green()}");
-                poolDict.Add(key, new PoolData(obj, poolManager));
-            }
-        }
+        internal static readonly Dictionary<string, IPool> objects = new Dictionary<string, IPool>();
 
         /// <summary>
         /// 弹出对象池
@@ -83,10 +17,9 @@ namespace JFramework.Core
         /// <returns>返回弹出对象</returns>
         public static T Pop<T>() where T : new()
         {
-            var key = typeof(T);
-            if (streamDict.ContainsKey(key) && streamDict[key].Count > 0)
+            if (objects.TryGetValue(typeof(T).Name, out var pool) && pool.Count > 0)
             {
-                return ((IPool<T>)streamDict[key]).Pop();
+                return ((IPool<T>)pool).Pop();
             }
 
             return new T();
@@ -99,14 +32,64 @@ namespace JFramework.Core
         /// <typeparam name="T">任何可以被new的对象</typeparam>
         public static void Push<T>(T obj) where T : new()
         {
-            var key = typeof(T);
-            if (streamDict.TryGetValue(key, out var pool))
+            if (objects.TryGetValue(typeof(T).Name, out var pool))
             {
                 ((IPool<T>)pool).Push(obj);
                 return;
             }
+
+            objects.Add(typeof(T).Name, new Pool<T>(obj));
+        }
+
+        /// <summary>
+        /// 对象池管理器异步获取对象 (生成并返回结果)
+        /// </summary>
+        /// <param name="path">弹出对象的路径</param>
+        public static async Task<T> Pop<T>(string path) where T : Object
+        {
+            if (!GlobalManager.Runtime) return null;
+            if (objects.TryGetValue(path, out var pool) && pool.Count > 0)
+            {
+                var @object = ((IPool<GameObject>)pool).Pop();
+                if (@object != null)
+                {
+                    Log.Info(DebugOption.Pool, $"取出 => {path.Pink()} 对象成功");
+                    return @object.GetComponent<T>();
+                }
+
+                Log.Info(DebugOption.Pool, $"移除已销毁对象 : {path.Red()}");
+            }
+
+            var obj = await AssetManager.LoadAsync<GameObject>(path);
+            Log.Info(DebugOption.Pool, $"创建 => {path.Green()} 对象成功");
+            obj.name = path;
+            return obj.GetComponent<T>();
+        }
+
+        /// <summary>
+        /// 对象池管理器推入对象
+        /// </summary>
+        /// <param name="obj">对象的实例</param>
+        public static void Push(GameObject obj)
+        {
+            if (!GlobalManager.Runtime) return;
+            var key = obj.name;
+            if (obj == null)
+            {
+                Debug.LogWarning($"{nameof(PoolManager).Sky()} 存入对象为空 : {key.Red()}");
+                return;
+            }
             
-            streamDict.Add(key, new Pool<T>(obj));
+            if (objects.TryGetValue(key, out var pool))
+            {
+                Log.Info(DebugOption.Pool, $"存入 => {key.Pink()} 对象成功");
+                ((IPool<GameObject>)pool).Push(obj);
+            }
+            else
+            {
+                Log.Info(DebugOption.Pool, $"创建 => 对象池 : {key.Green()}");
+                objects.Add(key, new PoolData(obj, GlobalManager.poolManager));
+            }
         }
 
         /// <summary>
@@ -114,19 +97,12 @@ namespace JFramework.Core
         /// </summary>
         internal static void Destroy()
         {
-            foreach (var pool in poolDict.Values)
+            foreach (var pool in objects.Values)
             {
                 pool.Clear();
             }
 
-            foreach (var stack in streamDict.Values)
-            {
-                stack.Clear();
-            }
-
-            poolDict.Clear();
-            streamDict.Clear();
-            poolManager = null;
+            objects.Clear();
         }
     }
 }

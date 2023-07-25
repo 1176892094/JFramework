@@ -13,10 +13,10 @@ namespace JFramework.Core
         internal DebugOption debugOption;
 
         [ShowInInspector, LabelText("资源管理数据"), FoldoutGroup("通用管理器")]
-        private Dictionary<string, AsyncOperationHandle> assetDict => AssetManager.assetDict;
+        private Dictionary<string, AsyncOperationHandle> assets => AssetManager.assets;
 
         [ShowInInspector, LabelText("事件管理数据"), FoldoutGroup("通用管理器")]
-        private Dictionary<Type, HashSet<IEvent>> eventDict => EventManager.observerDict;
+        private Dictionary<Type, HashSet<IEvent>> eventDict => EventManager.events;
 
         [ShowInInspector, LabelText("完成计时队列"), FoldoutGroup("计时器管理器")]
         private Queue<Timer> timerQueue => TimerManager.timerQueue;
@@ -57,14 +57,8 @@ namespace JFramework.Core
         [ShowInInspector, LabelText("播放音效列表"), FoldoutGroup("音效管理器")]
         private List<AudioSource> audioList => AudioManager.audioList;
 
-        [ShowInInspector, LabelText("对象池管理器"), FoldoutGroup("对象池管理器")]
-        private Transform poolManager => PoolManager.poolManager;
-
         [ShowInInspector, LabelText("游戏对象管理"), FoldoutGroup("对象池管理器")]
-        private Dictionary<string, IPool<GameObject>> poolDict => PoolManager.poolDict;
-
-        [ShowInInspector, LabelText("数据对象管理"), FoldoutGroup("对象池管理器")]
-        private Dictionary<Type, IPool> stackDict => PoolManager.streamDict;
+        private Dictionary<string, IPool> poolDict => Core.PoolManager.objects;
     }
 
     internal static class Log

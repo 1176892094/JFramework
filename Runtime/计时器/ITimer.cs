@@ -1,3 +1,5 @@
+using System;
+
 namespace JFramework.Interface
 {
     /// <summary>
@@ -34,6 +36,22 @@ namespace JFramework.Interface
         /// <param name="count">循环次数</param>
         /// <returns>返回自身</returns>
         ITimer Loop(int count);
+        
+        /// <summary>
+        /// 计时器队列
+        /// </summary>
+        /// <param name="duration"></param>
+        /// <param name="OnFinish"></param>
+        /// <returns></returns>
+        ITimer Pop(float duration, Action OnFinish);
+
+        /// <summary>
+        /// 计时器队列
+        /// </summary>
+        /// <param name="duration"></param>
+        /// <param name="OnFinish"></param>
+        /// <returns></returns>
+        ITimer Pop(float duration, Action<ITimer> OnFinish);
 
         /// <summary>
         /// 计时器推入
