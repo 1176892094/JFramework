@@ -13,6 +13,11 @@ namespace JFramework.Interface
         int Id { get; set; }
 
         /// <summary>
+        /// 实体变换
+        /// </summary>
+        Transform transform { get; }
+
+        /// <summary>
         /// 实体对象
         /// </summary>
         GameObject gameObject { get; }

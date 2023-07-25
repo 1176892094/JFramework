@@ -15,11 +15,6 @@ namespace JFramework
         /// 实体Id
         /// </summary>
         public int Id { get; private set; }
-        
-        /// <summary>
-        /// 实体销毁
-        /// </summary>
-        protected virtual void Despawn() { }
 
         /// <summary>
         /// 实体更新
@@ -37,21 +32,6 @@ namespace JFramework
         protected virtual void OnDisable() => GlobalManager.Remove(this);
 
         /// <summary>
-        /// 实体销毁
-        /// </summary>
-        private void OnDestroy()
-        {
-            try
-            {
-                Despawn();
-            }
-            catch (Exception e)
-            {
-                Log.Info(DebugOption.Custom, e.ToString());
-            }
-        }
-
-        /// <summary>
         /// 实体Id
         /// </summary>
         int IEntity.Id
@@ -59,6 +39,16 @@ namespace JFramework
             get => Id;
             set => Id = value;
         }
+        
+        /// <summary>
+        /// 实体Transform
+        /// </summary>
+        Transform IEntity.transform => transform;
+
+        /// <summary>
+        /// 实体GameObject
+        /// </summary>
+        GameObject IEntity.gameObject => gameObject;
 
         /// <summary>
         /// 实体接口调用实体更新方法
