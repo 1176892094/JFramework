@@ -1,5 +1,4 @@
-using System;
-using JFramework.Core;
+using UnityEngine;
 
 namespace JFramework.Interface
 {
@@ -9,59 +8,18 @@ namespace JFramework.Interface
     public interface IEntity
     {
         /// <summary>
+        /// 实体Id
+        /// </summary>
+        int Id { get; set; }
+
+        /// <summary>
+        /// 实体对象
+        /// </summary>
+        GameObject gameObject { get; }
+
+        /// <summary>
         /// 实体更新
         /// </summary>
         void Update();
-
-        /// <summary>
-        /// 实体销毁
-        /// </summary>
-        void Despawn();
-
-        /// <summary>
-        /// 实体启用
-        /// </summary>
-        void Enable()
-        {
-            if (!GlobalManager.Instance) return;
-            GlobalManager.OnUpdate += Update;
-        }
-
-        /// <summary>
-        /// 实体禁用
-        /// </summary>
-        void Disable()
-        {
-            if (!GlobalManager.Runtime) return;
-            GlobalManager.OnUpdate -= Update;
-        }
-
-        /// <summary>
-        /// 实体销毁
-        /// </summary>
-        void Destroy()
-        {
-            try
-            {
-                Despawn();
-            }
-            catch (Exception e)
-            {
-                Log.Info(DebugOption.Custom, e.ToString());
-            }
-        }
-    }
-
-    /// <summary>
-    /// 泛型实体接口
-    /// </summary>
-    /// <typeparam name="T">物体生成事件</typeparam>
-    public interface IEntity<in T> : IEntity where T : IEvent
-    {
-        /// <summary>
-        /// 实体生成
-        /// </summary>
-        /// <param name="data"></param>
-        void Spawn(T data);
     }
 }

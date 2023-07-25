@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using JFramework.Interface;
 using UnityEngine;
 
 namespace JFramework.Core
@@ -6,6 +8,16 @@ namespace JFramework.Core
     [AddComponentMenu(""), DefaultExecutionOrder(-10)]
     public sealed partial class GlobalManager : MonoBehaviour
     {
+        /// <summary>
+        /// 实体字典
+        /// </summary>
+        private static readonly Dictionary<int, IEntity> entities = new Dictionary<int, IEntity>();
+
+        /// <summary>
+        /// 未使用的Id队列
+        /// </summary>
+        private static readonly Queue<int> idQueue = new Queue<int>();
+
         /// <summary>
         /// 私有的单例对象
         /// </summary>
@@ -77,11 +89,34 @@ namespace JFramework.Core
         private void Start() => OnStart?.Invoke();
         private void Update() => OnUpdate?.Invoke();
 
+        public static void Listen(IEntity entity)
+        {
+            if (!Instance) return;
+            entity.Id = idQueue.Count > 0 ? idQueue.Dequeue() : entities.Count + 1;
+            OnUpdate += entity.Update;
+            entities.Add(entity.Id, entity);
+        }
+
+        public static T Get<T>(int id) where T : IEntity
+        {
+            return entities.TryGetValue(id, out var entity) ? (T)entity : default;
+        }
+
+        public static void Remove(IEntity entity)
+        {
+            if (!Runtime) return;
+            idQueue.Enqueue(entity.Id);
+            OnUpdate -= entity.Update;
+            entities.Remove(entity.Id);
+        }
+
         private void OnDestroy()
         {
             try
             {
                 runtime = false;
+                idQueue.Clear();
+                entities.Clear();
                 OnQuit?.Invoke();
             }
             finally
