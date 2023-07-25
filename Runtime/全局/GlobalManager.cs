@@ -82,8 +82,8 @@ namespace JFramework.Core
         {
             runtime = true;
             instance ??= this;
-            transform.Find("PoolManager");
             DontDestroyOnLoad(gameObject);
+            poolManager = transform.Find("PoolManager");
             TimerManager.Awake();
             DateManager.Awake();
             AudioManager.Awake();
