@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using JFramework.Interface;
-using Sirenix.OdinInspector;
 using UnityEngine;
 
 namespace JFramework.Core
@@ -12,7 +11,7 @@ namespace JFramework.Core
         /// <summary>
         /// 实体字典
         /// </summary>
-        [ShowInInspector]private static readonly Dictionary<int, IEntity> entities = new Dictionary<int, IEntity>();
+        private static readonly Dictionary<int, IEntity> entities = new Dictionary<int, IEntity>();
 
         /// <summary>
         /// 私有的单例对象

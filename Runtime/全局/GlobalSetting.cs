@@ -7,12 +7,12 @@ using UnityEngine.ResourceManagement.AsyncOperations;
 
 namespace JFramework.Core
 {
-#if UNITY_EDITOR
+
     public sealed partial class GlobalManager
     {
         [FoldoutGroup("设置管理器"), SerializeField, LabelText("控制台输出选项")]
         internal DebugOption debugOption;
-
+#if UNITY_EDITOR
         [ShowInInspector, LabelText("资源管理数据"), FoldoutGroup("通用管理器")]
         private Dictionary<string, AsyncOperationHandle> assets => AssetManager.assets;
 
@@ -57,8 +57,8 @@ namespace JFramework.Core
         
         [ShowInInspector, LabelText("游戏组件管理"), FoldoutGroup("对象池管理器")]
         private Dictionary<int, Dictionary<Type, ScriptableObject>> controllers => Controllers.controllers;
-    }
 #endif
+    }
     internal static class Log
     {
         private static readonly Dictionary<DebugOption, string> debugDict = new Dictionary<DebugOption, string>()
