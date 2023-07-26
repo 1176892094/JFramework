@@ -19,12 +19,12 @@ namespace JFramework.Core
         /// <summary>
         /// UI层级字典
         /// </summary>
-        internal static readonly Dictionary<Type, Transform> layerDict = new Dictionary<Type, Transform>();
+        internal static readonly Dictionary<Type, Transform> layers = new Dictionary<Type, Transform>();
         
         /// <summary>
         /// 存储所有UI的字典
         /// </summary>
-        internal static readonly Dictionary<Type, UIPanel> panelDict = new Dictionary<Type, UIPanel>();
+        internal static readonly Dictionary<Type, UIPanel> panels = new Dictionary<Type, UIPanel>();
 
         /// <summary>
         /// 管理器名称
@@ -37,11 +37,11 @@ namespace JFramework.Core
         internal static void Awake()
         {
             var transform = GlobalManager.Instance.transform;
-            layerDict.Add(typeof(UILayer1), transform.Find("UICanvas/Layer1"));
-            layerDict.Add(typeof(UILayer2), transform.Find("UICanvas/Layer2"));
-            layerDict.Add(typeof(UILayer3), transform.Find("UICanvas/Layer3"));
-            layerDict.Add(typeof(UILayer4), transform.Find("UICanvas/Layer4"));
-            layerDict.Add(typeof(UILayer5), transform.Find("UICanvas/Layer5"));
+            layers.Add(typeof(UILayer1), transform.Find("UICanvas/Layer1"));
+            layers.Add(typeof(UILayer2), transform.Find("UICanvas/Layer2"));
+            layers.Add(typeof(UILayer3), transform.Find("UICanvas/Layer3"));
+            layers.Add(typeof(UILayer4), transform.Find("UICanvas/Layer4"));
+            layers.Add(typeof(UILayer5), transform.Find("UICanvas/Layer5"));
         }
 
         /// <summary>
@@ -51,11 +51,11 @@ namespace JFramework.Core
         private static async Task<T> LoadPanel<T>() where T : UIPanel
         {
             var key = typeof(T);
-            if (panelDict.ContainsKey(key)) return null;
+            if (panels.ContainsKey(key)) return null;
             var obj = await AssetManager.LoadAsync<GameObject>("UI/" + key.Name);
             var panel = obj.GetComponent<T>();
             SetLayer<T>(obj,typeof(UILayer));
-            panelDict.Add(key, panel);
+            panels.Add(key, panel);
             panel.Show();
             return panel;
         }
@@ -67,7 +67,7 @@ namespace JFramework.Core
         public static async Task<T> ShowPanelAsync<T>() where T : UIPanel
         {
             if (!GlobalManager.Runtime) return null;
-            if (panelDict.TryGetValue(typeof(T), out var panel))
+            if (panels.TryGetValue(typeof(T), out var panel))
             {
                 panel.Show();
                 return (T)panel;
@@ -83,7 +83,7 @@ namespace JFramework.Core
         public static async void ShowPanel<T>() where T : UIPanel
         {
             if (!GlobalManager.Runtime) return;
-            if (panelDict.TryGetValue(typeof(T), out var panel))
+            if (panels.TryGetValue(typeof(T), out var panel))
             {
                 panel.Show();
                 return;
@@ -99,19 +99,19 @@ namespace JFramework.Core
         {
             if (!GlobalManager.Runtime) return;
             var key = typeof(T);
-            if (panelDict.ContainsKey(key))
+            if (panels.ContainsKey(key))
             {
-                if (panelDict[key].stateType == UIStateType.Freeze)
+                if (panels[key].stateType == UIStateType.Freeze)
                 {
                     Debug.Log($"{Name} 隐藏 => {key.Name.Red()} 失败,面板处于冻结状态!");
                     return;
                 }
 
-                panelDict[key].Hide();
-                if (panelDict[key].stateType == UIStateType.Common)
+                panels[key].Hide();
+                if (panels[key].stateType == UIStateType.Common)
                 {
-                    Object.Destroy(panelDict[key].gameObject);
-                    panelDict.Remove(key);
+                    Object.Destroy(panels[key].gameObject);
+                    panels.Remove(key);
                 }
             }
         }
@@ -127,7 +127,7 @@ namespace JFramework.Core
         /// UI管理器得到UI面板
         /// </summary>
         /// <returns>返回获取到的UI面板</returns>
-        public static UIPanel GetPanel(Type key) => panelDict.TryGetValue(key, out var panel) ? panel : null;
+        public static UIPanel GetPanel(Type key) => panels.TryGetValue(key, out var panel) ? panel : null;
 
         /// <summary>
         /// 设置UI面板层级
@@ -142,7 +142,7 @@ namespace JFramework.Core
             {
                 foreach (var type in types)
                 {
-                    if (layerDict.TryGetValue(type, out var transform))
+                    if (layers.TryGetValue(type, out var transform))
                     {
                         obj.transform.SetParent(transform, false);
                         return;
@@ -150,14 +150,14 @@ namespace JFramework.Core
                 }
             }
 
-            obj.transform.SetParent(layerDict[typeof(UILayer1)], false);
+            obj.transform.SetParent(layers[typeof(UILayer1)], false);
         }
 
         /// <summary>
         /// UI管理器得到层级
         /// </summary>
         /// <returns>返回得到的层级</returns>
-        public static Transform GetLayer<T>() where T : UILayer => panelDict != null ? layerDict[typeof(T)] : null;
+        public static Transform GetLayer<T>() where T : UILayer => panels != null ? layers[typeof(T)] : null;
 
         /// <summary>
         /// UI管理器侦听UI面板事件
@@ -180,9 +180,9 @@ namespace JFramework.Core
         public static void Register<T>(UIPanel panel) where T : UIPanel
         {
             var key = typeof(T);
-            if (!panelDict.ContainsKey(key))
+            if (!panels.ContainsKey(key))
             {
-                UIManager.panelDict.Add(key, panel);
+                UIManager.panels.Add(key, panel);
             }
         }
 
@@ -192,12 +192,12 @@ namespace JFramework.Core
         public static void Clear()
         {
             if (!GlobalManager.Runtime) return;
-            foreach (var key in panelDict.Keys.ToList().Where(key => panelDict.ContainsKey(key)))
+            foreach (var key in panels.Keys.ToList().Where(key => panels.ContainsKey(key)))
             {
-                if (panelDict[key].stateType != UIStateType.Ignore)
+                if (panels[key].stateType != UIStateType.Ignore)
                 {
-                    Object.Destroy(panelDict[key].gameObject);
-                    panelDict.Remove(key);
+                    Object.Destroy(panels[key].gameObject);
+                    panels.Remove(key);
                 }
             }
         }
@@ -207,8 +207,8 @@ namespace JFramework.Core
         /// </summary>
         internal static void Destroy()
         {
-            panelDict.Clear();
-            layerDict.Clear();
+            panels.Clear();
+            layers.Clear();
         }
     }
 }

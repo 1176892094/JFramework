@@ -9,6 +9,7 @@ namespace JFramework
     /// <summary>
     /// 计时器
     /// </summary>
+    [Serializable]
     internal class Timer : ITimer
     {
         /// <summary>
@@ -147,45 +148,6 @@ namespace JFramework
             this.count = count;
             return this;
         }
-        
-        /// <summary>
-        /// 计时器队列
-        /// </summary>
-        /// <param name="duration"></param>
-        /// <param name="OnFinish"></param>
-        /// <returns></returns>
-        public ITimer Pop(float duration, Action OnFinish)
-        {
-            if (count != 1)
-            {
-                Log.Info(DebugOption.Timer, $"=> 计时器队列不能使用循环。");
-                return null;
-            }
-
-            return TimerManager.Pop(this.duration + duration, OnFinish);
-        }
-
-        /// <summary>
-        /// 计时器队列
-        /// </summary>
-        /// <param name="duration"></param>
-        /// <param name="OnFinish"></param>
-        /// <returns></returns>
-        public ITimer Pop(float duration, Action<ITimer> OnFinish)
-        {
-            if (count != 1)
-            {
-                Log.Info(DebugOption.Timer, $"=> 计时器队列不能使用循环。");
-                return null;
-            }
-
-            return TimerManager.Pop(this.duration + duration, OnFinish);
-        }
-
-        /// <summary>
-        /// 计时器推入
-        /// </summary>
-        public void Push() => TimerManager.Push(this);
 
         /// <summary>
         /// 设置计时器是否受TimeScale影响
@@ -207,5 +169,56 @@ namespace JFramework
             unscaled = false;
             state = TimerState.Finish;
         }
+
+        /// <summary>
+        /// 计时器队列
+        /// </summary>
+        /// <param name="duration"></param>
+        /// <param name="OnFinish"></param>
+        /// <returns></returns>
+        public ITimer Pop(float duration, Action OnFinish)
+        {
+            if (count == 0)
+            {
+                Log.Info(DebugOption.Timer, $"=> 计时器停止时不能使用计时器队列。");
+                return null;
+            }
+
+            if (count > 1)
+            {
+                Log.Info(DebugOption.Timer, $"=> 计时器队列不能使用循环。");
+                return null;
+            }
+            
+            return TimerManager.Pop(this.duration + duration, OnFinish);
+        }
+
+        /// <summary>
+        /// 计时器队列
+        /// </summary>
+        /// <param name="duration"></param>
+        /// <param name="OnFinish"></param>
+        /// <returns></returns>
+        public ITimer Pop(float duration, Action<ITimer> OnFinish)
+        {
+            if (count == 0)
+            {
+                Log.Info(DebugOption.Timer, $"=> 计时器停止时不能使用计时器队列。");
+                return null;
+            }
+
+            if (count > 1)
+            {
+                Log.Info(DebugOption.Timer, $"=> 计时器队列不能使用循环。");
+                return null;
+            }
+            
+            return TimerManager.Pop(this.duration + duration, OnFinish);
+        }
+        
+        /// <summary>
+        /// 计时器推入
+        /// </summary>
+        public void Push() => TimerManager.Push(this);
     }
 }

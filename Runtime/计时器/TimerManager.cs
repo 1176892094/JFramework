@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using JFramework.Interface;
 
 namespace JFramework.Core
@@ -12,18 +13,13 @@ namespace JFramework.Core
         /// <summary>
         /// 存储已经完成的计时器
         /// </summary>
-        internal static readonly Queue<Timer> timerQueue = new Queue<Timer>();
+        internal static readonly HashSet<Timer> finishList = new HashSet<Timer>();
 
         /// <summary>
         /// 存储正在执行的计时器
         /// </summary>
-        internal static readonly LinkedList<Timer> timerList = new LinkedList<Timer>();
-
-        /// <summary>
-        /// 当前计时器节点
-        /// </summary>
-        private static LinkedListNode<Timer> currentNode;
-
+        internal static readonly HashSet<Timer> timerList = new HashSet<Timer>();
+        
         /// <summary>
         /// 构造函数初始化数据
         /// </summary>
@@ -37,13 +33,10 @@ namespace JFramework.Core
         /// </summary>
         private static void OnUpdate()
         {
-            if (timerList.Count <= 0) return;
-            currentNode = timerList.First;
-            while (currentNode != null)
+            if (timerList.Count == 0) return;
+            for (int i = timerList.Count - 1; i >= 0; i--)
             {
-                var nextNode = currentNode.Next;
-                currentNode.Value?.OnUpdate();
-                currentNode = nextNode;
+                timerList.ElementAt(i).OnUpdate();
             }
         }
 
@@ -55,19 +48,24 @@ namespace JFramework.Core
         public static ITimer Pop(float time, Action action = null)
         {
             if (!GlobalManager.Runtime) return null;
-            Timer tick = timerQueue.Count > 0 ? timerQueue.Dequeue() : new Timer();
-            tick.Open(time, action);
-            timerList.AddLast(tick);
-            return tick;
+            var timer = finishList.Pop(() => new Timer());
+            timer.Open(time, action);
+            timerList.Add(timer);
+            return timer;
         }
 
+        /// <summary>
+        /// 计时器管理器侦听计时器
+        /// </summary>
+        /// <param name="time">持续时间</param>
+        /// <param name="action">完成回调</param>
         public static ITimer Pop(float time, Action<ITimer> action = null)
         {
             if (!GlobalManager.Runtime) return null;
-            Timer tick = timerQueue.Count > 0 ? timerQueue.Dequeue() : new Timer();
-            tick.Open(time, action);
-            timerList.AddLast(tick);
-            return tick;
+            var timer = finishList.Pop(() => new Timer());
+            timer.Open(time, action);
+            timerList.Add(timer);
+            return timer;
         }
 
         /// <summary>
@@ -78,11 +76,10 @@ namespace JFramework.Core
         {
             if (!GlobalManager.Runtime) return;
             var tick = (Timer)timer;
-            if (timerList.Contains(tick))
+            if (timerList.Remove(tick))
             {
-                tick.Close();
-                timerList?.Remove(tick);
-                timerQueue?.Enqueue(tick);
+                tick?.Close();
+                finishList.Add(tick);
             }
         }
 
@@ -91,8 +88,8 @@ namespace JFramework.Core
         /// </summary>
         internal static void Destroy()
         {
-            timerQueue.Clear();
             timerList.Clear();
+            finishList.Clear();
         }
     }
 }

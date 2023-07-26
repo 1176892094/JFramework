@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace JFramework
 {
@@ -18,7 +20,7 @@ namespace JFramework
             var nextIndex = (currIndex + 1) % enumArray.Length;
             return enumArray[nextIndex];
         }
-        
+
         /// <summary>
         /// 将当前枚举切换到上一枚举
         /// 若当前为第一个，则循环至最后一个
@@ -32,6 +34,32 @@ namespace JFramework
             var currIndex = Array.IndexOf(enumArray, current);
             var lastIndex = (currIndex - 1 + enumArray.Length) % enumArray.Length;
             return enumArray[lastIndex];
+        }
+        
+        /// <summary>
+        /// 对哈希表进行基于栈的拓展
+        /// </summary>
+        /// <param name="objects"></param>
+        /// <param name="func"></param>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
+        public static T Pop<T>(this HashSet<T> objects, Func<T> func = null)
+        {
+            T @object = default;
+            if (objects.Count > 0)
+            {
+                @object = objects.First();
+                objects.Remove(@object);
+            }
+            else
+            {
+                if (func != null)
+                {
+                    @object = func();
+                }
+            }
+
+            return @object;
         }
     }
 }

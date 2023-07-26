@@ -9,22 +9,22 @@ namespace JFramework.Core
         /// <summary>
         /// 完成音效队列
         /// </summary>
-        internal static readonly Queue<AudioSource> audioQueue = new Queue<AudioSource>();
+        internal static readonly HashSet<AudioSource> finishList = new HashSet<AudioSource>();
 
         /// <summary>
         /// 播放音效队列
         /// </summary>
-        internal static readonly List<AudioSource> audioList = new List<AudioSource>();
+        internal static readonly HashSet<AudioSource> audioList = new HashSet<AudioSource>();
 
         /// <summary>
         /// 音效挂载系统
         /// </summary>
-        internal static GameObject poolManager;
+        private static GameObject poolManager;
 
         /// <summary>
         /// 背景音乐组件
         /// </summary>
-        internal static AudioSource audioSource;
+        private static AudioSource audioSource;
 
         /// <summary>
         /// 游戏音效设置
@@ -103,8 +103,8 @@ namespace JFramework.Core
         public static async void PlayAudio(string path)
         {
             if (!GlobalManager.Runtime) return;
-            Log.Info(DebugOption.Audio,$"播放音效: {path.Blue()}");
-            var audio = audioQueue.Count > 0 ? audioQueue.Dequeue() : poolManager.AddComponent<AudioSource>();
+            Log.Info(DebugOption.Audio, $"播放音效: {path.Blue()}");
+            var audio = finishList.Pop(() => poolManager.AddComponent<AudioSource>());
             var clip = await AssetManager.LoadAsync<AudioClip>(path);
             audioList.Add(audio);
             audio.volume = audioSetting.audioVolume;
@@ -141,7 +141,7 @@ namespace JFramework.Core
             {
                 audioSource.Stop();
                 audioList.Remove(audioSource);
-                audioQueue.Enqueue(audioSource);
+                finishList.Add(audioSource);
             }
         }
 
@@ -151,7 +151,7 @@ namespace JFramework.Core
         internal static void Destroy()
         {
             audioList.Clear();
-            audioQueue.Clear();
+            finishList.Clear();
             audioSource = null;
             audioSetting = null;
         }
