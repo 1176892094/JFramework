@@ -58,10 +58,10 @@ namespace JFramework
         /// <param name="obj">推出的游戏物体</param>
         public void Push(GameObject obj)
         {
+            if (stackPool.Contains(obj)) return;
             obj.SetActive(false);
             if (transform == null) return;
             obj.transform.SetParent(transform);
-            if (stackPool.Contains(obj)) return;
             stackPool.Push(obj);
         }
 
