@@ -50,7 +50,7 @@ namespace JFramework
         /// 销毁控制器
         /// </summary>
         /// <param name="id"></param>
-        public static void DestroyCtrl(int id)
+        public static void RemoveCtrl(int id)
         {
             if (controllers.TryGetValue(id, out Components components))
             {
