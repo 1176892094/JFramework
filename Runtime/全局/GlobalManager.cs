@@ -97,8 +97,8 @@ namespace JFramework.Core
         public static void Listen(IEntity entity)
         {
             if (!Instance) return;
-            entity.Id = ++entityId;
             OnUpdate += entity.Update;
+            if (entity.Id == 0) entity.Id = ++entityId;
             entities[entity.Id] = entity;
         }
 
