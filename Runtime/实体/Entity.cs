@@ -34,7 +34,7 @@ namespace JFramework
         /// <summary>
         /// 实体销毁
         /// </summary>
-        protected virtual void OnDestroy() => Controllers.DestroyCtrl(Id);
+        protected virtual void OnDestroy() => Controllers.RemoveCtrl(Id);
 
         /// <summary>
         /// 获取或添加控制器
