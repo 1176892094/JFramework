@@ -59,6 +59,9 @@ namespace JFramework.Core
 
         [ShowInInspector, LabelText("游戏对象管理"), FoldoutGroup("对象池管理器")]
         private Dictionary<string, IPool> poolDict => PoolManager.pools;
+        
+        [ShowInInspector, LabelText("游戏组件管理"), FoldoutGroup("对象池管理器")]
+        private Dictionary<int, Dictionary<Type, ScriptableObject>> controllers => Controllers.controllers;
     }
 
     internal static class Log
@@ -96,6 +99,5 @@ namespace JFramework.Core
         Audio = 32,
         Timer = 64,
         Event = 128,
-        Custom = 256,
     }
 }

@@ -32,6 +32,17 @@ namespace JFramework
         protected virtual void OnDisable() => GlobalManager.Remove(this);
 
         /// <summary>
+        /// 实体销毁
+        /// </summary>
+        protected virtual void OnDestroy() => Controllers.DestroyCtrl(Id);
+
+        /// <summary>
+        /// 获取或添加控制器
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        public T GetOrAddCtrl<T>() where T : ScriptableObject, IController => Controllers.GetOrAddCtrl<T>(Id);
+
+        /// <summary>
         /// 实体Id
         /// </summary>
         int IEntity.Id
@@ -39,7 +50,7 @@ namespace JFramework
             get => Id;
             set => Id = value;
         }
-        
+
         /// <summary>
         /// 实体Transform
         /// </summary>

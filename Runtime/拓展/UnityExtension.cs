@@ -1,40 +1,9 @@
 using System;
-using UnityEngine;
 
 namespace JFramework
 {
     public static partial class Extensions
     {
-        /// <summary>
-        /// 判断对象是否为Component类
-        /// </summary>
-        /// <param name="type">对象类型</param>
-        /// <returns>返回是否为组件</returns>
-        public static bool IsComponent(this Type type) => typeof(Component).IsAssignableFrom(type);
-
-        /// <summary>
-        /// 判断对象是否为Component类
-        /// </summary>
-        /// <param name="type">对象类型</param>
-        /// <returns>返回是否为组件</returns>
-        public static bool IsScriptable(this Type type) => typeof(ScriptableObject).IsAssignableFrom(type);
-
-        /// <summary>
-        /// 比较int和enum的值是否相等
-        /// </summary>
-        /// <param name="value">int的值</param>
-        /// <param name="type">enum的类型</param>
-        /// <returns>返回是否相等</returns>
-        public static bool Compare(this int value, Enum type) => value == Convert.ToInt32(type);
-
-        /// <summary>
-        /// 比较string和enum的值是否相等
-        /// </summary>
-        /// <param name="value">string的值</param>
-        /// <param name="type">enum的类型</param>
-        /// <returns>返回字符串是否相等</returns>
-        public static bool Compare(this string value, Enum type) => value == type.ToString();
-
         /// <summary>
         /// 将当前枚举切换到下一枚举
         /// 若当前为最后一个，则循环至第一个

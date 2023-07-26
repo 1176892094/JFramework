@@ -19,7 +19,7 @@ namespace JFramework.Core
         /// <summary>
         /// 音效挂载系统
         /// </summary>
-        internal static GameObject poolManager => GlobalManager.poolManager.gameObject;
+        internal static GameObject poolManager;
 
         /// <summary>
         /// 背景音乐组件
@@ -51,7 +51,7 @@ namespace JFramework.Core
         /// </summary>
         internal static void Awake()
         {
-            var transform = GlobalManager.Instance.transform;
+            poolManager = GlobalManager.poolManager.gameObject;
             audioSetting = JsonManager.Decrypt<AudioSetting>(Name);
             audioSource = poolManager.GetComponent<AudioSource>();
             audioSetting ??= new AudioSetting();

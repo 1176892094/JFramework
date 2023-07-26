@@ -8,6 +8,9 @@ namespace JFramework.Core
 {
     public static class PoolManager
     {
+        /// <summary>
+        /// 对象池容器
+        /// </summary>
         internal static readonly Dictionary<string, IPool> pools = new Dictionary<string, IPool>();
 
         /// <summary>

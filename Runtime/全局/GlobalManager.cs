@@ -14,11 +14,6 @@ namespace JFramework.Core
         private static readonly Dictionary<int, IEntity> entities = new Dictionary<int, IEntity>();
 
         /// <summary>
-        /// 未使用的Id队列
-        /// </summary>
-        private static readonly Queue<int> idQueue = new Queue<int>();
-
-        /// <summary>
         /// 私有的单例对象
         /// </summary>
         private static GlobalManager instance;
@@ -56,6 +51,11 @@ namespace JFramework.Core
         /// 全局管理器销毁事件
         /// </summary>
         public static event Action OnQuit;
+
+        /// <summary>
+        /// 实体Id
+        /// </summary>
+        private static int entityId;
 
         /// <summary>
         /// 是否在运行模式
@@ -97,7 +97,7 @@ namespace JFramework.Core
         public static void Listen(IEntity entity)
         {
             if (!Instance) return;
-            entity.Id = idQueue.Count > 0 ? idQueue.Dequeue() : entities.Count + 1;
+            entity.Id = ++entityId;
             OnUpdate += entity.Update;
             entities[entity.Id] = entity;
         }
@@ -110,7 +110,6 @@ namespace JFramework.Core
         public static void Remove(IEntity entity)
         {
             if (!Runtime) return;
-            idQueue.Enqueue(entity.Id);
             OnUpdate -= entity.Update;
             entities.Remove(entity.Id);
         }
@@ -120,8 +119,6 @@ namespace JFramework.Core
             try
             {
                 runtime = false;
-                idQueue.Clear();
-                entities.Clear();
                 OnQuit?.Invoke();
             }
             finally
@@ -135,10 +132,13 @@ namespace JFramework.Core
                 AudioManager.Destroy();
                 AssetManager.Destroy();
                 EventManager.Destroy();
+                Controllers.Destroy();
+                entities.Clear();
                 instance = null;
                 OnStart = null;
                 OnUpdate = null;
                 OnQuit = null;
+                entityId = 0;
                 GC.Collect();
             }
         }

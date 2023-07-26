@@ -60,9 +60,9 @@ namespace JFramework.Core
         /// </summary>
         internal static void Destroy()
         {
-            foreach (var hashSet in events.Values)
+            foreach (var @event in events.Values)
             {
-                hashSet.Clear();
+                @event.Clear();
             }
 
             events.Clear();
