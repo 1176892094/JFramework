@@ -8,7 +8,7 @@ namespace JFramework.Core
 {
     public static class PoolManager
     {
-        internal static readonly Dictionary<string, IPool> objects = new Dictionary<string, IPool>();
+        internal static readonly Dictionary<string, IPool> pools = new Dictionary<string, IPool>();
 
         /// <summary>
         /// 弹出对象池
@@ -17,7 +17,7 @@ namespace JFramework.Core
         /// <returns>返回弹出对象</returns>
         public static T Pop<T>() where T : new()
         {
-            if (objects.TryGetValue(typeof(T).Name, out var pool) && pool.Count > 0)
+            if (pools.TryGetValue(typeof(T).Name, out var pool) && pool.Count > 0)
             {
                 return ((IPool<T>)pool).Pop();
             }
@@ -32,13 +32,13 @@ namespace JFramework.Core
         /// <typeparam name="T">任何可以被new的对象</typeparam>
         public static void Push<T>(T obj) where T : new()
         {
-            if (objects.TryGetValue(typeof(T).Name, out var pool))
+            if (pools.TryGetValue(typeof(T).Name, out var pool))
             {
                 ((IPool<T>)pool).Push(obj);
                 return;
             }
 
-            objects.Add(typeof(T).Name, new Pool<T>(obj));
+            pools.Add(typeof(T).Name, new Pool<T>(obj));
         }
 
         /// <summary>
@@ -48,9 +48,9 @@ namespace JFramework.Core
         public static async Task<T> Pop<T>(string path) where T : Object
         {
             if (!GlobalManager.Runtime) return null;
-            if (objects.TryGetValue(path, out var pool) && pool.Count > 0)
+            if (pools.TryGetValue(path, out var pool) && pool.Count > 0)
             {
-                var @object = ((IPool<GameObject>)pool).Pop();
+                var @object = ((Pool)pool).Pop();
                 if (@object != null)
                 {
                     Log.Info(DebugOption.Pool, $"取出 => {path.Pink()} 对象成功");
@@ -80,15 +80,15 @@ namespace JFramework.Core
                 return;
             }
             
-            if (objects.TryGetValue(key, out var pool))
+            if (pools.TryGetValue(key, out var pool))
             {
                 Log.Info(DebugOption.Pool, $"存入 => {key.Pink()} 对象成功");
-                ((IPool<GameObject>)pool).Push(obj);
+                ((Pool)pool).Push(obj);
             }
             else
             {
                 Log.Info(DebugOption.Pool, $"创建 => 对象池 : {key.Green()}");
-                objects.Add(key, new PoolData(obj, GlobalManager.poolManager));
+                pools.Add(key, new Pool(obj));
             }
         }
 
@@ -97,12 +97,12 @@ namespace JFramework.Core
         /// </summary>
         internal static void Destroy()
         {
-            foreach (var pool in objects.Values)
+            foreach (var pool in pools.Values)
             {
                 pool.Clear();
             }
 
-            objects.Clear();
+            pools.Clear();
         }
     }
 }

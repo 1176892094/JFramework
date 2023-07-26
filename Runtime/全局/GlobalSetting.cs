@@ -58,7 +58,7 @@ namespace JFramework.Core
         private List<AudioSource> audioList => AudioManager.audioList;
 
         [ShowInInspector, LabelText("游戏对象管理"), FoldoutGroup("对象池管理器")]
-        private Dictionary<string, IPool> poolDict => Core.PoolManager.objects;
+        private Dictionary<string, IPool> poolDict => PoolManager.pools;
     }
 
     internal static class Log

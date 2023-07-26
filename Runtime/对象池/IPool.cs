@@ -32,6 +32,6 @@ namespace JFramework.Interface
         /// 推入对象
         /// </summary>
         /// <param name="obj">传入推入的对象</param>
-        void Push(T obj);
+        bool Push(T obj);
     }
 }
