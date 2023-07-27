@@ -42,7 +42,7 @@ namespace JFramework.Core
         /// <summary>
         /// 构造函数初始化数据
         /// </summary>
-        internal static void Awake()
+        public static void Awake()
         {
             var (assembly, types) = GetAssemblyAndTypes();
             if (types == null || types.Length == 0) return;
