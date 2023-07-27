@@ -23,7 +23,7 @@ namespace JFramework.Core
         private HashSet<Timer> timerFinish => TimerManager.finishList;
 
         [ShowInInspector, LabelText("正在计时队列"), FoldoutGroup("计时器管理器")]
-        private HashSet<Timer> timerList => TimerManager.timerList;
+        private LinkedList<Timer> timerList => TimerManager.timerList;
 
         [ShowInInspector, LabelText("整数数据管理"), FoldoutGroup("数据管理器")]
         private Dictionary<Type, Dictionary<int, IData>> intDataDict => DataManager.IntDataDict;
