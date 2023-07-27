@@ -192,7 +192,8 @@ namespace JFramework.Core
         public static void Clear()
         {
             if (!GlobalManager.Runtime) return;
-            foreach (var key in panels.Keys.ToList().Where(key => panels.ContainsKey(key)))
+            var copyList = panels.Keys.ToList();
+            foreach (var key in copyList.Where(key => panels.ContainsKey(key)))
             {
                 if (panels[key].stateType != UIStateType.Ignore)
                 {
