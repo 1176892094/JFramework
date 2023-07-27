@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using JFramework.Interface;
 
 namespace JFramework.Core
@@ -18,7 +17,12 @@ namespace JFramework.Core
         /// <summary>
         /// 存储正在执行的计时器
         /// </summary>
-        internal static readonly HashSet<Timer> timerList = new HashSet<Timer>();
+        internal static readonly LinkedList<Timer> timerList = new LinkedList<Timer>();
+
+        /// <summary>
+        /// 当前计时器节点
+        /// </summary>
+        private static LinkedListNode<Timer> currentNode;
         
         /// <summary>
         /// 构造函数初始化数据
@@ -33,10 +37,13 @@ namespace JFramework.Core
         /// </summary>
         private static void OnUpdate()
         {
-            if (timerList.Count == 0) return;
-            for (int i = timerList.Count - 1; i >= 0; i--)
+            if (timerList.Count <= 0) return;
+            currentNode = timerList.First;
+            while (currentNode != null)
             {
-                timerList.ElementAt(i).OnUpdate();
+                var nextNode = currentNode.Next;
+                currentNode.Value?.OnUpdate();
+                currentNode = nextNode;
             }
         }
 
@@ -50,7 +57,7 @@ namespace JFramework.Core
             if (!GlobalManager.Runtime) return null;
             var timer = finishList.Pop(() => new Timer());
             timer.Open(time, action);
-            timerList.Add(timer);
+            timerList.AddLast(timer);
             return timer;
         }
 
@@ -64,7 +71,7 @@ namespace JFramework.Core
             if (!GlobalManager.Runtime) return null;
             var timer = finishList.Pop(() => new Timer());
             timer.Open(time, action);
-            timerList.Add(timer);
+            timerList.AddLast(timer);
             return timer;
         }
 
