@@ -37,11 +37,11 @@ namespace JFramework.Core
         internal static void Awake()
         {
             var transform = GlobalManager.Instance.transform;
-            layers.Add(typeof(UILayer1), transform.Find("UICanvas/Layer1"));
-            layers.Add(typeof(UILayer2), transform.Find("UICanvas/Layer2"));
-            layers.Add(typeof(UILayer3), transform.Find("UICanvas/Layer3"));
-            layers.Add(typeof(UILayer4), transform.Find("UICanvas/Layer4"));
-            layers.Add(typeof(UILayer5), transform.Find("UICanvas/Layer5"));
+            layers.Add(typeof(UINormal), transform.Find("UICanvas/Layer1"));
+            layers.Add(typeof(UIBottom), transform.Find("UICanvas/Layer2"));
+            layers.Add(typeof(UIMiddle), transform.Find("UICanvas/Layer3"));
+            layers.Add(typeof(UIHeight), transform.Find("UICanvas/Layer4"));
+            layers.Add(typeof(UIIgnore), transform.Find("UICanvas/Layer5"));
         }
 
         /// <summary>
@@ -54,7 +54,7 @@ namespace JFramework.Core
             if (panels.ContainsKey(key)) return null;
             var obj = await AssetManager.LoadAsync<GameObject>("UI/" + key.Name);
             var panel = obj.GetComponent<T>();
-            SetLayer<T>(obj,typeof(UILayer));
+            SetLayer<T>(obj,typeof(UINormal));
             panels.Add(key, panel);
             panel.Show();
             return panel;
@@ -137,7 +137,7 @@ namespace JFramework.Core
         /// <typeparam name="T"></typeparam>
         private static void SetLayer<T>(GameObject obj, Type layer) where T : UIPanel
         {
-            var types = typeof(T).GetInterfaces().Where(t => t != layer && layer.IsAssignableFrom(t)).ToArray();
+            var types = typeof(T).GetInterfaces().Where(t => layer.IsAssignableFrom(t)).ToArray();
             if (types.Length > 0)
             {
                 foreach (var type in types)
@@ -150,14 +150,14 @@ namespace JFramework.Core
                 }
             }
 
-            obj.transform.SetParent(layers[typeof(UILayer1)], false);
+            obj.transform.SetParent(layers[typeof(UINormal)], false);
         }
 
         /// <summary>
         /// UI管理器得到层级
         /// </summary>
         /// <returns>返回得到的层级</returns>
-        public static Transform GetLayer<T>() where T : UILayer => panels != null ? layers[typeof(T)] : null;
+        public static Transform GetLayer<T>() where T : UINormal => panels != null ? layers[typeof(T)] : null;
 
         /// <summary>
         /// UI管理器侦听UI面板事件
