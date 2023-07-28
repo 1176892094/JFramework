@@ -31,3 +31,7 @@ Async/Await拓展：https://github.com/1176892094/JFramework-Async
 进入Example中的查看代码模版，将上面的代码复制到一个脚本中即可
 
 QQ交流群：882833795
+
+7.贡献者
+
+* [龙傲天](https://github.com/Molth)
