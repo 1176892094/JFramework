@@ -35,13 +35,13 @@ namespace JFramework.Core
         private LinkedList<Timer> timerList => TimerManager.timerList;
 
         [ShowInInspector, LabelText("整数数据管理"), FoldoutGroup("数据管理器")]
-        private Dictionary<Type, Dictionary<int, IData>> intDataDict => DataManager.IntDataDict;
+        private Dictionary<Type, Dictionary<int, IData>> intDataDict => DataManager<int>.dataDict;
 
         [ShowInInspector, LabelText("字符数据管理"), FoldoutGroup("数据管理器")]
-        private Dictionary<Type, Dictionary<string, IData>> strDataDict => DataManager.StrDataDict;
+        private Dictionary<Type, Dictionary<string, IData>> strDataDict => DataManager<string>.dataDict;
 
         [ShowInInspector, LabelText("枚举数据管理"), FoldoutGroup("数据管理器")]
-        private Dictionary<Type, Dictionary<Enum, IData>> enmDataDict => DataManager.EnmDataDict;
+        private Dictionary<Type, Dictionary<Enum, IData>> enmDataDict => DataManager<Enum>.dataDict;
 
         [ShowInInspector, LabelText("面板数据管理"), FoldoutGroup("面板管理器")]
         private Dictionary<Type, UIPanel> panels => UIManager.panels;
