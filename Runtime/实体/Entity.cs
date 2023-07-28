@@ -32,15 +32,9 @@ namespace JFramework
         protected virtual void OnDisable() => GlobalManager.Remove(this);
 
         /// <summary>
-        /// 实体销毁
+        /// 实体销毁 (如果能获取到角色接口 则销毁角色的控制器)
         /// </summary>
-        protected virtual void OnDestroy() => Controllers.RemoveCtrl(Id);
-
-        /// <summary>
-        /// 获取或添加控制器
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        public T GetOrAddCtrl<T>() where T : ScriptableObject, IController => Controllers.GetOrAddCtrl<T>(Id);
+        protected virtual void OnDestroy() => GetComponent<ICharacter>()?.Destroy();
 
         /// <summary>
         /// 实体Id

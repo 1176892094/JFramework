@@ -27,4 +27,8 @@ namespace JFramework.Interface
         /// </summary>
         void Update();
     }
+    
+    public interface ICharacter : IEntity
+    {
+    }
 }

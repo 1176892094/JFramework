@@ -56,7 +56,7 @@ namespace JFramework.Core
         private Dictionary<string, IPool> pools => PoolManager.pools;
         
         [ShowInInspector, LabelText("游戏组件管理"), FoldoutGroup("对象池管理器")]
-        private Dictionary<int, Dictionary<Type, ScriptableObject>> controllers => Controllers.controllers;
+        private Dictionary<int, Dictionary<Type, ScriptableObject>> controllerDict => ControllerManager.controllerDict;
 #endif
     }
     internal static class Log

@@ -132,7 +132,7 @@ namespace JFramework.Core
                 AudioManager.Destroy();
                 AssetManager.Destroy();
                 EventManager.Destroy();
-                Controllers.Destroy();
+                ControllerManager.Destroy();
                 entities.Clear();
                 instance = null;
                 OnStart = null;
