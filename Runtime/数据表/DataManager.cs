@@ -7,15 +7,13 @@ using UnityEngine;
 
 namespace JFramework.Core
 {
+    /// <summary>
+    /// 数据管理器
+    /// </summary>
     public static class DataManager
     {
         /// <summary>
-        /// 管理器名称
-        /// </summary>
-        private static string Name => nameof(DataManager);
-
-        /// <summary>
-        /// 构造函数初始化数据
+        /// 初始化加载数据
         /// </summary>
         public static void Awake()
         {
@@ -30,7 +28,7 @@ namespace JFramework.Core
                     var keyInfo = GetKeyField<KeyFieldAttribute>(dataType);
                     if (keyInfo == null)
                     {
-                        Debug.Log($"{Name.Sky()} 缺少主键 => {type.Name.Red()}");
+                        Debug.Log($"{nameof(DataManager).Sky()} 缺少主键 => {type.Name.Red()}");
                         return;
                     }
 
@@ -47,11 +45,10 @@ namespace JFramework.Core
                     {
                         DataManager<Enum>.Add(dataType, keyInfo, (IDataTable)table);
                     }
-                    
                 }
                 catch (Exception)
                 {
-                    Debug.Log($"{Name.Sky()} 加载 => {type.Name.Red()} 数据失败");
+                    Debug.Log($"{nameof(DataManager).Sky()} 加载 => {type.Name.Red()} 数据失败");
                 }
             }
         }
