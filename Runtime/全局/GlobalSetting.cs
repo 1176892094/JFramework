@@ -44,7 +44,7 @@ namespace JFramework.Core
         private Dictionary<Type, Dictionary<Enum, IData>> enmDataDict => DataManager<Enum>.dataDict;
 
         [ShowInInspector, LabelText("面板数据管理"), FoldoutGroup("面板管理器")]
-        private Dictionary<Type, UIPanel> panels => UIManager.panels;
+        private Dictionary<Type, IPanel> panels => UIManager.panels;
 
         [ShowInInspector, LabelText("面板层级配置"), FoldoutGroup("面板管理器")]
         private Dictionary<Type, Transform> layers => UIManager.layers;

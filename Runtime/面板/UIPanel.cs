@@ -1,30 +1,37 @@
+using System;
 using System.Collections.Generic;
 using System.Reflection;
+using JFramework.Core;
+using JFramework.Interface;
 using Sirenix.OdinInspector;
 using TMPro;
+using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 // ReSharper disable All
 namespace JFramework
 {
-    using Component = Dictionary<string, UIBehaviour>;
-
     /// <summary>
     /// UI面板的抽象类
     /// </summary>
-    public abstract class UIPanel : Entity
+    public abstract class UIPanel : MonoBehaviour, IPanel
     {
         /// <summary>
         /// 视觉容器字典
         /// </summary>
         [ShowInInspector, LabelText("视觉元素")]
-        private Dictionary<string, Component> components = new Dictionary<string, Component>();
+        private Dictionary<Type, Dictionary<string, UIBehaviour>> components = new Dictionary<Type, Dictionary<string, UIBehaviour>>();
 
         /// <summary>
         /// UI隐藏类型
         /// </summary>
-        [LabelText("面板状态")] public UIStateType stateType;
+        [ShowInInspector, LabelText("面板状态")] public UIStateType stateType;
+
+        /// <summary>
+        /// 实体Id
+        /// </summary>
+        public int entityId { get; private set; }
 
         /// <summary>
         /// 开始时查找所有控件
@@ -41,19 +48,36 @@ namespace JFramework
         }
 
         /// <summary>
+        /// 实体更新
+        /// </summary>`
+        protected virtual void OnUpdate()
+        {
+        }
+
+        /// <summary>
+        /// 实体启用
+        /// </summary>
+        protected virtual void OnEnable() => GlobalManager.Listen(this);
+
+        /// <summary>
+        /// 实体禁用
+        /// </summary>
+        protected virtual void OnDisable() => GlobalManager.Remove(this);
+
+        /// <summary>
         /// 查找所有组件
         /// </summary>
         /// <typeparam name="T"></typeparam>
         private void FindComponent<T>() where T : UIBehaviour
         {
-            var type = typeof(T).Name;
+            var type = typeof(T);
             var components = GetComponentsInChildren<T>();
             foreach (var component in components)
             {
                 var key = component.gameObject.name;
                 if (!this.components.ContainsKey(type))
                 {
-                    var container = new Component();
+                    var container = new Dictionary<string, UIBehaviour>();
                     this.components.Add(type, container);
                     container.Add(key, component);
                 }
@@ -88,22 +112,46 @@ namespace JFramework
         /// <returns>返回查找到的组件</returns>
         public T Get<T>(string key) where T : UIBehaviour
         {
-            var type = typeof(T).Name;
-            return components.ContainsKey(type) ? (T)components[type][key] : null;
+            return components.TryGetValue(typeof(T), out var component) ? (T)component[key] : null;
         }
 
         /// <summary>
         /// 显示UI面板
         /// </summary>
-        public virtual void Show()
-        {
-        }
+        public virtual void Show() { }
 
         /// <summary>
         /// 隐藏UI面板
         /// </summary>
-        public virtual void Hide()
+        public virtual void Hide() { }
+
+        /// <summary>
+        /// UI 面板状态
+        /// </summary>
+        UIStateType IPanel.state => stateType;
+
+        /// <summary>
+        /// 实体Id
+        /// </summary>
+        int IEntity.entityId
         {
+            get => entityId;
+            set => entityId = value;
         }
+
+        /// <summary>
+        /// 实体Transform
+        /// </summary>
+        Transform IEntity.transform => transform;
+
+        /// <summary>
+        /// 实体GameObject
+        /// </summary>
+        GameObject IEntity.gameObject => gameObject;
+
+        /// <summary>
+        /// 实体接口调用实体更新方法
+        /// </summary>
+        void IEntity.Update() => OnUpdate();
     }
 }

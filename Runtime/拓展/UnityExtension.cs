@@ -72,7 +72,7 @@ namespace JFramework
         /// <returns></returns>
         public static T GetOrAddCtrl<T>(this ICharacter character) where T : ScriptableObject, IController
         {
-            return CtrlManager.GetOrAddCtrl<T>(character.Id);
+            return CtrlManager.GetOrAddCtrl<T>(character.entityId);
         }
 
         /// <summary>
@@ -81,7 +81,7 @@ namespace JFramework
         /// <param name="character"></param>
         public static void Destroy(this ICharacter character)
         {
-            CtrlManager.Destroy(character.Id);
+            CtrlManager.Destroy(character.entityId);
         }
     }
 }

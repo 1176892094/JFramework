@@ -136,8 +136,8 @@ namespace JFramework.Core
         {
             if (!Instance) return;
             OnUpdate += entity.Update;
-            if (entity.Id == 0) entity.Id = ++entityId;
-            entities[entity.Id] = entity;
+            if (entity.entityId == 0) entity.entityId = ++entityId;
+            entities[entity.entityId] = entity;
         }
 
         /// <summary>
@@ -148,7 +148,7 @@ namespace JFramework.Core
         {
             if (!Runtime) return;
             OnUpdate -= entity.Update;
-            entities.Remove(entity.Id);
+            entities.Remove(entity.entityId);
         }
 
         /// <summary>

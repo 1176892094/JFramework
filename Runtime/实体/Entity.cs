@@ -14,7 +14,7 @@ namespace JFramework
         /// <summary>
         /// 实体Id
         /// </summary>
-        public int Id { get; private set; }
+        public int entityId { get; private set; }
 
         /// <summary>
         /// 实体更新
@@ -39,10 +39,10 @@ namespace JFramework
         /// <summary>
         /// 实体Id
         /// </summary>
-        int IEntity.Id
+        int IEntity.entityId
         {
-            get => Id;
-            set => Id = value;
+            get => entityId;
+            set => entityId = value;
         }
 
         /// <summary>

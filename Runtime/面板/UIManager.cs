@@ -24,7 +24,7 @@ namespace JFramework.Core
         /// <summary>
         /// 存储所有UI的字典
         /// </summary>
-        internal static readonly Dictionary<Type, UIPanel> panels = new Dictionary<Type, UIPanel>();
+        internal static readonly Dictionary<Type, IPanel> panels = new Dictionary<Type, IPanel>();
 
         /// <summary>
         /// 管理器名称
@@ -48,10 +48,10 @@ namespace JFramework.Core
         /// UI管理器加载面板
         /// </summary>
         /// <typeparam name="T">可以使用所有继承IPanel的对象</typeparam>
-        private static async Task<T> LoadPanel<T>() where T : UIPanel
+        private static async Task<T> LoadPanel<T>() where T : IPanel
         {
             var key = typeof(T);
-            if (panels.ContainsKey(key)) return null;
+            if (panels.ContainsKey(key)) return default;
             var obj = await AssetManager.LoadAsync<GameObject>("UI/" + key.Name);
             var panel = obj.GetComponent<T>();
             SetLayer<T>(panel);
@@ -64,9 +64,9 @@ namespace JFramework.Core
         /// UI管理器显示UI面板 (有返回值)
         /// </summary>
         /// <typeparam name="T">可以使用所有继承IPanel的对象</typeparam>
-        public static async Task<T> ShowPanelAsync<T>() where T : UIPanel
+        public static async Task<T> ShowPanelAsync<T>() where T : IPanel
         {
-            if (!GlobalManager.Runtime) return null;
+            if (!GlobalManager.Runtime) return default;
             if (panels.TryGetValue(typeof(T), out var panel))
             {
                 panel.Show();
@@ -80,7 +80,7 @@ namespace JFramework.Core
         /// UI管理器显示UI面板 (无返回值)
         /// </summary>
         /// <typeparam name="T">可以使用所有继承IPanel的对象</typeparam>
-        public static async void ShowPanel<T>() where T : UIPanel
+        public static async void ShowPanel<T>() where T : IPanel
         {
             if (!GlobalManager.Runtime) return;
             if (panels.TryGetValue(typeof(T), out var panel))
@@ -95,20 +95,20 @@ namespace JFramework.Core
         /// <summary>
         /// UI管理器隐藏UI面板
         /// </summary>
-        public static void HidePanel<T>() where T : UIPanel
+        public static void HidePanel<T>() where T : IPanel
         {
             if (!GlobalManager.Runtime) return;
             var key = typeof(T);
             if (panels.ContainsKey(key))
             {
-                if (panels[key].stateType == UIStateType.Freeze)
+                if (panels[key].state == UIStateType.Freeze)
                 {
                     Debug.Log($"{Name} 隐藏 => {key.Name.Red()} 失败,面板处于冻结状态!");
                     return;
                 }
 
                 panels[key].Hide();
-                if (panels[key].stateType == UIStateType.Common)
+                if (panels[key].state == UIStateType.Common)
                 {
                     Object.Destroy(panels[key].gameObject);
                     panels.Remove(key);
@@ -127,14 +127,14 @@ namespace JFramework.Core
         /// UI管理器得到UI面板
         /// </summary>
         /// <returns>返回获取到的UI面板</returns>
-        public static UIPanel GetPanel(Type key) => panels.TryGetValue(key, out var panel) ? panel : null;
+        public static IPanel GetPanel(Type key) => panels.TryGetValue(key, out var panel) ? panel : null;
 
         /// <summary>
         /// 设置UI面板层级
         /// </summary>
         /// <param name="panel"></param>
         /// <typeparam name="T"></typeparam>
-        private static void SetLayer<T>(T panel) where T : UIPanel
+        private static void SetLayer<T>(T panel) where T : IPanel
         {
             var layer = typeof(UILayer);
             var types = typeof(T).GetInterfaces();
@@ -178,7 +178,7 @@ namespace JFramework.Core
         /// <summary>
         /// 手动注册到UI管理器
         /// </summary>
-        public static void Register<T>(UIPanel panel) where T : UIPanel
+        public static void Register<T>(T panel) where T : IPanel
         {
             var key = typeof(T);
             if (!panels.ContainsKey(key))
@@ -196,7 +196,7 @@ namespace JFramework.Core
             var copyList = panels.Keys.ToList();
             foreach (var key in copyList.Where(key => panels.ContainsKey(key)))
             {
-                if (panels[key].stateType != UIStateType.Ignore)
+                if (panels[key].state != UIStateType.Ignore)
                 {
                     Object.Destroy(panels[key].gameObject);
                     panels.Remove(key);

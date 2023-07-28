@@ -10,7 +10,7 @@ namespace JFramework.Interface
         /// <summary>
         /// 实体Id
         /// </summary>
-        int Id { get; set; }
+        int entityId { get; set; }
 
         /// <summary>
         /// 实体变换
