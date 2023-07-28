@@ -19,7 +19,6 @@ namespace JFramework
         /// <summary>
         /// 全局控制器容器
         /// </summary>
-        [ShowInInspector]
         internal static readonly Dictionary<int, Controllers> controllerDict = new Dictionary<int, Controllers>();
 
         /// <summary>

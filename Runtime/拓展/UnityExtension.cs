@@ -83,6 +83,5 @@ namespace JFramework
         {
             ControllerManager.Destroy(character.Id);
         }
-
     }
 }
