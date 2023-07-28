@@ -20,7 +20,7 @@ namespace JFramework.Core
         /// UI层级字典
         /// </summary>
         internal static readonly Dictionary<Type, Transform> layers = new Dictionary<Type, Transform>();
-        
+
         /// <summary>
         /// 存储所有UI的字典
         /// </summary>
@@ -54,12 +54,12 @@ namespace JFramework.Core
             if (panels.ContainsKey(key)) return null;
             var obj = await AssetManager.LoadAsync<GameObject>("UI/" + key.Name);
             var panel = obj.GetComponent<T>();
-            SetLayer<T>(obj,typeof(UINormal));
+            SetLayer<T>(panel);
             panels.Add(key, panel);
             panel.Show();
             return panel;
         }
-        
+
         /// <summary>
         /// UI管理器显示UI面板 (有返回值)
         /// </summary>
@@ -75,7 +75,7 @@ namespace JFramework.Core
 
             return await LoadPanel<T>();
         }
-        
+
         /// <summary>
         /// UI管理器显示UI面板 (无返回值)
         /// </summary>
@@ -132,32 +132,33 @@ namespace JFramework.Core
         /// <summary>
         /// 设置UI面板层级
         /// </summary>
-        /// <param name="obj"></param>
-        /// <param name="layer"></param>
+        /// <param name="panel"></param>
         /// <typeparam name="T"></typeparam>
-        private static void SetLayer<T>(GameObject obj, Type layer) where T : UIPanel
+        private static void SetLayer<T>(T panel) where T : UIPanel
         {
-            var types = typeof(T).GetInterfaces().Where(t => layer.IsAssignableFrom(t)).ToArray();
+            var layer = typeof(UILayer);
+            var types = typeof(T).GetInterfaces();
+            types = types.Where(type => type != layer && layer.IsAssignableFrom(type)).ToArray();
             if (types.Length > 0)
             {
                 foreach (var type in types)
                 {
                     if (layers.TryGetValue(type, out var transform))
                     {
-                        obj.transform.SetParent(transform, false);
+                        panel.transform.SetParent(transform, false);
                         return;
                     }
                 }
             }
 
-            obj.transform.SetParent(layers[typeof(UINormal)], false);
+            panel.transform.SetParent(layers[typeof(UINormal)], false);
         }
 
         /// <summary>
         /// UI管理器得到层级
         /// </summary>
         /// <returns>返回得到的层级</returns>
-        public static Transform GetLayer<T>() where T : UINormal => panels != null ? layers[typeof(T)] : null;
+        public static Transform GetLayer<T>() where T : UILayer => panels != null ? layers[typeof(T)] : null;
 
         /// <summary>
         /// UI管理器侦听UI面板事件
