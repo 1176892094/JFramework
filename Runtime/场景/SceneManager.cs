@@ -70,6 +70,7 @@ namespace JFramework.Core
         internal static void Destroy()
         {
             OnLoadProgress = null;
+            OnLoadComplete = null;
         }
     }
 }
