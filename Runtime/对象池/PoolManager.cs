@@ -14,6 +14,19 @@ namespace JFramework.Core
         internal static readonly Dictionary<string, IPool> pools = new Dictionary<string, IPool>();
 
         /// <summary>
+        /// 对象池管理器对象
+        /// </summary>
+        internal static Transform poolManager;
+
+        /// <summary>
+        /// 获取 PoolManager 对象
+        /// </summary>
+        internal static void Awake()
+        {
+            poolManager = GlobalManager.Instance.transform.Find("PoolManager");
+        }
+
+        /// <summary>
         /// 弹出对象池
         /// </summary>
         /// <typeparam name="T">任何可以被new的对象</typeparam>
@@ -33,15 +46,15 @@ namespace JFramework.Core
         /// </summary>
         /// <param name="obj">传入对象</param>
         /// <typeparam name="T">任何可以被new的对象</typeparam>
-        public static void Push<T>(T obj) where T : new()
+        public static bool Push<T>(T obj) where T : new()
         {
             if (pools.TryGetValue(typeof(T).Name, out var pool))
             {
-                ((IPool<T>)pool).Push(obj);
-                return;
+                return ((IPool<T>)pool).Push(obj);
             }
 
             pools.Add(typeof(T).Name, new Pool<T>(obj));
+            return true;
         }
 
         /// <summary>
@@ -73,26 +86,25 @@ namespace JFramework.Core
         /// 对象池管理器推入对象
         /// </summary>
         /// <param name="obj">对象的实例</param>
-        public static void Push(GameObject obj)
+        public static bool Push(GameObject obj)
         {
-            if (!GlobalManager.Runtime) return;
+            if (!GlobalManager.Runtime) return false;
             if (obj == null)
             {
                 Debug.LogWarning($"{nameof(PoolManager).Sky()} 存入对象已被销毁");
-                return;
+                return false;
             }
 
             var key = obj.name;
             if (pools.TryGetValue(key, out var pool))
             {
                 Log.Info(DebugOption.Pool, $"存入 => {key.Pink()} 对象成功");
-                ((Pool)pool).Push(obj);
+                return ((Pool)pool).Push(obj);
             }
-            else
-            {
-                Log.Info(DebugOption.Pool, $"创建 => 对象池 : {key.Green()}");
-                pools.Add(key, new Pool(obj));
-            }
+
+            Log.Info(DebugOption.Pool, $"创建 => 对象池 : {key.Green()}");
+            pools.Add(key, new Pool(obj));
+            return true;
         }
 
         /// <summary>

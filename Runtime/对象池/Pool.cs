@@ -69,7 +69,7 @@ namespace JFramework
         /// <summary>
         /// 游戏物体组
         /// </summary>
-        private readonly Transform transform;
+        private GameObject gameObject;
 
         /// <summary>
         /// 对象池物体数量
@@ -82,8 +82,8 @@ namespace JFramework
         /// <param name="object">推入的游戏对象</param>
         public Pool(GameObject @object)
         {
-            transform = new GameObject(@object.name + "-Pool").transform;
-            transform.SetParent(GlobalManager.poolManager);
+            gameObject = new GameObject(@object.name + "-Pool");
+            gameObject.transform.SetParent(PoolManager.poolManager);
             Push(@object);
         }
 
@@ -96,6 +96,7 @@ namespace JFramework
             if (pool.Count == 0) return null;
             var @object = pool.First();
             @object.transform.SetParent(null);
+            @object.GetComponent<IPop>()?.OnPop();
             @object.SetActive(true);
             pool.Remove(@object);
             return @object;
@@ -108,8 +109,10 @@ namespace JFramework
         public bool Push(GameObject @object)
         {
             @object.SetActive(false);
-            if (transform == null) return false;
-            @object.transform.SetParent(transform);
+            @object.GetComponent<IPush>()?.OnPush();
+            gameObject ??= new GameObject(@object.name + "-Pool");
+            gameObject.transform.SetParent(PoolManager.poolManager);
+            @object.transform.SetParent(gameObject.transform);
             return pool.Add(@object);
         }
 

@@ -13,7 +13,7 @@ namespace JFramework
     /// <summary>
     /// 控制器管理器
     /// </summary>
-    internal static class ControllerManager
+    internal static class CtrlManager
     {
         /// <summary>
         /// 全局控制器容器

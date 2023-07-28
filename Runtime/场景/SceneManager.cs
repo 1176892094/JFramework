@@ -65,7 +65,7 @@ namespace JFramework.Core
         }
 
         /// <summary>
-        /// 管理器销毁
+        /// 场景管理器在开始游戏前清空
         /// </summary>
         internal static void Destroy()
         {

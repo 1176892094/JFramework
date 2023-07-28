@@ -15,21 +15,21 @@ namespace JFramework.Core
         /// 播放音效队列
         /// </summary>
         internal static readonly HashSet<AudioSource> audioList = new HashSet<AudioSource>();
+        
+        /// <summary>
+        /// 游戏音效设置
+        /// </summary>
+        private static AudioSetting audioSetting = new AudioSetting();
 
         /// <summary>
         /// 音效挂载系统
         /// </summary>
-        private static GameObject poolManager;
+        private static GameObject gameObject;
 
         /// <summary>
         /// 背景音乐组件
         /// </summary>
         private static AudioSource audioSource;
-
-        /// <summary>
-        /// 游戏音效设置
-        /// </summary>
-        private static AudioSetting audioSetting;
 
         /// <summary>
         /// 管理器名称
@@ -39,22 +39,22 @@ namespace JFramework.Core
         /// <summary>
         /// 背景音乐
         /// </summary>
-        public static float soundVolume => audioSetting?.soundVolume ?? 0.5f;
+        public static float soundVolume => audioSetting.soundVolume;
 
         /// <summary>
         /// 游戏声音
         /// </summary>
-        public static float audioVolume => audioSetting?.audioVolume ?? 0.5f;
+        public static float audioVolume => audioSetting.audioVolume;
 
         /// <summary>
         /// 音效管理器初始化
         /// </summary>
         internal static void Awake()
         {
-            poolManager = GlobalManager.poolManager.gameObject;
+            var transform = GlobalManager.Instance.transform;
+            gameObject = transform.Find("PoolManager").gameObject;
+            audioSource = gameObject.GetComponent<AudioSource>();
             audioSetting = JsonManager.Decrypt<AudioSetting>(Name);
-            audioSource = poolManager.GetComponent<AudioSource>();
-            audioSetting ??= new AudioSetting();
             SetSound(audioSetting.soundVolume);
             SetAudio(audioSetting.audioVolume);
         }
@@ -104,7 +104,7 @@ namespace JFramework.Core
         {
             if (!GlobalManager.Runtime) return;
             Log.Info(DebugOption.Audio, $"播放音效: {path.Blue()}");
-            var audio = finishList.Pop(() => poolManager.AddComponent<AudioSource>());
+            var audio = finishList.Pop(() => gameObject.AddComponent<AudioSource>());
             var clip = await AssetManager.LoadAsync<AudioClip>(path);
             audioList.Add(audio);
             audio.volume = audioSetting.audioVolume;
@@ -146,14 +146,12 @@ namespace JFramework.Core
         }
 
         /// <summary>
-        /// 释放管理器
+        /// 管理器销毁
         /// </summary>
         internal static void Destroy()
         {
             audioList.Clear();
             finishList.Clear();
-            audioSource = null;
-            audioSetting = null;
         }
 
         /// <summary>

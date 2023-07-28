@@ -1,9 +1,11 @@
+using System;
 using System.Collections.Generic;
 using System.IO;
 using Newtonsoft.Json;
 using UnityEngine;
 
 // ReSharper disable All
+
 namespace JFramework.Core
 {
     /// <summary>
@@ -11,12 +13,15 @@ namespace JFramework.Core
     /// </summary>
     public static partial class JsonManager
     {
-        private static Dictionary<string, JsonData> jsonDict = new Dictionary<string, JsonData>();
+        /// <summary>
+        /// 存储加密密钥的字典
+        /// </summary>
+        private static readonly Dictionary<string, JsonData> secrets = new Dictionary<string, JsonData>();
 
         /// <summary>
         /// 静态构造函数(第一次使用时加载密钥)
         /// </summary>
-        static JsonManager() => jsonDict = Load<Dictionary<string, JsonData>>(nameof(JsonManager));
+        static JsonManager() => secrets = Load<Dictionary<string, JsonData>>(nameof(JsonManager));
 
         /// <summary>
         /// 存储数据
@@ -40,7 +45,7 @@ namespace JFramework.Core
             var filePath = GetPath(obj.name);
             if (!File.Exists(filePath))
             {
-                Debug.LogWarning($"{nameof(JsonManager).Sky()} 创建 => {obj.name.Orange()} 数据文件");
+                Debug.Log($"{nameof(JsonManager).Sky()} 创建 => {obj.name.Orange()} 数据文件");
                 Save(obj, obj.name);
             }
 
@@ -67,7 +72,14 @@ namespace JFramework.Core
 
             Log.Info(DebugOption.Json, $"读取 => {name.Orange()} 数据文件");
             var saveJson = File.ReadAllText(filePath);
-            return !saveJson.IsEmpty() ? JsonConvert.DeserializeObject<T>(saveJson) : default;
+            try
+            {
+                return !saveJson.IsEmpty() ? JsonConvert.DeserializeObject<T>(saveJson) : default;
+            }
+            catch (Exception)
+            {
+                return new T();
+            }
         }
 
         /// <summary>
@@ -75,57 +87,8 @@ namespace JFramework.Core
         /// </summary>
         public static void Clear()
         {
-            jsonDict.Clear();
-            Save(jsonDict, nameof(JsonManager));
-        }
-
-        /// <summary>
-        /// Json管理器设置加密数据
-        /// </summary>
-        /// <param name="id">加密数据的id</param>
-        /// <param name="key">加密数据的键值</param>
-        /// <param name="iv">加密数据的向量</param>
-        private static void SetData(string id, byte[] key, byte[] iv)
-        {
-            if (!jsonDict.ContainsKey(id))
-            {
-                jsonDict.Add(id, new JsonData());
-            }
-
-            jsonDict[id].key = key;
-            jsonDict[id].iv = iv;
-            Save(jsonDict, nameof(JsonManager));
-        }
-
-        /// <summary>
-        /// Json管理器得到加密数据
-        /// </summary>
-        /// <param name="id">加密数据的id</param>
-        /// <returns>返回得到的加密数据</returns>
-        private static JsonData GetData(string id)
-        {
-            if (!jsonDict.ContainsKey(id))
-            {
-                jsonDict.Add(id, new JsonData());
-            }
-
-            return jsonDict[id];
-        }
-
-        /// <summary>
-        /// Json管理器获取路径
-        /// </summary>
-        /// <param name="name">传入的路径名称</param>
-        /// <returns>返回的到的路径</returns>
-        private static string GetPath(string name)
-        {
-            string filePath = Path.Combine(Application.streamingAssetsPath, $"{name}.json");
-            if (!File.Exists(filePath))
-            {
-                filePath = Path.Combine(Application.persistentDataPath, $"{name}.json");
-            }
-
-            return filePath;
+            secrets.Clear();
+            Save(secrets, nameof(JsonManager));
         }
     }
 }

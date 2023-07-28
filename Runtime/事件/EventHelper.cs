@@ -17,20 +17,14 @@ namespace JFramework
         /// </summary>
         /// <param name="event">传入观察的对象接口</param>
         /// <returns>返回是否添加成功</returns>
-        public static bool Listen(IEvent<TEvent> @event)
-        {
-            return events.Add(@event);
-        }
+        public static void Listen(IEvent<TEvent> @event) => events.Add(@event);
 
         /// <summary>
         /// 泛型事件管理器移除
         /// </summary>
         /// <param name="event">传入观察的对象接口</param>
         /// <returns>返回是否移除成功</returns>
-        public static bool Remove(IEvent<TEvent> @event)
-        {
-            return events.Remove(@event);
-        }
+        public static void Remove(IEvent<TEvent> @event) => events.Remove(@event);
 
         /// <summary>
         /// 泛型事件管理器调用事件
