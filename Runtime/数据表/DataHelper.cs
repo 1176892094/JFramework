@@ -38,7 +38,7 @@ namespace JFramework
                 }
                 else
                 {
-                    Debug.Log($"{nameof(DataManager).Sky()} 加载 => {table.GetType().Name.Orange()} 已经存在 {key.ToString().Red()} 键值!");
+                    Debug.Log($"{table.GetType().Name.Orange()} 中有重复键值！ Key：{key.ToString().Red()}");
                 }
             }
 
