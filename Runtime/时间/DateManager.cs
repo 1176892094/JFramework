@@ -40,6 +40,7 @@ namespace JFramework.Core
         /// </summary>
         internal static void Awake()
         {
+            lastCheckTime = 0;
             GlobalManager.OnUpdate += Update;
         }
 
