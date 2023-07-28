@@ -235,7 +235,8 @@ namespace JFramework.Core
         /// <returns></returns>
         private static Type[] GetTypes(Assembly assembly)
         {
-            return assembly.GetTypes().Where(type => typeof(IDataTable).IsAssignableFrom(type) && !type.IsAbstract).ToArray();
+            var types = assembly.GetTypes();
+            return Array.FindAll(types, type => typeof(IDataTable).IsAssignableFrom(type) && !type.IsAbstract);
         }
 
         /// <summary>
