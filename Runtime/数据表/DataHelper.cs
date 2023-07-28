@@ -11,13 +11,13 @@ namespace JFramework
     /// <summary>
     /// 泛型数据管理器
     /// </summary>
-    /// <typeparam name="T"></typeparam>
-    internal static class DataManager<T>
+    /// <typeparam name="TKey"></typeparam>
+    internal static class DataManager<TKey>
     {
         /// <summary>
         /// 泛型数据字典
         /// </summary>
-        internal static readonly Dictionary<Type, Dictionary<T, IData>> dataDict = new Dictionary<Type, Dictionary<T, IData>>();
+        internal static readonly Dictionary<Type, Dictionary<TKey, IData>> dataDict = new Dictionary<Type, Dictionary<TKey, IData>>();
 
         /// <summary>
         /// 添加数据
@@ -27,11 +27,11 @@ namespace JFramework
         /// <param name="table"></param>
         public static void Add(Type type, FieldInfo field, IDataTable table)
         {
-            var dataList = new Dictionary<T, IData>();
+            var dataList = new Dictionary<TKey, IData>();
             for (int i = 0; i < table.Count; i++)
             {
                 var data = table.GetData(i);
-                var key = (T)field.GetValue(data);
+                var key = (TKey)field.GetValue(data);
                 if (!dataList.ContainsKey(key))
                 {
                     dataList.Add(key, data);
@@ -51,9 +51,9 @@ namespace JFramework
         /// <param name="key"></param>
         /// <typeparam name="TData"></typeparam>
         /// <returns></returns>
-        public static TData Get<TData>(T key) where TData : IData
+        public static TData Get<TData>(TKey key) where TData : IData
         {
-            if (dataDict.TryGetValue(typeof(TData), out Dictionary<T, IData> dataList))
+            if (dataDict.TryGetValue(typeof(TData), out Dictionary<TKey, IData> dataList))
             {
                 if (dataList.TryGetValue(key, out IData data))
                 {
@@ -73,7 +73,7 @@ namespace JFramework
         /// <returns></returns>
         public static TData[] GetTable<TData>() where TData : IData
         {
-            if (!dataDict.TryGetValue(typeof(T), out Dictionary<T, IData> dataList)) return null;
+            if (!dataDict.TryGetValue(typeof(TKey), out Dictionary<TKey, IData> dataList)) return null;
             Log.Info(DebugOption.Data, $"获取 => {typeof(TData).Name.Blue()} 列表成功");
             return dataList.Values.Cast<TData>().ToArray();
         }
