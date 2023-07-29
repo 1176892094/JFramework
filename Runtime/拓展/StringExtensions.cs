@@ -1,5 +1,7 @@
-
 // ReSharper disable All
+
+using UnityEngine;
+
 namespace JFramework
 {
     public static partial class Extensions
@@ -12,6 +14,6 @@ namespace JFramework
         public static string Blue(this string s) => s.Color(0x00CCFF);
         public static string Red(this string s) => s.Color(0xFF0000);
         public static string Sky(this string s) => s.Color(0x00FFFF);
-        public static string Color(this string s, int color) => $"<color=#{color:X}>{s}</color>";
+        public static string Color(this string s, int color) => $"<color=#{color:X6}>{s}</color>";
     }
 }
