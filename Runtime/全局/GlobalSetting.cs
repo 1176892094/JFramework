@@ -64,7 +64,7 @@ namespace JFramework.Core
     }
     internal static class Log
     {
-        private static readonly Dictionary<DebugOption, string> debugDict = new Dictionary<DebugOption, string>()
+        private static readonly Dictionary<DebugOption, string> options = new Dictionary<DebugOption, string>()
         {
             { DebugOption.Json, "JsonManager " },
             { DebugOption.Pool, "PoolManager " },
@@ -81,7 +81,7 @@ namespace JFramework.Core
         {
             if (!GlobalManager.Runtime) return;
             if ((GlobalManager.Instance.debugOption & option) == DebugOption.None) return;
-            Debug.Log(debugDict.TryGetValue(option, out var value) ? value.Sky() + message : message);
+            Debug.Log(options.TryGetValue(option, out var value) ? value.Sky() + message : message);
         }
     }
 
