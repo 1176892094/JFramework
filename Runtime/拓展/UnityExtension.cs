@@ -47,16 +47,12 @@ namespace JFramework
         public static T Pop<T>(this HashSet<T> objects, Func<T> func = null)
         {
             if (objects == null) return default;
-            if (objects.Count > 0)
-            {
-                using var enumerator = objects.GetEnumerator();
-                enumerator.MoveNext();
-                T current = enumerator.Current;
-                objects.Remove(current);
-                return current;
-            }
-            
-            return func != null ? func() : default;
+            if (objects.Count <= 0) return func != null ? func() : default;
+            using var enumerator = objects.GetEnumerator();
+            enumerator.MoveNext();
+            T current = enumerator.Current;
+            objects.Remove(current);
+            return current;
         }
 
         /// <summary>
