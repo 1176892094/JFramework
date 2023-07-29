@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using JFramework.Interface;
 using UnityEngine;
 
@@ -37,7 +36,7 @@ namespace JFramework
             var lastIndex = (currIndex - 1 + enumArray.Length) % enumArray.Length;
             return enumArray[lastIndex];
         }
-        
+
         /// <summary>
         /// 对哈希表进行基于栈的拓展
         /// </summary>
@@ -47,23 +46,19 @@ namespace JFramework
         /// <returns></returns>
         public static T Pop<T>(this HashSet<T> objects, Func<T> func = null)
         {
-            T @object = default;
+            if (objects == null) return default;
             if (objects.Count > 0)
             {
-                @object = objects.First();
-                objects.Remove(@object);
+                using var enumerator = objects.GetEnumerator();
+                enumerator.MoveNext();
+                T current = enumerator.Current;
+                objects.Remove(current);
+                return current;
             }
-            else
-            {
-                if (func != null)
-                {
-                    @object = func();
-                }
-            }
-
-            return @object;
+            
+            return func != null ? func() : default;
         }
-        
+
         /// <summary>
         /// 继承ICharacter后可以使用 GetOrAddCtrl
         /// </summary>
