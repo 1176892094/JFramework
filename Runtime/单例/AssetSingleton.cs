@@ -27,8 +27,11 @@ namespace JFramework
             {
                 if (instance != null) return instance;
                 var name = typeof(T).Name;
-                instance ??= AssetManager.Load<T>($"Settings/{name}");
-                if (instance != null) return instance;
+                if (Application.isPlaying)
+                {
+                    instance ??= AssetManager.Load<T>($"Settings/{name}");
+                    if (instance != null) return instance;
+                }
 #if UNITY_EDITOR
                 var path = "Assets/AddressableResources/Settings";
                 var asset = $"{path}/{name}.asset";
