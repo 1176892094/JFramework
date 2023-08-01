@@ -2,7 +2,6 @@ using System;
 using JFramework.Core;
 using UnityEngine;
 
-// ReSharper disable All
 namespace JFramework
 {
     /// <summary>

@@ -14,10 +14,10 @@ namespace JFramework.Core
         /// <returns>返回的到的路径</returns>
         private static string GetPath(string name)
         {
-            string filePath = Path.Combine(Application.streamingAssetsPath, $"{name}.json");
+            var filePath = Path.Combine(Application.persistentDataPath, $"{name}.json");
             if (!File.Exists(filePath))
             {
-                filePath = Path.Combine(Application.persistentDataPath, $"{name}.json");
+                filePath = Path.Combine(Application.streamingAssetsPath, $"{name}.json");
             }
 
             return filePath;

@@ -3,11 +3,10 @@ using System.Collections.Generic;
 using JFramework.Interface;
 using Sirenix.OdinInspector;
 using UnityEngine;
-using UnityEngine.ResourceManagement.AsyncOperations;
+using Object = UnityEngine.Object;
 
 namespace JFramework.Core
 {
-
     public sealed partial class GlobalManager
     {
         [FoldoutGroup("设置管理器"), SerializeField, LabelText("控制台输出选项")]
@@ -23,7 +22,10 @@ namespace JFramework.Core
         private Dictionary<int, Dictionary<Type, ScriptableObject>> controllerDict => CtrlManager.controllerDict;
         
         [ShowInInspector, LabelText("资源管理数据"), FoldoutGroup("常用管理器")]
-        private Dictionary<string, AsyncOperationHandle> assets => AssetManager.assets;
+        private Dictionary<string, AssetBundle> depends => AssetManager.depends;
+
+        [ShowInInspector, LabelText("资源管理数据"), FoldoutGroup("常用管理器")]
+        private Dictionary<string, (string, string)> assets => AssetManager.assets;
 
         [ShowInInspector, LabelText("事件管理数据"), FoldoutGroup("常用管理器")]
         private Dictionary<Type, HashSet<IEvent>> observers => EventManager.observers;

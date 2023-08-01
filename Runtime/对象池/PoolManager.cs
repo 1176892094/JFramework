@@ -23,6 +23,7 @@ namespace JFramework.Core
         /// </summary>
         internal static void Awake()
         {
+            Destroy();
             poolManager = GlobalManager.Instance.transform.Find("PoolManager");
         }
 

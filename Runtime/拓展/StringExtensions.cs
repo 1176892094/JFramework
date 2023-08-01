@@ -1,7 +1,3 @@
-// ReSharper disable All
-
-using UnityEngine;
-
 namespace JFramework
 {
     public static partial class Extensions

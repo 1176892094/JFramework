@@ -1,8 +1,6 @@
 using System;
 using System.Threading.Tasks;
 using UnityEngine;
-using UnityEngine.AddressableAssets;
-using UnityEngine.ResourceManagement.AsyncOperations;
 using UnitySceneManager = UnityEngine.SceneManagement.SceneManager;
 
 namespace JFramework.Core
@@ -21,6 +19,7 @@ namespace JFramework.Core
 
         /// <summary>
         /// 当前场景名称
+        /// ReSharper disable once MemberCanBePrivate.Global
         /// </summary>
         public static string localScene => UnitySceneManager.GetActiveScene().name;
 
@@ -44,23 +43,23 @@ namespace JFramework.Core
         /// <returns>返回场景加载迭代器</returns>
         private static async Task OnSceneProgress(string path, float time)
         {
-            var handle = Addressables.LoadSceneAsync(path);
-            while (!handle.IsDone)
+            try
             {
-                OnLoadProgress?.Invoke(handle.PercentComplete);
-                Log.Info(DebugOption.Scene, $"加载进度 => {handle.PercentComplete.ToString("P").Green()}");
-                if (!GlobalManager.Runtime) return;
-                await Task.Yield();
-            }
+                var operation = await AssetManager.LoadSceneAsync(path);
+                while (!operation.isDone)
+                {
+                    OnLoadProgress?.Invoke(operation.progress);
+                    Log.Info(DebugOption.Scene, $"加载进度 => {operation.progress.ToString("P").Green()}");
+                    if (!GlobalManager.Runtime) return;
+                    await Task.Yield();
+                }
 
-            if (handle.Status == AsyncOperationStatus.Succeeded)
-            {
                 var totalTime = (Time.time - time).ToString("F");
                 Log.Info(DebugOption.Scene, $"异步加载 => {path.Green()} 场景完成, 耗时 {totalTime.Yellow()} 秒");
             }
-            else
+            catch (Exception e)
             {
-                Log.Info(DebugOption.Scene, $"异步加载 => {path.Red()} 场景失败");
+                Log.Info(DebugOption.Scene, $"异步加载 => {path.Red()} 场景失败\n{e}");
             }
         }
 

@@ -73,18 +73,19 @@ namespace JFramework.Core
         /// <summary>
         /// 全局管理器初始化
         /// </summary>
-        private void Awake()
+        private async void Awake()
         {
             entityId = 0;
             runtime = true;
             instance ??= this;
+            DontDestroyOnLoad(gameObject);
+            await AssetManager.Awake();
             UIManager.Awake();
             PoolManager.Awake();
             DataManager.Awake();
             DateManager.Awake();
-            TimerManager.Awake();
             AudioManager.Awake();
-            DontDestroyOnLoad(gameObject);
+            TimerManager.Awake();
         }
 
         /// <summary>

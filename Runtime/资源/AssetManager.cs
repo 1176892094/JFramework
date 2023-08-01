@@ -1,115 +1,296 @@
-using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using System.IO;
 using System.Threading.Tasks;
 using UnityEngine;
-using UnityEngine.AddressableAssets;
-using UnityEngine.ResourceManagement.AsyncOperations;
+using UnityEngine.SceneManagement;
 using Object = UnityEngine.Object;
+using UnitySceneManager = UnityEngine.SceneManagement.SceneManager;
 
 namespace JFramework.Core
 {
     public static class AssetManager
     {
-        internal static readonly Dictionary<string, AsyncOperationHandle> assets = new Dictionary<string, AsyncOperationHandle>();
+        /// <summary>
+        /// 存储AB包的名称和资源
+        /// </summary>
+        internal static readonly Dictionary<string, (string, string)> assets = new Dictionary<string, (string, string)>();
 
         /// <summary>
-        /// 通过资源管理器加载资源 (同步)
+        /// 存储字典
         /// </summary>
-        /// <param name="path">资源的路径</param>
-        /// <typeparam name="T">可以使用任何继承Object的对象</typeparam>
-        public static T Load<T>(string path) where T : Object
-        {
-            if (!GlobalManager.Runtime) return null;
-            var result = Addressables.LoadAssetAsync<T>(path).WaitForCompletion();
-            if (result == null)
-            {
-                Debug.Log($"{nameof(AssetManager).Sky()} 加载 => {path.Red()} 资源失败");
-                return null;
-            }
+        internal static readonly Dictionary<string, AssetBundle> depends = new Dictionary<string, AssetBundle>();
 
-            return LoadCompleted(result);
+        /// <summary>
+        /// 是否远端加载
+        /// </summary>
+        private static bool isRemote;
+
+        /// <summary>
+        /// 主包
+        /// </summary>
+        private static AssetBundle mainAsset;
+
+        /// <summary>
+        /// 声明文件
+        /// </summary>
+        private static AssetBundleManifest manifest;
+
+        /// <summary>
+        /// 从服务器下载资源包
+        /// </summary>
+        internal static async Task Awake()
+        {
+            Destroy();
+            if (isRemote)
+            {
+                await AssetHelper.UpdateAsync();
+            }
         }
 
         /// <summary>
-        /// 通过资源加载管理器异步加载资源
+        /// 加载主包 和 配置文件
         /// </summary>
-        /// <param name="path">资源的路径</param>
-        /// <typeparam name="T">可以使用任何继承Object的对象</typeparam>
-        /// <returns>返回资源的任务</returns>
-        public static async Task<T> LoadAsync<T>(string path) where T : Object
+        private static void LoadMainAssetBundle()
         {
-            if (!GlobalManager.Runtime) return null;
-            AsyncOperationHandle<T> handle;
-            if (assets.TryGetValue(path, out var asyncHandle))
+            if (mainAsset != null) return;
+            mainAsset = LoadFromFile(AssetConst.PLATFORM.ToString());
+            manifest = mainAsset.LoadAsset<AssetBundleManifest>("AssetBundleManifest");
+        }
+
+        /// <summary>
+        /// 加载指定包的依赖包
+        /// </summary>
+        /// <param name="bundleName"></param>
+        private static void LoadDependencies(string bundleName)
+        {
+            LoadMainAssetBundle();
+            var dependencies = manifest.GetAllDependencies(bundleName);
+            foreach (var dependency in dependencies)
             {
-                handle = asyncHandle.Convert<T>();
-                if (!handle.IsDone) await handle.Task;
-                return LoadCompleted(handle.Result);
+                if (depends.ContainsKey(dependency)) continue;
+                var assetBundle = LoadFromFile(dependency);
+                depends.Add(dependency, assetBundle);
+            }
+        }
+
+        /// <summary>
+        /// 根据路径加载
+        /// </summary>
+        /// <param name="path"></param>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
+        public static T Load<T>(string path) where T : Object
+        {
+            if (assets.ContainsKey(path))
+            {
+                return Load<T>(assets[path].Item1, assets[path].Item2);
             }
 
-            handle = Addressables.LoadAssetAsync<T>(path);
-            assets.Add(path, handle);
-            await handle.Task;
+            var array = path.Split('/');
+            assets.Add(path, (array[0], array[1]));
+            return Load<T>(array[0], array[1]);
+        }
 
-            if (handle.Status == AsyncOperationStatus.Succeeded)
+        /// <summary>
+        /// 泛型资源同步加载
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
+        private static T Load<T>(string bundleName, string assetName) where T : Object
+        {
+            LoadDependencies(bundleName);
+            if (!depends.ContainsKey(bundleName))
             {
-                return LoadCompleted(handle.Result);
+                var assetBundle = LoadFromFile(bundleName);
+                if (assetBundle != null)
+                {
+                    depends.Add(bundleName, assetBundle);
+                }
+                else
+                {
+                    Debug.Log($"{nameof(AssetManager).Sky()} 加载 => {bundleName.Red()} 资源失败");
+                }
             }
 
-            if (assets.ContainsKey(path)) //资源加载失败
+            var obj = depends[bundleName].LoadAsset<T>(assetName);
+            Log.Info(DebugOption.Asset, $"加载 => {obj.name.Green()} 资源成功");
+            return obj is GameObject ? Object.Instantiate(obj) : obj;
+        }
+
+        /// <summary>
+        /// 同步加载AB包
+        /// </summary>
+        /// <param name="assetBundle"></param>
+        /// <returns></returns>
+        private static AssetBundle LoadFromFile(string assetBundle)
+        {
+            var path = $"{Application.persistentDataPath}/{assetBundle}";
+            if (File.Exists(path))
             {
-                assets.Remove(path);
+                return AssetBundle.LoadFromFile(path);
             }
 
-            Debug.Log($"{nameof(AssetManager).Sky()} 加载 => {path.Red()} 资源失败");
+            path = $"{Application.streamingAssetsPath}/{AssetConst.PLATFORM}/{assetBundle}";
+            if (File.Exists(path))
+            {
+                return AssetBundle.LoadFromFile(path);
+            }
+
             return null;
         }
 
         /// <summary>
-        /// 通过资源加载管理器释放资源
+        /// 根据路径加载
         /// </summary>
-        /// <param name="name">资源的名称</param>
-        /// <typeparam name="T">可以使用任何继承Object的对象</typeparam>
-        public static void Dispose<T>(string name)
+        /// <param name="path"></param>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
+        public static Task<T> LoadAsync<T>(string path) where T : Object
         {
-            if (!GlobalManager.Runtime) return;
-            if (!assets.ContainsKey(name)) return;
-            var handle = assets[name].Convert<T>();
-            Addressables.Release(handle);
-            assets.Remove(name);
+            if (assets.ContainsKey(path))
+            {
+                return LoadAsync<T>(assets[path].Item1, assets[path].Item2);
+            }
+
+            var array = path.Split('/');
+            assets.Add(path, (array[0], array[1]));
+            return LoadAsync<T>(array[0], array[1]);
         }
 
         /// <summary>
-        /// 释放所有资源，并开启垃圾回收
+        /// 泛型异步加载资源
         /// </summary>
-        public static void Clear()
+        /// <typeparam name="T"></typeparam>
+        /// <param name="bundleName"></param>
+        /// <param name="assetName"></param>
+        private static async Task<T> LoadAsync<T>(string bundleName, string assetName) where T : Object
         {
-            foreach (var handle in assets.Values)
+            LoadDependencies(bundleName);
+            if (!depends.ContainsKey(bundleName))
             {
-                Addressables.Release(handle);
+                var assetBundle = await LoadFromFileAsync(bundleName);
+                if (assetBundle != null)
+                {
+                    depends.Add(bundleName, assetBundle);
+                }
+                else
+                {
+                    Debug.Log($"{nameof(AssetManager).Sky()} 加载 => {bundleName.Red()} 资源失败");
+                }
+            }
+
+            var request = depends[bundleName].LoadAssetAsync<T>(assetName);
+            if (!request.isDone)
+            {
+                await Task.Yield();
+            }
+            Log.Info(DebugOption.Asset, $"加载 => {request.asset.name.Green()} 资源成功");
+            return request.asset is GameObject ? (T)Object.Instantiate(request.asset) : (T)request.asset;
+        }
+
+        /// <summary>
+        /// 异步加载AB包路径
+        /// </summary>
+        /// <param name="assetBundle"></param>
+        /// <returns></returns>
+        private static async Task<AssetBundle> LoadFromFileAsync(string assetBundle)
+        {
+            var path = $"{Application.persistentDataPath}/{assetBundle}";
+            if (File.Exists(path))
+            {
+                return await LoadFromFilePath(path);
+            }
+
+            path = $"{Application.streamingAssetsPath}/{AssetConst.PLATFORM}/{assetBundle}";
+            if (File.Exists(path))
+            {
+                return await LoadFromFilePath(path);
+            }
+
+            return null;
+        }
+
+        /// <summary>
+        /// 异步加载AB包
+        /// </summary>
+        /// <param name="assetPath"></param>
+        /// <returns></returns>
+        private static async Task<AssetBundle> LoadFromFilePath(string assetPath)
+        {
+            var request = AssetBundle.LoadFromFileAsync(assetPath);
+            if (!request.isDone)
+            {
+                await Task.Yield();
+            }
+
+            return request.assetBundle;
+        }
+        
+        /// <summary>
+        /// 根据路径加载
+        /// </summary>
+        /// <param name="path"></param>
+        /// <returns></returns>
+        public static Task<AsyncOperation> LoadSceneAsync(string path)
+        {
+            if (assets.ContainsKey(path))
+            {
+                return LoadSceneAsync(assets[path].Item1, assets[path].Item2);
+            }
+
+            var array = path.Split('/');
+            assets.Add(path, (array[0], array[1]));
+            return LoadSceneAsync(array[0], array[1]);
+        }
+        
+        /// <summary>
+        /// 异步加载场景
+        /// </summary>
+        /// <param name="bundleName"></param>
+        /// <param name="sceneName"></param>
+        private static async Task<AsyncOperation> LoadSceneAsync(string bundleName, string sceneName)
+        {
+            LoadDependencies(bundleName);
+            if (!depends.ContainsKey(bundleName))
+            {
+                var assetBundle = await LoadFromFileAsync(bundleName);
+                depends.Add(bundleName, assetBundle);
             }
             
-            assets.Clear();
-            AssetBundle.UnloadAllAssetBundles(true);
-            Resources.UnloadUnusedAssets();
-            GC.Collect();
+            return UnitySceneManager.LoadSceneAsync(sceneName, LoadSceneMode.Single);
         }
-        
+
         /// <summary>
-        /// 资源加载完成
+        /// 卸载AB包的方法
         /// </summary>
-        /// <param name="result">传入返回的结果</param>
-        /// <typeparam name="T">可以使用任何继承Object的对象</typeparam>
-        /// <returns>返回资源的类型</returns>
-        private static T LoadCompleted<T>(T result) where T : Object
+        /// <param name="assetBundle"></param>
+        public static void Unload(string assetBundle)
         {
-            Log.Info(DebugOption.Asset, $"加载 => {result.name.Green()} 资源成功");
-            return result is GameObject ? Object.Instantiate(result) : result;
+            if (depends.ContainsKey(assetBundle))
+            {
+                depends[assetBundle].Unload(false);
+                foreach (var (bundleName, assetName) in assets.Values)
+                {
+                    if (bundleName == assetBundle)
+                    {
+                        assets.Remove($"{assetBundle}/{assetName}");
+                    }
+                }
+
+                depends.Remove(assetBundle);
+            }
         }
-        
+
         /// <summary>
-        /// 管理器销毁
+        /// 清空AB包的方法
         /// </summary>
-        internal static void Destroy() => assets.Clear();
+        public static void Destroy()
+        {
+            AssetBundle.UnloadAllAssetBundles(false);
+            depends.Clear();
+            assets.Clear();
+            manifest = null;
+            mainAsset = null;
+        }
     }
 }

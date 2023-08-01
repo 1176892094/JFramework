@@ -33,7 +33,7 @@ namespace JFramework
                     if (instance != null) return instance;
                 }
 #if UNITY_EDITOR
-                var path = "Assets/AddressableResources/Settings";
+                var path = $"{AssetConst.FILE_PATH}/Settings";
                 var asset = $"{path}/{name}.asset";
                 instance = AssetDatabase.LoadAssetAtPath<T>(asset);
                 if (instance != null) return instance;
@@ -41,7 +41,7 @@ namespace JFramework
                 instance = CreateInstance<T>();
                 AssetDatabase.CreateAsset(Instance, asset);
                 AssetDatabase.Refresh();
-                Debug.Log($"创建 <color=#00FF00>{name}</color> 单例资源。路径: <color=#FFFF00>{path}</color>");
+                Debug.Log($"创建 {name.Red()} 单例资源。路径: {path.Yellow()}");
 #endif
                 return instance;
             }

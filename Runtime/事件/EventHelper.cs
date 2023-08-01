@@ -1,14 +1,13 @@
 using System.Collections.Generic;
 using JFramework.Interface;
 
-// ReSharper disable All
-
 namespace JFramework
 {
     internal static class Event<TEvent> where TEvent : struct, IEvent
     {
         /// <summary>
         /// 存储事件的哈希表
+        /// ReSharper disable once StaticMemberInGenericType
         /// </summary>
         public static HashSet<IEvent> events = new HashSet<IEvent>();
 

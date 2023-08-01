@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using Newtonsoft.Json;
 using UnityEngine;
-
 // ReSharper disable All
 
 namespace JFramework.Core
@@ -16,7 +15,7 @@ namespace JFramework.Core
         /// <summary>
         /// 存储加密密钥的字典
         /// </summary>
-        private static readonly Dictionary<string, JsonData> secrets = new Dictionary<string, JsonData>();
+        private static readonly Dictionary<string, JsonData> secrets;
 
         /// <summary>
         /// 静态构造函数(第一次使用时加载密钥)
