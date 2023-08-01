@@ -1,25 +1,25 @@
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
+using System.Linq;
+using System.Threading.Tasks;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
 using UnityEngine;
+using Debug = UnityEngine.Debug;
 
 namespace JFramework
 {
     public class AssetSetting : AssetSingleton<AssetSetting>
     {
-        internal Dictionary<string, Object> assets = new Dictionary<string, Object>();
-        [SerializeField] private List<string> keys = new List<string>();
-        [SerializeField] private List<Object> values = new List<Object>();
 #if UNITY_EDITOR
         private AssetImporter importer;
 
         public void Update()
         {
-            keys.Clear();
-            values.Clear();
             string[] assetBundleNames = AssetDatabase.GetAllAssetBundleNames();
+
             foreach (string assetBundleName in assetBundleNames)
             {
                 if (AssetDatabase.GetAssetPathsFromAssetBundle(assetBundleName).Length == 0)
@@ -32,38 +32,37 @@ namespace JFramework
             {
                 Directory.CreateDirectory(AssetConst.FILE_PATH);
             }
-
+            
             string[] guids = AssetDatabase.FindAssets("t:Object", new[] { AssetConst.FILE_PATH });
-            foreach (string guid in guids)
+            var enumerable = guids.Select(AssetDatabase.GUIDToAssetPath).Where(asset => !AssetDatabase.IsValidFolder(asset));
+            foreach (var path in enumerable)
             {
-                string path = AssetDatabase.GUIDToAssetPath(guid);
-                if (!AssetDatabase.IsValidFolder(path))
+                var array = path.Replace('\\', '/').Split('/');
+                importer = AssetImporter.GetAtPath(path);
+                if (importer != null)
                 {
-                    string[] array = path.Replace('\\', '/').Split('/');
-                    if (array.Length > 3)
+                    var assetBundleName = importer.assetBundleName;
+                    if (assetBundleName != array[2].ToLower())
                     {
-                        importer = AssetImporter.GetAtPath(path);
-                        keys.Add($"{array[2]}/{Path.GetFileNameWithoutExtension(path)}");
-                        values.Add(AssetDatabase.LoadAssetAtPath<Object>(path));
-                        if (importer != null)
-                        {
-                            if (string.IsNullOrEmpty(importer.assetBundleVariant))
-                            {
-                                importer.assetBundleName = array[2];
-                            }
-                            else
-                            {
-                                importer.assetBundleVariant = array[2];
-                            }
-
-                            importer.SaveAndReimport();
-                        }
+                        importer.assetBundleName = array[2];
+                        importer.SaveAndReimport();
                     }
                 }
             }
 
             EditorUtility.SetDirty(this);
             AssetDatabase.Refresh();
+        }
+
+        private static string[] GetAssetsByGuid(string folder, string filter)
+        {
+            if (string.IsNullOrEmpty(folder)) return null;
+            if (string.IsNullOrEmpty(filter)) return null;
+            folder = folder.TrimEnd('/').TrimEnd('\\');
+            if (!filter.StartsWith("t:")) return null;
+            var guids = AssetDatabase.FindAssets(filter, new[] { folder });
+            return guids.Select(AssetDatabase.GUIDToAssetPath).Where(path => !AssetDatabase.IsValidFolder(path))
+                .ToArray();
         }
 #endif
     }
