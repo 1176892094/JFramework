@@ -6,6 +6,9 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 using JFramework.Core;
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 using UnityEngine;
 using UnityEngine.Networking;
 
@@ -267,6 +270,7 @@ namespace JFramework
         /// </summary>
         public static void CreateAssetBundleInfo()
         {
+            BuildPipeline.BuildAssetBundles($"{AssetConst.BUILD_PATH}/{AssetConst.PLATFORM}", (BuildAssetBundleOptions)AssetConst.OPTIONS, (BuildTarget)AssetConst.PLATFORM);
             var directory = Directory.CreateDirectory($"{localBuildPath}");
             var fileInfos = directory.GetFiles();
             var builder = PoolManager.Pop<StringBuilder>();
