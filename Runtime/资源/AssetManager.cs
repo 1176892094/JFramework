@@ -253,7 +253,7 @@ namespace JFramework.Core
             LoadDependencies(bundleName);
             if (!depends.ContainsKey(bundleName))
             {
-                var assetBundle = await LoadFromFileAsync(bundleName);
+                var assetBundle = await LoadFromFileAsync(bundleName.ToLower());
                 depends.Add(bundleName, assetBundle);
             }
 
