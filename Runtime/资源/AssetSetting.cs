@@ -31,7 +31,7 @@ namespace JFramework
         /// <summary>
         /// 资源服务器路径
         /// </summary>
-        public const string LoadPath = "http://192.168.0.3:8000/Files/Unity/JFramework/Assets/StreamingAssets";
+        public const string LoadPath = "http://192.168.0.3:8000/Files/Unity/Forest/Assets/StreamingAssets";
 
         /// <summary>
         /// 压缩选项

@@ -100,7 +100,7 @@ namespace JFramework.Core
             LoadDependencies(bundleName);
             if (!depends.ContainsKey(bundleName))
             {
-                var assetBundle = LoadFromFile(bundleName);
+                var assetBundle = LoadFromFile(bundleName.ToLower());
                 if (assetBundle != null)
                 {
                     depends.Add(bundleName, assetBundle);
@@ -167,7 +167,7 @@ namespace JFramework.Core
             LoadDependencies(bundleName);
             if (!depends.ContainsKey(bundleName))
             {
-                var assetBundle = await LoadFromFileAsync(bundleName);
+                var assetBundle = await LoadFromFileAsync(bundleName.ToLower());
                 if (assetBundle != null)
                 {
                     depends.Add(bundleName, assetBundle);
