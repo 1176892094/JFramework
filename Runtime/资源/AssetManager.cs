@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 using UnityEngine;
@@ -21,9 +22,9 @@ namespace JFramework.Core
         internal static readonly Dictionary<string, AssetBundle> depends = new Dictionary<string, AssetBundle>();
 
         /// <summary>
-        /// 是否远端加载
+        /// 当远端消息加载完成
         /// </summary>
-        private static bool isRemote;
+        public static event Action<bool> OnLoadComplete;
 
         /// <summary>
         /// 主包
@@ -41,10 +42,8 @@ namespace JFramework.Core
         internal static async Task Awake()
         {
             Destroy();
-            if (isRemote)
-            {
-                await AssetHelper.UpdateAsync();
-            }
+            var success = await AssetHelper.UpdateAsync();
+            OnLoadComplete?.Invoke(success);
         }
 
         /// <summary>
@@ -53,7 +52,7 @@ namespace JFramework.Core
         private static void LoadMainAssetBundle()
         {
             if (mainAsset != null) return;
-            mainAsset = LoadFromFile(AssetConst.PLATFORM.ToString());
+            mainAsset = LoadFromFile(AssetSetting.Platform.ToString());
             manifest = mainAsset.LoadAsset<AssetBundleManifest>("AssetBundleManifest");
         }
 
@@ -130,7 +129,7 @@ namespace JFramework.Core
                 return AssetBundle.LoadFromFile(path);
             }
 
-            path = $"{Application.streamingAssetsPath}/{AssetConst.PLATFORM}/{assetBundle}";
+            path = $"{Application.streamingAssetsPath}/{AssetSetting.Platform}/{assetBundle}";
             if (File.Exists(path))
             {
                 return AssetBundle.LoadFromFile(path);
@@ -184,6 +183,7 @@ namespace JFramework.Core
             {
                 await Task.Yield();
             }
+
             Log.Info(DebugOption.Asset, $"加载 => {request.asset.name.Green()} 资源成功");
             return request.asset is GameObject ? (T)Object.Instantiate(request.asset) : (T)request.asset;
         }
@@ -201,7 +201,7 @@ namespace JFramework.Core
                 return await LoadFromFilePath(path);
             }
 
-            path = $"{Application.streamingAssetsPath}/{AssetConst.PLATFORM}/{assetBundle}";
+            path = $"{Application.streamingAssetsPath}/{AssetSetting.Platform}/{assetBundle}";
             if (File.Exists(path))
             {
                 return await LoadFromFilePath(path);
@@ -225,7 +225,7 @@ namespace JFramework.Core
 
             return request.assetBundle;
         }
-        
+
         /// <summary>
         /// 根据路径加载
         /// </summary>
@@ -242,7 +242,7 @@ namespace JFramework.Core
             assets.Add(path, (array[0], array[1]));
             return LoadSceneAsync(array[0], array[1]);
         }
-        
+
         /// <summary>
         /// 异步加载场景
         /// </summary>
@@ -256,7 +256,7 @@ namespace JFramework.Core
                 var assetBundle = await LoadFromFileAsync(bundleName);
                 depends.Add(bundleName, assetBundle);
             }
-            
+
             return UnitySceneManager.LoadSceneAsync(sceneName, LoadSceneMode.Single);
         }
 

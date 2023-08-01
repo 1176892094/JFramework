@@ -19,16 +19,16 @@ namespace JFramework
         private static readonly Dictionary<string, AssetData> clientDataList = new Dictionary<string, AssetData>();
         private static readonly Dictionary<string, AssetData> serverDataList = new Dictionary<string, AssetData>();
         private static readonly List<string> assetDataList = new List<string>();
-        private static readonly string clientInfoName = $"{AssetConst.INFO}.txt";
-        private static readonly string serverInfoName = $"{AssetConst.INFO}_TMP.txt";
+        private static readonly string clientInfoName = $"{AssetSetting.Info}.txt";
+        private static readonly string serverInfoName = $"{AssetSetting.Info}_TMP.txt";
         private static readonly string clientInfoPath = $"{Application.persistentDataPath}/{clientInfoName}";
         private static readonly string serverInfoPath = $"{Application.persistentDataPath}/{serverInfoName}";
-        private static readonly string localBuildPath = $"{Application.streamingAssetsPath}/{AssetConst.PLATFORM.ToString()}";
+        private static readonly string localBuildPath = $"{Application.streamingAssetsPath}/{AssetSetting.Platform.ToString()}";
 
         /// <summary>
         /// 用于检测热更新的函数
         /// </summary>
-        internal static async Task UpdateAsync()
+        internal static async Task<bool> UpdateAsync()
         {
             assetDataList.Clear();
             clientDataList.Clear();
@@ -73,13 +73,15 @@ namespace JFramework
                     {
                         Debug.Log("更新本地AB包对比文件为最新");
                         await File.WriteAllTextAsync($"{clientInfoPath}", remoteInfo);
+                        return true;
                     }
+
+                    return false;
                 }
             }
-            else
-            {
-                Debug.Log("更新失败。");
-            }
+
+            Debug.Log("更新失败。");
+            return false;
         }
 
         /// <summary>
@@ -110,14 +112,14 @@ namespace JFramework
                 return await GetClientAssetBundleInfo($"file://{clientInfoPath}");
             }
 
-            if (File.Exists($"{Application.streamingAssetsPath}/{AssetConst.PLATFORM}/{clientInfoName}"))
+            if (File.Exists($"{Application.streamingAssetsPath}/{AssetSetting.Platform}/{clientInfoName}"))
             {
 #if UNITY_ANDROID
                 string path = Application.streamingAssetsPath;
 #else
                 string path = $"file://{Application.streamingAssetsPath}";
 #endif
-                return await GetClientAssetBundleInfo($"{path}/{AssetConst.PLATFORM}/{clientInfoName}");
+                return await GetClientAssetBundleInfo($"{path}/{AssetSetting.Platform}/{clientInfoName}");
             }
 
             return true;
@@ -194,7 +196,7 @@ namespace JFramework
         /// <returns></returns>
         private static async Task<bool> Download(string fileName, string localPath)
         {
-            using var request = UnityWebRequest.Get($"{AssetConst.LOAD_PATH}/{AssetConst.PLATFORM}/{fileName}");
+            using var request = UnityWebRequest.Get($"{AssetSetting.LoadPath}/{AssetSetting.Platform}/{fileName}");
             try
             {
                 var operation = request.SendWebRequest();
@@ -245,7 +247,7 @@ namespace JFramework
         /// <param name="fileName"></param>
         private static async Task Upload(string filePath, string fileName)
         {
-            var request = new UnityWebRequest($"{AssetConst.LOAD_PATH}/{AssetConst.PLATFORM}/{fileName}", "POST");
+            var request = new UnityWebRequest($"{AssetSetting.LoadPath}/{AssetSetting.Platform}/{fileName}", "POST");
             var fileData = await File.ReadAllBytesAsync(filePath);
             request.uploadHandler = new UploadHandlerRaw(fileData);
             request.SetRequestHeader("Content-Type", "application/octet-stream");
@@ -270,7 +272,7 @@ namespace JFramework
         /// </summary>
         public static void CreateAssetBundleInfo()
         {
-            BuildPipeline.BuildAssetBundles($"{AssetConst.BUILD_PATH}/{AssetConst.PLATFORM}", (BuildAssetBundleOptions)AssetConst.OPTIONS, (BuildTarget)AssetConst.PLATFORM);
+            BuildPipeline.BuildAssetBundles($"{AssetSetting.BuildPath}/{AssetSetting.Platform}", (BuildAssetBundleOptions)AssetSetting.Options, (BuildTarget)AssetSetting.Platform);
             var directory = Directory.CreateDirectory($"{localBuildPath}");
             var fileInfos = directory.GetFiles();
             var builder = PoolManager.Pop<StringBuilder>();
