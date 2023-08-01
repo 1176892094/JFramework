@@ -17,6 +17,12 @@ namespace JFramework.Core
         /// </summary>
         public static void Awake()
         {
+            AssetManager.OnLoadComplete += LoadData;
+            Debug.Log("+DataEvent");
+        }
+
+        private static void LoadData(bool success)
+        {
             var (assembly, types) = GetAssemblyAndTypes();
             if (types == null || types.Length == 0) return;
             foreach (var type in types)
@@ -143,6 +149,7 @@ namespace JFramework.Core
             DataManager<int>.Clear();
             DataManager<string>.Clear();
             DataManager<Enum>.Clear();
+            AssetManager.OnLoadComplete -= LoadData;
         }
     }
 }

@@ -33,7 +33,7 @@ namespace JFramework
                     if (instance != null) return instance;
                 }
 #if UNITY_EDITOR
-                var path = $"{AssetSetting.FilePath}/Settings";
+                var path = $"{AssetSetting.FILE_PATH}/Settings";
                 var asset = $"{path}/{name}.asset";
                 instance = AssetDatabase.LoadAssetAtPath<T>(asset);
                 if (instance != null) return instance;

@@ -39,7 +39,7 @@ namespace JFramework.Core
         /// <summary>
         /// 从服务器下载资源包
         /// </summary>
-        internal static async Task Awake()
+        internal static async void Awake()
         {
             Destroy();
             var success = await AssetHelper.UpdateAsync();
@@ -52,7 +52,7 @@ namespace JFramework.Core
         private static void LoadMainAssetBundle()
         {
             if (mainAsset != null) return;
-            mainAsset = LoadFromFile(AssetSetting.Platform.ToString());
+            mainAsset = LoadFromFile($"{AssetSetting.PLATFORM}");
             manifest = mainAsset.LoadAsset<AssetBundleManifest>("AssetBundleManifest");
         }
 
@@ -123,13 +123,13 @@ namespace JFramework.Core
         /// <returns></returns>
         private static AssetBundle LoadFromFile(string assetBundle)
         {
-            var path = $"{Application.persistentDataPath}/{assetBundle}";
+            var path = AssetSetting.GetPerFile(assetBundle);
             if (File.Exists(path))
             {
                 return AssetBundle.LoadFromFile(path);
             }
 
-            path = $"{Application.streamingAssetsPath}/{AssetSetting.Platform}/{assetBundle}";
+            path = AssetSetting.GetStrFile(assetBundle);
             if (File.Exists(path))
             {
                 return AssetBundle.LoadFromFile(path);
@@ -195,13 +195,13 @@ namespace JFramework.Core
         /// <returns></returns>
         private static async Task<AssetBundle> LoadFromFileAsync(string assetBundle)
         {
-            var path = $"{Application.persistentDataPath}/{assetBundle}";
+            var path = AssetSetting.GetPerFile(assetBundle);
             if (File.Exists(path))
             {
                 return await LoadFromFilePath(path);
             }
 
-            path = $"{Application.streamingAssetsPath}/{AssetSetting.Platform}/{assetBundle}";
+            path = AssetSetting.GetStrFile(assetBundle);
             if (File.Exists(path))
             {
                 return await LoadFromFilePath(path);
@@ -286,6 +286,7 @@ namespace JFramework.Core
         /// </summary>
         public static void Destroy()
         {
+            OnLoadComplete = null;
             AssetBundle.UnloadAllAssetBundles(false);
             depends.Clear();
             assets.Clear();
