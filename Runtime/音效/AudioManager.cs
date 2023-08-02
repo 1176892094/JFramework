@@ -39,12 +39,12 @@ namespace JFramework.Core
         /// <summary>
         /// 背景音乐
         /// </summary>
-        public static float soundVolume => audioSetting?.soundVolume ?? 0.5f;
+        public static float soundVolume => audioSetting.soundVolume;
 
         /// <summary>
         /// 游戏声音
         /// </summary>
-        public static float audioVolume => audioSetting?.audioVolume ?? 0.5f;
+        public static float audioVolume => audioSetting.audioVolume;
 
         /// <summary>
         /// 音效管理器初始化
@@ -55,7 +55,6 @@ namespace JFramework.Core
             gameObject = transform.Find("PoolManager").gameObject;
             audioSource = gameObject.GetComponent<AudioSource>();
             audioSetting = JsonManager.Decrypt<AudioSetting>(Name);
-            audioSetting ??= new AudioSetting();
             SetSound(audioSetting.soundVolume);
             SetAudio(audioSetting.audioVolume);
         }
