@@ -22,6 +22,7 @@ namespace JFramework.Core
 
         /// <summary>
         /// 加载数据表
+        /// ReSharper disable once MemberCanBePrivate.Global
         /// </summary>
         /// <param name="success"></param>
         public static void LoadDataTable(bool success)

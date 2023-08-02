@@ -231,7 +231,7 @@ namespace JFramework.Core
         /// </summary>
         /// <param name="path"></param>
         /// <returns></returns>
-        public static Task<AsyncOperation> LoadSceneAsync(string path)
+        internal static Task<AsyncOperation> LoadSceneAsync(string path)
         {
             if (assets.ContainsKey(path))
             {

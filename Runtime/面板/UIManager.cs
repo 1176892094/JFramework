@@ -60,37 +60,22 @@ namespace JFramework.Core
             panel.Show();
             return panel;
         }
-
+        
         /// <summary>
-        /// UI管理器显示UI面板 (有返回值)
+        /// UI管理器显示UI面板 (有委托值)
         /// </summary>
         /// <typeparam name="T">可以使用所有继承IPanel的对象</typeparam>
-        public static async Task<T> ShowPanelAsync<T>() where T : IPanel
-        {
-            if (!GlobalManager.Runtime) return default;
-            if (panels.TryGetValue(typeof(T), out var panel))
-            {
-                panel.Show();
-                return (T)panel;
-            }
-
-            return await LoadPanel<T>();
-        }
-
-        /// <summary>
-        /// UI管理器显示UI面板 (无返回值)
-        /// </summary>
-        /// <typeparam name="T">可以使用所有继承IPanel的对象</typeparam>
-        public static async void ShowPanel<T>() where T : IPanel
+        public static async void ShowPanel<T>(Action<T> action = null) where T : IPanel
         {
             if (!GlobalManager.Runtime) return;
             if (panels.TryGetValue(typeof(T), out var panel))
             {
                 panel.Show();
-                return;
+                action?.Invoke((T)panel);
             }
 
-            await LoadPanel<T>();
+            panel = await LoadPanel<T>();
+            action?.Invoke((T)panel);
         }
 
         /// <summary>
@@ -111,7 +96,7 @@ namespace JFramework.Core
                 panels[key].Hide();
                 if (panels[key].state == UIStateType.Common)
                 {
-                    Object.Destroy(GlobalManager.Get<UIPanel>(panels[key]));
+                    Object.Destroy(GlobalManager.Get(panels[key]));
                     panels.Remove(key);
                 }
             }
@@ -140,20 +125,19 @@ namespace JFramework.Core
             var layer = typeof(UILayer);
             var types = typeof(T).GetInterfaces();
             types = types.Where(type => type != layer && layer.IsAssignableFrom(type)).ToArray();
-            var current = GlobalManager.Get<UIPanel>(panel);
             if (types.Length > 0)
             {
                 foreach (var type in types)
                 {
                     if (layers.TryGetValue(type, out var transform))
                     {
-                        current.transform.SetParent(transform, false);
+                        GlobalManager.Get(panel).transform.SetParent(transform, false);
                         return;
                     }
                 }
             }
             
-            current.transform.SetParent(layers[typeof(UINormal)], false);
+            GlobalManager.Get(panel).transform.SetParent(layers[typeof(UINormal)], false);
         }
 
         /// <summary>
@@ -200,7 +184,7 @@ namespace JFramework.Core
             {
                 if (panels[key].state != UIStateType.Ignore)
                 {
-                    Object.Destroy(GlobalManager.Get<UIPanel>(panels[key]));
+                    Object.Destroy(GlobalManager.Get(panels[key]));
                     panels.Remove(key);
                 }
             }
