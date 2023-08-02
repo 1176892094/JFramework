@@ -17,10 +17,10 @@ namespace JFramework.Core
         /// </summary>
         public static void Awake()
         {
-            AssetManager.OnLoadComplete += LoadData;
+            AssetManager.OnLoadComplete += LoadDataTable;
         }
 
-        private static void LoadData(bool success)
+        private static void LoadDataTable(bool success)
         {
             var (assembly, types) = GetAssemblyAndTypes();
             if (types == null || types.Length == 0) return;
@@ -148,7 +148,7 @@ namespace JFramework.Core
             DataManager<int>.Clear();
             DataManager<string>.Clear();
             DataManager<Enum>.Clear();
-            AssetManager.OnLoadComplete -= LoadData;
+            AssetManager.OnLoadComplete -= LoadDataTable;
         }
     }
 }

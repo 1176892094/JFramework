@@ -283,7 +283,7 @@ namespace JFramework.Core
         /// <summary>
         /// 清空AB包的方法
         /// </summary>
-        public static void Destroy()
+        internal static void RuntimeInitializeOnLoad()
         {
             OnLoadComplete = null;
             AssetBundle.UnloadAllAssetBundles(false);

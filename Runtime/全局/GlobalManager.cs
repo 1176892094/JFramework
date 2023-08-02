@@ -101,18 +101,11 @@ namespace JFramework.Core
             finally
             {
                 UIManager.Destroy();
-                PoolManager.Destroy();
                 DataManager.Destroy();
                 DateManager.Destroy();
-                CtrlManager.Destroy();
                 TimerManager.Destroy();
                 AudioManager.Destroy();
-                EventManager.Destroy();
-                SceneManager.Destroy();
-                AssetManager.Destroy();
-                OnQuit = null;
-                OnStart = null;
-                OnUpdate = null;
+                RuntimeInitializeOnLoad();
                 instance = null;
                 entities.Clear();
                 GC.Collect();
@@ -167,6 +160,22 @@ namespace JFramework.Core
             }
 
             return default;
+        }
+
+        /// <summary>
+        /// 在场景加载之前重置
+        /// </summary>
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
+        private static void RuntimeInitializeOnLoad()
+        {
+            OnQuit = null;
+            OnStart = null;
+            OnUpdate = null;
+            CtrlManager.RuntimeInitializeOnLoad();
+            PoolManager.RuntimeInitializeOnLoad();
+            EventManager.RuntimeInitializeOnLoad();
+            SceneManager.RuntimeInitializeOnLoad();
+            AssetManager.RuntimeInitializeOnLoad();
         }
     }
 }

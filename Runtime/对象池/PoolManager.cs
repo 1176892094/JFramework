@@ -23,7 +23,6 @@ namespace JFramework.Core
         /// </summary>
         internal static void Awake()
         {
-            Destroy();
             poolManager = GlobalManager.Instance.transform.Find("PoolManager");
         }
 
@@ -111,7 +110,7 @@ namespace JFramework.Core
         /// <summary>
         /// 管理器销毁
         /// </summary>
-        internal static void Destroy()
+        internal static void RuntimeInitializeOnLoad()
         {
             foreach (var pool in pools.Values)
             {

@@ -66,7 +66,7 @@ namespace JFramework
         /// <summary>
         /// 销毁所有控制器
         /// </summary>
-        internal static void Destroy()
+        internal static void RuntimeInitializeOnLoad()
         {
             var controllers = controllerDict.Values.SelectMany(dictionary => dictionary.Values);
             foreach (var controller in controllers)

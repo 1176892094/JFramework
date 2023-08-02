@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using JFramework.Interface;
+using UnityEngine;
 
 namespace JFramework.Core
 {
@@ -55,9 +56,9 @@ namespace JFramework.Core
         }
 
         /// <summary>
-        /// 事件管理器在开始游戏前清空
+        /// 事件管理器在开始游戏前重置
         /// </summary>
-        internal static void Destroy()
+        internal static void RuntimeInitializeOnLoad()
         {
             foreach (var observer in observers.Values)
             {
