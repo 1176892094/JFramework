@@ -53,6 +53,7 @@ namespace JFramework.Core
             var key = typeof(T);
             if (panels.ContainsKey(key)) return default;
             var obj = await AssetManager.LoadAsync<GameObject>("UI/" + key.Name);
+            if (obj == null) return default;
             var panel = obj.GetComponent<T>();
             SetLayer<T>(panel);
             panels.Add(key, panel);
@@ -110,7 +111,7 @@ namespace JFramework.Core
                 panels[key].Hide();
                 if (panels[key].state == UIStateType.Common)
                 {
-                    Object.Destroy(panels[key].gameObject);
+                    Object.Destroy(GlobalManager.Get<UIPanel>(panels[key]));
                     panels.Remove(key);
                 }
             }
@@ -139,19 +140,20 @@ namespace JFramework.Core
             var layer = typeof(UILayer);
             var types = typeof(T).GetInterfaces();
             types = types.Where(type => type != layer && layer.IsAssignableFrom(type)).ToArray();
+            var current = GlobalManager.Get<UIPanel>(panel);
             if (types.Length > 0)
             {
                 foreach (var type in types)
                 {
                     if (layers.TryGetValue(type, out var transform))
                     {
-                        panel.transform.SetParent(transform, false);
+                        current.transform.SetParent(transform, false);
                         return;
                     }
                 }
             }
-
-            panel.transform.SetParent(layers[typeof(UINormal)], false);
+            
+            current.transform.SetParent(layers[typeof(UINormal)], false);
         }
 
         /// <summary>
@@ -198,7 +200,7 @@ namespace JFramework.Core
             {
                 if (panels[key].state != UIStateType.Ignore)
                 {
-                    Object.Destroy(panels[key].gameObject);
+                    Object.Destroy(GlobalManager.Get<UIPanel>(panels[key]));
                     panels.Remove(key);
                 }
             }

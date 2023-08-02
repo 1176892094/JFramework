@@ -18,40 +18,40 @@ namespace JFramework
         /// <summary>
         /// 全局控制器容器
         /// </summary>
-        internal static readonly Dictionary<int, Controllers> controllerDict = new Dictionary<int, Controllers>();
+        internal static readonly Dictionary<IEntity, Controllers> controllerDict = new Dictionary<IEntity, Controllers>();
 
         /// <summary>
         /// 获取或添加控制器
         /// </summary>
-        /// <param name="id"></param>
+        /// <param name="entity"></param>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
-        public static T GetOrAddCtrl<T>(int id) where T : ScriptableObject, IController
+        public static T GetOrAddCtrl<T>(IEntity entity) where T : ScriptableObject, IController
         {
             var key = typeof(T);
-            if (!controllerDict.TryGetValue(id, out Controllers controllers))
+            if (!controllerDict.TryGetValue(entity, out Controllers controllers))
             {
                 controllers = new Controllers();
-                controllerDict.Add(id, controllers);
+                controllerDict.Add(entity, controllers);
             }
 
             if (!controllers.ContainsKey(key))
             {
                 var controller = ScriptableObject.CreateInstance<T>();
-                controller.Spawn(GlobalManager.Get<IEntity>(id));
+                controller.Spawn(GlobalManager.Get<IEntity>(entity));
                 controllers.Add(key, controller);
             }
 
-            return (T)controllerDict[id][key];
+            return (T)controllerDict[entity][key];
         }
 
         /// <summary>
         /// 销毁指定控制器
         /// </summary>
-        /// <param name="id"></param>
-        public static void Destroy(int id)
+        /// <param name="entity"></param>
+        public static void Destroy(IEntity entity)
         {
-            if (controllerDict.TryGetValue(id, out Controllers controllers))
+            if (controllerDict.TryGetValue(entity, out Controllers controllers))
             {
                 foreach (var controller in controllers.Values)
                 {
@@ -59,7 +59,7 @@ namespace JFramework
                 }
 
                 controllers.Clear();
-                controllerDict.Remove(id);
+                controllerDict.Remove(entity);
             }
         }
 

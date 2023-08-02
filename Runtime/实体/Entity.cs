@@ -12,11 +12,6 @@ namespace JFramework
     public abstract class Entity : MonoBehaviour, IEntity
     {
         /// <summary>
-        /// 实体Id
-        /// </summary>
-        public int entityId { get; private set; }
-
-        /// <summary>
         /// 实体更新
         /// </summary>`
         protected virtual void OnUpdate() { }
@@ -24,7 +19,7 @@ namespace JFramework
         /// <summary>
         /// 实体启用
         /// </summary>
-        protected virtual void OnEnable() => GlobalManager.Listen(this);
+        protected virtual void OnEnable() => GlobalManager.Listen(this, gameObject);
 
         /// <summary>
         /// 实体禁用
@@ -35,25 +30,6 @@ namespace JFramework
         /// 实体销毁 (如果能获取到角色接口 则销毁角色的控制器)
         /// </summary>
         protected virtual void OnDestroy() => GetComponent<ICharacter>()?.Destroy();
-
-        /// <summary>
-        /// 实体Id
-        /// </summary>
-        int IEntity.entityId
-        {
-            get => entityId;
-            set => entityId = value;
-        }
-
-        /// <summary>
-        /// 实体Transform
-        /// </summary>
-        Transform IEntity.transform => transform;
-
-        /// <summary>
-        /// 实体GameObject
-        /// </summary>
-        GameObject IEntity.gameObject => gameObject;
 
         /// <summary>
         /// 实体接口调用实体更新方法

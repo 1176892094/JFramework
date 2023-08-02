@@ -13,14 +13,9 @@ namespace JFramework.Core
         private static GlobalManager instance;
 
         /// <summary>
-        /// 实体Id
+        /// 是否已经初始化
         /// </summary>
-        private static int entityId;
-
-        /// <summary>
-        /// 是否在运行模式
-        /// </summary>
-        private static bool runtime;
+        private static bool initialize;
 
         /// <summary>
         /// 全局管理器开始事件
@@ -38,11 +33,6 @@ namespace JFramework.Core
         public static event Action OnQuit;
 
         /// <summary>
-        /// 管理器名称
-        /// </summary>
-        private static string Name => nameof(GlobalManager);
-
-        /// <summary>
         /// 安全的单例调用
         /// </summary>
         internal static GlobalManager Instance
@@ -51,7 +41,7 @@ namespace JFramework.Core
             {
                 if (instance != null) return instance;
                 instance ??= FindObjectOfType<GlobalManager>();
-                var obj = Resources.Load<GlobalManager>(Name);
+                var obj = Resources.Load<GlobalManager>(nameof(GlobalManager));
                 instance ??= Instantiate(obj);
                 return instance;
             }
@@ -64,9 +54,9 @@ namespace JFramework.Core
         {
             get
             {
-                if (runtime) return runtime;
-                Debug.Log($"{Name.Red()} 没有初始化！");
-                return false;
+                if (initialize) return initialize;
+                Debug.Log($"{nameof(GlobalManager).Red()} 没有初始化！");
+                return initialize;
             }
         }
 
@@ -75,9 +65,7 @@ namespace JFramework.Core
         /// </summary>
         private void Awake()
         {
-            entityId = 0;
-            runtime = true;
-            instance ??= this;
+            initialize = true;
             DontDestroyOnLoad(gameObject);
             UIManager.Awake();
             PoolManager.Awake();
@@ -85,29 +73,6 @@ namespace JFramework.Core
             AudioManager.Awake();
             TimerManager.Awake();
             AssetManager.Awake();
-        }
-
-        /// <summary>
-        /// 全局管理器销毁
-        /// </summary>
-        private void OnDestroy()
-        {
-            try
-            {
-                runtime = false;
-                OnQuit?.Invoke();
-            }
-            finally
-            {
-                UIManager.Destroy();
-                DataManager.Destroy();
-                TimerManager.Destroy();
-                AudioManager.Destroy();
-                RuntimeInitializeOnLoad();
-                instance = null;
-                entities.Clear();
-                GC.Collect();
-            }
         }
 
         /// <summary>
@@ -121,15 +86,44 @@ namespace JFramework.Core
         private void Update() => OnUpdate?.Invoke();
 
         /// <summary>
+        /// 当应用退出
+        /// </summary>
+        private void OnApplicationQuit()
+        {
+            try
+            {
+                initialize = false;
+                OnQuit?.Invoke();
+            }
+            finally
+            {
+                entities.Clear();
+            }
+        }
+
+        /// <summary>
+        /// 全局管理器销毁
+        /// </summary>
+        private void OnDestroy()
+        {
+            UIManager.Destroy();
+            DataManager.Destroy();
+            TimerManager.Destroy();
+            AudioManager.Destroy();
+            RuntimeInitializeOnLoad();
+            GC.Collect();
+        }
+
+        /// <summary>
         /// 侦听实体的更新事件
         /// </summary>
         /// <param name="entity"></param>
-        public static void Listen(IEntity entity)
+        /// <param name="gameObject"></param>
+        public static void Listen(IEntity entity, GameObject gameObject)
         {
             if (!Instance) return;
             OnUpdate += entity.Update;
-            if (entity.entityId == 0) entity.entityId = ++entityId;
-            entities[entity.entityId] = entity;
+            entities[entity] = gameObject;
         }
 
         /// <summary>
@@ -140,24 +134,30 @@ namespace JFramework.Core
         {
             if (!Runtime) return;
             OnUpdate -= entity.Update;
-            entities.Remove(entity.entityId);
+            entities.Remove(entity);
         }
 
         /// <summary>
-        /// 获取实体
+        /// 获取组件
         /// </summary>
-        /// <param name="id"></param>
+        /// <param name="entity"></param>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
-        public static T Get<T>(int id) where T : IEntity
+        public static T Get<T>(IEntity entity)
         {
             if (!Runtime) return default;
-            if (entities.TryGetValue(id, out var entity))
-            {
-                return (T)entity;
-            }
+            return entities.TryGetValue(entity, out var @object) ? @object.GetComponent<T>() : default;
+        }
 
-            return default;
+        /// <summary>
+        /// 获取游戏对象
+        /// </summary>
+        /// <param name="entity"></param>
+        /// <returns></returns>
+        public static GameObject Get(IEntity entity)
+        {
+            if (!Runtime) return default;
+            return entities.TryGetValue(entity, out var @object) ? @object : null;
         }
 
         /// <summary>
@@ -169,6 +169,8 @@ namespace JFramework.Core
             OnQuit = null;
             OnStart = null;
             OnUpdate = null;
+            instance = null;
+            initialize = false;
             CtrlManager.RuntimeInitializeOnLoad();
             PoolManager.RuntimeInitializeOnLoad();
             EventManager.RuntimeInitializeOnLoad();

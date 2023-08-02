@@ -57,7 +57,7 @@ namespace JFramework
         /// <summary>
         /// 实体启用
         /// </summary>
-        protected virtual void OnEnable() => GlobalManager.Listen(this);
+        protected virtual void OnEnable() => GlobalManager.Listen(this, gameObject);
 
         /// <summary>
         /// 实体禁用
@@ -129,25 +129,6 @@ namespace JFramework
         /// UI 面板状态
         /// </summary>
         UIStateType IPanel.state => stateType;
-
-        /// <summary>
-        /// 实体Id
-        /// </summary>
-        int IEntity.entityId
-        {
-            get => entityId;
-            set => entityId = value;
-        }
-
-        /// <summary>
-        /// 实体Transform
-        /// </summary>
-        Transform IEntity.transform => transform;
-
-        /// <summary>
-        /// 实体GameObject
-        /// </summary>
-        GameObject IEntity.gameObject => gameObject;
 
         /// <summary>
         /// 实体接口调用实体更新方法

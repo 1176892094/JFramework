@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using JFramework.Interface;
 using Sirenix.OdinInspector;
 using UnityEngine;
-using Object = UnityEngine.Object;
 
 namespace JFramework.Core
 {
@@ -11,15 +10,15 @@ namespace JFramework.Core
     {
         [FoldoutGroup("设置管理器"), SerializeField, LabelText("控制台输出选项")]
         internal DebugOption debugOption;
-        
+
         [ShowInInspector, LabelText("游戏实体管理"), FoldoutGroup("对象管理器"), ReadOnly]
-        private static readonly Dictionary<int, IEntity> entities = new Dictionary<int, IEntity>();
+        private static readonly Dictionary<IEntity, GameObject> entities = new Dictionary<IEntity, GameObject>();
 #if UNITY_EDITOR
         [ShowInInspector, LabelText("游戏对象管理"), FoldoutGroup("对象管理器")]
         private Dictionary<string, IPool> pools => PoolManager.pools;
         
         [ShowInInspector, LabelText("游戏组件管理"), FoldoutGroup("对象管理器")]
-        private Dictionary<int, Dictionary<Type, ScriptableObject>> controllerDict => CtrlManager.controllerDict;
+        private Dictionary<IEntity, Dictionary<Type, ScriptableObject>> controllerDict => CtrlManager.controllerDict;
         
         [ShowInInspector, LabelText("资源管理数据"), FoldoutGroup("常用管理器")]
         private Dictionary<string, AssetBundle> depends => AssetManager.depends;

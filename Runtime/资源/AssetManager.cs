@@ -79,6 +79,7 @@ namespace JFramework.Core
         /// <returns></returns>
         public static T Load<T>(string path) where T : Object
         {
+            if (!GlobalManager.Runtime) return null;
             if (assets.ContainsKey(path))
             {
                 return Load<T>(assets[path].Item1.ToLower(), assets[path].Item2);
@@ -100,14 +101,13 @@ namespace JFramework.Core
             if (!depends.ContainsKey(bundleName))
             {
                 var assetBundle = LoadFromFile(bundleName);
-                if (assetBundle != null)
-                {
-                    depends.Add(bundleName, assetBundle);
-                }
-                else
+                if (assetBundle == null)
                 {
                     Debug.Log($"{nameof(AssetManager).Sky()} 加载 => {bundleName.Red()} 资源失败");
+                    return null;
                 }
+
+                depends.Add(bundleName, assetBundle);
             }
 
             var obj = depends[bundleName].LoadAsset<T>(assetName);
@@ -149,7 +149,7 @@ namespace JFramework.Core
             {
                 return LoadAsync<T>(assets[path].Item1.ToLower(), assets[path].Item2);
             }
-
+            
             var array = path.Split('/');
             assets.Add(path, (array[0].ToLower(), array[1]));
             return LoadAsync<T>(array[0].ToLower(), array[1]);
@@ -163,26 +163,27 @@ namespace JFramework.Core
         /// <param name="assetName"></param>
         private static async Task<T> LoadAsync<T>(string bundleName, string assetName) where T : Object
         {
+            if (!GlobalManager.Runtime) return null;
             LoadDependencies(bundleName);
             if (!depends.ContainsKey(bundleName))
             {
                 var assetBundle = await LoadFromFileAsync(bundleName);
-                if (assetBundle != null)
-                {
-                    depends.Add(bundleName, assetBundle);
-                }
-                else
+                if (assetBundle == null)
                 {
                     Debug.Log($"{nameof(AssetManager).Sky()} 加载 => {bundleName.Red()} 资源失败");
+                    return null;
                 }
+
+                depends.Add(bundleName, assetBundle);
             }
 
             var request = depends[bundleName].LoadAssetAsync<T>(assetName);
-            if (!request.isDone)
+            if (!request.isDone && GlobalManager.Runtime)
             {
                 await Task.Yield();
             }
-            
+
+            if (request.asset == null) return null;
             Log.Info(DebugOption.Asset, $"加载 => {request.asset.name.Green()} 资源成功");
             return request.asset is GameObject ? (T)Object.Instantiate(request.asset) : (T)request.asset;
         }
@@ -217,7 +218,7 @@ namespace JFramework.Core
         private static async Task<AssetBundle> LoadFromFilePath(string assetPath)
         {
             var request = AssetBundle.LoadFromFileAsync(assetPath);
-            if (!request.isDone)
+            if (!request.isDone && GlobalManager.Runtime)
             {
                 await Task.Yield();
             }
@@ -236,7 +237,7 @@ namespace JFramework.Core
             {
                 return LoadSceneAsync(assets[path].Item1.ToLower(), assets[path].Item2);
             }
-
+            
             var array = path.Split('/');
             assets.Add(path, (array[0].ToLower(), array[1]));
             return LoadSceneAsync(array[0].ToLower(), array[1]);
@@ -249,13 +250,21 @@ namespace JFramework.Core
         /// <param name="sceneName"></param>
         private static async Task<AsyncOperation> LoadSceneAsync(string bundleName, string sceneName)
         {
+            if (!GlobalManager.Runtime) return null;
             LoadDependencies(bundleName);
             if (!depends.ContainsKey(bundleName))
             {
                 var assetBundle = await LoadFromFileAsync(bundleName);
+                if (assetBundle == null)
+                {
+                    Debug.Log($"{nameof(AssetManager).Sky()} 加载 => {bundleName.Red()} 资源失败");
+                    return null;
+                }
+
                 depends.Add(bundleName, assetBundle);
             }
 
+            if (!GlobalManager.Runtime) return null;
             return UnitySceneManager.LoadSceneAsync(sceneName, LoadSceneMode.Single);
         }
 
