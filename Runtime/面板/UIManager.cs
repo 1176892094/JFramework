@@ -27,11 +27,6 @@ namespace JFramework.Core
         internal static readonly Dictionary<Type, IPanel> panels = new Dictionary<Type, IPanel>();
 
         /// <summary>
-        /// 管理器名称
-        /// </summary>
-        private static string Name => nameof(UIManager);
-
-        /// <summary>
         /// 界面管理器初始化数据
         /// </summary>
         internal static void Awake()
@@ -53,7 +48,6 @@ namespace JFramework.Core
             var key = typeof(T);
             if (panels.ContainsKey(key)) return default;
             var obj = await AssetManager.LoadAsync<GameObject>("UI/" + key.Name);
-            if (obj == null) return default;
             var panel = obj.GetComponent<T>();
             SetLayer<T>(panel);
             panels.Add(key, panel);
@@ -89,14 +83,14 @@ namespace JFramework.Core
             {
                 if (panels[key].state == UIStateType.Freeze)
                 {
-                    Debug.Log($"{Name} 隐藏 => {key.Name.Red()} 失败,面板处于冻结状态!");
+                    Debug.Log($"{nameof(UIManager)} 隐藏 => {key.Name.Red()} 失败,面板处于冻结状态!");
                     return;
                 }
 
                 panels[key].Hide();
                 if (panels[key].state == UIStateType.Common)
                 {
-                    Object.Destroy(GlobalManager.Get(panels[key]));
+                    Object.Destroy(panels[key].gameObject);
                     panels.Remove(key);
                 }
             }
@@ -131,13 +125,13 @@ namespace JFramework.Core
                 {
                     if (layers.TryGetValue(type, out var transform))
                     {
-                        GlobalManager.Get(panel).transform.SetParent(transform, false);
+                        panel.gameObject.transform.SetParent(transform, false);
                         return;
                     }
                 }
             }
             
-            GlobalManager.Get(panel).transform.SetParent(layers[typeof(UINormal)], false);
+            panel.gameObject.transform.SetParent(layers[typeof(UINormal)], false);
         }
 
         /// <summary>
@@ -184,7 +178,7 @@ namespace JFramework.Core
             {
                 if (panels[key].state != UIStateType.Ignore)
                 {
-                    Object.Destroy(GlobalManager.Get(panels[key]));
+                    Object.Destroy(panels[key].gameObject);
                     panels.Remove(key);
                 }
             }

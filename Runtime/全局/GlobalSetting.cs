@@ -10,9 +10,6 @@ namespace JFramework.Core
     {
         [FoldoutGroup("设置管理器"), SerializeField, LabelText("控制台输出选项")]
         internal DebugOption debugOption;
-
-        [ShowInInspector, LabelText("游戏实体管理"), FoldoutGroup("对象管理器"), ReadOnly]
-        private static readonly Dictionary<IEntity, GameObject> entities = new Dictionary<IEntity, GameObject>();
 #if UNITY_EDITOR
         [ShowInInspector, LabelText("游戏对象管理"), FoldoutGroup("对象管理器")]
         private Dictionary<string, IPool> pools => PoolManager.pools;

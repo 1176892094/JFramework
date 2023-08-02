@@ -1,3 +1,4 @@
+#if UNITY_EDITOR
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -9,16 +10,13 @@ using Newtonsoft.Json;
 using UnityEngine.Networking;
 using Debug = UnityEngine.Debug;
 using System.Threading.Tasks;
-#if UNITY_EDITOR
 using UnityEditor;
-#endif
 using UnityEngine;
 
 namespace JFramework
 {
     internal static class AssetEditor
     {
-#if UNITY_EDITOR
         /// <summary>
         /// AssetBundle 标签导入
         /// </summary>
@@ -46,7 +44,8 @@ namespace JFramework
             }
 
             string[] guids = AssetDatabase.FindAssets("t:Object", new[] { AssetSetting.FILE_PATH });
-            var enumerable = guids.Select(AssetDatabase.GUIDToAssetPath).Where(asset => !AssetDatabase.IsValidFolder(asset));
+            var enumerable = guids.Select(AssetDatabase.GUIDToAssetPath)
+                .Where(asset => !AssetDatabase.IsValidFolder(asset));
             foreach (var path in enumerable)
             {
                 var array = path.Replace('\\', '/').Split('/');
@@ -82,7 +81,8 @@ namespace JFramework
                 Directory.CreateDirectory(AssetSetting.localSavePath);
             }
 
-            BuildPipeline.BuildAssetBundles(AssetSetting.localSavePath, BuildAssetBundleOptions.ChunkBasedCompression, AssetSetting.Target);
+            BuildPipeline.BuildAssetBundles(AssetSetting.localSavePath, BuildAssetBundleOptions.ChunkBasedCompression,
+                AssetSetting.Target);
             var directory = Directory.CreateDirectory(AssetSetting.localSavePath);
             var fileInfos = directory.GetFiles();
             var fileList = new List<AssetData>();
@@ -193,6 +193,6 @@ namespace JFramework
                 Process.Start(Application.streamingAssetsPath);
             }
         }
-#endif
     }
 }
+#endif

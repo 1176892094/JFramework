@@ -33,12 +33,6 @@ namespace JFramework
         private bool unscaled;
 
         /// <summary>
-        /// 计时器的所有者
-        /// </summary>
-        [ShowInInspector]
-        private object target => OnFinish?.Target;
-
-        /// <summary>
         /// 计时器的状态
         /// </summary>
         [ShowInInspector] private TimerState state;
@@ -46,7 +40,7 @@ namespace JFramework
         /// <summary>
         /// 完成时执行的事件
         /// </summary>
-        private Action OnFinish;
+        [ShowInInspector] private Action OnFinish;
 
         /// <summary>
         /// 计时器初始化时调用

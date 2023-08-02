@@ -29,11 +29,6 @@ namespace JFramework
         [ShowInInspector, LabelText("面板状态")] public UIStateType stateType;
 
         /// <summary>
-        /// 实体Id
-        /// </summary>
-        public int entityId { get; private set; }
-
-        /// <summary>
         /// 开始时查找所有控件
         /// </summary>
         protected virtual void Awake()
@@ -57,7 +52,7 @@ namespace JFramework
         /// <summary>
         /// 实体启用
         /// </summary>
-        protected virtual void OnEnable() => GlobalManager.Listen(this, gameObject);
+        protected virtual void OnEnable() => GlobalManager.Listen(this);
 
         /// <summary>
         /// 实体禁用
@@ -129,7 +124,7 @@ namespace JFramework
         /// UI 面板状态
         /// </summary>
         UIStateType IPanel.state => stateType;
-
+        
         /// <summary>
         /// 实体接口调用实体更新方法
         /// </summary>

@@ -32,7 +32,7 @@ namespace JFramework
         /// 检测是否需要更新
         /// </summary>
         /// <returns></returns>
-        internal static async Task<bool> UpdateAsync()
+        internal static async Task UpdateAsync()
         {
             assetDataList.Clear();
             clientDataList.Clear();
@@ -78,14 +78,11 @@ namespace JFramework
                 {
                     Debug.Log("更新本地AB包对比文件为最新");
                     await File.WriteAllTextAsync(AssetSetting.clientInfoPath, serverInfo);
-                    return true;
+                    return;
                 }
-
-                return false;
             }
             
             Debug.Log("更新失败。");
-            return false;
         }
 
         /// <summary>

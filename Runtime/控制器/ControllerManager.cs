@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using JFramework.Core;
 using JFramework.Interface;
 using UnityEngine;
 using Object = UnityEngine.Object;
@@ -38,8 +37,8 @@ namespace JFramework
             if (!controllers.ContainsKey(key))
             {
                 var controller = ScriptableObject.CreateInstance<T>();
-                controller.Spawn(GlobalManager.Get<IEntity>(entity));
                 controllers.Add(key, controller);
+                controller.Spawn(entity);
             }
 
             return (T)controllerDict[entity][key];
@@ -66,7 +65,7 @@ namespace JFramework
         /// <summary>
         /// 销毁所有控制器
         /// </summary>
-        internal static void RuntimeInitializeOnLoad()
+        internal static void Destroy()
         {
             var controllers = controllerDict.Values.SelectMany(dictionary => dictionary.Values);
             foreach (var controller in controllers)

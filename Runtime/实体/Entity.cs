@@ -19,7 +19,7 @@ namespace JFramework
         /// <summary>
         /// 实体启用
         /// </summary>
-        protected virtual void OnEnable() => GlobalManager.Listen(this, gameObject);
+        protected virtual void OnEnable() => GlobalManager.Listen(this);
 
         /// <summary>
         /// 实体禁用
@@ -30,6 +30,11 @@ namespace JFramework
         /// 实体销毁 (如果能获取到角色接口 则销毁角色的控制器)
         /// </summary>
         protected virtual void OnDestroy() => GetComponent<ICharacter>()?.Destroy();
+
+        /// <summary>
+        /// 游戏对象
+        /// </summary>
+        GameObject IEntity.gameObject => gameObject;
 
         /// <summary>
         /// 实体接口调用实体更新方法

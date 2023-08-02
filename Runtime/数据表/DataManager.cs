@@ -13,19 +13,10 @@ namespace JFramework.Core
     public static class DataManager
     {
         /// <summary>
-        /// 初始化加载数据
-        /// </summary>
-        public static void Awake()
-        {
-            AssetManager.OnLoadComplete += LoadDataTable;
-        }
-
-        /// <summary>
         /// 加载数据表
-        /// ReSharper disable once MemberCanBePrivate.Global
+        /// ReSharper disable once UnusedMember.Global
         /// </summary>
-        /// <param name="success"></param>
-        public static void LoadDataTable(bool success)
+        public static void LoadDataTable()
         {
             var (assembly, types) = GetAssemblyAndTypes();
             if (types == null || types.Length == 0) return;
@@ -148,12 +139,11 @@ namespace JFramework.Core
         /// <summary>
         /// 清除数据管理器
         /// </summary>
-        internal static void Destroy()
+        internal static void RuntimeInitializeOnLoad()
         {
             DataManager<int>.Clear();
             DataManager<string>.Clear();
             DataManager<Enum>.Clear();
-            AssetManager.OnLoadComplete -= LoadDataTable;
         }
     }
 }

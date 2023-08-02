@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 using UnityEngine;
@@ -22,11 +21,6 @@ namespace JFramework.Core
         internal static readonly Dictionary<string, AssetBundle> depends = new Dictionary<string, AssetBundle>();
 
         /// <summary>
-        /// 当远端消息加载完成
-        /// </summary>
-        public static event Action<bool> OnLoadComplete;
-
-        /// <summary>
         /// 主包
         /// </summary>
         private static AssetBundle mainAsset;
@@ -39,10 +33,9 @@ namespace JFramework.Core
         /// <summary>
         /// 从服务器下载资源包
         /// </summary>
-        internal static async void Awake()
+        internal static async Task Awake()
         {
-            var success = await AssetHelper.UpdateAsync();
-            OnLoadComplete?.Invoke(success);
+            await AssetHelper.UpdateAsync();
         }
 
         /// <summary>
@@ -182,7 +175,7 @@ namespace JFramework.Core
             {
                 await Task.Yield();
             }
-
+            
             if (request.asset == null) return null;
             Log.Info(DebugOption.Asset, $"加载 => {request.asset.name.Green()} 资源成功");
             return request.asset is GameObject ? (T)Object.Instantiate(request.asset) : (T)request.asset;
@@ -294,7 +287,6 @@ namespace JFramework.Core
         /// </summary>
         internal static void RuntimeInitializeOnLoad()
         {
-            OnLoadComplete = null;
             AssetBundle.UnloadAllAssetBundles(false);
             depends.Clear();
             assets.Clear();
