@@ -125,13 +125,13 @@ namespace JFramework.Core
                 {
                     if (layers.TryGetValue(type, out var transform))
                     {
-                        panel.gameObject.transform.SetParent(transform, false);
+                        panel.transform.SetParent(transform, false);
                         return;
                     }
                 }
             }
             
-            panel.gameObject.transform.SetParent(layers[typeof(UINormal)], false);
+            panel.transform.SetParent(layers[typeof(UINormal)], false);
         }
 
         /// <summary>
