@@ -81,8 +81,7 @@ namespace JFramework
                 Directory.CreateDirectory(AssetSetting.localSavePath);
             }
 
-            BuildPipeline.BuildAssetBundles(AssetSetting.localSavePath, BuildAssetBundleOptions.ChunkBasedCompression,
-                AssetSetting.Target);
+            BuildPipeline.BuildAssetBundles(AssetSetting.localSavePath, BuildAssetBundleOptions.ChunkBasedCompression, AssetSetting.Target);
             var directory = Directory.CreateDirectory(AssetSetting.localSavePath);
             var fileInfos = directory.GetFiles();
             var fileList = new List<AssetData>();
@@ -97,6 +96,7 @@ namespace JFramework
             var saveJson = JsonConvert.SerializeObject(fileList);
             File.WriteAllText(AssetSetting.localInfoPath, saveJson);
             AssetDatabase.Refresh();
+            Debug.Log($"构建 AssetBundles 成功!".Green());
         }
 
         /// <summary>
