@@ -41,7 +41,6 @@ namespace JFramework.Core
         /// </summary>
         internal static async void Awake()
         {
-            Destroy();
             var success = await AssetHelper.UpdateAsync();
             OnLoadComplete?.Invoke(success);
         }

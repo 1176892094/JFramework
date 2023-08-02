@@ -8,12 +8,11 @@ using JFramework.Core;
 using Newtonsoft.Json;
 using UnityEngine.Networking;
 using Debug = UnityEngine.Debug;
-#if UNITY_EDITOR
 using System.Threading.Tasks;
+#if UNITY_EDITOR
 using UnityEditor;
-using UnityEngine;
 #endif
-
+using UnityEngine;
 
 namespace JFramework
 {

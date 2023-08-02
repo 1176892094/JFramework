@@ -18,7 +18,6 @@ namespace JFramework.Core
         public static void Awake()
         {
             AssetManager.OnLoadComplete += LoadData;
-            Debug.Log("+DataEvent");
         }
 
         private static void LoadData(bool success)

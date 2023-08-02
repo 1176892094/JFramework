@@ -1,10 +1,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Security.Cryptography;
-using System.Text;
 using System.Threading.Tasks;
-using JFramework.Core;
 using Newtonsoft.Json;
 using UnityEngine;
 using UnityEngine.Networking;
@@ -47,49 +44,46 @@ namespace JFramework
                 var dataList = JsonConvert.DeserializeObject<List<AssetData>>(serverInfo);
                 serverDataList = dataList.ToDictionary(data => data.name);
                 Debug.Log("解析远端对比文件完成");
-                success = await LoadClientAssetBundleInfo();
-                if (success)
+                await LoadClientAssetBundleInfo();
+                Debug.Log("解析本地对比文件完成");
+                foreach (var fileName in serverDataList.Keys)
                 {
-                    Debug.Log("解析本地对比文件完成");
-                    foreach (var fileName in serverDataList.Keys)
+                    if (!clientDataList.ContainsKey(fileName))
                     {
-                        if (!clientDataList.ContainsKey(fileName))
+                        assetDataList.Add(fileName);
+                        Debug.Log("更新文件: " + fileName);
+                    }
+                    else
+                    {
+                        if (clientDataList[fileName] != serverDataList[fileName])
                         {
                             assetDataList.Add(fileName);
                             Debug.Log("更新文件: " + fileName);
                         }
-                        else
-                        {
-                            if (clientDataList[fileName] != serverDataList[fileName])
-                            {
-                                assetDataList.Add(fileName);
-                                Debug.Log("更新文件: " + fileName);
-                            }
 
-                            clientDataList.Remove(fileName);
-                        }
+                        clientDataList.Remove(fileName);
                     }
-
-                    Debug.Log("删除无用的AB包文件");
-                    var fileList = clientDataList.Keys.Where(file => File.Exists(AssetSetting.GetPerFile(file)));
-                    foreach (var fileName in fileList)
-                    {
-                        File.Delete(AssetSetting.GetPerFile(fileName));
-                    }
-
-                    Debug.Log("下载和更新AB包文件");
-                    success = await LoadAssetBundles();
-                    if (success)
-                    {
-                        Debug.Log("更新本地AB包对比文件为最新");
-                        await File.WriteAllTextAsync(AssetSetting.clientInfoPath, serverInfo);
-                        return true;
-                    }
-
-                    return false;
                 }
-            }
 
+                Debug.Log("删除无用的AB包文件");
+                var fileList = clientDataList.Keys.Where(file => File.Exists(AssetSetting.GetPerFile(file)));
+                foreach (var fileName in fileList)
+                {
+                    File.Delete(AssetSetting.GetPerFile(fileName));
+                }
+
+                Debug.Log("下载和更新AB包文件");
+                success = await LoadAssetBundles();
+                if (success)
+                {
+                    Debug.Log("更新本地AB包对比文件为最新");
+                    await File.WriteAllTextAsync(AssetSetting.clientInfoPath, serverInfo);
+                    return true;
+                }
+
+                return false;
+            }
+            
             Debug.Log("更新失败。");
             return false;
         }
@@ -112,14 +106,14 @@ namespace JFramework
         /// <summary>
         /// 本地AB包对比文件加载 解析信息
         /// </summary>
-        private static async Task<bool> LoadClientAssetBundleInfo()
+        private static async Task LoadClientAssetBundleInfo()
         {
             if (File.Exists(AssetSetting.clientInfoPath))
             {
                 var saveJson = await File.ReadAllTextAsync(AssetSetting.clientInfoPath);
                 var dataList = JsonConvert.DeserializeObject<List<AssetData>>(saveJson);
                 clientDataList = dataList.ToDictionary(data => data.name);
-                return true;
+                return;
             }
 
             if (File.Exists(AssetSetting.localInfoPath))
@@ -127,10 +121,7 @@ namespace JFramework
                 var saveJson = await File.ReadAllTextAsync(AssetSetting.localInfoPath);
                 var dataList = JsonConvert.DeserializeObject<List<AssetData>>(saveJson);
                 clientDataList = dataList.ToDictionary(data => data.name);
-                return true;
             }
-
-            return false;
         }
 
         /// <summary>
