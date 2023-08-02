@@ -42,7 +42,7 @@ namespace JFramework
                 }
             }
 
-            dataDict.Add(type, dataList);
+            dataDict[type] = dataList;
         }
 
         /// <summary>
