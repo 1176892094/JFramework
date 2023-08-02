@@ -81,12 +81,12 @@ namespace JFramework.Core
         {
             if (assets.ContainsKey(path))
             {
-                return Load<T>(assets[path].Item1, assets[path].Item2);
+                return Load<T>(assets[path].Item1.ToLower(), assets[path].Item2);
             }
 
             var array = path.Split('/');
-            assets.Add(path, (array[0], array[1]));
-            return Load<T>(array[0], array[1]);
+            assets.Add(path, (array[0].ToLower(), array[1]));
+            return Load<T>(array[0].ToLower(), array[1]);
         }
 
         /// <summary>
@@ -99,7 +99,7 @@ namespace JFramework.Core
             LoadDependencies(bundleName);
             if (!depends.ContainsKey(bundleName))
             {
-                var assetBundle = LoadFromFile(bundleName.ToLower());
+                var assetBundle = LoadFromFile(bundleName);
                 if (assetBundle != null)
                 {
                     depends.Add(bundleName, assetBundle);
@@ -147,12 +147,12 @@ namespace JFramework.Core
         {
             if (assets.ContainsKey(path))
             {
-                return LoadAsync<T>(assets[path].Item1, assets[path].Item2);
+                return LoadAsync<T>(assets[path].Item1.ToLower(), assets[path].Item2);
             }
 
             var array = path.Split('/');
-            assets.Add(path, (array[0], array[1]));
-            return LoadAsync<T>(array[0], array[1]);
+            assets.Add(path, (array[0].ToLower(), array[1]));
+            return LoadAsync<T>(array[0].ToLower(), array[1]);
         }
 
         /// <summary>
@@ -166,7 +166,7 @@ namespace JFramework.Core
             LoadDependencies(bundleName);
             if (!depends.ContainsKey(bundleName))
             {
-                var assetBundle = await LoadFromFileAsync(bundleName.ToLower());
+                var assetBundle = await LoadFromFileAsync(bundleName);
                 if (assetBundle != null)
                 {
                     depends.Add(bundleName, assetBundle);
@@ -182,7 +182,7 @@ namespace JFramework.Core
             {
                 await Task.Yield();
             }
-
+            
             Log.Info(DebugOption.Asset, $"加载 => {request.asset.name.Green()} 资源成功");
             return request.asset is GameObject ? (T)Object.Instantiate(request.asset) : (T)request.asset;
         }
@@ -234,12 +234,12 @@ namespace JFramework.Core
         {
             if (assets.ContainsKey(path))
             {
-                return LoadSceneAsync(assets[path].Item1, assets[path].Item2);
+                return LoadSceneAsync(assets[path].Item1.ToLower(), assets[path].Item2);
             }
 
             var array = path.Split('/');
-            assets.Add(path, (array[0], array[1]));
-            return LoadSceneAsync(array[0], array[1]);
+            assets.Add(path, (array[0].ToLower(), array[1]));
+            return LoadSceneAsync(array[0].ToLower(), array[1]);
         }
 
         /// <summary>
@@ -252,7 +252,7 @@ namespace JFramework.Core
             LoadDependencies(bundleName);
             if (!depends.ContainsKey(bundleName))
             {
-                var assetBundle = await LoadFromFileAsync(bundleName.ToLower());
+                var assetBundle = await LoadFromFileAsync(bundleName);
                 depends.Add(bundleName, assetBundle);
             }
 
