@@ -287,7 +287,7 @@ namespace JFramework.Core
         /// </summary>
         internal static void RuntimeInitializeOnLoad()
         {
-            AssetBundle.UnloadAllAssetBundles(false);
+            AssetBundle.UnloadAllAssetBundles(true);
             depends.Clear();
             assets.Clear();
             manifest = null;
