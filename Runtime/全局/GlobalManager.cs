@@ -82,7 +82,6 @@ namespace JFramework.Core
             UIManager.Awake();
             PoolManager.Awake();
             DataManager.Awake();
-            DateManager.Awake();
             AudioManager.Awake();
             TimerManager.Awake();
             AssetManager.Awake();
@@ -102,7 +101,6 @@ namespace JFramework.Core
             {
                 UIManager.Destroy();
                 DataManager.Destroy();
-                DateManager.Destroy();
                 TimerManager.Destroy();
                 AudioManager.Destroy();
                 RuntimeInitializeOnLoad();
