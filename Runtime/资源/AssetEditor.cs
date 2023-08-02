@@ -16,7 +16,7 @@ using UnityEngine;
 
 namespace JFramework
 {
-    public static class AssetEditor
+    internal static class AssetEditor
     {
 #if UNITY_EDITOR
         /// <summary>

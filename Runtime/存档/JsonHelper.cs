@@ -48,10 +48,14 @@ namespace JFramework.Core
             catch (Exception e)
             {
                 Debug.LogWarning($"{nameof(JsonManager).Red()} {name} 存档丢失 => 加密失败!\n" + e);
+            }
+            finally
+            {
                 secrets[name] = new JsonData();
                 Save(secrets, nameof(JsonManager));
-                return null;
             }
+
+            return null;
         }
 
         /// <summary>

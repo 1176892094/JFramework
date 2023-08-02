@@ -15,7 +15,7 @@ namespace JFramework.Core
         /// 播放音效队列
         /// </summary>
         internal static readonly HashSet<AudioSource> audioList = new HashSet<AudioSource>();
-        
+
         /// <summary>
         /// 游戏音效设置
         /// </summary>
@@ -39,12 +39,12 @@ namespace JFramework.Core
         /// <summary>
         /// 背景音乐
         /// </summary>
-        public static float soundVolume => audioSetting.soundVolume;
+        public static float soundVolume => audioSetting?.soundVolume ?? 0.5f;
 
         /// <summary>
         /// 游戏声音
         /// </summary>
-        public static float audioVolume => audioSetting.audioVolume;
+        public static float audioVolume => audioSetting?.audioVolume ?? 0.5f;
 
         /// <summary>
         /// 音效管理器初始化
@@ -55,6 +55,7 @@ namespace JFramework.Core
             gameObject = transform.Find("PoolManager").gameObject;
             audioSource = gameObject.GetComponent<AudioSource>();
             audioSetting = JsonManager.Decrypt<AudioSetting>(Name);
+            audioSetting ??= new AudioSetting();
             SetSound(audioSetting.soundVolume);
             SetAudio(audioSetting.audioVolume);
         }
@@ -66,7 +67,7 @@ namespace JFramework.Core
         public static async void PlaySound(string path)
         {
             if (!GlobalManager.Runtime) return;
-            Log.Info(DebugOption.Audio,$"播放背景音乐: {path.Green()}");
+            Log.Info(DebugOption.Audio, $"播放背景音乐: {path.Green()}");
             var clip = await AssetManager.LoadAsync<AudioClip>(path);
             audioSource.volume = audioSetting.soundVolume;
             audioSource.clip = clip;
@@ -92,7 +93,7 @@ namespace JFramework.Core
         public static void StopSound()
         {
             if (!GlobalManager.Runtime) return;
-            Log.Info(DebugOption.Audio,$"停止背景音乐");
+            Log.Info(DebugOption.Audio, $"停止背景音乐");
             audioSource.Pause();
         }
 
@@ -136,7 +137,7 @@ namespace JFramework.Core
         public static void StopAudio(AudioSource audioSource)
         {
             if (!GlobalManager.Runtime) return;
-            Log.Info(DebugOption.Audio,$"停止音效: {audioSource.clip.name.Orange()}");
+            Log.Info(DebugOption.Audio, $"停止音效: {audioSource.clip.name.Orange()}");
             if (audioList.Contains(audioSource))
             {
                 audioSource.Stop();

@@ -20,7 +20,6 @@ namespace JFramework.Core
             var filePath = GetPath(name);
             var saveJson = obj is ScriptableObject ? JsonUtility.ToJson(obj) : JsonConvert.SerializeObject(obj);
             File.WriteAllBytes(filePath,  Encrypt(saveJson, name));
-            Save(secrets, nameof(JsonManager));
             Log.Info(DebugOption.Json, $"保存加密 => {name.Orange()} 数据文件");
         }
 
