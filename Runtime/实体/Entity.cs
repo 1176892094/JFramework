@@ -32,11 +32,6 @@ namespace JFramework
         protected virtual void OnDestroy() => GetComponent<ICharacter>()?.Destroy();
 
         /// <summary>
-        /// 游戏对象
-        /// </summary>
-        GameObject IEntity.gameObject => gameObject;
-
-        /// <summary>
         /// 实体接口调用实体更新方法
         /// </summary>
         void IEntity.Update() => OnUpdate();
