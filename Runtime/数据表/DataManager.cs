@@ -20,7 +20,11 @@ namespace JFramework.Core
             AssetManager.OnLoadComplete += LoadDataTable;
         }
 
-        private static void LoadDataTable(bool success)
+        /// <summary>
+        /// 加载数据表
+        /// </summary>
+        /// <param name="success"></param>
+        public static void LoadDataTable(bool success)
         {
             var (assembly, types) = GetAssemblyAndTypes();
             if (types == null || types.Length == 0) return;
