@@ -4,7 +4,6 @@ using System.Reflection;
 using JFramework.Core;
 using JFramework.Interface;
 using Sirenix.OdinInspector;
-using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -33,13 +32,13 @@ namespace JFramework
         /// </summary>
         protected virtual void Awake()
         {
+            FindComponent<Text>();
             FindComponent<Image>();
             FindComponent<Slider>();
             FindComponent<Button>();
             FindComponent<Toggle>();
             FindComponent<RawImage>();
-            FindComponent<TMP_Text>();
-            FindComponent<TMP_InputField>();
+            FindComponent<InputField>();
         }
 
         /// <summary>
