@@ -91,6 +91,7 @@ namespace JFramework
                     {
                         Instance.sceneAssets.Add(path);
                     }
+
                     if (obj == null) continue;
                     var name = $"{array[2]}/{obj.name}";
                     Instance.objectValue.Add(obj);
@@ -240,39 +241,76 @@ namespace JFramework
                 Process.Start(Application.streamingAssetsPath);
             }
         }
-        
+
+        /// <summary>
+        /// 远端加载移除 BuildSetting 反之 加入到 BuildSetting
+        /// </summary>
+        /// <param name="isRemote"></param>
         internal static void AddSceneToBuildSettings(bool isRemote)
         {
-            if (isRemote)
+            foreach (var scenePath in Instance.sceneAssets)
             {
-                EditorBuildSettings.scenes = null;
-            }
-            else
-            {
-                foreach (var scenePath in Instance.sceneAssets)
+                var sceneIndex = -1;
+                var sceneFound = false;
+
+                if (isRemote)
                 {
-                    int sceneBuildIndex = EditorBuildSettings.scenes.Length;
+                    var scenes = EditorBuildSettings.scenes;
+                    for (int i = 0; i < scenes.Length; i++)
+                    {
+                        if (scenes[i].path == scenePath)
+                        {
+                            sceneIndex = i;
+                            sceneFound = true;
+                            break;
+                        }
+                    }
+                }
+                else
+                {
+                    sceneIndex = EditorBuildSettings.scenes.Length;
                     for (int i = 0; i < EditorBuildSettings.scenes.Length; i++)
                     {
                         if (EditorBuildSettings.scenes[i].path == scenePath)
                         {
-                            sceneBuildIndex = i;
+                            sceneIndex = i;
+                            sceneFound = true;
                             break;
                         }
                     }
-                
-                    if (sceneBuildIndex == EditorBuildSettings.scenes.Length)
+                }
+
+                if (sceneFound)
+                {
+                    if (isRemote)
                     {
-                        EditorBuildSettingsScene[] newScenes = new EditorBuildSettingsScene[EditorBuildSettings.scenes.Length + 1];
-                        for (int i = 0; i < EditorBuildSettings.scenes.Length; i++)
+                        var oldScenes = EditorBuildSettings.scenes;
+                        var newScenes = new EditorBuildSettingsScene[oldScenes.Length - 1];
+                        int newIndex = 0;
+
+                        for (int i = 0; i < oldScenes.Length; i++)
                         {
-                            newScenes[i] = EditorBuildSettings.scenes[i];
+                            if (i != sceneIndex)
+                            {
+                                newScenes[newIndex] = oldScenes[i];
+                                newIndex++;
+                            }
                         }
-            
-                        newScenes[EditorBuildSettings.scenes.Length] = new EditorBuildSettingsScene(scenePath, true);
+
                         EditorBuildSettings.scenes = newScenes;
-                        EditorSceneManager.SaveOpenScenes();
                     }
+                }
+                else
+                {
+                    var scenes = new EditorBuildSettingsScene[EditorBuildSettings.scenes.Length + 1];
+                    for (int i = 0; i < EditorBuildSettings.scenes.Length; i++)
+                    {
+                        scenes[i] = EditorBuildSettings.scenes[i];
+                    }
+
+                    scenes[EditorBuildSettings.scenes.Length] = new EditorBuildSettingsScene(scenePath, true);
+                    EditorBuildSettings.scenes = scenes;
+                    EditorSceneManager.SaveOpenScenes();
                 }
             }
         }
