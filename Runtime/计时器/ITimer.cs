@@ -35,7 +35,7 @@ namespace JFramework.Interface
         /// </summary>
         /// <param name="count">循环次数</param>
         /// <returns>返回自身</returns>
-        ITimer Loop(int count);
+        ITimer Loop(int count = -1);
         
         /// <summary>
         /// 计时器队列
