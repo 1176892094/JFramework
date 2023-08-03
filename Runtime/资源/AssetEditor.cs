@@ -12,6 +12,7 @@ using Debug = UnityEngine.Debug;
 using System.Threading.Tasks;
 using Sirenix.OdinInspector;
 using UnityEditor;
+using UnityEditor.SceneManagement;
 using UnityEngine;
 
 namespace JFramework
@@ -20,10 +21,11 @@ namespace JFramework
     {
         private static AssetEditor instance;
         private static AssetImporter importer;
-        public static bool isRemote => GlobalManager.Instance.assetBundle;
+        public static bool isRemote => GlobalManager.Instance.isRemote;
         [ShowInInspector] public static readonly Dictionary<string, Object> objects = new Dictionary<string, Object>();
-        private readonly List<string> objectKey = new List<string>();
-        private readonly List<Object> objectValue = new List<Object>();
+        [HideInInspector] public List<string> objectKey = new List<string>();
+        [HideInInspector] public List<Object> objectValue = new List<Object>();
+        public List<string> sceneAssets = new List<string>();
 
 
         private static AssetEditor Instance
@@ -69,6 +71,7 @@ namespace JFramework
             var enumerable = guids.Select(AssetDatabase.GUIDToAssetPath).Where(p => !AssetDatabase.IsValidFolder(p));
             Instance.objectKey.Clear();
             Instance.objectValue.Clear();
+            Instance.sceneAssets.Clear();
             foreach (var path in enumerable)
             {
                 var array = path.Replace('\\', '/').Split('/');
@@ -84,6 +87,10 @@ namespace JFramework
                     }
 
                     var obj = AssetDatabase.LoadAssetAtPath<Object>(path);
+                    if (obj is SceneAsset)
+                    {
+                        Instance.sceneAssets.Add(path);
+                    }
                     if (obj == null) continue;
                     var name = $"{array[2]}/{obj.name}";
                     Instance.objectValue.Add(obj);
@@ -231,6 +238,42 @@ namespace JFramework
             {
                 Directory.CreateDirectory(Application.dataPath + "/StreamingAssets");
                 Process.Start(Application.streamingAssetsPath);
+            }
+        }
+        
+        internal static void AddSceneToBuildSettings(bool isRemote)
+        {
+            if (isRemote)
+            {
+                EditorBuildSettings.scenes = null;
+            }
+            else
+            {
+                foreach (var scenePath in Instance.sceneAssets)
+                {
+                    int sceneBuildIndex = EditorBuildSettings.scenes.Length;
+                    for (int i = 0; i < EditorBuildSettings.scenes.Length; i++)
+                    {
+                        if (EditorBuildSettings.scenes[i].path == scenePath)
+                        {
+                            sceneBuildIndex = i;
+                            break;
+                        }
+                    }
+                
+                    if (sceneBuildIndex == EditorBuildSettings.scenes.Length)
+                    {
+                        EditorBuildSettingsScene[] newScenes = new EditorBuildSettingsScene[EditorBuildSettings.scenes.Length + 1];
+                        for (int i = 0; i < EditorBuildSettings.scenes.Length; i++)
+                        {
+                            newScenes[i] = EditorBuildSettings.scenes[i];
+                        }
+            
+                        newScenes[EditorBuildSettings.scenes.Length] = new EditorBuildSettingsScene(scenePath, true);
+                        EditorBuildSettings.scenes = newScenes;
+                        EditorSceneManager.SaveOpenScenes();
+                    }
+                }
             }
         }
     }

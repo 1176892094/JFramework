@@ -8,16 +8,20 @@ namespace JFramework.Core
 {
     public sealed partial class GlobalManager
     {
-        [FoldoutGroup("设置管理器"), SerializeField, LabelText("控制台输出选项")]
+        [SerializeField, LabelText("控制台输出选项"), FoldoutGroup("设置管理器")]
         internal DebugOption debugOption;
-
-        [FoldoutGroup("设置管理器"), SerializeField, LabelText("远端打包选项")]
-        internal bool assetBundle;
-        
 #if UNITY_EDITOR
+        [HideInInspector] public bool isRemote;
+
+        [Button("关闭远端加载"), ShowIf("isRemote"), GUIColor(1, 0, 0), FoldoutGroup("设置管理器")]
+        public void LocalButton() => AssetEditor.AddSceneToBuildSettings(isRemote = !isRemote);
+
+        [Button("开启远端加载"), HideIf("isRemote"), GUIColor(0, 1, 0), FoldoutGroup("设置管理器")]
+        public void RemoteButton() => AssetEditor.AddSceneToBuildSettings(isRemote = !isRemote);
+
         [ShowInInspector, LabelText("游戏对象管理"), FoldoutGroup("对象管理器")]
         private Dictionary<string, IPool> pools => PoolManager.pools;
-        
+
         [ShowInInspector, LabelText("游戏组件管理"), FoldoutGroup("对象管理器")]
         private Dictionary<ICharacter, Dictionary<Type, ScriptableObject>> characters => CtrlManager.characters;
 
@@ -64,6 +68,7 @@ namespace JFramework.Core
         private HashSet<AudioSource> audioList => AudioManager.audioList;
 #endif
     }
+
     internal static class Log
     {
         private static readonly Dictionary<DebugOption, string> options = new Dictionary<DebugOption, string>()

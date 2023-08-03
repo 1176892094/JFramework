@@ -264,6 +264,13 @@ namespace JFramework.Core
         private static async Task<AsyncOperation> LoadSceneAsync(string bundleName, string sceneName)
         {
             if (!GlobalManager.Runtime) return null;
+#if UNITY_EDITOR
+            if (!AssetEditor.isRemote)
+            {
+                if (!GlobalManager.Runtime) return null;
+                return UnitySceneManager.LoadSceneAsync(sceneName, LoadSceneMode.Single);
+            }
+#endif
             LoadDependencies(bundleName);
             if (!depends.ContainsKey(bundleName))
             {
