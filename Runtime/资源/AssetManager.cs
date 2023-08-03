@@ -42,6 +42,9 @@ namespace JFramework.Core
         /// </summary>
         internal static async Task Awake()
         {
+#if UNITY_EDITOR
+            if (!isRemote) return;
+#endif
             await AssetHelper.UpdateAsync();
         }
 
