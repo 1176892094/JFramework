@@ -67,11 +67,11 @@ namespace JFramework
         /// <summary>
         /// 延迟改变状态
         /// </summary>
-        /// <param name="time">延迟时间</param>
+        /// <param name="duration">延迟时间</param>
         /// <typeparam name="TState">可传入任何继承IState的对象</typeparam>
-        public void ChangeState<TState>(float time) where TState : IState
+        public void ChangeState<TState>(float duration) where TState : IState
         {
-            TimerManager.Pop(time, ChangeState<TState>);
+            TimerManager.Pop(duration, ChangeState<TState>);
         }
     }
 }
