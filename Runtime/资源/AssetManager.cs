@@ -20,6 +20,13 @@ namespace JFramework.Core
         /// </summary>
         internal static readonly Dictionary<string, AssetBundle> depends = new Dictionary<string, AssetBundle>();
 
+#if UNITY_EDITOR
+        /// <summary>
+        /// 是否为远端加载
+        /// </summary>
+        public static bool isRemote => GlobalManager.Instance.isRemote;
+#endif
+        
         /// <summary>
         /// 主包
         /// </summary>
@@ -74,7 +81,7 @@ namespace JFramework.Core
         {
             if (!GlobalManager.Runtime) return null;
 #if UNITY_EDITOR
-            if (!AssetEditor.isRemote)
+            if (!isRemote)
             {
                 var obj = AssetEditor.objects[path];
                 return obj is GameObject ? Object.Instantiate((T)obj) : (T)obj;
@@ -146,7 +153,7 @@ namespace JFramework.Core
         public static Task<T> LoadAsync<T>(string path) where T : Object
         {
 #if UNITY_EDITOR
-            if (!AssetEditor.isRemote)
+            if (!isRemote)
             {
                 return LoadAsyncYield();
 
@@ -264,7 +271,7 @@ namespace JFramework.Core
         {
             if (!GlobalManager.Runtime) return null;
 #if UNITY_EDITOR
-            if (!AssetEditor.isRemote)
+            if (!isRemote)
             {
                 if (!GlobalManager.Runtime) return null;
                 return UnitySceneManager.LoadSceneAsync(sceneName, LoadSceneMode.Single);

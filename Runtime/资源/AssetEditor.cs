@@ -18,15 +18,39 @@ namespace JFramework
 {
     public class AssetEditor : ScriptableObject
     {
+        /// <summary>
+        /// 资源编辑器单例
+        /// </summary>
         private static AssetEditor instance;
+        
+        /// <summary>
+        /// 资源标签导入器
+        /// </summary>
         private static AssetImporter importer;
-        public static bool isRemote => GlobalManager.Instance.isRemote;
+        
+        /// <summary>
+        /// 存储本地加载的资源字典
+        /// </summary>
         [ShowInInspector] public static readonly Dictionary<string, Object> objects = new Dictionary<string, Object>();
+        
+        /// <summary>
+        /// 本地加载资源的键
+        /// </summary>
         [HideInInspector] public List<string> objectKey = new List<string>();
+        
+        /// <summary>
+        /// 本地加载资源的值
+        /// </summary>
         [HideInInspector] public List<Object> objectValue = new List<Object>();
+        
+        /// <summary>
+        /// 场景资源
+        /// </summary>
         public List<string> sceneAssets = new List<string>();
 
-
+        /// <summary>
+        /// 安全的单例调用
+        /// </summary>
         private static AssetEditor Instance
         {
             get
@@ -102,6 +126,9 @@ namespace JFramework
             AssetDatabase.Refresh();
         }
 
+        /// <summary>
+        /// 为本地加载的字典赋值
+        /// </summary>
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
         private static void RuntimeInitializeOnLoad()
         {
