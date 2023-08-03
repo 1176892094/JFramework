@@ -73,13 +73,13 @@ namespace JFramework.Core
         public static T Load<T>(string path) where T : Object
         {
             if (!GlobalManager.Runtime) return null;
-// #if UNITY_EDITOR
-//             if (!AssetEditor.isRemote)
-//             {
-//                 var obj = GlobalManager.Instance.objects[path];
-//                 return obj is GameObject ? Object.Instantiate((T)obj) : (T)obj;
-//             }
-// #endif
+#if UNITY_EDITOR
+            if (!AssetEditor.isRemote)
+            {
+                var obj = AssetEditor.objects[path];
+                return obj is GameObject ? Object.Instantiate((T)obj) : (T)obj;
+            }
+#endif
             
             if (assets.ContainsKey(path))
             {
@@ -146,18 +146,18 @@ namespace JFramework.Core
         /// <returns></returns>
         public static Task<T> LoadAsync<T>(string path) where T : Object
         {
-// #if UNITY_EDITOR
-//             if (!AssetEditor.isRemote)
-//             {
-//                 return LoadAsyncYield();
-//
-//                 async Task<T> LoadAsyncYield()
-//                 {
-//                     await Task.Yield();
-//                     return Load<T>(path);
-//                 }
-//             }
-// #endif
+#if UNITY_EDITOR
+            if (!AssetEditor.isRemote)
+            {
+                return LoadAsyncYield();
+
+                async Task<T> LoadAsyncYield()
+                {
+                    await Task.Yield();
+                    return Load<T>(path);
+                }
+            }
+#endif
             if (assets.ContainsKey(path))
             {
                 return LoadAsync<T>(assets[path].Item1.ToLower(), assets[path].Item2);

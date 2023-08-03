@@ -39,7 +39,7 @@ namespace JFramework
                 if (instance != null) return instance;
                 if (!Directory.Exists(path)) Directory.CreateDirectory(path);
                 instance = CreateInstance<T>();
-                AssetDatabase.CreateAsset(Instance, asset);
+                AssetDatabase.CreateAsset(instance, asset);
                 AssetDatabase.Refresh();
                 Debug.Log($"创建 {name.Red()} 单例资源。路径: {path.Yellow()}");
 #endif

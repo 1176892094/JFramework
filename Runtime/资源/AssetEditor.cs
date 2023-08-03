@@ -10,24 +10,39 @@ using Newtonsoft.Json;
 using UnityEngine.Networking;
 using Debug = UnityEngine.Debug;
 using System.Threading.Tasks;
+using Sirenix.OdinInspector;
 using UnityEditor;
 using UnityEngine;
 
 namespace JFramework
 {
-    public static class AssetEditor
+    public class AssetEditor : ScriptableObject
     {
-        private static Dictionary<string, Object> objects => GlobalManager.Instance.objects;
-        
-        /// <summary>
-        /// 是否远端加载
-        /// </summary>
-        public static bool isRemote => GlobalManager.Instance.assetBundle;
-
-        /// <summary>
-        /// AssetBundle 标签导入
-        /// </summary>
+        private static AssetEditor instance;
         private static AssetImporter importer;
+        public static bool isRemote => GlobalManager.Instance.assetBundle;
+        [ShowInInspector] public static readonly Dictionary<string, Object> objects = new Dictionary<string, Object>();
+        private readonly List<string> objectKey = new List<string>();
+        private readonly List<Object> objectValue = new List<Object>();
+
+
+        private static AssetEditor Instance
+        {
+            get
+            {
+                if (instance != null) return instance;
+                var path = $"Assets/Editor";
+                var asset = $"{path}/{nameof(AssetEditor)}.asset";
+                instance = AssetDatabase.LoadAssetAtPath<AssetEditor>(asset);
+                if (instance != null) return instance;
+                if (!Directory.Exists(path)) Directory.CreateDirectory(path);
+                instance = CreateInstance<AssetEditor>();
+                AssetDatabase.CreateAsset(instance, asset);
+                AssetDatabase.Refresh();
+                Debug.Log($"创建 {nameof(AssetEditor).Red()} 单例资源。路径: {path.Yellow()}");
+                return instance;
+            }
+        }
 
         /// <summary>
         /// 更新 AssetBundles 标签
@@ -52,6 +67,8 @@ namespace JFramework
 
             string[] guids = AssetDatabase.FindAssets("t:Object", new[] { AssetSetting.FILE_PATH });
             var enumerable = guids.Select(AssetDatabase.GUIDToAssetPath).Where(p => !AssetDatabase.IsValidFolder(p));
+            Instance.objectKey.Clear();
+            Instance.objectValue.Clear();
             foreach (var path in enumerable)
             {
                 var array = path.Replace('\\', '/').Split('/');
@@ -69,18 +86,22 @@ namespace JFramework
                     var obj = AssetDatabase.LoadAssetAtPath<Object>(path);
                     if (obj == null) continue;
                     var name = $"{array[2]}/{obj.name}";
-                    if (!objects.ContainsKey(name))
-                    {
-                        objects[name] = obj;
-                    }
-                    else if (objects[name] == null)
-                    {
-                        objects.Remove(name);
-                    }
+                    Instance.objectValue.Add(obj);
+                    Instance.objectKey.Add(name);
+                    objects[name] = obj;
                 }
             }
 
             AssetDatabase.Refresh();
+        }
+
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
+        private static void RuntimeInitializeOnLoad()
+        {
+            for (int i = 0; i < Instance.objectKey.Count; i++)
+            {
+                objects[Instance.objectKey[i]] = Instance.objectValue[i];
+            }
         }
 
         /// <summary>
@@ -99,7 +120,8 @@ namespace JFramework
                 Directory.CreateDirectory(AssetSetting.localSavePath);
             }
 
-            BuildPipeline.BuildAssetBundles(AssetSetting.localSavePath, BuildAssetBundleOptions.ChunkBasedCompression, AssetSetting.Target);
+            BuildPipeline.BuildAssetBundles(AssetSetting.localSavePath, BuildAssetBundleOptions.ChunkBasedCompression,
+                AssetSetting.Target);
             var directory = Directory.CreateDirectory(AssetSetting.localSavePath);
             var fileInfos = directory.GetFiles();
             var fileList = new List<AssetData>();
