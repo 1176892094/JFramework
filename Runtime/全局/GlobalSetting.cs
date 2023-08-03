@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using JFramework.Interface;
 using Sirenix.OdinInspector;
 using UnityEngine;
+using Object = UnityEngine.Object;
 
 namespace JFramework.Core
 {
@@ -10,12 +11,19 @@ namespace JFramework.Core
     {
         [FoldoutGroup("设置管理器"), SerializeField, LabelText("控制台输出选项")]
         internal DebugOption debugOption;
+
+        [FoldoutGroup("设置管理器"), SerializeField, LabelText("远端打包选项")]
+        internal bool assetBundle;
+        
 #if UNITY_EDITOR
         [ShowInInspector, LabelText("游戏对象管理"), FoldoutGroup("对象管理器")]
         private Dictionary<string, IPool> pools => PoolManager.pools;
         
         [ShowInInspector, LabelText("游戏组件管理"), FoldoutGroup("对象管理器")]
         private Dictionary<ICharacter, Dictionary<Type, ScriptableObject>> characters => CtrlManager.characters;
+        
+        [ShowInInspector,SerializeField, LabelText("本地资源数据"), FoldoutGroup("常用管理器")]
+        internal Dictionary<string, Object> objects = new Dictionary<string, Object>();
         
         [ShowInInspector, LabelText("资源管理数据"), FoldoutGroup("常用管理器")]
         private Dictionary<string, AssetBundle> depends => AssetManager.depends;

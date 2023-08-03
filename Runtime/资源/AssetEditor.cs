@@ -15,8 +15,15 @@ using UnityEngine;
 
 namespace JFramework
 {
-    internal static class AssetEditor
+    public static class AssetEditor
     {
+        private static Dictionary<string, Object> objects => GlobalManager.Instance.objects;
+        
+        /// <summary>
+        /// 是否远端加载
+        /// </summary>
+        public static bool isRemote => GlobalManager.Instance.assetBundle;
+
         /// <summary>
         /// AssetBundle 标签导入
         /// </summary>
@@ -26,7 +33,7 @@ namespace JFramework
         /// 更新 AssetBundles 标签
         /// </summary>
         [MenuItem("Tools/JFramework/Update AssetBundles", priority = 1)]
-        public static void Update()
+        private static void Update()
         {
             string[] assetBundleNames = AssetDatabase.GetAllAssetBundleNames();
 
@@ -44,8 +51,7 @@ namespace JFramework
             }
 
             string[] guids = AssetDatabase.FindAssets("t:Object", new[] { AssetSetting.FILE_PATH });
-            var enumerable = guids.Select(AssetDatabase.GUIDToAssetPath)
-                .Where(asset => !AssetDatabase.IsValidFolder(asset));
+            var enumerable = guids.Select(AssetDatabase.GUIDToAssetPath).Where(p => !AssetDatabase.IsValidFolder(p));
             foreach (var path in enumerable)
             {
                 var array = path.Replace('\\', '/').Split('/');
@@ -59,6 +65,18 @@ namespace JFramework
                         importer.assetBundleName = array[2];
                         importer.SaveAndReimport();
                     }
+
+                    var obj = AssetDatabase.LoadAssetAtPath<Object>(path);
+                    if (obj == null) continue;
+                    var name = $"{array[2]}/{obj.name}";
+                    if (!objects.ContainsKey(name))
+                    {
+                        objects[name] = obj;
+                    }
+                    else if (objects[name] == null)
+                    {
+                        objects.Remove(name);
+                    }
                 }
             }
 
@@ -69,7 +87,7 @@ namespace JFramework
         /// 构建 AssetBundles
         /// </summary>
         [MenuItem("Tools/JFramework/Build AssetBundles", priority = 2)]
-        public static void Build()
+        private static void Build()
         {
             if (!Directory.Exists(AssetSetting.SAVE_PATH))
             {
@@ -94,7 +112,7 @@ namespace JFramework
             }
 
             var saveJson = JsonConvert.SerializeObject(fileList);
-            File.WriteAllText(AssetSetting.localInfoPath, saveJson);
+            File.WriteAllText(AssetSetting.localSaveInfo, saveJson);
             AssetDatabase.Refresh();
             Debug.Log($"构建 AssetBundles 成功!".Green());
         }
@@ -125,7 +143,7 @@ namespace JFramework
         /// 上传 AssetBundle 到服务器
         /// </summary>
         [MenuItem("Tools/JFramework/Upload AssetBundles", priority = 3)]
-        public static async void Upload()
+        private static async void Upload()
         {
             DirectoryInfo directoryInfo = Directory.CreateDirectory(AssetSetting.localSavePath);
             var fileInfos = directoryInfo.GetFiles();

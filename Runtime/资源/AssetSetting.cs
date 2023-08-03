@@ -40,12 +40,12 @@ namespace JFramework
         /// <summary>
         /// 构建 AssetBundle 存放的路径
         /// </summary>
-        public const string SAVE_PATH = "Assets/StreamingAssets";
+        public const string SAVE_PATH = "AssetBundles";
 
         /// <summary>
         /// 从远端加载 AssetBundle 的路径
         /// </summary>
-        private const string LOAD_PATH = "http://192.168.0.3:8000/Files/Unity/Forest/Assets/StreamingAssets";
+        private const string LOAD_PATH = "http://192.168.0.3:8000/Files/Unity/Forest/AssetBundles";
 
 #if UNITY_EDITOR
         /// <summary>
@@ -53,7 +53,6 @@ namespace JFramework
         /// </summary>
         public static UnityEditor.BuildTarget Target => (UnityEditor.BuildTarget)PLATFORM;
 #endif
-
         /// <summary>
         /// 客户端校验文件名称
         /// </summary>
@@ -78,6 +77,11 @@ namespace JFramework
         /// 本地构建存储路径
         /// </summary>
         public static readonly string localSavePath = $"{SAVE_PATH}/{PLATFORM}";
+
+        /// <summary>
+        /// 本地构建校验文件
+        /// </summary>
+        public static readonly string localSaveInfo = $"{SAVE_PATH}/{PLATFORM}/{clientInfoName}";
 
         /// <summary>
         /// 本地校验文件路径
