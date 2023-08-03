@@ -17,40 +17,40 @@ namespace JFramework
         /// <summary>
         /// 全局控制器容器
         /// </summary>
-        internal static readonly Dictionary<IEntity, Controllers> controllerDict = new Dictionary<IEntity, Controllers>();
+        internal static readonly Dictionary<ICharacter, Controllers> characters = new Dictionary<ICharacter, Controllers>();
 
         /// <summary>
         /// 获取或添加控制器
         /// </summary>
-        /// <param name="entity"></param>
+        /// <param name="character"></param>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
-        public static T GetOrAddCtrl<T>(IEntity entity) where T : ScriptableObject, IController
+        public static T GetOrAddCtrl<T>(ICharacter character) where T : ScriptableObject, IController
         {
             var key = typeof(T);
-            if (!controllerDict.TryGetValue(entity, out Controllers controllers))
+            if (!characters.TryGetValue(character, out Controllers controllers))
             {
                 controllers = new Controllers();
-                controllerDict.Add(entity, controllers);
+                characters.Add(character, controllers);
             }
 
             if (!controllers.ContainsKey(key))
             {
                 var controller = ScriptableObject.CreateInstance<T>();
                 controllers.Add(key, controller);
-                controller.Spawn(entity);
+                controller.Spawn(character);
             }
 
-            return (T)controllerDict[entity][key];
+            return (T)characters[character][key];
         }
 
         /// <summary>
         /// 销毁指定控制器
         /// </summary>
-        /// <param name="entity"></param>
-        public static void Destroy(IEntity entity)
+        /// <param name="character"></param>
+        public static void Destroy(ICharacter character)
         {
-            if (controllerDict.TryGetValue(entity, out Controllers controllers))
+            if (characters.TryGetValue(character, out Controllers controllers))
             {
                 foreach (var controller in controllers.Values)
                 {
@@ -58,7 +58,7 @@ namespace JFramework
                 }
 
                 controllers.Clear();
-                controllerDict.Remove(entity);
+                characters.Remove(character);
             }
         }
 
@@ -67,13 +67,13 @@ namespace JFramework
         /// </summary>
         internal static void Destroy()
         {
-            var controllers = controllerDict.Values.SelectMany(dictionary => dictionary.Values);
+            var controllers = characters.Values.SelectMany(dictionary => dictionary.Values);
             foreach (var controller in controllers)
             {
                 Object.Destroy(controller);
             }
 
-            controllerDict.Clear();
+            characters.Clear();
         }
     }
 }

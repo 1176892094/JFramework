@@ -15,7 +15,7 @@ namespace JFramework.Core
         private Dictionary<string, IPool> pools => PoolManager.pools;
         
         [ShowInInspector, LabelText("游戏组件管理"), FoldoutGroup("对象管理器")]
-        private Dictionary<IEntity, Dictionary<Type, ScriptableObject>> controllerDict => CtrlManager.controllerDict;
+        private Dictionary<ICharacter, Dictionary<Type, ScriptableObject>> characters => CtrlManager.characters;
         
         [ShowInInspector, LabelText("资源管理数据"), FoldoutGroup("常用管理器")]
         private Dictionary<string, AssetBundle> depends => AssetManager.depends;
