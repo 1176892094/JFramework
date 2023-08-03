@@ -80,7 +80,6 @@ namespace JFramework.Core
                 return obj is GameObject ? Object.Instantiate((T)obj) : (T)obj;
             }
 #endif
-            
             if (assets.ContainsKey(path))
             {
                 return Load<T>(assets[path].Item1.ToLower(), assets[path].Item2);
