@@ -12,7 +12,6 @@ using Debug = UnityEngine.Debug;
 using System.Threading.Tasks;
 using Sirenix.OdinInspector;
 using UnityEditor;
-using UnityEditor.SceneManagement;
 using UnityEngine;
 
 namespace JFramework
@@ -248,38 +247,15 @@ namespace JFramework
         /// <param name="isRemote"></param>
         internal static void AddSceneToBuildSettings(bool isRemote)
         {
+            var sceneAssets = new HashSet<string>();
+            foreach (var scene in EditorBuildSettings.scenes)
+            {
+                sceneAssets.Add(scene.path);
+            }
+
             foreach (var scenePath in Instance.sceneAssets)
             {
-                var sceneIndex = -1;
-                var sceneFound = false;
-
-                if (isRemote)
-                {
-                    var scenes = EditorBuildSettings.scenes;
-                    for (int i = 0; i < scenes.Length; i++)
-                    {
-                        if (scenes[i].path == scenePath)
-                        {
-                            sceneIndex = i;
-                            sceneFound = true;
-                            break;
-                        }
-                    }
-                }
-                else
-                {
-                    sceneIndex = EditorBuildSettings.scenes.Length;
-                    for (int i = 0; i < EditorBuildSettings.scenes.Length; i++)
-                    {
-                        if (EditorBuildSettings.scenes[i].path == scenePath)
-                        {
-                            sceneIndex = i;
-                            sceneFound = true;
-                            break;
-                        }
-                    }
-                }
-
+                bool sceneFound = sceneAssets.Contains(scenePath);
                 if (sceneFound)
                 {
                     if (isRemote)
@@ -288,11 +264,11 @@ namespace JFramework
                         var newScenes = new EditorBuildSettingsScene[oldScenes.Length - 1];
                         int newIndex = 0;
 
-                        for (int i = 0; i < oldScenes.Length; i++)
+                        foreach (var scene in oldScenes)
                         {
-                            if (i != sceneIndex)
+                            if (scene.path != scenePath)
                             {
-                                newScenes[newIndex] = oldScenes[i];
+                                newScenes[newIndex] = scene;
                                 newIndex++;
                             }
                         }
@@ -310,7 +286,6 @@ namespace JFramework
 
                     scenes[EditorBuildSettings.scenes.Length] = new EditorBuildSettingsScene(scenePath, true);
                     EditorBuildSettings.scenes = scenes;
-                    EditorSceneManager.SaveOpenScenes();
                 }
             }
         }
