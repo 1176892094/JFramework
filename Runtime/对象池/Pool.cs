@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using JFramework.Core;
 using JFramework.Interface;
 using Sirenix.OdinInspector;
@@ -63,7 +62,7 @@ namespace JFramework
         /// <summary>
         /// 游戏物体组
         /// </summary>
-        private GameObject gameObject;
+        private GameObject parent;
 
         /// <summary>
         /// 对象池物体数量
@@ -76,8 +75,8 @@ namespace JFramework
         /// <param name="object">推入的游戏对象</param>
         public Pool(GameObject @object)
         {
-            gameObject = new GameObject(@object.name + "-Pool");
-            gameObject.transform.SetParent(PoolManager.poolManager);
+            parent = new GameObject(@object.name + "-Pool");
+            parent.transform.SetParent(PoolManager.poolManager);
             Push(@object);
         }
 
@@ -87,13 +86,12 @@ namespace JFramework
         /// <returns>返回拉取的游戏物体</returns>
         public GameObject Pop()
         {
-            if (pool.Count == 0) return null;
-            var @object = pool.First();
+            if (!pool.TryPop(out var @object)) return null;
+            @object.SetActive(true);
             @object.transform.SetParent(null);
             @object.GetComponent<IPop>()?.OnPop();
-            @object.SetActive(true);
-            pool.Remove(@object);
             return @object;
+
         }
 
         /// <summary>
@@ -103,11 +101,9 @@ namespace JFramework
         public bool Push(GameObject @object)
         {
             if (!pool.Add(@object)) return false;
-            @object.GetComponent<IPush>()?.OnPush();
-            gameObject ??= new GameObject(@object.name + "-Pool");
-            gameObject.transform.SetParent(PoolManager.poolManager);
-            @object.transform.SetParent(gameObject.transform);
             @object.SetActive(false);
+            @object.transform.SetParent(parent.transform);
+            @object.GetComponent<IPush>()?.OnPush();
             return true;
         }
 

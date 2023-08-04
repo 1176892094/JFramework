@@ -46,15 +46,15 @@ namespace JFramework.Core
         /// </summary>
         /// <param name="obj">传入对象</param>
         /// <typeparam name="T">任何可以被new的对象</typeparam>
-        public static bool Push<T>(T obj) where T : new()
+        public static void Push<T>(T obj) where T : new()
         {
             if (pools.TryGetValue(typeof(T).Name, out var pool))
             {
-                return ((IPool<T>)pool).Push(obj);
+                ((IPool<T>)pool).Push(obj);
+                return;
             }
 
             pools.Add(typeof(T).Name, new Pool<T>(obj));
-            return true;
         }
 
         /// <summary>
@@ -79,6 +79,8 @@ namespace JFramework.Core
             var obj = await AssetManager.LoadAsync<GameObject>(path);
             Log.Info(DebugOption.Pool, $"创建 => {path.Green()} 对象成功");
             obj.name = path;
+            obj.transform.SetParent(null);
+            obj.GetComponent<IPop>()?.OnPop();
             return obj.GetComponent<T>();
         }
 
@@ -94,16 +96,16 @@ namespace JFramework.Core
                 Debug.LogWarning($"{nameof(PoolManager).Sky()} 存入对象已被销毁");
                 return;
             }
-
-            var key = obj.name;
-            if (pools.TryGetValue(key, out var pool))
+            
+            if (pools.TryGetValue(obj.name, out var pool))
             {
-                Log.Info(DebugOption.Pool, $"存入 => {key.Pink()} 对象成功");
+                Log.Info(DebugOption.Pool, $"存入 => {obj.name.Pink()} 对象成功");
                 ((Pool)pool).Push(obj);
+                return;
             }
 
-            Log.Info(DebugOption.Pool, $"创建 => 对象池 : {key.Green()}");
-            pools.Add(key, new Pool(obj));
+            Log.Info(DebugOption.Pool, $"创建 => 对象池 : {obj.name.Green()}");
+            pools.Add(obj.name, new Pool(obj));
         }
 
         /// <summary>
