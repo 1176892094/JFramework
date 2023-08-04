@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using UnityEngine;
 
 // ReSharper disable All
@@ -49,14 +50,14 @@ namespace JFramework.Core
         /// <summary>
         /// 音效管理器初始化
         /// </summary>
-        internal static void Awake()
+        internal static async void Awake()
         {
             var transform = GlobalManager.Instance.transform;
             gameObject = transform.Find("PoolManager").gameObject;
             audioSource = gameObject.GetComponent<AudioSource>();
-            audioSetting = JsonManager.Decrypt<AudioSetting>(Name);
-            SetSound(audioSetting.soundVolume);
-            SetAudio(audioSetting.audioVolume);
+            audioSetting = await JsonManager.Decrypt<AudioSetting>(Name);
+            await SetSound(audioSetting.soundVolume);
+            await SetAudio(audioSetting.audioVolume);
         }
 
         /// <summary>
@@ -78,12 +79,12 @@ namespace JFramework.Core
         /// 设置背景音乐
         /// </summary>
         /// <param name="soundVolume">音量的大小</param>
-        public static void SetSound(float soundVolume)
+        public static async Task SetSound(float soundVolume)
         {
             if (!GlobalManager.Runtime) return;
             audioSetting.soundVolume = soundVolume;
             audioSource.volume = soundVolume;
-            JsonManager.Encrypt(audioSetting, Name);
+            await JsonManager.Encrypt(audioSetting, Name);
         }
 
         /// <summary>
@@ -117,7 +118,7 @@ namespace JFramework.Core
         /// 设置音量
         /// </summary>
         /// <param name="audioVolume">传入音量大小</param>
-        public static void SetAudio(float audioVolume)
+        public static async Task SetAudio(float audioVolume)
         {
             if (!GlobalManager.Runtime) return;
             audioSetting.audioVolume = audioVolume;
@@ -126,7 +127,7 @@ namespace JFramework.Core
                 audio.volume = audioVolume;
             }
 
-            JsonManager.Encrypt(audioSetting, Name);
+            await JsonManager.Encrypt(audioSetting, Name);
         }
 
         /// <summary>
