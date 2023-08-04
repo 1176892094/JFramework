@@ -47,9 +47,9 @@ namespace JFramework.Core
                         DataManager<Enum>.Add(dataType, keyInfo, (IDataTable)table);
                     }
                 }
-                catch (Exception)
+                catch (Exception e)
                 {
-                    Debug.Log($"{nameof(DataManager).Sky()} 加载 => {type.Name.Red()} 数据失败");
+                    Debug.Log($"{nameof(DataManager).Sky()} 加载 => {type.Name.Red()} 数据失败\n{e}");
                 }
             }
         }
