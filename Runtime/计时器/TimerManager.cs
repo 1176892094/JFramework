@@ -55,7 +55,10 @@ namespace JFramework.Core
         public static ITimer Pop(float time, Action action = null)
         {
             if (!GlobalManager.Runtime) return null;
-            var timer = finishList.Pop(() => new Timer());
+            if (!finishList.TryPop(out var timer))
+            {
+                timer = new Timer();
+            }
             timer.Open(time, action);
             timerList.AddLast(timer);
             return timer;
@@ -69,7 +72,10 @@ namespace JFramework.Core
         public static ITimer Pop(float time, Action<ITimer> action = null)
         {
             if (!GlobalManager.Runtime) return null;
-            var timer = finishList.Pop(() => new Timer());
+            if (!finishList.TryPop(out var timer))
+            {
+                timer = new Timer();
+            }
             timer.Open(time, action);
             timerList.AddLast(timer);
             return timer;

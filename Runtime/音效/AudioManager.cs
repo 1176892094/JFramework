@@ -105,7 +105,11 @@ namespace JFramework.Core
         {
             if (!GlobalManager.Runtime) return;
             Log.Info(DebugOption.Audio, $"播放音效: {path.Blue()}");
-            var audio = finishList.Pop(() => gameObject.AddComponent<AudioSource>());
+            if (!finishList.TryPop(out var audio))
+            {
+                audio = gameObject.AddComponent<AudioSource>();
+            }
+
             var clip = await AssetManager.LoadAsync<AudioClip>(path);
             audioList.Add(audio);
             audio.volume = audioSetting.audioVolume;

@@ -41,18 +41,18 @@ namespace JFramework
         /// 对哈希表进行基于栈的拓展
         /// </summary>
         /// <param name="objects"></param>
-        /// <param name="func"></param>
+        /// <param name="obj"></param>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
-        public static T Pop<T>(this HashSet<T> objects, Func<T> func = null)
+        public static bool TryPop<T>(this HashSet<T> objects, out T obj)
         {
-            if (objects == null) return default;
-            if (objects.Count <= 0) return func != null ? func() : default;
+            obj = default;
+            if (objects is not { Count: > 0 }) return false;
             using var enumerator = objects.GetEnumerator();
             enumerator.MoveNext();
-            T current = enumerator.Current;
-            objects.Remove(current);
-            return current;
+            obj = enumerator.Current;
+            objects.Remove(obj);
+            return true;
         }
 
         /// <summary>

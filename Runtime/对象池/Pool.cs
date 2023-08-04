@@ -35,7 +35,7 @@ namespace JFramework
         /// 对象弹出
         /// </summary>
         /// <returns>返回对象</returns>
-        public T Pop() => pool.Pop(() => new T());
+        public T Pop() => pool.TryPop(out var obj) ? obj : new T();
 
         /// <summary>
         /// 对象推入
