@@ -86,25 +86,24 @@ namespace JFramework.Core
         /// 对象池管理器推入对象
         /// </summary>
         /// <param name="obj">对象的实例</param>
-        public static bool Push(GameObject obj)
+        public static void Push(GameObject obj)
         {
-            if (!GlobalManager.Runtime) return false;
+            if (!GlobalManager.Runtime) return;
             if (obj == null)
             {
                 Debug.LogWarning($"{nameof(PoolManager).Sky()} 存入对象已被销毁");
-                return false;
+                return;
             }
 
             var key = obj.name;
             if (pools.TryGetValue(key, out var pool))
             {
                 Log.Info(DebugOption.Pool, $"存入 => {key.Pink()} 对象成功");
-                return ((Pool)pool).Push(obj);
+                ((Pool)pool).Push(obj);
             }
 
             Log.Info(DebugOption.Pool, $"创建 => 对象池 : {key.Green()}");
             pools.Add(key, new Pool(obj));
-            return true;
         }
 
         /// <summary>

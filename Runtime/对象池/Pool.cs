@@ -35,13 +35,7 @@ namespace JFramework
         /// 对象弹出
         /// </summary>
         /// <returns>返回对象</returns>
-        public T Pop()
-        {
-            if (pool.Count == 0) return new T();
-            var @object = pool.First();
-            pool.Remove(@object);
-            return @object;
-        }
+        public T Pop() => pool.Pop(() => new T());
 
         /// <summary>
         /// 对象推入
@@ -108,12 +102,13 @@ namespace JFramework
         /// <param name="object">推出的游戏物体</param>
         public bool Push(GameObject @object)
         {
-            @object.SetActive(false);
+            if (!pool.Add(@object)) return false;
             @object.GetComponent<IPush>()?.OnPush();
             gameObject ??= new GameObject(@object.name + "-Pool");
             gameObject.transform.SetParent(PoolManager.poolManager);
             @object.transform.SetParent(gameObject.transform);
-            return pool.Add(@object);
+            @object.SetActive(false);
+            return true;
         }
 
         /// <summary>
