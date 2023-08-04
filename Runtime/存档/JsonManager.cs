@@ -62,7 +62,7 @@ namespace JFramework.Core
             var filePath = GetPath(name);
             if (!File.Exists(filePath))
             {
-                Debug.LogWarning($"{nameof(JsonManager).Sky()} 创建 => {name.Orange()} 数据文件");
+                Debug.Log($"{nameof(JsonManager).Sky()} 创建 => {name.Orange()} 数据文件");
                 await Save(new T(), name);
             }
 
