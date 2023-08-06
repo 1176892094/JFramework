@@ -14,7 +14,7 @@ using Sirenix.OdinInspector;
 using UnityEditor;
 using UnityEngine;
 
-namespace JFramework
+namespace JFramework.Editor
 {
     public class AssetEditor : ScriptableObject
     {

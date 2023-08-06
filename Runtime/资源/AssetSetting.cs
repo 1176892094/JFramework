@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace JFramework
 {
-    public enum BuildPlatform
+    internal enum BuildPlatform
     {
         StandaloneOSX = 2,
         StandaloneWindows = 5,
@@ -16,7 +16,7 @@ namespace JFramework
         /// <summary>
         /// 构建平台
         /// </summary>
-        public const BuildPlatform PLATFORM =
+        internal const BuildPlatform PLATFORM =
 #if UNITY_STANDALONE_WINDOWS
             BuildPlatform.StandaloneWindows;
 #elif UNITY_STANDALONE_OSX
