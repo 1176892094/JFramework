@@ -27,7 +27,7 @@ namespace JFramework
             {
                 if (instance != null) return instance;
                 var name = typeof(T).Name;
-                if (Application.isPlaying)
+                if (GlobalManager.Runtime)
                 {
                     instance ??= AssetManager.Load<T>($"Settings/{name}");
                     if (instance != null) return instance;
