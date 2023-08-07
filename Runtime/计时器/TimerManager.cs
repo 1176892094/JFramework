@@ -29,6 +29,7 @@ namespace JFramework.Core
         /// </summary>
         internal static void Awake()
         {
+            GlobalManager.OnUpdate -= OnUpdate;
             GlobalManager.OnUpdate += OnUpdate;
         }
 

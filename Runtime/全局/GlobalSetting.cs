@@ -26,7 +26,7 @@ namespace JFramework.Core
         private Dictionary<string, IPool> pools => PoolManager.pools;
 
         [ShowInInspector, LabelText("游戏组件管理"), FoldoutGroup("对象管理器")]
-        private Dictionary<ICharacter, Dictionary<Type, ScriptableObject>> characters => CtrlManager.characters;
+        private Dictionary<ICharacter, Dictionary<Type, ScriptableObject>> characters => ControllerManager.characters;
 
         [ShowInInspector, LabelText("资源管理数据"), FoldoutGroup("常用管理器")]
         private Dictionary<string, AssetBundle> depends => AssetManager.depends;
@@ -56,7 +56,7 @@ namespace JFramework.Core
         private Dictionary<Type, IPanel> panels => UIManager.panels;
 
         [ShowInInspector, LabelText("面板层级配置"), FoldoutGroup("面板管理器")]
-        private Dictionary<Type, Transform> layers => UIManager.layers;
+        private Dictionary<UILayerType, Transform> layers => UIManager.layers;
 
         [ShowInInspector, LabelText("背景音乐大小"), FoldoutGroup("音效管理器")]
         private float soundVolume => AudioManager.soundVolume;

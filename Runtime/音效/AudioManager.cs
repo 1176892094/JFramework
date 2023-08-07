@@ -23,9 +23,9 @@ namespace JFramework.Core
         private static AudioSetting audioSetting = new AudioSetting();
 
         /// <summary>
-        /// 音效挂载系统
+        /// 音效挂载对象
         /// </summary>
-        private static GameObject gameObject;
+        private static Transform poolManager;
 
         /// <summary>
         /// 背景音乐组件
@@ -52,9 +52,8 @@ namespace JFramework.Core
         /// </summary>
         internal static async void Awake()
         {
-            var transform = GlobalManager.Instance.transform;
-            gameObject = transform.Find("PoolManager").gameObject;
-            audioSource = gameObject.GetComponent<AudioSource>();
+            poolManager = GlobalManager.Instance.transform.Find("PoolManager");
+            audioSource = poolManager.GetComponent<AudioSource>();
             audioSetting = await JsonManager.Decrypt<AudioSetting>(Name);
             await SetSound(audioSetting.soundVolume);
             await SetAudio(audioSetting.audioVolume);
@@ -104,12 +103,12 @@ namespace JFramework.Core
         public static async void PlayAudio(string path)
         {
             if (!GlobalManager.Runtime) return;
-            Log.Info(DebugOption.Audio, $"播放音效: {path.Blue()}");
             if (!finishList.TryPop(out var audio))
             {
-                audio = gameObject.AddComponent<AudioSource>();
+                audio = poolManager.gameObject.AddComponent<AudioSource>();
+                Log.Info(DebugOption.Audio, $"添加音效组件: {path.Pink()}");
             }
-
+            Log.Info(DebugOption.Audio, $"播放音效: {path.Blue()}");
             var clip = await AssetManager.LoadAsync<AudioClip>(path);
             audioList.Add(audio);
             audio.volume = audioSetting.audioVolume;

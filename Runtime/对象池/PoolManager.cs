@@ -79,7 +79,6 @@ namespace JFramework.Core
             var obj = await AssetManager.LoadAsync<GameObject>(path);
             Log.Info(DebugOption.Pool, $"创建 => {path.Green()} 对象成功");
             obj.name = path;
-            obj.transform.SetParent(null);
             obj.GetComponent<IPop>()?.OnPop();
             return obj.GetComponent<T>();
         }
@@ -111,7 +110,7 @@ namespace JFramework.Core
         /// <summary>
         /// 管理器销毁
         /// </summary>
-        internal static void RuntimeInitializeOnLoad()
+        internal static void Destroy()
         {
             foreach (var pool in pools.Values)
             {

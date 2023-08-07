@@ -13,9 +13,9 @@ namespace JFramework.Core
         private static GlobalManager instance;
 
         /// <summary>
-        /// 是否已经初始化
+        /// 是否为活跃的
         /// </summary>
-        private static bool initialize;
+        private static bool isActive;
 
         /// <summary>
         /// 全局管理器开始事件
@@ -54,9 +54,9 @@ namespace JFramework.Core
         {
             get
             {
-                if (initialize) return initialize;
+                if (isActive) return isActive;
                 Debug.Log($"{nameof(GlobalManager).Red()} 没有初始化！");
-                return initialize;
+                return isActive;
             }
         }
 
@@ -65,12 +65,12 @@ namespace JFramework.Core
         /// </summary>
         private async void Awake()
         {
-            initialize = true;
+            isActive = true;
             DontDestroyOnLoad(gameObject);
             UIManager.Awake();
             PoolManager.Awake();
-            AudioManager.Awake();
             TimerManager.Awake();
+            AudioManager.Awake();
             await AssetManager.Awake();
             OnStart?.Invoke();
         }
@@ -81,10 +81,9 @@ namespace JFramework.Core
         private void OnDestroy()
         {
             UIManager.Destroy();
-            CtrlManager.Destroy();
+            PoolManager.Destroy();
             TimerManager.Destroy();
             AudioManager.Destroy();
-            EventManager.Destroy();
             RuntimeInitializeOnLoad();
             GC.Collect();
         }
@@ -101,7 +100,7 @@ namespace JFramework.Core
         {
             try
             {
-                initialize = false;
+                isActive = false;
                 OnQuit?.Invoke();
             }
             catch
@@ -140,11 +139,7 @@ namespace JFramework.Core
             OnStart = null;
             OnUpdate = null;
             instance = null;
-            initialize = false;
-            DataManager.RuntimeInitializeOnLoad();
-            PoolManager.RuntimeInitializeOnLoad();
-            SceneManager.RuntimeInitializeOnLoad();
-            AssetManager.RuntimeInitializeOnLoad();
+            isActive = false;
         }
     }
 }

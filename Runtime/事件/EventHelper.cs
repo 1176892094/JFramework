@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using JFramework.Interface;
 
 namespace JFramework
@@ -16,6 +17,7 @@ namespace JFramework
         /// </summary>
         /// <param name="event">传入观察的对象接口</param>
         /// <returns>返回是否添加成功</returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void Listen(IEvent<TEvent> @event) => events.Add(@event);
 
         /// <summary>
@@ -23,6 +25,7 @@ namespace JFramework
         /// </summary>
         /// <param name="event">传入观察的对象接口</param>
         /// <returns>返回是否移除成功</returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void Remove(IEvent<TEvent> @event) => events.Remove(@event);
 
         /// <summary>

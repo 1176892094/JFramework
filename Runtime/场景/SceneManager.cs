@@ -66,6 +66,7 @@ namespace JFramework.Core
         /// <summary>
         /// 场景管理器在开始游戏前清空
         /// </summary>
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
         internal static void RuntimeInitializeOnLoad()
         {
             OnLoadProgress = null;

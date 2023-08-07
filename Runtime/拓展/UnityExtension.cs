@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using JFramework.Core;
 using JFramework.Interface;
 using UnityEngine;
 
@@ -63,7 +64,7 @@ namespace JFramework
         /// <returns></returns>
         public static T GetOrAddCtrl<T>(this ICharacter character) where T : ScriptableObject, IController
         {
-            return CtrlManager.GetOrAddCtrl<T>(character);
+            return ControllerManager.GetOrAddCtrl<T>(character);
         }
 
         /// <summary>
@@ -72,7 +73,17 @@ namespace JFramework
         /// <param name="character"></param>
         public static void Destroy(this ICharacter character)
         {
-            CtrlManager.Destroy(character);
+            ControllerManager.Destroy(character);
+        }
+
+        /// <summary>
+        /// 面板设置层级
+        /// </summary>
+        /// <param name="panel"></param>
+        /// <param name="layer"></param>
+        public static void SetLayer(this IPanel panel, UILayerType layer)
+        {
+            panel.transform.SetParent(UIManager.GetLayer(layer), false);
         }
     }
 }

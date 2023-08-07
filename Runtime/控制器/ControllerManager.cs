@@ -12,7 +12,7 @@ namespace JFramework
     /// <summary>
     /// 控制器管理器
     /// </summary>
-    internal static class CtrlManager
+    internal static class ControllerManager
     {
         /// <summary>
         /// 全局控制器容器
@@ -27,21 +27,20 @@ namespace JFramework
         /// <returns></returns>
         public static T GetOrAddCtrl<T>(ICharacter character) where T : ScriptableObject, IController
         {
-            var key = typeof(T);
             if (!characters.TryGetValue(character, out Controllers controllers))
             {
                 controllers = new Controllers();
                 characters.Add(character, controllers);
             }
 
-            if (!controllers.ContainsKey(key))
+            if (!controllers.ContainsKey(typeof(T)))
             {
                 var controller = ScriptableObject.CreateInstance<T>();
-                controllers.Add(key, controller);
+                controllers.Add(typeof(T), controller);
                 controller.Spawn(character);
             }
 
-            return (T)characters[character][key];
+            return (T)characters[character][typeof(T)];
         }
 
         /// <summary>
@@ -65,7 +64,8 @@ namespace JFramework
         /// <summary>
         /// 销毁所有控制器
         /// </summary>
-        internal static void Destroy()
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
+        internal static void RuntimeInitializeOnLoad()
         {
             var controllers = characters.Values.SelectMany(dictionary => dictionary.Values);
             foreach (var controller in controllers)

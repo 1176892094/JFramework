@@ -139,6 +139,7 @@ namespace JFramework.Core
         /// <summary>
         /// 清除数据管理器
         /// </summary>
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
         internal static void RuntimeInitializeOnLoad()
         {
             DataManager<int>.Clear();

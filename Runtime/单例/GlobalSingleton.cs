@@ -1,4 +1,3 @@
-using System;
 using JFramework.Core;
 using UnityEngine;
 
@@ -60,27 +59,6 @@ namespace JFramework
             }
         }
 
-        /// <summary>
-        /// 销毁单例
-        /// </summary>
-        private void OnDestroy()
-        {
-            try
-            {
-                instance = null;
-                Despawn();
-            }
-            catch (Exception e)
-            {
-                Debug.LogWarning(e.ToString());
-            }
-        }
-
-        /// <summary>
-        /// 释放内存
-        /// </summary>
-        protected virtual void Despawn()
-        {
-        }
+        protected virtual void OnDestroy() => instance = null;
     }
 }

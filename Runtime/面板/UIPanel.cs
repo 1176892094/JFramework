@@ -19,13 +19,17 @@ namespace JFramework
         /// <summary>
         /// 视觉容器字典
         /// </summary>
-        [ShowInInspector, LabelText("视觉元素")]
-        private Dictionary<Type, Dictionary<string, UIBehaviour>> components = new Dictionary<Type, Dictionary<string, UIBehaviour>>();
+        [ShowInInspector, LabelText("视觉元素")] private Dictionary<Type, Dictionary<string, UIBehaviour>> components = new Dictionary<Type, Dictionary<string, UIBehaviour>>();
 
         /// <summary>
         /// UI隐藏类型
         /// </summary>
         [ShowInInspector, LabelText("面板状态")] public UIStateType stateType;
+
+        /// <summary>
+        /// 面板是否活跃
+        /// </summary>
+        private bool isActive;
 
         /// <summary>
         /// 开始时查找所有控件
@@ -64,20 +68,19 @@ namespace JFramework
         /// <typeparam name="T"></typeparam>
         private void FindComponent<T>() where T : UIBehaviour
         {
-            var type = typeof(T);
             var components = GetComponentsInChildren<T>();
             foreach (var component in components)
             {
                 var key = component.gameObject.name;
-                if (!this.components.ContainsKey(type))
+                if (!this.components.ContainsKey(typeof(T)))
                 {
                     var container = new Dictionary<string, UIBehaviour>();
-                    this.components.Add(type, container);
+                    this.components.Add(typeof(T), container);
                     container.Add(key, component);
                 }
-                else if (!this.components[type].ContainsKey(key))
+                else if (!this.components[typeof(T)].ContainsKey(key))
                 {
-                    this.components[type].Add(key, component);
+                    this.components[typeof(T)].Add(key, component);
                 }
 
                 if (component is Button button)
@@ -112,18 +115,20 @@ namespace JFramework
         /// <summary>
         /// 显示UI面板
         /// </summary>
-        public virtual void Show() { }
+        public virtual void Show() => gameObject.SetActive(isActive = true);
 
         /// <summary>
         /// 隐藏UI面板
         /// </summary>
-        public virtual void Hide() { }
+        public virtual void Hide() => gameObject.SetActive(isActive = false);
+
+        bool IPanel.isActive => isActive;
 
         /// <summary>
         /// UI 面板状态
         /// </summary>
-        UIStateType IPanel.state => stateType;
-        
+        UIStateType IPanel.stateType => stateType;
+
         /// <summary>
         /// 实体接口调用实体更新方法
         /// </summary>

@@ -324,6 +324,7 @@ namespace JFramework.Core
         /// <summary>
         /// 清空AB包的方法
         /// </summary>
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
         internal static void RuntimeInitializeOnLoad()
         {
             AssetBundle.UnloadAllAssetBundles(true);
