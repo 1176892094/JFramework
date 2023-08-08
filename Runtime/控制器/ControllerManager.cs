@@ -37,7 +37,7 @@ namespace JFramework
             {
                 var controller = ScriptableObject.CreateInstance<T>();
                 controllers.Add(typeof(T), controller);
-                controller.Spawn(character);
+                ((IController<ICharacter>)controller).Spawn(character);
             }
 
             return (T)characters[character][typeof(T)];

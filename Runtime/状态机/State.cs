@@ -8,29 +8,17 @@ namespace JFramework
     /// 状态的抽象类
     /// </summary>
     [Serializable]
-    public abstract class State<TEntity> : IState where TEntity : MonoBehaviour, IEntity
+    public abstract class State<TCharacter> : IState<TCharacter> where TCharacter : MonoBehaviour, ICharacter
     {
         /// <summary>
         /// 状态的所有者
         /// </summary>
-        protected TEntity owner;
+        protected TCharacter owner;
 
         /// <summary>
         /// 基本状态机的接口 (用于转换指定状态机)
         /// </summary>
         protected IStateMachine baseMachine;
-
-        /// <summary>
-        /// 状态醒来
-        /// </summary>
-        /// <param name="owner">传入状态的所有者</param>
-        /// <param name="baseMachine">传入状态机</param>
-        private void OnAwake(TEntity owner, IStateMachine baseMachine)
-        {
-            this.owner = owner;
-            this.baseMachine = baseMachine;
-            OnAwake();
-        }
 
         /// <summary>
         /// 状态初始化
@@ -51,13 +39,18 @@ namespace JFramework
         /// 退出状态
         /// </summary>
         protected abstract void OnExit();
-
+        
         /// <summary>
-        /// 受保护的状态醒来方法
+        /// 状态机醒来
         /// </summary>
-        /// <param name="owner">传入状态的所有者</param>
-        /// <param name="stateMachine">传入状态机</param>
-        void IState.OnAwake(IEntity owner, IStateMachine stateMachine) => OnAwake((TEntity)owner, stateMachine);
+        /// <param name="owner"></param>
+        /// <param name="baseMachine"></param>
+        void IState<TCharacter>.OnAwake(TCharacter owner, IStateMachine baseMachine)
+        {
+            this.owner = owner;
+            this.baseMachine = baseMachine;
+            OnAwake();
+        }
 
         /// <summary>
         /// 受保护的状态进入方法

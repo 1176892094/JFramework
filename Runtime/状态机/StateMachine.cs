@@ -8,7 +8,7 @@ using UnityEngine;
 // ReSharper disable All
 namespace JFramework
 {
-    public abstract class StateMachine<T> : Controller<T>, IStateMachine where T : MonoBehaviour, IEntity
+    public abstract class StateMachine<TCharacter> : Controller<TCharacter>, IStateMachine where TCharacter : MonoBehaviour, ICharacter
     {
         /// <summary>
         /// 存储状态的字典
@@ -36,7 +36,7 @@ namespace JFramework
             if (stateDict.ContainsKey(typeof(TState))) return;
             state = new TState();
             stateDict.Add(typeof(TState), state);
-            state.OnAwake(owner, this);
+            ((IState<TCharacter>)state).OnAwake(owner, this);
         }
 
         /// <summary>
@@ -48,7 +48,7 @@ namespace JFramework
         {
             if (stateDict.ContainsKey(typeof(TState))) return;
             stateDict.Add(typeof(TState), state);
-            state.OnAwake(owner, this);
+            ((IState<TCharacter>)state).OnAwake(owner, this);
         }
 
         /// <summary>

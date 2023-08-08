@@ -15,45 +15,4 @@ namespace JFramework.Interface
         /// </summary>
         void Clear();
     }
-
-    /// <summary>
-    /// 泛型对象池接口
-    /// </summary>
-    /// <typeparam name="T"></typeparam>
-    public interface IPool<T> : IPool
-    {
-        /// <summary>
-        /// 弹出对象
-        /// </summary>
-        /// <returns>返回对象</returns>
-        T Pop();
-
-        /// <summary>
-        /// 推入对象
-        /// </summary>
-        /// <param name="obj">传入推入的对象</param>
-        bool Push(T obj);
-    }
-    
-    /// <summary>
-    /// 继承后会在管理器Pop时调用 (限定GameObject)
-    /// </summary>
-    public interface IPop
-    {
-        /// <summary>
-        /// 当从对象池弹出时调用
-        /// </summary>
-        void OnPop();
-    }
-
-    /// <summary>
-    /// 继承后会在管理器Push时调用 (限定GameObject)
-    /// </summary>
-    public interface IPush
-    {
-        /// <summary>
-        /// 当推入对象池时调用
-        /// </summary>
-        void OnPush();
-    }
 }
