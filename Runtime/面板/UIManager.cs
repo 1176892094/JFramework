@@ -91,13 +91,13 @@ namespace JFramework.Core
             {
                 if (!panels[typeof(TPanel)].isActive)
                 {
-                    Debug.Log($"{nameof(UIManager)} 隐藏 => {typeof(TPanel).Name.Red()} 失败,面板已经隐藏!");
+                    Debug.Log($"{nameof(UIManager).Sky()} 隐藏 => {typeof(TPanel).Name.Red()} 失败,面板已经隐藏!");
                     return;
                 }
                 
                 if (panels[typeof(TPanel)].stateType == UIStateType.Freeze)
                 {
-                    Debug.Log($"{nameof(UIManager)} 隐藏 => {typeof(TPanel).Name.Red()} 失败,面板处于冻结状态!");
+                    Debug.Log($"{nameof(UIManager).Sky()} 隐藏 => {typeof(TPanel).Name.Red()} 失败,面板处于冻结状态!");
                     return;
                 }
 
