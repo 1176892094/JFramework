@@ -69,15 +69,15 @@ namespace JFramework.Core
                 var @object = ((Pool)pool).Pop();
                 if (@object != null)
                 {
-                    Log.Info(DebugOption.Pool, $"取出 => {path.Pink()} 对象成功");
+                    Log.Info(Option.Pool, $"取出 => {path.Pink()} 对象成功");
                     return @object.GetComponent<T>();
                 }
 
-                Log.Info(DebugOption.Pool, $"移除已销毁对象 : {path.Red()}");
+                Log.Info(Option.Pool, $"移除已销毁对象 : {path.Red()}");
             }
 
             var obj = await AssetManager.LoadAsync<GameObject>(path);
-            Log.Info(DebugOption.Pool, $"创建 => {path.Green()} 对象成功");
+            Log.Info(Option.Pool, $"创建 => {path.Green()} 对象成功");
             obj.name = path;
             obj.GetComponent<IPop>()?.OnPop();
             return obj.GetComponent<T>();
@@ -98,12 +98,12 @@ namespace JFramework.Core
             
             if (pools.TryGetValue(obj.name, out var pool))
             {
-                Log.Info(DebugOption.Pool, $"存入 => {obj.name.Pink()} 对象成功");
+                Log.Info(Option.Pool, $"存入 => {obj.name.Pink()} 对象成功");
                 ((Pool)pool).Push(obj);
                 return;
             }
 
-            Log.Info(DebugOption.Pool, $"创建 => 对象池 : {obj.name.Green()}");
+            Log.Info(Option.Pool, $"创建 => 对象池 : {obj.name.Green()}");
             pools.Add(obj.name, new Pool(obj));
         }
 

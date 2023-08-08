@@ -6,13 +6,14 @@ using JFramework.Editor;
 using JFramework.Interface;
 using Sirenix.OdinInspector;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace JFramework.Core
 {
     public sealed partial class GlobalManager
     {
-        [SerializeField, LabelText("控制台输出选项"), FoldoutGroup("设置管理器")]
-        internal DebugOption debugOption;
+        [FormerlySerializedAs("debugOption")] [SerializeField, LabelText("控制台输出选项"), FoldoutGroup("设置管理器")]
+        internal Option option;
 #if UNITY_EDITOR
         [HideInInspector] public bool isRemote;
 
@@ -74,29 +75,29 @@ namespace JFramework.Core
 
     internal static class Log
     {
-        private static readonly Dictionary<DebugOption, string> options = new Dictionary<DebugOption, string>()
+        private static readonly Dictionary<Option, string> options = new Dictionary<Option, string>()
         {
-            { DebugOption.Json, "JsonManager " },
-            { DebugOption.Pool, "PoolManager " },
-            { DebugOption.Data, "DataManager " },
-            { DebugOption.Scene, "SceneManager " },
-            { DebugOption.Asset, "AssetManager " },
-            { DebugOption.Audio, "AudioManager " },
-            { DebugOption.Timer, "TimerManager " },
-            { DebugOption.Event, "EventManager " },
+            { Option.Json, "JsonManager " },
+            { Option.Pool, "PoolManager " },
+            { Option.Data, "DataManager " },
+            { Option.Scene, "SceneManager " },
+            { Option.Asset, "AssetManager " },
+            { Option.Audio, "AudioManager " },
+            { Option.Timer, "TimerManager " },
+            { Option.Event, "EventManager " },
         };
 
 
-        public static void Info(DebugOption option, string message)
+        public static void Info(Option option, string message)
         {
             if (!GlobalManager.Runtime) return;
-            if ((GlobalManager.Instance.debugOption & option) == DebugOption.None) return;
+            if ((GlobalManager.Instance.option & option) == Option.None) return;
             Debug.Log(options.TryGetValue(option, out var value) ? value.Sky() + message : message);
         }
     }
 
     [Flags]
-    internal enum DebugOption
+    internal enum Option
     {
         None = 0,
         Json = 1,

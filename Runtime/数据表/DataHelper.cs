@@ -57,12 +57,12 @@ namespace JFramework
             {
                 if (dataList.TryGetValue(key, out IData data))
                 {
-                    Log.Info(DebugOption.Data, $"获取 => {typeof(TData).Name.Blue()} : {key.ToString().Green()} 数据成功");
+                    Log.Info(Option.Data, $"获取 => {typeof(TData).Name.Blue()} : {key.ToString().Green()} 数据成功");
                     return (TData)data;
                 }
             }
 
-            Log.Info(DebugOption.Data, $"获取 => {typeof(TData).Name.Red()} : {key.ToString().Green()} 数据失败");
+            Log.Info(Option.Data, $"获取 => {typeof(TData).Name.Red()} : {key.ToString().Green()} 数据失败");
             return default;
         }
 
@@ -74,7 +74,7 @@ namespace JFramework
         public static TData[] GetTable<TData>() where TData : IData
         {
             if (!dataDict.TryGetValue(typeof(TKey), out Dictionary<TKey, IData> dataList)) return null;
-            Log.Info(DebugOption.Data, $"获取 => {typeof(TData).Name.Blue()} 列表成功");
+            Log.Info(Option.Data, $"获取 => {typeof(TData).Name.Blue()} 列表成功");
             return dataList.Values.Cast<TData>().ToArray();
         }
 
