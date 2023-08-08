@@ -7,7 +7,7 @@ namespace JFramework
     /// 控制器的抽象类
     /// </summary>
     /// <typeparam name="TCharacter">实现了IEntity接口的类型</typeparam>
-    public abstract class Controller<TCharacter> : SerializedScriptableObject, IController<TCharacter> where TCharacter : ICharacter
+    public abstract class Controller<TCharacter> : SerializedScriptableObject, IController where TCharacter : ICharacter
     {
         /// <summary>
         /// 控制器的所有者
@@ -25,9 +25,9 @@ namespace JFramework
         /// 控制器初始化
         /// </summary>
         /// <param name="owner">传入所有者</param>
-        void IController<TCharacter>.Spawn(TCharacter owner)
+        void IController.Spawn(ICharacter owner)
         {
-            this.owner = owner;
+            this.owner = (TCharacter)owner;
             Spawn();
         }
     }

@@ -4,6 +4,10 @@ using JFramework.Interface;
 
 namespace JFramework
 {
+    /// <summary>
+    /// 静态泛型事件存储类
+    /// </summary>
+    /// <typeparam name="TEvent"></typeparam>
     internal static class Event<TEvent> where TEvent : struct, IEvent
     {
         /// <summary>

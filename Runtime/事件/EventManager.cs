@@ -5,6 +5,9 @@ using UnityEngine;
 
 namespace JFramework.Core
 {
+    /// <summary>
+    /// 事件管理器
+    /// </summary>
     public static class EventManager
     {
         /// <summary>

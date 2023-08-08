@@ -8,7 +8,7 @@ namespace JFramework
     /// 状态的抽象类
     /// </summary>
     [Serializable]
-    public abstract class State<TCharacter> : IState<TCharacter> where TCharacter : MonoBehaviour, ICharacter
+    public abstract class State<TCharacter> : IState where TCharacter : MonoBehaviour, ICharacter
     {
         /// <summary>
         /// 状态的所有者
@@ -45,9 +45,9 @@ namespace JFramework
         /// </summary>
         /// <param name="owner"></param>
         /// <param name="baseMachine"></param>
-        void IState<TCharacter>.OnAwake(TCharacter owner, IStateMachine baseMachine)
+        void IState.OnAwake(ICharacter owner, IStateMachine baseMachine)
         {
-            this.owner = owner;
+            this.owner = (TCharacter)owner;
             this.baseMachine = baseMachine;
             OnAwake();
         }

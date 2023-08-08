@@ -1,18 +1,17 @@
 using System;
 using System.Collections.Generic;
-#if UNITY_EDITOR
-using JFramework.Editor;
-#endif
 using JFramework.Interface;
 using Sirenix.OdinInspector;
 using UnityEngine;
-using UnityEngine.Serialization;
+#if UNITY_EDITOR
+using JFramework.Editor;
+#endif
 
 namespace JFramework.Core
 {
     public sealed partial class GlobalManager
     {
-        [FormerlySerializedAs("debugOption")] [SerializeField, LabelText("控制台输出选项"), FoldoutGroup("设置管理器")]
+        [SerializeField, LabelText("控制台输出选项"), FoldoutGroup("设置管理器")]
         internal Option option;
 #if UNITY_EDITOR
         [HideInInspector] public bool isRemote;
@@ -71,42 +70,5 @@ namespace JFramework.Core
         [ShowInInspector, LabelText("播放音效列表"), FoldoutGroup("音效管理器")]
         private HashSet<AudioSource> audioList => AudioManager.audioList;
 #endif
-    }
-
-    internal static class Log
-    {
-        private static readonly Dictionary<Option, string> options = new Dictionary<Option, string>()
-        {
-            { Option.Json, "JsonManager " },
-            { Option.Pool, "PoolManager " },
-            { Option.Data, "DataManager " },
-            { Option.Scene, "SceneManager " },
-            { Option.Asset, "AssetManager " },
-            { Option.Audio, "AudioManager " },
-            { Option.Timer, "TimerManager " },
-            { Option.Event, "EventManager " },
-        };
-
-
-        public static void Info(Option option, string message)
-        {
-            if (!GlobalManager.Runtime) return;
-            if ((GlobalManager.Instance.option & option) == Option.None) return;
-            Debug.Log(options.TryGetValue(option, out var value) ? value.Sky() + message : message);
-        }
-    }
-
-    [Flags]
-    internal enum Option
-    {
-        None = 0,
-        Json = 1,
-        Pool = 2,
-        Data = 4,
-        Scene = 8,
-        Asset = 16,
-        Audio = 32,
-        Timer = 64,
-        Event = 128,
     }
 }
