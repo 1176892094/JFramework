@@ -89,8 +89,12 @@ namespace JFramework.Core
 #if UNITY_EDITOR
             if (!isRemote)
             {
-                var obj = AssetEditor.objects[path];
-                return obj is GameObject ? Object.Instantiate((T)obj) : (T)obj;
+                if (AssetEditor.objects.TryGetValue(path, out var obj))
+                {
+                    return obj is GameObject ? Object.Instantiate((T)obj) : (T)obj;
+                }
+                
+                return null;
             }
 #endif
             if (assets.ContainsKey(path))
