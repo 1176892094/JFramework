@@ -63,7 +63,7 @@ namespace JFramework.Core
             panel.Show();
             action?.Invoke((TPanel)panel);
         }
-
+        
         /// <summary>
         /// UI管理器加载面板
         /// </summary>
