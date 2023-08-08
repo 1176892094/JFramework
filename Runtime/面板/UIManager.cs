@@ -24,6 +24,11 @@ namespace JFramework.Core
         /// 存储所有UI的字典
         /// </summary>
         internal static readonly Dictionary<Type, IPanel> panels = new Dictionary<Type, IPanel>();
+        
+        /// <summary>
+        /// UI画布
+        /// </summary>
+        public static Canvas canvas;
 
         /// <summary>
         /// 界面管理器初始化数据
@@ -31,6 +36,7 @@ namespace JFramework.Core
         internal static void Awake()
         {
             var transform = GlobalManager.Instance.transform;
+            canvas = transform.Find("UICanvas").GetComponent<Canvas>();
             layers.Add(UILayerType.Normal, transform.Find("UICanvas/Layer1"));
             layers.Add(UILayerType.Bottom, transform.Find("UICanvas/Layer2"));
             layers.Add(UILayerType.Middle, transform.Find("UICanvas/Layer3"));
@@ -70,7 +76,7 @@ namespace JFramework.Core
                 return default;
             }
 
-            var obj = await AssetManager.LoadAsync<GameObject>("UI/" + typeof(TPanel).Name);
+            var obj = await AssetManager.LoadAsync<GameObject>("Prefabs/" + typeof(TPanel).Name);
             obj.transform.SetParent(layers[UILayerType.Normal], false);
             return obj.GetComponent<TPanel>();
         }

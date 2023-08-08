@@ -66,7 +66,7 @@ namespace JFramework
         /// 查找所有组件
         /// </summary>
         /// <typeparam name="T"></typeparam>
-        private void FindComponent<T>() where T : UIBehaviour
+        protected void FindComponent<T>() where T : UIBehaviour
         {
             var components = GetComponentsInChildren<T>();
             foreach (var component in components)
