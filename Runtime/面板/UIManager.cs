@@ -43,12 +43,32 @@ namespace JFramework.Core
             layers.Add(UILayerType.Height, transform.Find("UICanvas/Layer4"));
             layers.Add(UILayerType.Ignore, transform.Find("UICanvas/Layer5"));
         }
+        
+        /// <summary>
+        /// UI管理器显示UI面板 (无委托值)
+        /// </summary>
+        /// <typeparam name="TPanel">可以使用所有继承IPanel的对象</typeparam>
+        public static async void ShowPanel<TPanel>(Action action = null) where TPanel : IPanel
+        {
+            if (!GlobalManager.Runtime) return;
+            if (panels.TryGetValue(typeof(TPanel), out var panel))
+            {
+                panel.Show();
+                action?.Invoke();
+                return;
+            }
+
+            panel = await LoadPanel<TPanel>();
+            panels.Add(typeof(TPanel), panel);
+            panel.Show();
+            action?.Invoke();
+        }
 
         /// <summary>
         /// UI管理器显示UI面板 (有委托值)
         /// </summary>
         /// <typeparam name="TPanel">可以使用所有继承IPanel的对象</typeparam>
-        public static async void ShowPanel<TPanel>(Action<TPanel> action = null) where TPanel : IPanel
+        public static async void ShowPanel<TPanel>(Action<TPanel> action) where TPanel : IPanel
         {
             if (!GlobalManager.Runtime) return;
             if (panels.TryGetValue(typeof(TPanel), out var panel))
@@ -63,7 +83,7 @@ namespace JFramework.Core
             panel.Show();
             action?.Invoke((TPanel)panel);
         }
-        
+
         /// <summary>
         /// UI管理器加载面板
         /// </summary>
