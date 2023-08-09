@@ -13,13 +13,13 @@ namespace JFramework
         /// <summary>
         /// 存储状态的字典
         /// </summary>
-        [ShowInInspector, LabelText("持有状态")]
+        [ShowInInspector]
         private Dictionary<Type, IState> stateDict = new Dictionary<Type, IState>();
 
         /// <summary>
         /// 状态的接口
         /// </summary>
-        [ShowInInspector, LabelText("当前状态"), SerializeField]
+        [ShowInInspector, SerializeField]
         protected IState state;
 
         /// <summary>
