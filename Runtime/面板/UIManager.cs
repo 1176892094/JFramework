@@ -24,7 +24,7 @@ namespace JFramework.Core
         /// 存储所有UI的字典
         /// </summary>
         internal static readonly Dictionary<Type, IPanel> panels = new Dictionary<Type, IPanel>();
-        
+
         /// <summary>
         /// UI画布
         /// </summary>
@@ -43,7 +43,7 @@ namespace JFramework.Core
             layers.Add(UILayerType.Height, transform.Find("UICanvas/Layer4"));
             layers.Add(UILayerType.Ignore, transform.Find("UICanvas/Layer5"));
         }
-        
+
         /// <summary>
         /// UI管理器显示UI面板 (无委托值)
         /// </summary>
@@ -59,7 +59,6 @@ namespace JFramework.Core
             }
 
             panel = await LoadPanel<TPanel>();
-            panels.Add(typeof(TPanel), panel);
             panel.Show();
             action?.Invoke();
         }
@@ -79,7 +78,6 @@ namespace JFramework.Core
             }
 
             panel = await LoadPanel<TPanel>();
-            panels.Add(typeof(TPanel), panel);
             panel.Show();
             action?.Invoke((TPanel)panel);
         }
@@ -97,8 +95,17 @@ namespace JFramework.Core
             }
 
             var obj = await AssetManager.LoadAsync<GameObject>("Prefabs/" + typeof(TPanel).Name);
-            obj.transform.SetParent(layers[UILayerType.Normal], false);
-            return obj.GetComponent<TPanel>();
+            var panel = obj.GetComponent<TPanel>();
+
+            if (panel == null)
+            {
+                Debug.Log($"{nameof(UIManager)} 加载 => {typeof(TPanel).Name.Red()} 失败,面板挂载没有组件!");
+                return default;
+            }
+
+            panels.Add(typeof(TPanel), panel);
+            panel.SetLayer(panel.layerType);
+            return panel;
         }
 
         /// <summary>
@@ -107,21 +114,21 @@ namespace JFramework.Core
         public static void HidePanel<TPanel>() where TPanel : IPanel
         {
             if (!GlobalManager.Runtime) return;
-            if (panels.ContainsKey(typeof(TPanel)))
+            if (panels.TryGetValue(typeof(TPanel), out var panel))
             {
-                if (!panels[typeof(TPanel)].isActive)
+                if (!IsActive<TPanel>())
                 {
                     Debug.Log($"{nameof(UIManager).Sky()} 隐藏 => {typeof(TPanel).Name.Red()} 失败,面板已经隐藏!");
                     return;
                 }
-                
-                if (panels[typeof(TPanel)].stateType == UIStateType.Freeze)
+
+                if (panel.stateType == UIStateType.Freeze)
                 {
                     Debug.Log($"{nameof(UIManager).Sky()} 隐藏 => {typeof(TPanel).Name.Red()} 失败,面板处于冻结状态!");
                     return;
                 }
 
-                panels[typeof(TPanel)].Hide();
+                panel.Hide();
             }
         }
 
@@ -130,13 +137,23 @@ namespace JFramework.Core
         /// </summary>
         /// <typeparam name="TPanel">可以使用所有继承IPanel的对象</typeparam>
         /// <returns>返回获取到的UI面板</returns>
-        public static TPanel GetPanel<TPanel>() where TPanel : UIPanel => (TPanel)GetPanel(typeof(TPanel));
+        public static TPanel GetPanel<TPanel>() where TPanel : IPanel => (TPanel)GetPanel(typeof(TPanel));
 
         /// <summary>
         /// UI管理器得到UI面板
         /// </summary>
         /// <returns>返回获取到的UI面板</returns>
         public static IPanel GetPanel(Type key) => panels.TryGetValue(key, out var panel) ? panel : null;
+
+        /// <summary>
+        /// UI面板是否活跃
+        /// </summary>
+        /// <typeparam name="TPanel"></typeparam>
+        /// <returns></returns>
+        public static bool IsActive<TPanel>() where TPanel : IPanel
+        {
+            return panels.TryGetValue(typeof(TPanel), out var panel) ? panel.gameObject.activeInHierarchy : false;
+        }
 
         /// <summary>
         /// 手动注册到UI管理器

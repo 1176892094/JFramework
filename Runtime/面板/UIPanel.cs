@@ -11,6 +11,8 @@ using UnityEngine.UI;
 // ReSharper disable All
 namespace JFramework
 {
+    using VisualElement = Dictionary<string, UIBehaviour>;
+
     /// <summary>
     /// UI面板的抽象类
     /// </summary>
@@ -19,17 +21,18 @@ namespace JFramework
         /// <summary>
         /// 视觉容器字典
         /// </summary>
-        [ShowInInspector, LabelText("视觉元素")] private Dictionary<Type, Dictionary<string, UIBehaviour>> components = new Dictionary<Type, Dictionary<string, UIBehaviour>>();
+        [ShowInInspector, LabelText("视觉元素")]
+        private Dictionary<Type, VisualElement> elements = new Dictionary<Type, VisualElement>();
 
         /// <summary>
         /// UI隐藏类型
         /// </summary>
-        [ShowInInspector, LabelText("面板状态")] public UIStateType stateType;
+        [ShowInInspector, LabelText("面板状态")] public UIStateType stateType = UIStateType.Normal;
 
         /// <summary>
-        /// 面板是否活跃
+        /// UI层级
         /// </summary>
-        private bool isActive;
+        [ShowInInspector, LabelText("面板层级")] public UILayerType layerType = UILayerType.Normal;
 
         /// <summary>
         /// 开始时查找所有控件
@@ -72,15 +75,15 @@ namespace JFramework
             foreach (var component in components)
             {
                 var key = component.gameObject.name;
-                if (!this.components.ContainsKey(typeof(T)))
+                if (!elements.ContainsKey(typeof(T)))
                 {
-                    var container = new Dictionary<string, UIBehaviour>();
-                    this.components.Add(typeof(T), container);
+                    var container = new VisualElement();
+                    elements.Add(typeof(T), container);
                     container.Add(key, component);
                 }
-                else if (!this.components[typeof(T)].ContainsKey(key))
+                else if (!elements[typeof(T)].ContainsKey(key))
                 {
-                    this.components[typeof(T)].Add(key, component);
+                    elements[typeof(T)].Add(key, component);
                 }
 
                 if (component is Button button)
@@ -109,25 +112,28 @@ namespace JFramework
         /// <returns>返回查找到的组件</returns>
         public T Get<T>(string key) where T : UIBehaviour
         {
-            return components.TryGetValue(typeof(T), out var component) ? (T)component[key] : null;
+            return elements.TryGetValue(typeof(T), out var component) ? (T)component[key] : null;
         }
 
         /// <summary>
         /// 显示UI面板
         /// </summary>
-        public virtual void Show() => gameObject.SetActive(isActive = true);
+        public virtual void Show() => gameObject.SetActive(true);
 
         /// <summary>
         /// 隐藏UI面板
         /// </summary>
-        public virtual void Hide() => gameObject.SetActive(isActive = false);
-
-        bool IPanel.isActive => isActive;
+        public virtual void Hide() => gameObject.SetActive(false);
 
         /// <summary>
         /// UI 面板状态
         /// </summary>
         UIStateType IPanel.stateType => stateType;
+
+        /// <summary>
+        /// UI 面板层级
+        /// </summary>
+        UILayerType IPanel.layerType => layerType;
 
         /// <summary>
         /// 实体接口调用实体更新方法

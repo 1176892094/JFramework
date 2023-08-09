@@ -3,9 +3,9 @@ namespace JFramework.Interface
     public interface IPanel : IEntity
     {
         /// <summary>
-        /// 是否为活跃的
+        /// UI层级
         /// </summary>
-        bool isActive { get; }
+        UILayerType layerType { get; }
         
         /// <summary>
         /// UI面板状态
