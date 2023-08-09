@@ -1,6 +1,5 @@
 using System;
 using JFramework.Interface;
-using UnityEngine;
 
 namespace JFramework
 {
@@ -8,7 +7,7 @@ namespace JFramework
     /// 状态的抽象类
     /// </summary>
     [Serializable]
-    public abstract class State<TCharacter> : IState where TCharacter : MonoBehaviour, ICharacter
+    public abstract class State<TCharacter> : IState where TCharacter :  ICharacter
     {
         /// <summary>
         /// 状态的所有者
