@@ -5,13 +5,12 @@ using JFramework.Core;
 using JFramework.Interface;
 using Sirenix.OdinInspector;
 using UnityEngine;
-using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 // ReSharper disable All
 namespace JFramework
 {
-    using VisualElement = Dictionary<string, UIBehaviour>;
+    using VisualElement = Dictionary<string, Component>;
 
     /// <summary>
     /// UI面板的抽象类
@@ -21,18 +20,17 @@ namespace JFramework
         /// <summary>
         /// 视觉容器字典
         /// </summary>
-        [ShowInInspector, LabelText("视觉元素")]
-        private Dictionary<Type, VisualElement> elements = new Dictionary<Type, VisualElement>();
+        [ShowInInspector] private Dictionary<Type, VisualElement> elements = new Dictionary<Type, VisualElement>();
 
         /// <summary>
         /// UI隐藏类型
         /// </summary>
-        [ShowInInspector, LabelText("面板状态")] public UIStateType stateType = UIStateType.Normal;
+        public UIStateType stateType = UIStateType.Normal;
 
         /// <summary>
         /// UI层级
         /// </summary>
-        [ShowInInspector, LabelText("面板层级")] public UILayerType layerType = UILayerType.Normal;
+        public UILayerType layerType = UILayerType.Normal;
 
         /// <summary>
         /// 开始时查找所有控件
@@ -69,7 +67,7 @@ namespace JFramework
         /// 查找所有组件
         /// </summary>
         /// <typeparam name="T"></typeparam>
-        protected void FindComponent<T>() where T : UIBehaviour
+        protected void FindComponent<T>() where T : Component
         {
             var components = GetComponentsInChildren<T>();
             foreach (var component in components)
@@ -110,7 +108,7 @@ namespace JFramework
         /// <param name="key">组件的名称</param>
         /// <typeparam name="T">可以使用任何继承UIBehaviour的组件</typeparam>
         /// <returns>返回查找到的组件</returns>
-        public T Get<T>(string key) where T : UIBehaviour
+        public T Get<T>(string key) where T : Component
         {
             return elements.TryGetValue(typeof(T), out var component) ? (T)component[key] : null;
         }
