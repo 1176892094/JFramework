@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Reflection;
 using JFramework.Core;
 using JFramework.Interface;
 using Sirenix.OdinInspector;
@@ -86,20 +85,22 @@ namespace JFramework
 
                 if (component is Button button)
                 {
-                    button.onClick.AddListener(() => OnButtonClick(key));
+                    button.onClick.AddListener(() =>
+                    {
+                        if (stateType == UIStateType.Freeze) return;
+                        SendMessage(key);
+                    });
+                }
+
+                if (component is Toggle toggle)
+                {
+                    toggle.onValueChanged.AddListener(value =>
+                    {
+                        if (stateType == UIStateType.Freeze) return;
+                        SendMessage(key, value);
+                    });
                 }
             }
-        }
-
-        /// <summary>
-        /// 反射按钮名称
-        /// </summary>
-        /// <param name="key">点击的按钮名称</param>
-        private void OnButtonClick(string key)
-        {
-            if (stateType == UIStateType.Freeze) return;
-            var method = GetType().GetMethod(key, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
-            method?.Invoke(this, null);
         }
 
         /// <summary>
