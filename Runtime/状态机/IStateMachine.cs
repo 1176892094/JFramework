@@ -11,9 +11,9 @@ namespace JFramework.Interface
         /// <summary>
         /// 状态机添加状态
         /// </summary>
-        /// <param name="state">添加的状态类型</param>
         /// <typeparam name="TState">可传入任何继承IState的对象</typeparam>
-        void AddState<TState>(IState state) where TState : IState;
+        /// <typeparam name="TValue"></typeparam>
+        void AddState<TState, TValue>() where TState : IState where TValue : IState, new();
 
         /// <summary>
         /// 改变状态

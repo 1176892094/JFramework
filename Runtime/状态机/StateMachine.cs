@@ -34,21 +34,18 @@ namespace JFramework
         public void AddState<TState>() where TState : IState, new()
         {
             if (stateDict.ContainsKey(typeof(TState))) return;
-            state = new TState();
-            stateDict.Add(typeof(TState), state);
-            state.OnAwake(owner, this);
+            stateDict[typeof(TState)] = Create<TState>();
         }
 
         /// <summary>
         /// 状态机添加状态
         /// </summary>
-        /// <param name="state">添加的状态类型</param>
         /// <typeparam name="TState">可传入任何继承IState的对象</typeparam>
-        public void AddState<TState>(IState state) where TState : IState
+        /// <typeparam name="TValue">用于重写状态</typeparam>
+        public void AddState<TState, TValue>() where TState : IState where TValue : IState, new()
         {
             if (stateDict.ContainsKey(typeof(TState))) return;
-            stateDict.Add(typeof(TState), state);
-            state.OnAwake(owner, this);
+            stateDict[typeof(TState)] = Create<TValue>();
         }
 
         /// <summary>
@@ -70,6 +67,18 @@ namespace JFramework
         public void ChangeState<TState>(float duration) where TState : IState
         {
             TimerManager.Pop(duration, ChangeState<TState>);
+        }
+        
+        /// <summary>
+        /// 创建状态
+        /// </summary>
+        /// <typeparam name="TState"></typeparam>
+        /// <returns></returns>
+        private TState Create<TState>() where TState : IState, new()
+        {
+            var state = new TState();
+            state.OnAwake(owner, this);
+            return state;
         }
     }
 }
