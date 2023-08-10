@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 #if UNITY_EDITOR
@@ -23,13 +24,6 @@ namespace JFramework.Core
         /// </summary>
         internal static readonly Dictionary<string, AssetBundle> depends = new Dictionary<string, AssetBundle>();
 
-#if UNITY_EDITOR
-        /// <summary>
-        /// 是否为远端加载
-        /// </summary>
-        public static bool isRemote => GlobalManager.Instance.isRemote;
-#endif
-        
         /// <summary>
         /// 主包
         /// </summary>
@@ -41,14 +35,31 @@ namespace JFramework.Core
         private static AssetBundleManifest manifest;
 
         /// <summary>
+        /// 是否加载完成
+        /// </summary>
+        public static event Action OnLoadCompleted;
+        
+#if UNITY_EDITOR
+        /// <summary>
+        /// 是否为远端加载
+        /// </summary>
+        public static bool isRemote => GlobalManager.Instance.isRemote;
+#endif
+
+        /// <summary>
         /// 从服务器下载资源包
         /// </summary>
-        internal static async Task Awake()
+        public static async void LoadAssetBundle()
         {
 #if UNITY_EDITOR
-            if (!isRemote) return;
+            if (!isRemote)
+            {
+                OnLoadCompleted?.Invoke();
+                return;
+            }
 #endif
-            await AssetHelper.UpdateAsync();
+            await AssetHelper.UpdateVersion();
+            OnLoadCompleted?.Invoke();
         }
 
         /// <summary>
@@ -93,7 +104,7 @@ namespace JFramework.Core
                 {
                     return obj is GameObject ? Object.Instantiate((T)obj) : (T)obj;
                 }
-                
+
                 return null;
             }
 #endif
@@ -128,7 +139,7 @@ namespace JFramework.Core
             }
 
             var obj = depends[bundleName].LoadAsset<T>(assetName);
-            Log.Info(Option.Asset, $"加载 => {obj.name.Green()} 资源成功");
+            Log.Info($"加载 => {obj.name.Green()} 资源成功", Option.AssetManager);
             return obj is GameObject ? Object.Instantiate(obj) : obj;
         }
 
@@ -178,7 +189,7 @@ namespace JFramework.Core
             {
                 return LoadAsync<T>(assets[path].Item1.ToLower(), assets[path].Item2);
             }
-            
+
             var array = path.Split('/');
             assets.Add(path, (array[0].ToLower(), array[1]));
             return LoadAsync<T>(array[0].ToLower(), array[1]);
@@ -211,9 +222,9 @@ namespace JFramework.Core
             {
                 await Task.Yield();
             }
-            
+
             if (request.asset == null) return null;
-            Log.Info(Option.Asset, $"加载 => {request.asset.name.Green()} 资源成功");
+            Log.Info($"加载 => {request.asset.name.Green()} 资源成功", Option.AssetManager);
             return request.asset is GameObject ? (T)Object.Instantiate(request.asset) : (T)request.asset;
         }
 
@@ -266,7 +277,7 @@ namespace JFramework.Core
             {
                 return LoadSceneAsync(assets[path].Item1.ToLower(), assets[path].Item2);
             }
-            
+
             var array = path.Split('/');
             assets.Add(path, (array[0].ToLower(), array[1]));
             return LoadSceneAsync(array[0].ToLower(), array[1]);
@@ -328,14 +339,14 @@ namespace JFramework.Core
         /// <summary>
         /// 清空AB包的方法
         /// </summary>
-        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
-        internal static void RuntimeInitializeOnLoad()
+        internal static void Clear()
         {
             AssetBundle.UnloadAllAssetBundles(true);
-            depends.Clear();
             assets.Clear();
+            depends.Clear();
             manifest = null;
             mainAsset = null;
+            OnLoadCompleted = null;
         }
     }
 }

@@ -31,17 +31,17 @@ namespace JFramework.Core
         public static Canvas canvas;
 
         /// <summary>
-        /// 界面管理器初始化数据
+        /// UI管理器初始化
         /// </summary>
-        internal static void Awake()
+        internal static void Register()
         {
             var transform = GlobalManager.Instance.transform;
             canvas = transform.Find("UICanvas").GetComponent<Canvas>();
-            layers.Add(UILayerType.Normal, transform.Find("UICanvas/Layer1"));
-            layers.Add(UILayerType.Bottom, transform.Find("UICanvas/Layer2"));
-            layers.Add(UILayerType.Middle, transform.Find("UICanvas/Layer3"));
-            layers.Add(UILayerType.Height, transform.Find("UICanvas/Layer4"));
-            layers.Add(UILayerType.Ignore, transform.Find("UICanvas/Layer5"));
+            layers.Add(UILayerType.Normal, canvas.transform.Find("Layer1"));
+            layers.Add(UILayerType.Bottom, canvas.transform.Find("Layer2"));
+            layers.Add(UILayerType.Middle, canvas.transform.Find("Layer3"));
+            layers.Add(UILayerType.Height, canvas.transform.Find("Layer4"));
+            layers.Add(UILayerType.Ignore, canvas.transform.Find("Layer5"));
         }
 
         /// <summary>
@@ -146,6 +146,11 @@ namespace JFramework.Core
         public static IPanel GetPanel(Type key) => panels.TryGetValue(key, out var panel) ? panel : null;
 
         /// <summary>
+        /// 手动注册到UI管理器
+        /// </summary>
+        public static void Register<T>(T panel) where T : IPanel => panels[typeof(T)] = panel;
+        
+        /// <summary>
         /// UI面板是否活跃
         /// </summary>
         /// <typeparam name="TPanel"></typeparam>
@@ -154,18 +159,7 @@ namespace JFramework.Core
         {
             return panels.TryGetValue(typeof(TPanel), out var panel) ? panel.gameObject.activeInHierarchy : false;
         }
-
-        /// <summary>
-        /// 手动注册到UI管理器
-        /// </summary>
-        public static void Register<T>(T panel) where T : IPanel
-        {
-            if (!panels.ContainsKey(typeof(T)))
-            {
-                UIManager.panels.Add(typeof(T), panel);
-            }
-        }
-
+        
         /// <summary>
         /// UI管理器得到层级
         /// </summary>
@@ -222,7 +216,7 @@ namespace JFramework.Core
         /// <summary>
         /// UI管理器销毁
         /// </summary>
-        internal static void Destroy()
+        internal static void UnRegister()
         {
             panels.Clear();
             layers.Clear();

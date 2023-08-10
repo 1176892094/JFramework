@@ -33,11 +33,6 @@ namespace JFramework.Core
         private static AudioSource audioSource;
 
         /// <summary>
-        /// 管理器名称
-        /// </summary>
-        private static string Name => nameof(AudioManager);
-
-        /// <summary>
         /// 背景音乐
         /// </summary>
         public static float soundVolume => audioSetting.soundVolume;
@@ -50,11 +45,11 @@ namespace JFramework.Core
         /// <summary>
         /// 音效管理器初始化
         /// </summary>
-        internal static async void Awake()
+        internal static async void Register()
         {
             poolManager = GlobalManager.Instance.transform.Find("PoolManager");
+            audioSetting = await JsonManager.Decrypt<AudioSetting>(nameof(AudioManager));
             audioSource = poolManager.GetComponent<AudioSource>();
-            audioSetting = await JsonManager.Decrypt<AudioSetting>(Name);
             await SetSound(audioSetting.soundVolume);
             await SetAudio(audioSetting.audioVolume);
         }
@@ -66,7 +61,7 @@ namespace JFramework.Core
         public static async void PlaySound(string path)
         {
             if (!GlobalManager.Runtime) return;
-            Log.Info(Option.Audio, $"播放背景音乐: {path.Green()}");
+            Log.Info($"播放背景音乐: {path.Green()}", Option.AudioManager);
             var clip = await AssetManager.LoadAsync<AudioClip>(path);
             audioSource.volume = audioSetting.soundVolume;
             audioSource.clip = clip;
@@ -83,7 +78,7 @@ namespace JFramework.Core
             if (!GlobalManager.Runtime) return;
             audioSetting.soundVolume = soundVolume;
             audioSource.volume = soundVolume;
-            await JsonManager.Encrypt(audioSetting, Name);
+            await JsonManager.Encrypt(audioSetting, nameof(AudioManager));
         }
 
         /// <summary>
@@ -92,7 +87,7 @@ namespace JFramework.Core
         public static void StopSound()
         {
             if (!GlobalManager.Runtime) return;
-            Log.Info(Option.Audio, $"停止背景音乐");
+            Log.Info($"停止背景音乐", Option.AudioManager);
             audioSource.Pause();
         }
 
@@ -106,9 +101,10 @@ namespace JFramework.Core
             if (!finishList.TryPop(out var audio))
             {
                 audio = poolManager.gameObject.AddComponent<AudioSource>();
-                Log.Info(Option.Audio, $"添加音效组件: {path.Pink()}");
+                Log.Info($"添加音效组件: {path.Pink()}", Option.AudioManager);
             }
-            Log.Info(Option.Audio, $"播放音效: {path.Blue()}");
+
+            Log.Info($"播放音效: {path.Blue()}", Option.AudioManager);
             var clip = await AssetManager.LoadAsync<AudioClip>(path);
             audioList.Add(audio);
             audio.volume = audioSetting.audioVolume;
@@ -130,7 +126,7 @@ namespace JFramework.Core
                 audio.volume = audioVolume;
             }
 
-            await JsonManager.Encrypt(audioSetting, Name);
+            await JsonManager.Encrypt(audioSetting, nameof(AudioManager));
         }
 
         /// <summary>
@@ -140,7 +136,7 @@ namespace JFramework.Core
         public static void StopAudio(AudioSource audioSource)
         {
             if (!GlobalManager.Runtime) return;
-            Log.Info(Option.Audio, $"停止音效: {audioSource.clip.name.Orange()}");
+            Log.Info($"停止音效: {audioSource.clip.name.Orange()}", Option.AudioManager);
             if (audioList.Contains(audioSource))
             {
                 audioSource.Stop();
@@ -152,7 +148,7 @@ namespace JFramework.Core
         /// <summary>
         /// 管理器销毁
         /// </summary>
-        internal static void Destroy()
+        internal static void UnRegister()
         {
             audioList.Clear();
             finishList.Clear();

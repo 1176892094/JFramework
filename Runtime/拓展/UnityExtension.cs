@@ -62,9 +62,9 @@ namespace JFramework
         /// <param name="character"></param>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
-        public static T GetOrAddCtrl<T>(this ICharacter character) where T : ScriptableObject, IController
+        public static T Register<T>(this ICharacter character) where T : ScriptableObject, IController
         {
-            return ControllerManager.GetOrAddCtrl<T>(character);
+            return ControllerManager.Register<T>(character);
         }
 
         /// <summary>

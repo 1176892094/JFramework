@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Reflection;
 using JFramework.Core;
 using JFramework.Interface;
 using Sirenix.OdinInspector;
@@ -16,6 +17,16 @@ namespace JFramework
     /// </summary>
     public abstract class UIPanel : MonoBehaviour, IPanel
     {
+        /// <summary>
+        /// 忽略名称
+        /// </summary>
+        private static HashSet<string> ignore = new HashSet<string>()
+        {
+            "Image", "Panel", "Button", "Toggle", "Slider", "RawImage",
+            "Text (Legacy)", "Button (Legacy)", "InputField (Legacy)",
+            "Text (TMP)", "InputField (TMP)",
+        };
+
         /// <summary>
         /// 视觉容器字典
         /// </summary>
@@ -72,6 +83,7 @@ namespace JFramework
             foreach (var component in components)
             {
                 var key = component.gameObject.name;
+                if (ignore.Contains(key)) continue;
                 if (!elements.ContainsKey(typeof(T)))
                 {
                     var container = new VisualElement();
@@ -85,20 +97,26 @@ namespace JFramework
 
                 if (component is Button button)
                 {
-                    button.onClick.AddListener(() =>
+                    if (GetType().GetMethod(key, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic) != null)
                     {
-                        if (stateType == UIStateType.Freeze) return;
-                        SendMessage(key);
-                    });
+                        button.onClick.AddListener(() =>
+                        {
+                            if (stateType == UIStateType.Freeze) return;
+                            SendMessage(key);
+                        });
+                    }
                 }
 
                 if (component is Toggle toggle)
                 {
-                    toggle.onValueChanged.AddListener(value =>
+                    if (GetType().GetMethod(key, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic) != null)
                     {
-                        if (stateType == UIStateType.Freeze) return;
-                        SendMessage(key, value);
-                    });
+                        toggle.onValueChanged.AddListener(value =>
+                        {
+                            if (stateType == UIStateType.Freeze) return;
+                            SendMessage(key, value);
+                        });
+                    }
                 }
             }
         }

@@ -8,14 +8,14 @@ namespace JFramework.Core
     public sealed partial class GlobalManager : MonoBehaviour
     {
         /// <summary>
-        /// 私有的单例对象
+        /// 安全的单例调用
         /// </summary>
-        private static GlobalManager instance;
+        internal static GlobalManager Instance;
 
         /// <summary>
-        /// 是否为活跃的
+        /// 是否在运行模式
         /// </summary>
-        private static bool isActive;
+        public static bool Runtime;
 
         /// <summary>
         /// 全局管理器开始事件
@@ -33,60 +33,20 @@ namespace JFramework.Core
         public static event Action OnQuit;
 
         /// <summary>
-        /// 安全的单例调用
-        /// </summary>
-        internal static GlobalManager Instance
-        {
-            get
-            {
-                if (instance != null) return instance;
-                instance ??= FindObjectOfType<GlobalManager>();
-                var obj = Resources.Load<GlobalManager>(nameof(GlobalManager));
-                instance ??= Instantiate(obj);
-                return instance;
-            }
-        }
-
-        /// <summary>
-        /// 禁用单例访问 GlobalManager
-        /// </summary>
-        public static bool Runtime
-        {
-            get
-            {
-                if (isActive) return isActive;
-                Debug.Log($"{nameof(GlobalManager).Red()} 没有初始化！");
-                return isActive;
-            }
-        }
-
-        /// <summary>
         /// 全局管理器初始化
         /// </summary>
-        private async void Awake()
+        private void Awake()
         {
-            isActive = true;
+            Register();
+            Runtime = true;
+            Instance = this;
             DontDestroyOnLoad(gameObject);
-            UIManager.Awake();
-            PoolManager.Awake();
-            TimerManager.Awake();
-            AudioManager.Awake();
-            await AssetManager.Awake();
-            OnStart?.Invoke();
         }
-        
+
         /// <summary>
-        /// 全局管理器销毁
+        /// 广播开始事件
         /// </summary>
-        private void OnDestroy()
-        {
-            UIManager.Destroy();
-            PoolManager.Destroy();
-            TimerManager.Destroy();
-            AudioManager.Destroy();
-            RuntimeInitializeOnLoad();
-            GC.Collect();
-        }
+        private void Start() => OnStart?.Invoke();
 
         /// <summary>
         /// 广播管理器更新事件
@@ -100,13 +60,27 @@ namespace JFramework.Core
         {
             try
             {
-                isActive = false;
+                Runtime = false;
                 OnQuit?.Invoke();
             }
-            catch
+            catch (Exception e)
             {
-                //TODO: OnQuit 有可能会发生异常 但可以忽略
+                Debug.Log(e.ToString());
             }
+        }
+
+        /// <summary>
+        /// 全局管理器销毁
+        /// </summary>
+        private void OnDestroy()
+        {
+            Clear();
+            UnRegister();
+            OnQuit = null;
+            OnStart = null;
+            OnUpdate = null;
+            Instance = null;
+            GC.Collect();
         }
 
         /// <summary>
@@ -115,7 +89,7 @@ namespace JFramework.Core
         /// <param name="entity"></param>
         public static void Listen(IEntity entity)
         {
-            if (!Instance) return;
+            if (!Runtime) return;
             OnUpdate += entity.Update;
         }
 
@@ -130,16 +104,38 @@ namespace JFramework.Core
         }
 
         /// <summary>
-        /// 在场景加载之前重置
+        /// 注册
+        /// </summary>
+        private static void Register()
+        {
+            UIManager.Register();
+            PoolManager.Register();
+            TimerManager.Register();
+            AudioManager.Register();
+        }
+
+        /// <summary>
+        /// 取消注册
+        /// </summary>
+        private static void UnRegister()
+        {
+            UIManager.UnRegister();
+            PoolManager.UnRegister();
+            TimerManager.UnRegister();
+            AudioManager.UnRegister();
+        }
+
+        /// <summary>
+        /// 在场景加载前进行清空
         /// </summary>
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
-        private static void RuntimeInitializeOnLoad()
+        private static void Clear()
         {
-            OnQuit = null;
-            OnStart = null;
-            OnUpdate = null;
-            instance = null;
-            isActive = false;
+            DataManager.Clear();
+            EventManager.Clear();
+            SceneManager.Clear();
+            AssetManager.Clear();
+            ControllerManager.Clear();
         }
     }
 }

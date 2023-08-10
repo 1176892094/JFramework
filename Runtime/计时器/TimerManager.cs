@@ -23,13 +23,12 @@ namespace JFramework.Core
         /// 当前计时器节点
         /// </summary>
         private static LinkedListNode<Timer> currentNode;
-        
+
         /// <summary>
-        /// 构造函数初始化数据
+        /// 注册
         /// </summary>
-        internal static void Awake()
+        internal static void Register()
         {
-            GlobalManager.OnUpdate -= OnUpdate;
             GlobalManager.OnUpdate += OnUpdate;
         }
 
@@ -60,6 +59,7 @@ namespace JFramework.Core
             {
                 timer = new Timer();
             }
+
             timer.Open(time, action);
             timerList.AddLast(timer);
             return timer;
@@ -77,6 +77,7 @@ namespace JFramework.Core
             {
                 timer = new Timer();
             }
+
             timer.Open(time, action);
             timerList.AddLast(timer);
             return timer;
@@ -98,9 +99,9 @@ namespace JFramework.Core
         }
 
         /// <summary>
-        /// 计时器管理器清除计时器
+        /// 取消注册
         /// </summary>
-        internal static void Destroy()
+        internal static void UnRegister()
         {
             timerList.Clear();
             finishList.Clear();

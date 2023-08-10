@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using JFramework.Interface;
-using UnityEngine;
 
 namespace JFramework.Core
 {
@@ -29,7 +28,7 @@ namespace JFramework.Core
                 observers.Add(typeof(TEvent), Event<TEvent>.events = new HashSet<IEvent>());
             }
 
-            Log.Info(Option.Event, $"侦听 => {@event} {typeof(TEvent).Name.Yellow()} 事件");
+            Log.Info($"侦听 => {@event} {typeof(TEvent).Name.Yellow()}", Option.EventManager);
             Event<TEvent>.Listen(@event);
         }
 
@@ -42,7 +41,7 @@ namespace JFramework.Core
         public static void Remove<TEvent>(IEvent<TEvent> @event) where TEvent : struct, IEvent
         {
             if (!GlobalManager.Runtime) return;
-            Log.Info(Option.Event, $"移除 => {@event} {typeof(TEvent).Name.Yellow()} 事件");
+            Log.Info($"移除 => {@event} {typeof(TEvent).Name.Yellow()}", Option.EventManager);
             Event<TEvent>.Remove(@event);
         }
 
@@ -54,15 +53,14 @@ namespace JFramework.Core
         public static void Invoke<TEvent>(TEvent @event = default) where TEvent : struct, IEvent
         {
             if (!GlobalManager.Runtime) return;
-            Log.Info(Option.Event, $"触发 => {@event} {typeof(TEvent).Name.Yellow()} 事件");
+            Log.Info($"广播 => {@event} {typeof(TEvent).Name.Yellow()}", Option.EventManager);
             Event<TEvent>.Invoke(@event);
         }
 
         /// <summary>
         /// 事件管理器在开始游戏前重置
         /// </summary>
-        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
-        internal static void RuntimeInitializeOnLoad()
+        internal static void Clear()
         {
             foreach (var observer in observers.Values)
             {

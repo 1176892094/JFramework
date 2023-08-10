@@ -1,0 +1,11 @@
+using JFramework;
+using UnityEngine.UI;
+using TMPro;
+
+namespace Test
+{
+    public partial class TemplatePanel : UIPanel
+    {
+//TODO:1
+    }
+}

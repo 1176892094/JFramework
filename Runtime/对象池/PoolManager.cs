@@ -21,7 +21,7 @@ namespace JFramework.Core
         /// <summary>
         /// 获取 PoolManager 对象
         /// </summary>
-        internal static void Awake()
+        internal static void Register()
         {
             poolManager = GlobalManager.Instance.transform.Find("PoolManager");
         }
@@ -69,17 +69,18 @@ namespace JFramework.Core
                 var @object = ((Pool)pool).Pop();
                 if (@object != null)
                 {
-                    Log.Info(Option.Pool, $"取出 => {path.Pink()} 对象成功");
+                    Log.Info($"取出 => {path.Pink()} 对象成功", Option.PoolManager);
                     return @object.GetComponent<T>();
                 }
 
-                Log.Info(Option.Pool, $"移除已销毁对象 : {path.Red()}");
+                Log.Info($"移除已销毁对象 : {path.Red()}", Option.PoolManager);
             }
 
             var obj = await AssetManager.LoadAsync<GameObject>(path);
-            Log.Info(Option.Pool, $"创建 => {path.Green()} 对象成功");
-            obj.name = path;
+            Object.DontDestroyOnLoad(obj);
+            Log.Info($"创建 => {path.Green()} 对象成功", Option.PoolManager);
             obj.GetComponent<IPop>()?.OnPop();
+            obj.name = path;
             return obj.GetComponent<T>();
         }
 
@@ -95,22 +96,22 @@ namespace JFramework.Core
                 Debug.LogWarning($"{nameof(PoolManager).Sky()} 存入对象已被销毁");
                 return;
             }
-            
+
             if (pools.TryGetValue(obj.name, out var pool))
             {
-                Log.Info(Option.Pool, $"存入 => {obj.name.Pink()} 对象成功");
+                Log.Info($"存入 => {obj.name.Pink()} 对象成功", Option.PoolManager);
                 ((Pool)pool).Push(obj);
                 return;
             }
 
-            Log.Info(Option.Pool, $"创建 => 对象池 : {obj.name.Green()}");
+            Log.Info($"创建 => 对象池 : {obj.name.Green()}", Option.PoolManager);
             pools.Add(obj.name, new Pool(obj));
         }
 
         /// <summary>
-        /// 管理器销毁
+        /// 管理器卸载
         /// </summary>
-        internal static void Destroy()
+        internal static void UnRegister()
         {
             foreach (var pool in pools.Values)
             {

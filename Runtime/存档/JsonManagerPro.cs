@@ -22,7 +22,7 @@ namespace JFramework.Core
             var filePath = GetPath(name);
             var saveJson = obj is ScriptableObject ? JsonUtility.ToJson(obj) : JsonConvert.SerializeObject(obj);
             await File.WriteAllBytesAsync(filePath, await Encrypt(saveJson, name));
-            Log.Info(Option.Json, $"保存加密 => {name.Orange()} 数据文件");
+            Log.Info($"保存加密 => {name.Orange()} 数据文件", Option.JsonManager);
         }
 
         /// <summary>
@@ -39,7 +39,7 @@ namespace JFramework.Core
                 await Encrypt(obj, obj.name);
             }
 
-            Log.Info(Option.Json, $"读取解密 => {obj.name.Orange()} 数据文件");
+            Log.Info($"读取解密 => {obj.name.Orange()} 数据文件", Option.JsonManager);
             secrets.TryAdd(obj.name, new JsonData());
             if (!secrets[obj.name]) return;
             var saveJson = await Decrypt(await File.ReadAllBytesAsync(filePath), obj.name);
@@ -64,7 +64,7 @@ namespace JFramework.Core
                 await Encrypt(new T(), name);
             }
 
-            Log.Info(Option.Json, $"读取解密 => {name.Orange()} 数据文件");
+            Log.Info($"读取解密 => {name.Orange()} 数据文件", Option.JsonManager);
             secrets.TryAdd(name, new JsonData());
             if (!secrets[name]) return default;
             var saveJson = await Decrypt(await File.ReadAllBytesAsync(filePath), name);

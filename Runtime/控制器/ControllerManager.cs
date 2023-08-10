@@ -25,7 +25,7 @@ namespace JFramework
         /// <param name="character"></param>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
-        public static T GetOrAddCtrl<T>(ICharacter character) where T : ScriptableObject, IController
+        public static T Register<T>(ICharacter character) where T : ScriptableObject, IController
         {
             if (!characters.TryGetValue(character, out Controllers controllers))
             {
@@ -64,8 +64,7 @@ namespace JFramework
         /// <summary>
         /// 销毁所有控制器
         /// </summary>
-        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
-        internal static void RuntimeInitializeOnLoad()
+        internal static void Clear()
         {
             var controllers = characters.Values.SelectMany(dictionary => dictionary.Values);
             foreach (var controller in controllers)

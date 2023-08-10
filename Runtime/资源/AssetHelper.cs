@@ -32,7 +32,7 @@ namespace JFramework
         /// 检测是否需要更新
         /// </summary>
         /// <returns></returns>
-        internal static async Task UpdateAsync()
+        internal static async Task UpdateVersion()
         {
             assetDataList.Clear();
             clientDataList.Clear();

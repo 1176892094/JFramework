@@ -90,7 +90,7 @@ namespace JFramework.Core
             if (data != null) return data;
             data = DataManager<string>.GetTable<T>();
             if (data != null) return data;
-            Log.Info(Option.Data, $"获取 => {typeof(T).Name.Red()} 列表失败");
+            Log.Info($"获取 => {typeof(T).Name.Red()} 列表失败", Option.DataManager);
             return default;
         }
 
@@ -139,8 +139,7 @@ namespace JFramework.Core
         /// <summary>
         /// 清除数据管理器
         /// </summary>
-        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
-        internal static void RuntimeInitializeOnLoad()
+        internal static void Clear()
         {
             DataManager<int>.Clear();
             DataManager<string>.Clear();

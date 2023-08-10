@@ -17,7 +17,8 @@ namespace JFramework
         /// <summary>
         /// 泛型数据字典
         /// </summary>
-        internal static readonly Dictionary<Type, Dictionary<TKey, IData>> dataDict = new Dictionary<Type, Dictionary<TKey, IData>>();
+        internal static readonly Dictionary<Type, Dictionary<TKey, IData>> dataDict =
+            new Dictionary<Type, Dictionary<TKey, IData>>();
 
         /// <summary>
         /// 添加数据
@@ -57,12 +58,12 @@ namespace JFramework
             {
                 if (dataList.TryGetValue(key, out IData data))
                 {
-                    Log.Info(Option.Data, $"获取 => {typeof(TData).Name.Blue()} : {key.ToString().Green()} 数据成功");
+                    Log.Info($"获取 => {typeof(TData).Name.Blue()} : {key.ToString().Green()} 数据成功", Option.DataManager);
                     return (TData)data;
                 }
             }
 
-            Log.Info(Option.Data, $"获取 => {typeof(TData).Name.Red()} : {key.ToString().Green()} 数据失败");
+            Log.Info($"获取 => {typeof(TData).Name.Red()} : {key.ToString().Green()} 数据失败", Option.DataManager);
             return default;
         }
 
@@ -74,7 +75,7 @@ namespace JFramework
         public static TData[] GetTable<TData>() where TData : IData
         {
             if (!dataDict.TryGetValue(typeof(TKey), out Dictionary<TKey, IData> dataList)) return null;
-            Log.Info(Option.Data, $"获取 => {typeof(TData).Name.Blue()} 列表成功");
+            Log.Info($"获取 => {typeof(TData).Name.Blue()} 列表成功", Option.DataManager);
             return dataList.Values.Cast<TData>().ToArray();
         }
 
