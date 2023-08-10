@@ -37,10 +37,10 @@ namespace JFramework.Core
         /// </summary>
         private void Awake()
         {
-            Register();
             Runtime = true;
             Instance = this;
             DontDestroyOnLoad(gameObject);
+            Register();
         }
 
         /// <summary>
