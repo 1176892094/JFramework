@@ -17,7 +17,7 @@ namespace JFramework.Core
         {
             if (GlobalManager.Runtime && (GlobalManager.Instance.option & option) != Option.None)
             {
-                Debug.Log($"{option.ToString()} {message}");
+                Debug.Log($"{option} {message}");
             }
         }
     }

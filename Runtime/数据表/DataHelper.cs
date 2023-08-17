@@ -17,8 +17,7 @@ namespace JFramework
         /// <summary>
         /// 泛型数据字典
         /// </summary>
-        internal static readonly Dictionary<Type, Dictionary<TKey, IData>> dataDict =
-            new Dictionary<Type, Dictionary<TKey, IData>>();
+        internal static readonly Dictionary<Type, Dictionary<TKey, IData>> dataDict = new Dictionary<Type, Dictionary<TKey, IData>>();
 
         /// <summary>
         /// 添加数据

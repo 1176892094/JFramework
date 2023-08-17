@@ -30,5 +30,13 @@ namespace JFramework
             this.owner = (TCharacter)owner;
             Spawn();
         }
+
+        /// <summary>
+        /// 控制器销毁
+        /// </summary>
+        private void OnDestroy()
+        {
+            owner = default;
+        }
     }
 }

@@ -1,5 +1,4 @@
 using System;
-using JFramework.Interface;
 using UnityEngine;
 
 namespace JFramework.Core
@@ -10,12 +9,12 @@ namespace JFramework.Core
         /// <summary>
         /// 安全的单例调用
         /// </summary>
-        internal static GlobalManager Instance;
+        internal static GlobalManager Instance { get; private set; }
 
         /// <summary>
         /// 是否在运行模式
         /// </summary>
-        public static bool Runtime;
+        public static bool Runtime { get; private set; }
 
         /// <summary>
         /// 全局管理器开始事件
