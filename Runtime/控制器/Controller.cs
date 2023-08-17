@@ -21,10 +21,7 @@ namespace JFramework
         void IController.Spawn(ICharacter owner)
         {
             this.owner = (TCharacter)owner;
-            if (this is ISpawn spawn)
-            {
-                spawn.Spawn();
-            }
+            (this as IRegister)?.Register();
         }
 
         /// <summary>

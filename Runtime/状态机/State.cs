@@ -44,10 +44,6 @@ namespace JFramework
         {
             this.owner = (TCharacter)owner;
             this.machine = machine;
-            if (this is IAwake awake)
-            {
-                awake.OnAwake();
-            }
         }
 
         /// <summary>
