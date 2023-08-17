@@ -61,7 +61,7 @@ namespace JFramework.Core
         /// 对象池管理器异步获取对象 (生成并返回结果)
         /// </summary>
         /// <param name="path">弹出对象的路径</param>
-        public static async Task<T> Pop<T>(string path) where T : Object
+        public static async Task<T> Pop<T>(string path) where T : Component
         {
             if (!GlobalManager.Runtime) return null;
             if (pools.TryGetValue(path, out var pool) && pool.Count > 0)
