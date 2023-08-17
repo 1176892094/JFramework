@@ -61,7 +61,7 @@ namespace JFramework.Core
         public static async void PlaySound(string path)
         {
             if (!GlobalManager.Runtime) return;
-            Log.Info($"播放背景音乐: {path.Green()}", Option.AudioManager);
+            Log.Info($"播放背景音乐: {path.Green()}", Option.Audio);
             var clip = await AssetManager.LoadAsync<AudioClip>(path);
             audioSource.volume = audioSetting.soundVolume;
             audioSource.clip = clip;
@@ -87,7 +87,7 @@ namespace JFramework.Core
         public static void StopSound()
         {
             if (!GlobalManager.Runtime) return;
-            Log.Info($"停止背景音乐", Option.AudioManager);
+            Log.Info($"停止背景音乐", Option.Audio);
             audioSource.Pause();
         }
 
@@ -101,10 +101,10 @@ namespace JFramework.Core
             if (!finishList.TryPop(out var audio))
             {
                 audio = poolManager.gameObject.AddComponent<AudioSource>();
-                Log.Info($"添加音效组件: {path.Pink()}", Option.AudioManager);
+                Log.Info($"添加音效组件: {path.Pink()}", Option.Audio);
             }
 
-            Log.Info($"播放音效: {path.Blue()}", Option.AudioManager);
+            Log.Info($"播放音效: {path.Blue()}", Option.Audio);
             var clip = await AssetManager.LoadAsync<AudioClip>(path);
             audioList.Add(audio);
             audio.volume = audioSetting.audioVolume;
@@ -136,7 +136,7 @@ namespace JFramework.Core
         public static void StopAudio(AudioSource audioSource)
         {
             if (!GlobalManager.Runtime) return;
-            Log.Info($"停止音效: {audioSource.clip.name.Orange()}", Option.AudioManager);
+            Log.Info($"停止音效: {audioSource.clip.name.Orange()}", Option.Audio);
             if (audioList.Contains(audioSource))
             {
                 audioSource.Stop();

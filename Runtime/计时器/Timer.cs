@@ -92,7 +92,7 @@ namespace JFramework
                 }
                 catch (Exception e)
                 {
-                    Log.Info($"=> 计时器抛出异常，自动回收计时器。\n{e}", Option.TimerManager);
+                    Log.Info($"=> 计时器抛出异常，自动回收计时器。\n{e}", Option.Timer);
                     Push();
                 }
             }
@@ -174,13 +174,13 @@ namespace JFramework
         {
             if (count == 0)
             {
-                Log.Info($"=> 计时器停止时不能使用计时器队列。", Option.TimerManager);
+                Log.Info($"=> 计时器停止时不能使用计时器队列。", Option.Timer);
                 return null;
             }
 
             if (count > 1)
             {
-                Log.Info($"=> 计时器队列不能使用循环。", Option.TimerManager);
+                Log.Info($"=> 计时器队列不能使用循环。", Option.Timer);
                 return null;
             }
 
@@ -197,13 +197,13 @@ namespace JFramework
         {
             if (count == 0)
             {
-                Log.Info($"=> 计时器停止时不能使用计时器队列。", Option.TimerManager);
+                Log.Info($"=> 计时器停止时不能使用计时器队列。", Option.Timer);
                 return null;
             }
 
             if (count > 1)
             {
-                Log.Info($"=> 计时器队列不能使用循环。", Option.TimerManager);
+                Log.Info($"=> 计时器队列不能使用循环。", Option.Timer);
                 return null;
             }
 

@@ -90,7 +90,7 @@ namespace JFramework.Core
             if (data != null) return data;
             data = DataManager<string>.GetTable<T>();
             if (data != null) return data;
-            Log.Info($"获取 => {typeof(T).Name.Red()} 列表失败", Option.DataManager);
+            Log.Info($"获取 => {typeof(T).Name.Red()} 列表失败", Option.Data);
             return default;
         }
 

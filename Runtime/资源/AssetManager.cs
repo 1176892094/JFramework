@@ -145,7 +145,7 @@ namespace JFramework.Core
             }
 
             var obj = depends[bundleName].LoadAsset<T>(assetName);
-            Log.Info($"加载 => {obj.name.Green()} 资源成功", Option.AssetManager);
+            Log.Info($"加载 => {obj.name.Green()} 资源成功", Option.Asset);
             return obj is GameObject ? Object.Instantiate(obj) : obj;
         }
 
@@ -230,7 +230,7 @@ namespace JFramework.Core
             }
 
             if (request.asset == null) return null;
-            Log.Info($"加载 => {request.asset.name.Green()} 资源成功", Option.AssetManager);
+            Log.Info($"加载 => {request.asset.name.Green()} 资源成功", Option.Asset);
             return request.asset is GameObject ? (T)Object.Instantiate(request.asset) : (T)request.asset;
         }
 

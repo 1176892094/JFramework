@@ -13,14 +13,7 @@ namespace JFramework
         /// 控制器的所有者
         /// </summary>
         public TCharacter owner;
-
-        /// <summary>
-        /// 控制器初始化
-        /// </summary>
-        protected virtual void Spawn()
-        {
-        }
-
+        
         /// <summary>
         /// 控制器初始化
         /// </summary>
@@ -28,7 +21,7 @@ namespace JFramework
         void IController.Spawn(ICharacter owner)
         {
             this.owner = (TCharacter)owner;
-            Spawn();
+            this.GetComponent<IStart>()?.Start();
         }
 
         /// <summary>

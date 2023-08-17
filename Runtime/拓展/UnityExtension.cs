@@ -68,6 +68,38 @@ namespace JFramework
         }
 
         /// <summary>
+        /// 转换控制器
+        /// </summary>
+        /// <param name="controller"></param>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
+        public static T GetComponent<T>(this IController controller) where T : IController
+        {
+            if (controller is T component)
+            {
+                return component;
+            }
+            
+            return default;
+        }
+        
+        /// <summary>
+        /// 转换控制器
+        /// </summary>
+        /// <param name="panel"></param>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
+        public static T GetComponent<T>(this IPanel panel) where T : IPanel
+        {
+            if (panel is T component)
+            {
+                return component;
+            }
+            
+            return default;
+        }
+
+        /// <summary>
         /// 继承ICharacter后可以使用 Dispose
         /// </summary>
         /// <param name="character"></param>

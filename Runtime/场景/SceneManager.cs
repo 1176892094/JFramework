@@ -30,7 +30,7 @@ namespace JFramework.Core
         public static async void LoadSceneAsync(string path)
         {
             if (!GlobalManager.Runtime) return;
-            Log.Info($"异步加载 => {path.Green()} 场景", Option.SceneManager);
+            Log.Info($"异步加载 => {path.Green()} 场景", Option.Scene);
             await OnSceneProgress(path, Time.time);
             OnLoadComplete?.Invoke(localScene);
         }
@@ -49,17 +49,17 @@ namespace JFramework.Core
                 while (!operation.isDone)
                 {
                     OnLoadProgress?.Invoke(operation.progress);
-                    Log.Info($"加载进度 => {operation.progress.ToString("P").Green()}", Option.SceneManager);
+                    Log.Info($"加载进度 => {operation.progress.ToString("P").Green()}", Option.Scene);
                     if (!GlobalManager.Runtime) return;
                     await Task.Yield();
                 }
 
                 var totalTime = (Time.time - time).ToString("F");
-                Log.Info($"异步加载 => {path.Green()} 场景完成, 耗时 {totalTime.Yellow()} 秒", Option.SceneManager);
+                Log.Info($"异步加载 => {path.Green()} 场景完成, 耗时 {totalTime.Yellow()} 秒", Option.Scene);
             }
             catch (Exception e)
             {
-                Log.Info($"异步加载 => {path.Red()} 场景失败\n{e}", Option.SceneManager);
+                Log.Info($"异步加载 => {path.Red()} 场景失败\n{e}", Option.Scene);
             }
         }
 

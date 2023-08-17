@@ -15,19 +15,11 @@ namespace JFramework.Interface
         /// <summary>
         /// 侦听实体的更新事件
         /// </summary>
-        void Listen()
-        {
-            if (!GlobalManager.Runtime) return;
-            GlobalManager.OnUpdate += OnUpdate;
-        }
+        void Listen() => GlobalManager.Listen(this);
 
         /// <summary>
         /// 移除实体的更新
         /// </summary>
-        void Remove()
-        {
-            if (!GlobalManager.Runtime) return;
-            GlobalManager.OnUpdate -= OnUpdate;
-        }
+        void Remove() => GlobalManager.Remove(this);
     }
 }

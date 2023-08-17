@@ -17,7 +17,7 @@ namespace JFramework.Core
         {
             if (GlobalManager.Runtime && (GlobalManager.Instance.option & option) != Option.None)
             {
-                Debug.Log($"{option} {message}");
+                Debug.Log($"{option}Manager {message}");
             }
         }
     }
@@ -26,13 +26,13 @@ namespace JFramework.Core
     internal enum Option
     {
         None = 0,
-        JsonManager = 1 << 0,
-        PoolManager = 1 << 1,
-        DataManager = 1 << 2,
-        SceneManager = 1 << 3,
-        AssetManager = 1 << 4,
-        AudioManager = 1 << 5,
-        TimerManager = 1 << 6,
-        EventManager = 1 << 7,
+        Json = 1 << 0,
+        Pool = 1 << 1,
+        Data = 1 << 2,
+        Scene = 1 << 3,
+        Asset = 1 << 4,
+        Audio = 1 << 5,
+        Timer = 1 << 6,
+        Event = 1 << 7,
     }
 }
