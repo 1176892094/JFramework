@@ -11,15 +11,10 @@ namespace JFramework.Interface
         /// 对象变换
         /// </summary>
         Transform transform { get; }
-        
+
         /// <summary>
         /// 游戏对象
         /// </summary>
         GameObject gameObject { get; }
-
-        /// <summary>
-        /// 实体更新
-        /// </summary>
-        void Update();
     }
 }

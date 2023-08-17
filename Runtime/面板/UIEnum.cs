@@ -3,9 +3,9 @@ namespace JFramework
     public enum UIStateType
     {
         /// <summary>
-        /// 正常状态
+        /// 默认状态
         /// </summary>
-        Normal = 0,
+        Default = 0,
 
         /// <summary>
         /// 冻结状态 (无法隐藏和按钮响应)

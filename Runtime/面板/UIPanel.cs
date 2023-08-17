@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Reflection;
-using JFramework.Core;
 using JFramework.Interface;
 using Sirenix.OdinInspector;
 using UnityEngine;
@@ -33,14 +32,14 @@ namespace JFramework
         [ShowInInspector] private Dictionary<Type, VisualElement> elements = new Dictionary<Type, VisualElement>();
 
         /// <summary>
-        /// UI隐藏类型
-        /// </summary>
-        public UIStateType stateType = UIStateType.Normal;
-
-        /// <summary>
         /// UI层级
         /// </summary>
-        public UILayerType layerType = UILayerType.Normal;
+        public UILayerType layerType { get; protected set; } = UILayerType.Normal;
+        
+        /// <summary>
+        /// UI隐藏类型
+        /// </summary>
+        public UIStateType stateType { get; protected set; } = UIStateType.Default;
 
         /// <summary>
         /// 开始时查找所有控件
@@ -57,21 +56,14 @@ namespace JFramework
         }
 
         /// <summary>
-        /// 实体更新
-        /// </summary>`
-        protected virtual void OnUpdate()
-        {
-        }
-
-        /// <summary>
         /// 实体启用
         /// </summary>
-        protected virtual void OnEnable() => GlobalManager.Listen(this);
+        protected virtual void OnEnable() => GetComponent<IUpdate>()?.Listen();
 
         /// <summary>
         /// 实体禁用
         /// </summary>
-        protected virtual void OnDisable() => GlobalManager.Remove(this);
+        protected virtual void OnDisable() => GetComponent<IUpdate>()?.Remove();
 
         /// <summary>
         /// 查找所有组件
@@ -141,20 +133,5 @@ namespace JFramework
         /// 隐藏UI面板
         /// </summary>
         public virtual void Hide() => gameObject.SetActive(false);
-
-        /// <summary>
-        /// UI 面板状态
-        /// </summary>
-        UIStateType IPanel.stateType => stateType;
-
-        /// <summary>
-        /// UI 面板层级
-        /// </summary>
-        UILayerType IPanel.layerType => layerType;
-
-        /// <summary>
-        /// 实体接口调用实体更新方法
-        /// </summary>
-        void IEntity.Update() => OnUpdate();
     }
 }

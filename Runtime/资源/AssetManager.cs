@@ -102,6 +102,12 @@ namespace JFramework.Core
             {
                 if (AssetEditor.objects.TryGetValue(path, out var obj))
                 {
+                    if (obj is Texture2D texture)
+                    {
+                        obj = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), Vector2.one * 0.5f);
+                        return (T)obj;
+                    }
+                    
                     return obj is GameObject ? Object.Instantiate((T)obj) : (T)obj;
                 }
 

@@ -84,26 +84,6 @@ namespace JFramework.Core
         }
 
         /// <summary>
-        /// 侦听实体的更新事件
-        /// </summary>
-        /// <param name="entity"></param>
-        public static void Listen(IEntity entity)
-        {
-            if (!Runtime) return;
-            OnUpdate += entity.Update;
-        }
-
-        /// <summary>
-        /// 移除实体的更新
-        /// </summary>
-        /// <param name="entity"></param>
-        public static void Remove(IEntity entity)
-        {
-            if (!Runtime) return;
-            OnUpdate -= entity.Update;
-        }
-
-        /// <summary>
         /// 注册
         /// </summary>
         private static void Register()
