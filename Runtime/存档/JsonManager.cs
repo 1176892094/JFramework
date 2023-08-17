@@ -29,7 +29,7 @@ namespace JFramework.Core
             var filePath = GetPath(name);
             var saveJson = obj is ScriptableObject ? JsonUtility.ToJson(obj) : JsonConvert.SerializeObject(obj);
             await File.WriteAllTextAsync(filePath, saveJson);
-            Log.Info($"保存 => {name.Orange()} 数据文件", Option.Json);
+            Log.Info($"保存 {name.Orange()} 数据文件", Option.Json);
         }
 
         /// <summary>
@@ -45,7 +45,7 @@ namespace JFramework.Core
                 await Save(obj, obj.name);
             }
 
-            Log.Info($"读取 => {obj.name.Orange()} 数据文件", Option.Json);
+            Log.Info($"读取 {obj.name.Orange()} 数据文件", Option.Json);
             var saveJson = await File.ReadAllTextAsync(filePath);
             if (saveJson.IsEmpty()) return;
             JsonUtility.FromJsonOverwrite(saveJson, obj);
@@ -66,7 +66,7 @@ namespace JFramework.Core
                 await Save(new T(), name);
             }
 
-            Log.Info($"读取 => {name.Orange()} 数据文件", Option.Json);
+            Log.Info($"读取 {name.Orange()} 数据文件", Option.Json);
             var saveJson = await File.ReadAllTextAsync(filePath);
             try
             {

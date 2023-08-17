@@ -2,8 +2,8 @@ using JFramework.Interface;
 
 namespace JFramework
 {
-    public interface IStart : IController
+    public interface ISpawn : IController
     {
-        void Start();
+        void Spawn();
     }
 }

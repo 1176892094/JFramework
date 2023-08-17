@@ -92,7 +92,7 @@ namespace JFramework
                 }
                 catch (Exception e)
                 {
-                    Log.Info($"=> 计时器抛出异常，自动回收计时器。\n{e}", Option.Timer);
+                    Log.Info($"计时器抛出异常，自动回收计时器。\n{e}", Option.Timer);
                     Push();
                 }
             }
@@ -172,19 +172,17 @@ namespace JFramework
         /// <returns></returns>
         public ITimer Pop(float duration, Action OnFinish)
         {
-            if (count == 0)
+            switch (count)
             {
-                Log.Info($"=> 计时器停止时不能使用计时器队列。", Option.Timer);
-                return null;
+                case 0:
+                    Log.Info("计时器停止时不能使用计时器队列。", Option.Timer);
+                    return null;
+                case > 1:
+                    Log.Info("计时器队列不能使用循环。", Option.Timer);
+                    return null;
+                default:
+                    return TimerManager.Pop(this.duration + duration, OnFinish);
             }
-
-            if (count > 1)
-            {
-                Log.Info($"=> 计时器队列不能使用循环。", Option.Timer);
-                return null;
-            }
-
-            return TimerManager.Pop(this.duration + duration, OnFinish);
         }
 
         /// <summary>
@@ -195,19 +193,17 @@ namespace JFramework
         /// <returns></returns>
         public ITimer Pop(float duration, Action<ITimer> OnFinish)
         {
-            if (count == 0)
+            switch (count)
             {
-                Log.Info($"=> 计时器停止时不能使用计时器队列。", Option.Timer);
-                return null;
+                case 0:
+                    Log.Info("计时器停止时不能使用计时器队列。", Option.Timer);
+                    return null;
+                case > 1:
+                    Log.Info("计时器队列不能使用循环。", Option.Timer);
+                    return null;
+                default:
+                    return TimerManager.Pop(this.duration + duration, OnFinish);
             }
-
-            if (count > 1)
-            {
-                Log.Info($"=> 计时器队列不能使用循环。", Option.Timer);
-                return null;
-            }
-
-            return TimerManager.Pop(this.duration + duration, OnFinish);
         }
 
         /// <summary>

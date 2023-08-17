@@ -36,15 +36,15 @@ namespace JFramework.Core
                     var keyType = keyInfo.FieldType;
                     if (keyType == typeof(int))
                     {
-                        DataManager<int>.Add(dataType, keyInfo, (IDataTable)table);
+                        Data<int>.Add(dataType, keyInfo, (IDataTable)table);
                     }
                     else if (keyType == typeof(string))
                     {
-                        DataManager<string>.Add(dataType, keyInfo, (IDataTable)table);
+                        Data<string>.Add(dataType, keyInfo, (IDataTable)table);
                     }
                     else if (keyType.IsEnum)
                     {
-                        DataManager<Enum>.Add(dataType, keyInfo, (IDataTable)table);
+                        Data<Enum>.Add(dataType, keyInfo, (IDataTable)table);
                     }
                 }
                 catch (Exception e)
@@ -60,7 +60,7 @@ namespace JFramework.Core
         /// <param name="key">传入的int主键</param>
         /// <typeparam name="T">可以使用所有继承IData类型的对象</typeparam>
         /// <returns>返回一个数据对象</returns>
-        public static T Get<T>(int key) where T : IData => DataManager<int>.Get<T>(key);
+        public static T Get<T>(int key) where T : IData => Data<int>.Get<T>(key);
 
         /// <summary>
         /// 获取主键为string的数据
@@ -68,7 +68,7 @@ namespace JFramework.Core
         /// <param name="key">传入的string主键</param>
         /// <typeparam name="T">要获取数据的类型,必须继承自JFramework.Data</typeparam>
         /// <returns>返回一个数据对象</returns>
-        public static T Get<T>(string key) where T : IData => DataManager<string>.Get<T>(key);
+        public static T Get<T>(string key) where T : IData => Data<string>.Get<T>(key);
 
         /// <summary>
         /// 获取主键为Enum的数据
@@ -76,7 +76,7 @@ namespace JFramework.Core
         /// <param name="key">传入的string主键</param>
         /// <typeparam name="T">要获取数据的类型,必须继承自JFramework.Data</typeparam>
         /// <returns>返回一个数据对象</returns>
-        public static T Get<T>(Enum key) where T : IData => DataManager<Enum>.Get<T>(key);
+        public static T Get<T>(Enum key) where T : IData => Data<Enum>.Get<T>(key);
 
         /// <summary>
         /// 通过数据管理器得到数据表
@@ -84,13 +84,13 @@ namespace JFramework.Core
         /// <returns>返回一个Data的列表</returns>
         public static T[] GetTable<T>() where T : IData
         {
-            T[] data = DataManager<int>.GetTable<T>();
+            T[] data = Data<int>.GetTable<T>();
             if (data != null) return data;
-            data = DataManager<Enum>.GetTable<T>();
+            data = Data<Enum>.GetTable<T>();
             if (data != null) return data;
-            data = DataManager<string>.GetTable<T>();
+            data = Data<string>.GetTable<T>();
             if (data != null) return data;
-            Log.Info($"获取 => {typeof(T).Name.Red()} 列表失败", Option.Data);
+            Log.Info($"获取 {typeof(T).Name.Red()} 列表失败", Option.Data);
             return default;
         }
 
@@ -141,9 +141,9 @@ namespace JFramework.Core
         /// </summary>
         internal static void Clear()
         {
-            DataManager<int>.Clear();
-            DataManager<string>.Clear();
-            DataManager<Enum>.Clear();
+            Data<int>.Clear();
+            Data<string>.Clear();
+            Data<Enum>.Clear();
         }
     }
 }

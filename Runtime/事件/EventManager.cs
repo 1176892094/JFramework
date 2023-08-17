@@ -27,8 +27,7 @@ namespace JFramework.Core
             {
                 observers.Add(typeof(TEvent), Event<TEvent>.events = new HashSet<IEvent>());
             }
-
-            Log.Info($"侦听 => {@event} {typeof(TEvent).Name.Yellow()}", Option.Event);
+            
             Event<TEvent>.Listen(@event);
         }
 
@@ -41,7 +40,6 @@ namespace JFramework.Core
         public static void Remove<TEvent>(IEvent<TEvent> @event) where TEvent : struct, IEvent
         {
             if (!GlobalManager.Runtime) return;
-            Log.Info($"移除 => {@event} {typeof(TEvent).Name.Yellow()}", Option.Event);
             Event<TEvent>.Remove(@event);
         }
 
@@ -53,7 +51,6 @@ namespace JFramework.Core
         public static void Invoke<TEvent>(TEvent @event = default) where TEvent : struct, IEvent
         {
             if (!GlobalManager.Runtime) return;
-            Log.Info($"广播 => {@event} {typeof(TEvent).Name.Yellow()}", Option.Event);
             Event<TEvent>.Invoke(@event);
         }
 

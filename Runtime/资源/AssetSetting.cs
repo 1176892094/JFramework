@@ -4,13 +4,32 @@ namespace JFramework
 {
     internal enum BuildPlatform
     {
+        /// <summary>
+        /// Mac
+        /// </summary>
         StandaloneOSX = 2,
+        
+        /// <summary>
+        /// Windows64
+        /// </summary>
         StandaloneWindows = 5,
+        
+        /// <summary>
+        /// iOS
+        /// </summary>
         iOS = 9,
+        
+        /// <summary>
+        /// Android
+        /// </summary>
         Android = 13,
+        
+        /// <summary>
+        /// WebGL
+        /// </summary>
         WebGL = 20,
     }
-
+    
     public static class AssetSetting
     {
         /// <summary>
@@ -46,13 +65,7 @@ namespace JFramework
         /// 从远端加载 AssetBundle 的路径
         /// </summary>
         private const string LOAD_PATH = "http://192.168.0.3:8000/Files/Unity/Forest/AssetBundles";
-
-#if UNITY_EDITOR
-        /// <summary>
-        /// 构建目标
-        /// </summary>
-        public static UnityEditor.BuildTarget Target => (UnityEditor.BuildTarget)PLATFORM;
-#endif
+        
         /// <summary>
         /// 客户端校验文件名称
         /// </summary>
@@ -91,6 +104,13 @@ namespace JFramework
             $"file://{Application.streamingAssetsPath}/{PLATFORM}/{clientInfoName}";
 #else
             $"{Application.streamingAssetsPath}/{PLATFORM}/{clientInfoName}";
+#endif
+        
+#if UNITY_EDITOR
+        /// <summary>
+        /// 构建目标
+        /// </summary>
+        public static UnityEditor.BuildTarget Target => (UnityEditor.BuildTarget)PLATFORM;
 #endif
 
         /// <summary>

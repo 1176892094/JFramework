@@ -1,7 +1,7 @@
 namespace JFramework.Interface
 {
     /// <summary>
-    /// 继承后会在管理器Push时调用 (限定GameObject)
+    /// 继承后会在 PoolManager.Push 时调用 (限定GameObject)
     /// </summary>
     public interface IPush
     {

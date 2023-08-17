@@ -104,7 +104,7 @@ namespace JFramework.Core
             }
 
             panels.Add(typeof(TPanel), panel);
-            panel.SetLayer(panel.layerType);
+            panel.transform.SetParent(GetLayer(panel.layerType), false);
             return panel;
         }
 
@@ -149,7 +149,7 @@ namespace JFramework.Core
         /// 手动注册到UI管理器
         /// </summary>
         public static void Register<T>(T panel) where T : IPanel => panels[typeof(T)] = panel;
-        
+
         /// <summary>
         /// UI面板是否活跃
         /// </summary>
@@ -159,7 +159,7 @@ namespace JFramework.Core
         {
             return panels.TryGetValue(typeof(TPanel), out var panel) ? panel.gameObject.activeInHierarchy : false;
         }
-        
+
         /// <summary>
         /// UI管理器得到层级
         /// </summary>

@@ -7,9 +7,7 @@ using System.Security.Cryptography;
 using System.Text;
 using JFramework.Core;
 using Newtonsoft.Json;
-using UnityEngine.Networking;
 using Debug = UnityEngine.Debug;
-using System.Threading.Tasks;
 using Sirenix.OdinInspector;
 using UnityEditor;
 using UnityEngine;
@@ -193,50 +191,6 @@ namespace JFramework.Editor
             PoolManager.Push(builder);
             builder.Clear();
             return result;
-        }
-
-        /// <summary>
-        /// 上传 AssetBundle 到服务器
-        /// </summary>
-        [MenuItem("Tools/JFramework/Upload AssetBundles", priority = 3)]
-        private static async void Upload()
-        {
-            DirectoryInfo directoryInfo = Directory.CreateDirectory(AssetSetting.localSavePath);
-            var fileInfos = directoryInfo.GetFiles();
-            foreach (var info in fileInfos)
-            {
-                if (info.Extension is "" or ".txt")
-                {
-                    await Upload(info.FullName, info.Name);
-                }
-            }
-        }
-
-        /// <summary>
-        /// 上传指定文件
-        /// </summary>
-        /// <param name="filePath"></param>
-        /// <param name="fileName"></param>
-        private static async Task Upload(string filePath, string fileName)
-        {
-            var request = new UnityWebRequest(AssetSetting.GetRemoteFile(fileName), "POST");
-            var fileData = await File.ReadAllBytesAsync(filePath);
-            request.uploadHandler = new UploadHandlerRaw(fileData);
-            request.SetRequestHeader("Content-Type", "application/octet-stream");
-            var operation = request.SendWebRequest();
-            if (!operation.isDone)
-            {
-                await Task.Yield();
-            }
-
-            if (request.result != UnityWebRequest.Result.Success)
-            {
-                Debug.LogError("文件上传失败： " + request.error);
-            }
-            else
-            {
-                Debug.Log("文件上传成功");
-            }
         }
 
         /// <summary>

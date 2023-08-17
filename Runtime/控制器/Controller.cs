@@ -21,7 +21,10 @@ namespace JFramework
         void IController.Spawn(ICharacter owner)
         {
             this.owner = (TCharacter)owner;
-            this.GetComponent<IStart>()?.Start();
+            if (this is ISpawn spawn)
+            {
+                spawn.Spawn();
+            }
         }
 
         /// <summary>

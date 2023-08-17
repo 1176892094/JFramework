@@ -19,12 +19,14 @@ namespace JFramework
         /// <summary>
         /// 忽略名称
         /// </summary>
-        private static HashSet<string> ignore = new HashSet<string>()
+        private static readonly HashSet<string> ignore = new HashSet<string>()
         {
             "Image", "Panel", "Button", "Toggle", "Slider", "RawImage",
             "Text (Legacy)", "Button (Legacy)", "InputField (Legacy)",
             "Text (TMP)", "InputField (TMP)",
         };
+
+        private const BindingFlags Binding = BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic;
 
         /// <summary>
         /// 视觉容器字典
@@ -35,7 +37,7 @@ namespace JFramework
         /// UI层级
         /// </summary>
         public UILayerType layerType { get; protected set; } = UILayerType.Normal;
-        
+
         /// <summary>
         /// UI隐藏类型
         /// </summary>
@@ -89,7 +91,7 @@ namespace JFramework
 
                 if (component is Button button)
                 {
-                    if (GetType().GetMethod(key, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic) != null)
+                    if (GetType().GetMethod(key, Binding) != null)
                     {
                         button.onClick.AddListener(() =>
                         {
@@ -98,10 +100,9 @@ namespace JFramework
                         });
                     }
                 }
-
-                if (component is Toggle toggle)
+                else if (component is Toggle toggle)
                 {
-                    if (GetType().GetMethod(key, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic) != null)
+                    if (GetType().GetMethod(key, Binding) != null)
                     {
                         toggle.onValueChanged.AddListener(value =>
                         {

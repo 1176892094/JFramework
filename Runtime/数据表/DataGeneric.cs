@@ -12,7 +12,7 @@ namespace JFramework
     /// 泛型数据管理器
     /// </summary>
     /// <typeparam name="TKey"></typeparam>
-    internal static class DataManager<TKey>
+    internal static class Data<TKey>
     {
         /// <summary>
         /// 泛型数据字典
@@ -57,12 +57,12 @@ namespace JFramework
             {
                 if (dataList.TryGetValue(key, out IData data))
                 {
-                    Log.Info($"获取 => {typeof(TData).Name.Blue()} : {key.ToString().Green()} 数据成功", Option.Data);
+                    Log.Info($"获取 {typeof(TData).Name.Blue()} : {key.ToString().Green()} 数据成功", Option.Data);
                     return (TData)data;
                 }
             }
 
-            Log.Info($"获取 => {typeof(TData).Name.Red()} : {key.ToString().Green()} 数据失败", Option.Data);
+            Log.Info($"获取 {typeof(TData).Name.Red()} : {key.ToString().Green()} 数据失败", Option.Data);
             return default;
         }
 
@@ -74,7 +74,7 @@ namespace JFramework
         public static TData[] GetTable<TData>() where TData : IData
         {
             if (!dataDict.TryGetValue(typeof(TKey), out Dictionary<TKey, IData> dataList)) return null;
-            Log.Info($"获取 => {typeof(TData).Name.Blue()} 列表成功", Option.Data);
+            Log.Info($"获取 {typeof(TData).Name.Blue()} 列表成功", Option.Data);
             return dataList.Values.Cast<TData>().ToArray();
         }
 

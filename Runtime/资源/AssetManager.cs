@@ -145,7 +145,7 @@ namespace JFramework.Core
             }
 
             var obj = depends[bundleName].LoadAsset<T>(assetName);
-            Log.Info($"加载 => {obj.name.Green()} 资源成功", Option.Asset);
+            Log.Info($"加载 {obj.name.Green()} 资源成功", Option.Asset);
             return obj is GameObject ? Object.Instantiate(obj) : obj;
         }
 
@@ -230,7 +230,7 @@ namespace JFramework.Core
             }
 
             if (request.asset == null) return null;
-            Log.Info($"加载 => {request.asset.name.Green()} 资源成功", Option.Asset);
+            Log.Info($"加载 {request.asset.name.Green()} 资源成功", Option.Asset);
             return request.asset is GameObject ? (T)Object.Instantiate(request.asset) : (T)request.asset;
         }
 
@@ -244,34 +244,30 @@ namespace JFramework.Core
             var path = AssetSetting.GetPerFile(assetBundle);
             if (File.Exists(path))
             {
-                return await LoadFromFilePath(path);
+                var request = AssetBundle.LoadFromFileAsync(path);
+                if (!request.isDone && GlobalManager.Runtime)
+                {
+                    await Task.Yield();
+                }
+
+                return request.assetBundle;
             }
 
             path = AssetSetting.GetStrFile(assetBundle);
             if (File.Exists(path))
             {
-                return await LoadFromFilePath(path);
+                var request = AssetBundle.LoadFromFileAsync(path);
+                if (!request.isDone && GlobalManager.Runtime)
+                {
+                    await Task.Yield();
+                }
+
+                return request.assetBundle;
             }
 
             return null;
         }
-
-        /// <summary>
-        /// 异步加载AB包
-        /// </summary>
-        /// <param name="assetPath"></param>
-        /// <returns></returns>
-        private static async Task<AssetBundle> LoadFromFilePath(string assetPath)
-        {
-            var request = AssetBundle.LoadFromFileAsync(assetPath);
-            if (!request.isDone && GlobalManager.Runtime)
-            {
-                await Task.Yield();
-            }
-
-            return request.assetBundle;
-        }
-
+        
         /// <summary>
         /// 根据路径加载
         /// </summary>

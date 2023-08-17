@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using JFramework.Core;
 using JFramework.Interface;
 using UnityEngine;
 
@@ -57,7 +56,7 @@ namespace JFramework
         }
 
         /// <summary>
-        /// 继承ICharacter后可以使用 GetOrAddCtrl
+        /// 继承ICharacter后可以使用 Register
         /// </summary>
         /// <param name="character"></param>
         /// <typeparam name="T"></typeparam>
@@ -66,56 +65,14 @@ namespace JFramework
         {
             return ControllerManager.Register<T>(character);
         }
-
-        /// <summary>
-        /// 转换控制器
-        /// </summary>
-        /// <param name="controller"></param>
-        /// <typeparam name="T"></typeparam>
-        /// <returns></returns>
-        public static T GetComponent<T>(this IController controller) where T : IController
-        {
-            if (controller is T component)
-            {
-                return component;
-            }
-            
-            return default;
-        }
         
         /// <summary>
-        /// 转换控制器
-        /// </summary>
-        /// <param name="panel"></param>
-        /// <typeparam name="T"></typeparam>
-        /// <returns></returns>
-        public static T GetComponent<T>(this IPanel panel) where T : IPanel
-        {
-            if (panel is T component)
-            {
-                return component;
-            }
-            
-            return default;
-        }
-
-        /// <summary>
-        /// 继承ICharacter后可以使用 Dispose
+        /// 继承ICharacter后可以使用
         /// </summary>
         /// <param name="character"></param>
         public static void Destroy(this ICharacter character)
         {
             ControllerManager.Destroy(character);
-        }
-
-        /// <summary>
-        /// 面板设置层级
-        /// </summary>
-        /// <param name="panel"></param>
-        /// <param name="layer"></param>
-        public static void SetLayer(this IPanel panel, UILayerType layer)
-        {
-            panel.transform.SetParent(UIManager.GetLayer(layer), false);
         }
     }
 }

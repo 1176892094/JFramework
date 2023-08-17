@@ -1,5 +1,6 @@
 using System;
 using JFramework.Interface;
+// ReSharper disable All
 
 namespace JFramework
 {
@@ -17,12 +18,7 @@ namespace JFramework
         /// <summary>
         /// 基本状态机的接口 (用于转换指定状态机)
         /// </summary>
-        protected IStateMachine baseMachine;
-
-        /// <summary>
-        /// 状态初始化
-        /// </summary>
-        protected virtual void OnAwake() { }
+        protected IStateMachine machine;
 
         /// <summary>
         /// 进入状态
@@ -43,12 +39,15 @@ namespace JFramework
         /// 状态机醒来
         /// </summary>
         /// <param name="owner"></param>
-        /// <param name="baseMachine"></param>
-        void IState.OnAwake(ICharacter owner, IStateMachine baseMachine)
+        /// <param name="machine"></param>
+        void IState.OnAwake(ICharacter owner, IStateMachine machine)
         {
             this.owner = (TCharacter)owner;
-            this.baseMachine = baseMachine;
-            OnAwake();
+            this.machine = machine;
+            if (this is IAwake awake)
+            {
+                awake.OnAwake();
+            }
         }
 
         /// <summary>
