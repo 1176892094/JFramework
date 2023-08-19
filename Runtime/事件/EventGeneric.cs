@@ -8,7 +8,7 @@ namespace JFramework
     /// 静态泛型事件存储类
     /// </summary>
     /// <typeparam name="TEvent"></typeparam>
-    internal static class Event<TEvent> where TEvent : struct, IEvent
+    internal struct Event<TEvent> where TEvent : struct, IEvent
     {
         /// <summary>
         /// 存储事件的哈希表

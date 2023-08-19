@@ -54,7 +54,7 @@ namespace JFramework.Editor
             get
             {
                 if (instance != null) return instance;
-                var path = $"Assets/Editor";
+                var path = $"Assets/Editor/Resources";
                 var asset = $"{path}/{nameof(AssetEditor)}.asset";
                 instance = AssetDatabase.LoadAssetAtPath<AssetEditor>(asset);
                 if (instance != null) return instance;
@@ -131,10 +131,9 @@ namespace JFramework.Editor
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
         private static void RuntimeInitializeOnLoad()
         {
-            for (int i = 0; i < Instance.objectKey.Count; i++)
-            {
-                objects[Instance.objectKey[i]] = Instance.objectValue[i];
-            }
+#if UNITY_EDITOR
+            Update();
+#endif
         }
 
         /// <summary>

@@ -35,7 +35,7 @@ namespace JFramework.Core
         {
             if (pools.TryGetValue(typeof(T).Name, out var pool) && pool.Count > 0)
             {
-                return ((IPool<T>)pool).Pop();
+                return ((Pool<T>)pool).Pop();
             }
 
             return new T();
