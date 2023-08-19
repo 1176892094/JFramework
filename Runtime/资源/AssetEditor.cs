@@ -121,6 +121,7 @@ namespace JFramework.Editor
                 }
             }
 
+            Debug.Log($"更新 AssetBundles 完成。".Green());
             AssetDatabase.Refresh();
         }
 
@@ -142,6 +143,7 @@ namespace JFramework.Editor
         [MenuItem("Tools/JFramework/Build AssetBundles", priority = 2)]
         private static void Build()
         {
+            Update();
             if (!Directory.Exists(AssetSetting.SAVE_PATH))
             {
                 Directory.CreateDirectory(AssetSetting.SAVE_PATH);
@@ -152,8 +154,7 @@ namespace JFramework.Editor
                 Directory.CreateDirectory(AssetSetting.localSavePath);
             }
 
-            BuildPipeline.BuildAssetBundles(AssetSetting.localSavePath, BuildAssetBundleOptions.ChunkBasedCompression,
-                AssetSetting.Target);
+            BuildPipeline.BuildAssetBundles(AssetSetting.localSavePath, BuildAssetBundleOptions.ChunkBasedCompression, AssetSetting.Target);
             var directory = Directory.CreateDirectory(AssetSetting.localSavePath);
             var fileInfos = directory.GetFiles();
             var fileList = new List<AssetData>();
