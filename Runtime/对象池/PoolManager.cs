@@ -50,7 +50,7 @@ namespace JFramework.Core
         {
             if (pools.TryGetValue(typeof(T).Name, out var pool))
             {
-                ((IPool<T>)pool).Push(obj);
+                ((Pool<T>)pool).Push(obj);
                 return;
             }
 
