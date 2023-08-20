@@ -8,12 +8,12 @@ namespace JFramework.Core
     public static class AudioManager
     {
         /// <summary>
-        /// 完成音效队列
+        /// 完成音效列表
         /// </summary>
         internal static readonly Stack<AudioSource> stacks = new Stack<AudioSource>();
 
         /// <summary>
-        /// 播放音效队列
+        /// 播放音效列表
         /// </summary>
         internal static readonly HashSet<AudioSource> audios = new HashSet<AudioSource>();
 
