@@ -49,7 +49,7 @@ namespace JFramework
 
             foreach (var field in fields)
             {
-                var attribute = field.GetCustomAttribute<UIFindAttribute>(true);
+                var attribute = field.GetCustomAttribute<InjectAttribute>(true);
                 if (attribute != null)
                 {
                     var child = FindChild(transform, attribute.find);

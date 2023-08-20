@@ -63,7 +63,7 @@ namespace JFramework
         public static FieldInfo GetField(Type type, string name)
         {
             var fields = type.GetFields(Instance);
-            return fields.FirstOrDefault(field => field.GetCustomAttribute<UIFindAttribute>(false)?.find == name);
+            return fields.FirstOrDefault(field => field.GetCustomAttribute<InjectAttribute>(false)?.find == name);
         }
     }
 }
