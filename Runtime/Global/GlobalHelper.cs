@@ -75,21 +75,5 @@ namespace JFramework.Core
         [ShowInInspector, LabelText("游戏音效 (播放中)"), FoldoutGroup("音效管理器")]
         private HashSet<AudioSource> audios => AudioManager.audios;
     }
-
-    /// <summary>
-    /// 日志输出选项
-    /// </summary>
-    [Flags]
-    internal enum Option
-    {
-        None = 0,
-        Json = 1 << 0,
-        Pool = 1 << 1,
-        Data = 1 << 2,
-        Scene = 1 << 3,
-        Asset = 1 << 4,
-        Audio = 1 << 5,
-        Timer = 1 << 6,
-    }
 }
 #endif

@@ -21,7 +21,7 @@ namespace JFramework.Core
         /// 对象池管理器
         /// </summary>
         private static Transform poolManager;
-        
+
         /// <summary>
         /// 获取 PoolManager 对象
         /// </summary>
@@ -108,7 +108,7 @@ namespace JFramework.Core
             parents[obj.name].transform.SetParent(poolManager);
             pools.Add(obj.name, new Pool<GameObject>(obj));
         }
-        
+
         /// <summary>
         /// 管理器卸载
         /// </summary>

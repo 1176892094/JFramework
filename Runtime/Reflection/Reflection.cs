@@ -1,7 +1,6 @@
 using System;
 using System.Linq;
 using System.Reflection;
-using UnityEngine;
 
 namespace JFramework
 {
@@ -13,7 +12,7 @@ namespace JFramework
         /// <summary>
         /// 实例类
         /// </summary>
-        public const BindingFlags Instance = BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic;
+        private const BindingFlags Instance = BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic;
 
         /// <summary>
         /// 静态类
