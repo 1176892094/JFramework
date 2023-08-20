@@ -16,6 +16,11 @@ namespace JFramework.Core
         public static void LoadDataTable()
         {
             var assembly = Reflection.GetAssembly("HotUpdate");
+            if (assembly == null)
+            {
+                assembly = Reflection.GetAssembly("Assembly-CSharp");
+            }
+
             var types = Reflection.GetTypes<IDataTable>(assembly);
             if (types == null || types.Length == 0) return;
             foreach (var type in types)
