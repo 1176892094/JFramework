@@ -69,7 +69,7 @@ namespace JFramework.Interface
                 var inject = field.GetCustomAttribute<InjectAttribute>(true);
                 if (inject == null) continue;
 
-                var target = GetChild(obj.transform, inject.find);
+                var target = GetChild(obj.transform, inject.name);
                 if (target == null) continue;
 
                 var component = target.GetComponent(field.FieldType);
@@ -79,14 +79,14 @@ namespace JFramework.Interface
                 }
 
                 if (!obj.TryGetComponent(out IPanel panel)) continue;
-                var method = type.GetMethod(inject.find, Reflection.Instance);
+                var method = type.GetMethod(inject.name, Reflection.Instance);
                 if (method == null) continue;
                 if (target.TryGetComponent(out Button button) && component == button)
                 {
                     button.onClick.AddListener(() =>
                     {
                         if (panel.state == UIState.Freeze) return;
-                        obj.SendMessage(inject.find);
+                        obj.SendMessage(inject.name);
                     });
                 }
                 else if (target.TryGetComponent(out Toggle toggle) && component == toggle)
@@ -94,7 +94,7 @@ namespace JFramework.Interface
                     toggle.onValueChanged.AddListener(value =>
                     {
                         if (panel.state == UIState.Freeze) return;
-                        obj.SendMessage(inject.find, value);
+                        obj.SendMessage(inject.name, value);
                     });
                 }
             }
