@@ -44,7 +44,8 @@ namespace JFramework
         /// </summary>
         private void InitFind()
         {
-            var fields = GetType().GetFields(Reflection.Instance);
+            var type = GetType();
+            var fields = type.GetFields(Reflection.Instance);
 
             foreach (var field in fields)
             {
@@ -60,6 +61,7 @@ namespace JFramework
                             field.SetValue(this, component);
                         }
 
+                        if (type.GetMethod(attribute.find, Reflection.Instance) == null) continue;
                         if (child.TryGetComponent(out Button button) && component == button)
                         {
                             button.onClick.AddListener(() =>
