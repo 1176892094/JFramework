@@ -58,8 +58,7 @@ namespace JFramework.Interface
         /// 获取子物体并注入字段
         /// </summary>
         /// <param name="obj"></param>
-        /// <typeparam name="T"></typeparam>
-        void Inject<T>(T obj) where T : Component
+        void Inject(Transform obj)
         {
             var type = obj.GetType();
             var fields = type.GetFields(Reflection.Instance);
@@ -78,24 +77,37 @@ namespace JFramework.Interface
                     field.SetValue(obj, component);
                 }
 
-                if (!obj.TryGetComponent(out IPanel panel)) continue;
                 var method = type.GetMethod(inject.name, Reflection.Instance);
                 if (method == null) continue;
                 if (target.TryGetComponent(out Button button) && component == button)
                 {
-                    button.onClick.AddListener(() =>
+                    if (obj.TryGetComponent(out IPanel panel))
                     {
-                        if (panel.state == UIState.Freeze) return;
-                        obj.SendMessage(inject.name);
-                    });
+                        button.onClick.AddListener(() =>
+                        {
+                            if (panel.state == UIState.Freeze) return;
+                            obj.SendMessage(inject.name);
+                        });
+                    }
+                    else
+                    {
+                        button.onClick.AddListener(() => obj.SendMessage(inject.name));
+                    }
                 }
                 else if (target.TryGetComponent(out Toggle toggle) && component == toggle)
                 {
-                    toggle.onValueChanged.AddListener(value =>
+                    if (obj.TryGetComponent(out IPanel panel))
                     {
-                        if (panel.state == UIState.Freeze) return;
-                        obj.SendMessage(inject.name, value);
-                    });
+                        toggle.onValueChanged.AddListener(value =>
+                        {
+                            if (panel.state == UIState.Freeze) return;
+                            obj.SendMessage(inject.name, value);
+                        });
+                    }
+                    else
+                    {
+                        toggle.onValueChanged.AddListener(value => obj.SendMessage(inject.name, value));
+                    }
                 }
             }
         }

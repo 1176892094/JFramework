@@ -22,7 +22,7 @@ namespace JFramework
         /// <summary>
         /// 开始时查找所有控件
         /// </summary>
-        protected virtual void Awake() => GetComponent<IInject>()?.Inject(this);
+        protected virtual void Awake() => this.Inject();
 
         /// <summary>
         /// 实体启用
