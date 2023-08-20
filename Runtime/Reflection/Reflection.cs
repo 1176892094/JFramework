@@ -63,19 +63,7 @@ namespace JFramework
         public static FieldInfo GetField(Type type, string name)
         {
             var fields = type.GetFields(Instance);
-            return fields.FirstOrDefault(field => field.GetCustomAttribute<UIFieldAttribute>(false)?.name == name);
-        }
-
-        /// <summary>
-        /// 根据 String 获取方法
-        /// </summary>
-        /// <param name="type"></param>
-        /// <param name="name"></param>
-        /// <returns></returns>
-        public static MethodInfo GetMethod(Type type, string name)
-        {
-            var methods = type.GetMethods(Instance);
-            return methods.FirstOrDefault(method => method.GetCustomAttribute<UIMethodAttribute>(false)?.name == name);
+            return fields.FirstOrDefault(field => field.GetCustomAttribute<UIFindAttribute>(false)?.find == name);
         }
     }
 }

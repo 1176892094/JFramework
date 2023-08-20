@@ -26,8 +26,7 @@ namespace JFramework
         /// </summary>
         protected virtual void Awake()
         {
-            InitField();
-            InitMethod();
+            InitFind();
         }
 
         /// <summary>
@@ -43,16 +42,16 @@ namespace JFramework
         /// <summary>
         /// 初始化字段
         /// </summary>
-        private void InitField()
+        private void InitFind()
         {
             var fields = GetType().GetFields(Reflection.Instance);
 
             foreach (var field in fields)
             {
-                var attribute = field.GetCustomAttribute<UIFieldAttribute>(true);
+                var attribute = field.GetCustomAttribute<UIFindAttribute>(true);
                 if (attribute != null)
                 {
-                    var child = FindChild(transform, attribute.name);
+                    var child = FindChild(transform, attribute.find);
                     if (child != null)
                     {
                         var component = child.GetComponent(field.FieldType);
@@ -60,32 +59,13 @@ namespace JFramework
                         {
                             field.SetValue(this, component);
                         }
-                    }
-                }
-            }
-        }
 
-        /// <summary>
-        /// 初始化方法
-        /// </summary>
-        private void InitMethod()
-        {
-            var methods = GetType().GetMethods(Reflection.Instance);
-
-            foreach (var method in methods)
-            {
-                var attribute = method.GetCustomAttribute<UIMethodAttribute>(false);
-                if (attribute != null)
-                {
-                    var child = FindChild(transform, attribute.name);
-                    if (child != null)
-                    {
                         if (child.TryGetComponent(out Button button))
                         {
                             button.onClick.AddListener(() =>
                             {
                                 if (state == UIState.Freeze) return;
-                                method.Invoke(this, null);
+                                SendMessage(attribute.find);
                             });
                         }
                         else if (child.TryGetComponent(out Toggle toggle))
@@ -93,7 +73,7 @@ namespace JFramework
                             toggle.onValueChanged.AddListener(value =>
                             {
                                 if (state == UIState.Freeze) return;
-                                method.Invoke(this, new object[] { value });
+                                SendMessage(attribute.find, value);
                             });
                         }
                     }
