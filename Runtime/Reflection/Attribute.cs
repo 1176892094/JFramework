@@ -19,8 +19,8 @@ namespace JFramework
     [AttributeUsage(AttributeTargets.Field)]
     public class InjectAttribute : Attribute
     {
-        public readonly string find;
+        public readonly string name;
 
-        public InjectAttribute(string find) => this.find = find;
+        public InjectAttribute(string name) => this.name = name;
     }
 }
