@@ -1,35 +1,16 @@
-using System;
-using System.Collections.Generic;
+using System.Reflection;
 using JFramework.Interface;
-using Sirenix.OdinInspector;
 using UnityEngine;
 using UnityEngine.UI;
 
 // ReSharper disable All
 namespace JFramework
 {
-    using Components = Dictionary<string, Component>;
-
     /// <summary>
     /// UI面板的抽象类
     /// </summary>
     public abstract class UIPanel : MonoBehaviour, IPanel
     {
-        /// <summary>
-        /// 忽略名称
-        /// </summary>
-        private static readonly HashSet<string> filters = new HashSet<string>()
-        {
-            nameof(Text), nameof(Image), nameof(Button), nameof(Toggle),
-            nameof(Slider), nameof(RawImage), nameof(InputField),
-            "Panel", "Text (TMP)", "InputField (TMP)",
-        };
-
-        /// <summary>
-        /// 视觉容器字典
-        /// </summary>
-        [ShowInInspector] private Dictionary<Type, Components> elements = new Dictionary<Type, Components>();
-
         /// <summary>
         /// UI层级
         /// </summary>
@@ -45,13 +26,8 @@ namespace JFramework
         /// </summary>
         protected virtual void Awake()
         {
-            FindComponent<Text>();
-            FindComponent<Image>();
-            FindComponent<Button>();
-            FindComponent<Toggle>();
-            FindComponent<Slider>();
-            FindComponent<RawImage>();
-            FindComponent<InputField>();
+            InitField();
+            InitMethod();
         }
 
         /// <summary>
@@ -65,63 +41,90 @@ namespace JFramework
         protected virtual void OnDisable() => GetComponent<IUpdate>()?.Remove();
 
         /// <summary>
-        /// 查找所有组件
+        /// 初始化字段
         /// </summary>
-        /// <typeparam name="T"></typeparam>
-        protected void FindComponent<T>() where T : Component
+        private void InitField()
         {
-            var components = GetComponentsInChildren<T>();
-            foreach (var component in components)
-            {
-                var key = component.gameObject.name;
-                if (filters.Contains(key)) continue;
-                if (!elements.ContainsKey(typeof(T)))
-                {
-                    var element = new Components();
-                    elements.Add(typeof(T), element);
-                    element.Add(key, component);
-                }
-                else if (!elements[typeof(T)].ContainsKey(key))
-                {
-                    elements[typeof(T)].Add(key, component);
-                }
+            var fields = GetType().GetFields(Reflection.Instance);
 
-                if (component is Button button)
+            foreach (var field in fields)
+            {
+                var attribute = field.GetCustomAttribute<UIFieldAttribute>(true);
+                if (attribute != null)
                 {
-                    var method = Reflection.GetMethod(GetType(), key);
-                    if (method != null)
+                    var child = FindChild(transform, attribute.name);
+                    if (child != null)
                     {
-                        button.onClick.AddListener(() =>
+                        var component = child.GetComponent(field.FieldType);
+                        if (component != null)
                         {
-                            if (state == UIState.Freeze) return;
-                            method.Invoke(this, null);
-                        });
-                    }
-                }
-                else if (component is Toggle toggle)
-                {
-                    var method = Reflection.GetMethod(GetType(), key);
-                    if (method != null)
-                    {
-                        toggle.onValueChanged.AddListener(value =>
-                        {
-                            if (state == UIState.Freeze) return;
-                            method.Invoke(this, new object[] { value });
-                        });
+                            field.SetValue(this, component);
+                        }
                     }
                 }
             }
         }
 
         /// <summary>
-        /// 查找存在的组件
+        /// 初始化方法
         /// </summary>
-        /// <param name="key">组件的名称</param>
-        /// <typeparam name="T">可以使用任何继承UIBehaviour的组件</typeparam>
-        /// <returns>返回查找到的组件</returns>
-        public T Get<T>(string key) where T : Component
+        private void InitMethod()
         {
-            return elements.TryGetValue(typeof(T), out var component) ? (T)component[key] : null;
+            var methods = GetType().GetMethods(Reflection.Instance);
+
+            foreach (var method in methods)
+            {
+                var attribute = method.GetCustomAttribute<UIMethodAttribute>(false);
+                if (attribute != null)
+                {
+                    var child = FindChild(transform, attribute.name);
+                    if (child != null)
+                    {
+                        if (child.TryGetComponent(out Button button))
+                        {
+                            button.onClick.AddListener(() =>
+                            {
+                                if (state == UIState.Freeze) return;
+                                method.Invoke(this, null);
+                            });
+                        }
+                        else if (child.TryGetComponent(out Toggle toggle))
+                        {
+                            toggle.onValueChanged.AddListener(value =>
+                            {
+                                if (state == UIState.Freeze) return;
+                                method.Invoke(this, new object[] { value });
+                            });
+                        }
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// 递归查找子物体
+        /// </summary>
+        /// <param name="parent"></param>
+        /// <param name="name"></param>
+        /// <returns></returns>
+        public static Transform FindChild(Transform parent, string name)
+        {
+            for (int i = 0; i < parent.childCount; i++)
+            {
+                Transform child = parent.GetChild(i);
+                if (child.name == name)
+                {
+                    return child;
+                }
+
+                Transform result = FindChild(child, name);
+                if (result != null)
+                {
+                    return result;
+                }
+            }
+
+            return null;
         }
 
         /// <summary>

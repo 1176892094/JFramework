@@ -12,7 +12,7 @@ namespace JFramework
         /// <summary>
         /// 实例类
         /// </summary>
-        private const BindingFlags Instance = BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic;
+        public const BindingFlags Instance = BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic;
 
         /// <summary>
         /// 静态类
@@ -55,6 +55,18 @@ namespace JFramework
         }
 
         /// <summary>
+        /// 根据 String 获取字段
+        /// </summary>
+        /// <param name="type"></param>
+        /// <param name="name"></param>
+        /// <returns></returns>
+        public static FieldInfo GetField(Type type, string name)
+        {
+            var fields = type.GetFields(Instance);
+            return fields.FirstOrDefault(field => field.GetCustomAttribute<UIFieldAttribute>(false)?.name == name);
+        }
+
+        /// <summary>
         /// 根据 String 获取方法
         /// </summary>
         /// <param name="type"></param>
@@ -63,7 +75,7 @@ namespace JFramework
         public static MethodInfo GetMethod(Type type, string name)
         {
             var methods = type.GetMethods(Instance);
-            return methods.FirstOrDefault(method => method.GetCustomAttribute<InvokeAttribute>(false)?.name == name);
+            return methods.FirstOrDefault(method => method.GetCustomAttribute<UIMethodAttribute>(false)?.name == name);
         }
     }
 }
