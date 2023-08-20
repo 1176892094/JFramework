@@ -13,7 +13,7 @@ namespace JFramework
         /// <param name="inject"></param>
         public static void Inject(this IInject inject)
         {
-            inject.Inject(inject.transform);
+            inject.Inject(inject);
         }
     }
 }

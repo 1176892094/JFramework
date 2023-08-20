@@ -58,7 +58,7 @@ namespace JFramework.Interface
         /// 获取子物体并注入字段
         /// </summary>
         /// <param name="obj"></param>
-        void Inject(Transform obj)
+        void Inject<T>(T obj) where T : IInject
         {
             var type = obj.GetType();
             var fields = type.GetFields(Reflection.Instance);
@@ -81,32 +81,32 @@ namespace JFramework.Interface
                 if (method == null) continue;
                 if (target.TryGetComponent(out Button button) && component == button)
                 {
-                    if (obj.TryGetComponent(out IPanel panel))
+                    if (obj.transform.TryGetComponent(out IPanel panel))
                     {
                         button.onClick.AddListener(() =>
                         {
                             if (panel.state == UIState.Freeze) return;
-                            obj.SendMessage(inject.name);
+                            obj.transform.SendMessage(inject.name);
                         });
                     }
                     else
                     {
-                        button.onClick.AddListener(() => obj.SendMessage(inject.name));
+                        button.onClick.AddListener(() => obj.transform.SendMessage(inject.name));
                     }
                 }
                 else if (target.TryGetComponent(out Toggle toggle) && component == toggle)
                 {
-                    if (obj.TryGetComponent(out IPanel panel))
+                    if (obj.transform.TryGetComponent(out IPanel panel))
                     {
                         toggle.onValueChanged.AddListener(value =>
                         {
                             if (panel.state == UIState.Freeze) return;
-                            obj.SendMessage(inject.name, value);
+                            obj.transform.SendMessage(inject.name, value);
                         });
                     }
                     else
                     {
-                        toggle.onValueChanged.AddListener(value => obj.SendMessage(inject.name, value));
+                        toggle.onValueChanged.AddListener(value => obj.transform.SendMessage(inject.name, value));
                     }
                 }
             }
