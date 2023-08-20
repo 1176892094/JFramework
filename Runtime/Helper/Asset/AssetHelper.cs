@@ -51,14 +51,12 @@ namespace JFramework
                     if (!clientDataList.ContainsKey(fileName))
                     {
                         assetDataList.Add(fileName);
-                        Debug.Log("更新文件: " + fileName);
                     }
                     else
                     {
                         if (clientDataList[fileName] != serverDataList[fileName])
                         {
                             assetDataList.Add(fileName);
-                            Debug.Log("更新文件: " + fileName);
                         }
 
                         clientDataList.Remove(fileName);
