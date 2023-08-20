@@ -1,5 +1,4 @@
 using System;
-using System.Reflection;
 using JFramework.Interface;
 using UnityEngine;
 using Debug = UnityEngine.Debug;
@@ -14,13 +13,9 @@ namespace JFramework.Core
         /// <summary>
         /// 加载数据表
         /// </summary>
-        public static void LoadDataTable(Assembly assembly = null)
+        public static void LoadDataTable()
         {
-            if (assembly == null)
-            {
-                assembly = Reflection.GetAssembly("Assembly-CSharp");
-            }
-
+            var assembly = Reflection.GetAssembly("HotUpdate");
             var types = Reflection.GetTypes<IDataTable>(assembly);
             if (types == null || types.Length == 0) return;
             foreach (var type in types)
