@@ -112,7 +112,7 @@ Transform:
   - {fileID: 2603981728109888316}
   - {fileID: 3832616549184431333}
   m_Father: {fileID: 0}
-  m_RootOrder: 1
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &3346680263604035365
 MonoBehaviour:
@@ -123,10 +123,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 2046465299821470986}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b750b66b07a8348e08d53030fdb40e6c, type: 3}
+  m_Script: {fileID: 11500000, guid: 92dea2edc05674cbcb0816f9fc8b0740, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  debugOption: 0
+  isRemote: 0
 --- !u!114 &778044560079173824
 MonoBehaviour:
   m_ObjectHideFlags: 0

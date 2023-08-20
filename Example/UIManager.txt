@@ -26,8 +26,8 @@ public class Test7: MonoBehaviour
 
     private void GetLayer()
     {
-        UIManager.GetLayer(UILayerType.Layer1);//获取层级
-        Transform common = UIManager.GetLayer(UILayerType.Layer2);
+        UIManager.GetLayer(UILayer.Layer1);//获取层级
+        Transform common = UIManager.GetLayer(UILayer.Layer2);
     }
 
     private void Clear()
