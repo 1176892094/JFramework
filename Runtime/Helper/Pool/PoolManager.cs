@@ -106,6 +106,9 @@ namespace JFramework.Core
 
             parents[obj.name] = new GameObject(obj.name + "-Pool");
             parents[obj.name].transform.SetParent(poolManager);
+            obj.SetActive(false);
+            obj.transform.SetParent(parents[obj.name].transform);
+            obj.GetComponent<IPush>()?.OnPush();
             pools.Add(obj.name, new Pool<GameObject>(obj));
         }
 
