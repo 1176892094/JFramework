@@ -53,17 +53,5 @@ namespace JFramework
             var fields = type.GetFields(Instance);
             return fields.FirstOrDefault(field => field.GetCustomAttributes(typeof(T), false).Length > 0);
         }
-
-        /// <summary>
-        /// 根据 String 获取字段
-        /// </summary>
-        /// <param name="type"></param>
-        /// <param name="name"></param>
-        /// <returns></returns>
-        public static FieldInfo GetField(Type type, string name)
-        {
-            var fields = type.GetFields(Instance);
-            return fields.FirstOrDefault(field => field.GetCustomAttribute<InjectAttribute>(false)?.find == name);
-        }
     }
 }

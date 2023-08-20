@@ -1,7 +1,5 @@
-using System.Reflection;
 using JFramework.Interface;
 using UnityEngine;
-using UnityEngine.UI;
 
 // ReSharper disable All
 namespace JFramework
@@ -9,7 +7,7 @@ namespace JFramework
     /// <summary>
     /// UI面板的抽象类
     /// </summary>
-    public abstract class UIPanel : MonoBehaviour, IPanel
+    public abstract class UIPanel : MonoBehaviour, IPanel, IInject
     {
         /// <summary>
         /// UI层级
@@ -24,10 +22,7 @@ namespace JFramework
         /// <summary>
         /// 开始时查找所有控件
         /// </summary>
-        protected virtual void Awake()
-        {
-            InitFind();
-        }
+        protected virtual void Awake() => GetComponent<IInject>()?.Inject(this);
 
         /// <summary>
         /// 实体启用
@@ -38,76 +33,6 @@ namespace JFramework
         /// 实体禁用
         /// </summary>
         protected virtual void OnDisable() => GetComponent<IUpdate>()?.Remove();
-
-        /// <summary>
-        /// 初始化字段
-        /// </summary>
-        private void InitFind()
-        {
-            var type = GetType();
-            var fields = type.GetFields(Reflection.Instance);
-
-            foreach (var field in fields)
-            {
-                var attribute = field.GetCustomAttribute<InjectAttribute>(true);
-                if (attribute != null)
-                {
-                    var child = FindChild(transform, attribute.find);
-                    if (child != null)
-                    {
-                        var component = child.GetComponent(field.FieldType);
-                        if (component != null)
-                        {
-                            field.SetValue(this, component);
-                        }
-
-                        if (type.GetMethod(attribute.find, Reflection.Instance) == null) continue;
-                        if (child.TryGetComponent(out Button button) && component == button)
-                        {
-                            button.onClick.AddListener(() =>
-                            {
-                                if (state == UIState.Freeze) return;
-                                SendMessage(attribute.find);
-                            });
-                        }
-                        else if (child.TryGetComponent(out Toggle toggle) && component == toggle)
-                        {
-                            toggle.onValueChanged.AddListener(value =>
-                            {
-                                if (state == UIState.Freeze) return;
-                                SendMessage(attribute.find, value);
-                            });
-                        }
-                    }
-                }
-            }
-        }
-
-        /// <summary>
-        /// 递归查找子物体
-        /// </summary>
-        /// <param name="parent"></param>
-        /// <param name="name"></param>
-        /// <returns></returns>
-        public static Transform FindChild(Transform parent, string name)
-        {
-            for (int i = 0; i < parent.childCount; i++)
-            {
-                Transform child = parent.GetChild(i);
-                if (child.name == name)
-                {
-                    return child;
-                }
-
-                Transform result = FindChild(child, name);
-                if (result != null)
-                {
-                    return result;
-                }
-            }
-
-            return null;
-        }
 
         /// <summary>
         /// 显示UI面板
