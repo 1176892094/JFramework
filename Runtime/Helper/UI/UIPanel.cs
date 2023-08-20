@@ -60,7 +60,7 @@ namespace JFramework
                             field.SetValue(this, component);
                         }
 
-                        if (child.TryGetComponent(out Button button))
+                        if (child.TryGetComponent(out Button button) && component == button)
                         {
                             button.onClick.AddListener(() =>
                             {
@@ -68,7 +68,7 @@ namespace JFramework
                                 SendMessage(attribute.find);
                             });
                         }
-                        else if (child.TryGetComponent(out Toggle toggle))
+                        else if (child.TryGetComponent(out Toggle toggle) && component == toggle)
                         {
                             toggle.onValueChanged.AddListener(value =>
                             {
