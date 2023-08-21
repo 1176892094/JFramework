@@ -153,6 +153,25 @@ namespace JFramework.Core
                 panel.Hide();
             }
         }
+        
+        /// <summary>
+        /// 销毁面板
+        /// </summary>
+        /// <typeparam name="TPanel"></typeparam>
+        public static void Destroy<TPanel>() where TPanel : IPanel
+        {
+            if (!GlobalManager.Runtime) return;
+            if (panels.TryGetValue(typeof(TPanel), out var panel))
+            {
+                if (IsActive<TPanel>())
+                {
+                    panel.Hide();
+                }
+               
+                Object.Destroy(panel.gameObject);
+                panels.Remove(typeof(TPanel));
+            }
+        }
 
         /// <summary>
         /// UI管理器得到UI面板
@@ -189,21 +208,6 @@ namespace JFramework.Core
         /// </summary>
         /// <returns>返回得到的层级</returns>
         public static Transform GetLayer(UILayer type) => panels != null ? layers[type] : null;
-
-        /// <summary>
-        /// 销毁面板
-        /// </summary>
-        /// <typeparam name="TPanel"></typeparam>
-        public static void Destroy<TPanel>() where TPanel : IPanel
-        {
-            if (!GlobalManager.Runtime) return;
-            if (panels.ContainsKey(typeof(TPanel)))
-            {
-                panels[typeof(TPanel)].Hide();
-                Object.Destroy(panels[typeof(TPanel)].gameObject);
-                panels.Remove(typeof(TPanel));
-            }
-        }
 
         /// <summary>
         /// UI管理器清除可销毁的面板
