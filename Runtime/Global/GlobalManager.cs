@@ -58,9 +58,6 @@ namespace JFramework.Core
             Runtime = false;
             Instance = null;
             OnQuit?.Invoke();
-            OnStart = null;
-            OnUpdate = null;
-            OnQuit = null;
         }
 
         private void OnDestroy()
@@ -98,6 +95,9 @@ namespace JFramework.Core
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
         private static void Clear()
         {
+            OnQuit = null;
+            OnStart = null;
+            OnUpdate = null;
             DataManager.Clear();
             SceneManager.Clear();
             EventManager.Clear();
