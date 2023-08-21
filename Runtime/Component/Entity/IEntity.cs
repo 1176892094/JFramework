@@ -1,4 +1,3 @@
-using JFramework.Core;
 using UnityEngine;
 
 namespace JFramework.Interface
@@ -28,29 +27,19 @@ namespace JFramework.Interface
         /// 实体更新
         /// </summary>
         void OnUpdate();
-
-        /// <summary>
-        /// 侦听实体的更新事件
-        /// </summary>
-        void Listen() => GlobalManager.Listen(this);
-
-        /// <summary>
-        /// 移除实体的更新
-        /// </summary>
-        void Remove() => GlobalManager.Remove(this);
+    }
+    
+    /// <summary>
+    /// 注入接口 (根据子物体名称 查找 并注入值)
+    /// </summary>
+    public interface IInject : IEntity
+    {
     }
 
     /// <summary>
     /// 角色接口
     /// </summary>
     public interface ICharacter : IEntity
-    {
-    }
-
-    /// <summary>
-    /// 注入接口 (根据子物体名称 查找 并注入值)
-    /// </summary>
-    public interface IInject : IEntity
     {
     }
 }

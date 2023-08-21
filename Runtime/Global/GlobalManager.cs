@@ -1,5 +1,4 @@
 using System;
-using JFramework.Interface;
 using UnityEngine;
 
 // ReSharper disable All
@@ -71,26 +70,6 @@ namespace JFramework.Core
             GC.Collect();
         }
 
-        /// <summary>
-        /// 侦听实体的更新事件
-        /// </summary>
-        /// <param name="entity"></param>
-        internal static void Listen(IUpdate entity)
-        {
-            if (!Runtime) return;
-            OnUpdate += entity.OnUpdate;
-        }
-
-        /// <summary>
-        /// 移除实体的更新
-        /// </summary>
-        /// <param name="entity"></param>
-        internal static void Remove(IUpdate entity)
-        {
-            if (!Runtime) return;
-            OnUpdate -= entity.OnUpdate;
-        }
-        
         /// <summary>
         /// 注册
         /// </summary>

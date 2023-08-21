@@ -9,6 +9,24 @@ namespace JFramework
     public static partial class Extensions
     {
         /// <summary>
+        /// 侦听实体的更新事件
+        /// </summary>
+        public static void Listen(this IUpdate entity)
+        {
+            if (!GlobalManager.Runtime) return;
+            GlobalManager.OnUpdate += entity.OnUpdate;
+        }
+
+        /// <summary>
+        /// 移除实体的更新
+        /// </summary>
+        public static void Remove(this IUpdate entity)
+        {
+            if (!GlobalManager.Runtime) return;
+            GlobalManager.OnUpdate -= entity.OnUpdate;
+        }
+
+        /// <summary>
         /// 角色接口的注册
         /// </summary>
         /// <param name="character"></param>
