@@ -64,7 +64,10 @@ namespace JFramework
             }
             else
             {
-                button.onClick.AddListener(() => inject.transform.SendMessage(name));
+                button.onClick.AddListener(() =>
+                {
+                    inject.transform.SendMessage(name);
+                });
             }
         }
 
@@ -86,7 +89,10 @@ namespace JFramework
             }
             else
             {
-                toggle.onValueChanged.AddListener(value => inject.transform.SendMessage(name, value));
+                toggle.onValueChanged.AddListener(value =>
+                {
+                    inject.transform.SendMessage(name, value);
+                });
             }
         }
 
@@ -106,7 +112,7 @@ namespace JFramework
                     return child;
                 }
 
-                var result = GetChild(child, name);
+                var result = child.GetChild(name);
                 if (result != null)
                 {
                     return result;
