@@ -74,6 +74,7 @@ namespace JFramework.Core
         {
             UIManager.Register();
             PoolManager.Register();
+            InputManager.Register();
             AudioManager.Register();
             TimerManager.Register();
         }
@@ -85,6 +86,7 @@ namespace JFramework.Core
         {
             UIManager.UnRegister();
             PoolManager.UnRegister();
+            InputManager.UnRegister();
             AudioManager.UnRegister();
             TimerManager.UnRegister();
         }

@@ -36,12 +36,15 @@ namespace JFramework.Core
         [ShowInInspector, LabelText("事件管理数据"), FoldoutGroup("基本管理器")]
         private Dictionary<Type, HashSet<IEvent>> observers => EventManager.observers;
 
+        [ShowInInspector, LabelText("玩家输入数据"), FoldoutGroup("基本管理器")]
+        private Dictionary<KeyCode, InputAction> inputs => InputManager.inputs;
+
         [ShowInInspector, LabelText("资源依赖数据"), FoldoutGroup("基本管理器")]
         private Dictionary<string, AssetBundle> depends => AssetManager.depends;
 
         [ShowInInspector, LabelText("资源加载数据"), FoldoutGroup("基本管理器")]
         private Dictionary<string, (string, string)> assets => AssetManager.assets;
-        
+
         [ShowInInspector, LabelText("用户界面管理"), FoldoutGroup("面板管理器")]
         private Dictionary<Type, IPanel> panels => UIManager.panels;
 
