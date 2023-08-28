@@ -35,12 +35,12 @@ namespace JFramework.Core
         /// <summary>
         /// 背景音乐
         /// </summary>
-        public static float soundVolume => audioData.soundVolume;
+        public static float soundVolume => audioData?.soundVolume ?? 1;
 
         /// <summary>
         /// 游戏声音
         /// </summary>
-        public static float audioVolume => audioData.audioVolume;
+        public static float audioVolume => audioData?.audioVolume ?? 1;
 
         /// <summary>
         /// 音效管理器初始化
@@ -100,7 +100,7 @@ namespace JFramework.Core
             {
                 audio = poolManager.gameObject.AddComponent<AudioSource>();
             }
-            
+
             var clip = await AssetManager.LoadAsync<AudioClip>(path);
             audios.Add(audio);
             audio.volume = audioData.audioVolume;
