@@ -78,10 +78,9 @@ namespace JFramework.Core
         /// <summary>
         /// 清空管理器
         /// </summary>
-        public static async void Clear()
+        internal static void Clear()
         {
-            secrets.Clear();
-            await Save(secrets, nameof(JsonManager));
+            secrets = null;
         }
     }
 }

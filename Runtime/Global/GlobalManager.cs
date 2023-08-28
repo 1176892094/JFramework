@@ -100,6 +100,7 @@ namespace JFramework.Core
             OnQuit = null;
             OnStart = null;
             OnUpdate = null;
+            JsonManager.Clear();
             DataManager.Clear();
             SceneManager.Clear();
             EventManager.Clear();
