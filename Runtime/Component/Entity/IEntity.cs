@@ -19,17 +19,6 @@ namespace JFramework.Interface
     }
 
     /// <summary>
-    /// 更新接口
-    /// </summary>
-    public interface IUpdate : IEntity
-    {
-        /// <summary>
-        /// 实体更新
-        /// </summary>
-        void OnUpdate();
-    }
-    
-    /// <summary>
     /// 注入接口 (根据子物体名称 查找 并注入值)
     /// </summary>
     public interface IInject : IEntity

@@ -1,5 +1,7 @@
 using System.Collections.Generic;
+using JFramework.Interface;
 using UnityEngine;
+
 // ReSharper disable All
 
 namespace JFramework.Core
@@ -12,7 +14,7 @@ namespace JFramework.Core
         /// <summary>
         /// 输入管理字典
         /// </summary>
-        internal static readonly Dictionary<KeyCode, InputAction> inputs = new Dictionary<KeyCode, InputAction>();
+        internal static readonly Dictionary<KeyCode, IInputAction> inputs = new Dictionary<KeyCode, IInputAction>();
 
         /// <summary>
         /// 是否活跃
@@ -38,11 +40,11 @@ namespace JFramework.Core
             {
                 if (Input.GetKeyDown(key))
                 {
-                    input.OnDownEvent();
+                    input.OnEnter();
                 }
                 else if (Input.GetKeyUp(key))
                 {
-                    input.OnUpEvent();
+                    input.OnExit();
                 }
             }
         }
@@ -60,7 +62,7 @@ namespace JFramework.Core
                 inputs[key] = input;
             }
 
-            return input;
+            return (InputAction)input;
         }
 
         /// <summary>
@@ -72,7 +74,7 @@ namespace JFramework.Core
             {
                 if (inputs.TryGetValue(key, out var input))
                 {
-                    input.Clear();
+                    ((InputAction)input).Clear();
                 }
             }
 

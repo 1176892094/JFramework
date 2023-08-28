@@ -1,11 +1,12 @@
 using System;
+using JFramework.Interface;
 
 namespace JFramework
 {
     /// <summary>
     /// 输入事件
     /// </summary>
-    public class InputAction
+    public class InputAction : IInputAction
     {
         /// <summary>
         /// 按下
@@ -20,15 +21,15 @@ namespace JFramework
         /// <summary>
         /// 按下
         /// </summary>
-        internal void OnDownEvent() => OnEnter?.Invoke();
+        void IEnter.OnEnter() => OnEnter?.Invoke();
 
         /// <summary>
-        /// 退出
+        /// 弹起
         /// </summary>
-        internal void OnUpEvent() => OnExit?.Invoke();
+        void IExit.OnExit() => OnExit?.Invoke();
 
         /// <summary>
-        /// 清除
+        /// 清空
         /// </summary>
         internal void Clear()
         {

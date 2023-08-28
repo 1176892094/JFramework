@@ -3,7 +3,7 @@ namespace JFramework.Interface
     /// <summary>
     /// 状态接口
     /// </summary>
-    public interface IState
+    public interface IState : IUpdate, IEnter, IExit
     {
         /// <summary>
         /// 状态的初始化方法
@@ -11,19 +11,37 @@ namespace JFramework.Interface
         /// <param name="owner">状态的所有者</param>
         /// <param name="machine">状态机</param>
         void OnAwake(ICharacter owner, IStateMachine machine);
+    }
 
+    /// <summary>
+    /// 更新接口
+    /// </summary>
+    public interface IUpdate
+    {
         /// <summary>
-        /// 进入该状态的方法
-        /// </summary>
-        void OnEnter();
-
-        /// <summary>
-        /// 更新该状态的方法
+        /// 状态更新
         /// </summary>
         void OnUpdate();
+    }
 
+    /// <summary>
+    /// 进入接口
+    /// </summary>
+    public interface IEnter
+    {
         /// <summary>
-        /// 退出该状态的方法
+        /// 进入状态
+        /// </summary>
+        void OnEnter();
+    }
+
+    /// <summary>
+    /// 退出接口
+    /// </summary>
+    public interface IExit
+    {
+        /// <summary>
+        /// 退出状态
         /// </summary>
         void OnExit();
     }

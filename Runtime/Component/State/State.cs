@@ -48,16 +48,16 @@ namespace JFramework
         /// <summary>
         /// 受保护的状态进入方法
         /// </summary>
-        void IState.OnEnter() => OnEnter();
+        void IEnter.OnEnter() => OnEnter();
 
         /// <summary>
         /// 受保护的状态更新方法
         /// </summary>
-        void IState.OnUpdate() => OnUpdate();
+        void IUpdate.OnUpdate() => OnUpdate();
 
         /// <summary>
         /// 受保护的状态退出方法
         /// </summary>
-        void IState.OnExit() => OnExit();
+        void IExit.OnExit() => OnExit();
     }
 }
