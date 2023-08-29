@@ -20,6 +20,11 @@ namespace JFramework
         protected IStateMachine machine;
 
         /// <summary>
+        /// 当初始化
+        /// </summary>
+        protected virtual void OnAwake() { }
+
+        /// <summary>
         /// 进入状态
         /// </summary>
         protected abstract void OnEnter();
@@ -43,6 +48,7 @@ namespace JFramework
         {
             this.owner = (T)owner;
             this.machine = machine;
+            OnAwake();
         }
 
         /// <summary>
