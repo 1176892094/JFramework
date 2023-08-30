@@ -51,8 +51,9 @@ namespace JFramework
             waitTime = current + duration;
             try
             {
+                count--;
                 OnFinish?.Invoke();
-                if (--count == 0)
+                if (count == 0)
                 {
                     TimerManager.Push(this);
                 }
