@@ -13,7 +13,7 @@ using UnityEngine;
 
 namespace JFramework.Editor
 {
-    public class GlobalEditor : ScriptableObject
+    internal class GlobalEditor : ScriptableObject
     {
         /// <summary>
         /// 资源编辑器单例
