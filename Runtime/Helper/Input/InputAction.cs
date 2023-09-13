@@ -6,7 +6,7 @@ namespace JFramework
     /// <summary>
     /// 输入事件
     /// </summary>
-    public class InputAction : IInputAction
+    public class InputAction : IInput
     {
         /// <summary>
         /// 按下

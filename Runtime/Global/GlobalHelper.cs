@@ -37,7 +37,7 @@ namespace JFramework.Core
         private Dictionary<Type, HashSet<IEvent>> observers => EventManager.observers;
 
         [ShowInInspector, LabelText("玩家输入数据"), FoldoutGroup("基本管理器")]
-        private Dictionary<KeyCode, IInputAction> inputs => InputManager.inputs;
+        private Dictionary<KeyCode, IInput> inputs => InputManager.inputs;
 
         [ShowInInspector, LabelText("资源依赖数据"), FoldoutGroup("基本管理器")]
         private Dictionary<string, AssetBundle> depends => AssetManager.depends;

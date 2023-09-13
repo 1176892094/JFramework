@@ -14,7 +14,7 @@ namespace JFramework.Core
         /// <summary>
         /// 输入管理字典
         /// </summary>
-        internal static readonly Dictionary<KeyCode, IInputAction> inputs = new Dictionary<KeyCode, IInputAction>();
+        internal static readonly Dictionary<KeyCode, IInput> inputs = new Dictionary<KeyCode, IInput>();
 
         /// <summary>
         /// 是否活跃
