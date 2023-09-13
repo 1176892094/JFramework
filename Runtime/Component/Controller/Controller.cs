@@ -19,11 +19,18 @@ namespace JFramework
         /// <summary>
         /// 控制器注册角色
         /// </summary>
+        protected virtual void Register()
+        {
+        }
+        
+        /// <summary>
+        /// 控制器注册角色
+        /// </summary>
         /// <param name="owner"></param>
         void IController.Register(ICharacter owner)
         {
             this.owner = (T)owner;
-            (this as IRegister)?.Register();
+            Register();
         }
     }
 }
