@@ -62,11 +62,11 @@ namespace JFramework.Core
                 await Encrypt(new T(), name);
             }
             
-            secrets.TryAdd(name, new JsonData());
-            if (!secrets[name]) return default;
-            var saveJson = await Decrypt(await File.ReadAllBytesAsync(filePath), name);
             try
             {
+                secrets.TryAdd(name, new JsonData());
+                if (!secrets[name]) return default;
+                var saveJson = await Decrypt(await File.ReadAllBytesAsync(filePath), name);
                 return !saveJson.IsEmpty() ? JsonConvert.DeserializeObject<T>(saveJson) : default;
             }
             catch (Exception)

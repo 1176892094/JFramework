@@ -63,10 +63,10 @@ namespace JFramework.Core
                 Debug.Log($"创建 {name.Orange()} 数据文件");
                 await Save(new T(), name);
             }
-
-            var saveJson = await File.ReadAllTextAsync(filePath);
+            
             try
             {
+                var saveJson = await File.ReadAllTextAsync(filePath);
                 return !saveJson.IsEmpty() ? JsonConvert.DeserializeObject<T>(saveJson) : default;
             }
             catch (Exception)

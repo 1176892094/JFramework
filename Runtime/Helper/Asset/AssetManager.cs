@@ -39,6 +39,11 @@ namespace JFramework.Core
         /// </summary>
         public static event Action OnLoadCompleted;
         
+        /// <summary>
+        /// 资源加载进度
+        /// </summary>
+        public static event Action<AssetProgress> OnLoadProgress; 
+        
 #if UNITY_EDITOR
         /// <summary>
         /// 是否为远端加载
@@ -87,6 +92,12 @@ namespace JFramework.Core
                 depends.Add(dependency, assetBundle);
             }
         }
+
+        /// <summary>
+        /// 下载资源包进度
+        /// </summary>
+        /// <param name="progress"></param>
+        internal static void LoadProgress(AssetProgress progress) => OnLoadProgress?.Invoke(progress);
 
         /// <summary>
         /// 根据路径加载
@@ -346,6 +357,7 @@ namespace JFramework.Core
             depends.Clear();
             manifest = null;
             mainAsset = null;
+            OnLoadProgress = null;
             OnLoadCompleted = null;
         }
     }

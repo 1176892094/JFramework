@@ -1,7 +1,9 @@
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using JFramework.Core;
 using Newtonsoft.Json;
 using UnityEngine;
 using UnityEngine.Networking;
@@ -140,6 +142,7 @@ namespace JFramework
                         assetDataList.Remove(fileName);
                     }
 
+                    AssetManager.LoadProgress(new AssetProgress(fileName, ++curProgress, maxProgress));
                     Debug.Log($"{++curProgress}/{maxProgress}");
                 }
             }
