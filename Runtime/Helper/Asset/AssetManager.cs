@@ -75,7 +75,7 @@ namespace JFramework.Core
         /// <summary>
         /// 从服务器下载资源包
         /// </summary>
-        public static async void LoadAssetBundle() => await AssetHelper.UpdateAssetBundles();
+        public static async Task<bool> LoadAssetBundle() => await AssetHelper.UpdateAssetBundles();
 
         /// <summary>
         /// 下载资源包进度

@@ -30,11 +30,17 @@ namespace JFramework
         private static readonly List<string> assetDataList = new List<string>();
 
         /// <summary>
+        /// 是否进行更新
+        /// </summary>
+        private static bool isUpdate;
+
+        /// <summary>
         /// 检测是否需要更新
         /// </summary>
         /// <returns></returns>
-        internal static async Task UpdateAssetBundles()
+        internal static async Task<bool> UpdateAssetBundles()
         {
+            isUpdate = false;
             assetDataList.Clear();
             clientDataList.Clear();
             serverDataList.Clear();
@@ -77,11 +83,12 @@ namespace JFramework
                 {
                     Debug.Log("更新本地AB包对比文件为最新");
                     await File.WriteAllTextAsync(GlobalSetting.clientInfoPath, serverInfo);
-                    return;
+                    return isUpdate;
                 }
             }
             
             Debug.Log("更新失败。");
+            return false;
         }
 
         /// <summary>
@@ -133,7 +140,6 @@ namespace JFramework
             {
                 foreach (var fileName in copies)
                 {
-                   
                     var success = await Download(fileName,  GlobalSetting.GetPerFile(fileName));
                     if (!success) continue;
                     if (assetDataList.Contains(fileName))
@@ -141,6 +147,7 @@ namespace JFramework
                         assetDataList.Remove(fileName);
                     }
 
+                    isUpdate = true;
                     AssetManager.LoadProgress(new AssetProgress(fileName, ++curProgress, maxProgress));
                 }
             }
