@@ -143,7 +143,7 @@ namespace JFramework
                     }
 
                     AssetManager.LoadProgress(new AssetProgress(fileName, ++curProgress, maxProgress));
-                    Debug.Log($"{++curProgress}/{maxProgress}");
+                    Debug.Log($"{curProgress}/{maxProgress}");
                 }
             }
 
