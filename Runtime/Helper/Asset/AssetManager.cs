@@ -2,13 +2,13 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
-#if UNITY_EDITOR
-using JFramework.Editor;
-#endif
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using Object = UnityEngine.Object;
 using UnitySceneManager = UnityEngine.SceneManagement.SceneManager;
+#if UNITY_EDITOR
+using JFramework.Editor;
+#endif
 
 namespace JFramework.Core
 {
@@ -33,11 +33,6 @@ namespace JFramework.Core
         /// 声明文件
         /// </summary>
         private static AssetBundleManifest manifest;
-
-        /// <summary>
-        /// 是否加载完成
-        /// </summary>
-        public static event Action OnLoadCompleted;
         
         /// <summary>
         /// 资源加载进度
@@ -50,23 +45,7 @@ namespace JFramework.Core
         /// </summary>
         public static bool isRemote => GlobalManager.Instance.isRemote;
 #endif
-
-        /// <summary>
-        /// 从服务器下载资源包
-        /// </summary>
-        public static async void LoadAssetBundle()
-        {
-#if UNITY_EDITOR
-            if (!isRemote)
-            {
-                OnLoadCompleted?.Invoke();
-                return;
-            }
-#endif
-            await AssetHelper.UpdateVersion();
-            OnLoadCompleted?.Invoke();
-        }
-
+        
         /// <summary>
         /// 加载主包 和 配置文件
         /// </summary>
@@ -92,6 +71,11 @@ namespace JFramework.Core
                 depends.Add(dependency, assetBundle);
             }
         }
+
+        /// <summary>
+        /// 从服务器下载资源包
+        /// </summary>
+        public static async void LoadAssetBundle() => await AssetHelper.UpdateAssetBundles();
 
         /// <summary>
         /// 下载资源包进度
@@ -358,7 +342,6 @@ namespace JFramework.Core
             manifest = null;
             mainAsset = null;
             OnLoadProgress = null;
-            OnLoadCompleted = null;
         }
     }
 }

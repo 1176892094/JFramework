@@ -8,17 +8,17 @@ namespace JFramework
         /// <summary>
         /// 文件名称
         /// </summary>
-        public string name;
+        public readonly string name;
 
         /// <summary>
         /// 当前进度
         /// </summary>
-        public float current;
+        public readonly float current;
 
         /// <summary>
         /// 最大进度
         /// </summary>
-        public float progress;
+        public readonly float progress;
 
         /// <summary>
         /// 初始化

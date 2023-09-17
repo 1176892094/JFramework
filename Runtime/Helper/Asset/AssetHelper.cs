@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -34,7 +33,7 @@ namespace JFramework
         /// 检测是否需要更新
         /// </summary>
         /// <returns></returns>
-        internal static async Task UpdateVersion()
+        internal static async Task UpdateAssetBundles()
         {
             assetDataList.Clear();
             clientDataList.Clear();
@@ -143,7 +142,6 @@ namespace JFramework
                     }
 
                     AssetManager.LoadProgress(new AssetProgress(fileName, ++curProgress, maxProgress));
-                    Debug.Log($"{curProgress}/{maxProgress}");
                 }
             }
 
