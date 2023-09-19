@@ -165,8 +165,16 @@ namespace JFramework
         {
             using var request = UnityWebRequest.Get(GlobalSetting.GetRemoteFile(fileName));
             var operation = request.SendWebRequest();
+            var time = Time.time;
             while (!operation.isDone)
             {
+                if (Time.time > time + 0.2f)
+                {
+                    Debug.LogWarning($"下载 {fileName} 文件失败\n");
+                    request.Abort();
+                    return false;
+                }
+
                 await Task.Yield();
             }
 
