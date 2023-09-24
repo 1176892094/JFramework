@@ -1,3 +1,5 @@
 *.DS_Store
 .idea*
 Plugins/Sirenix/Odin Inspector/Modules/Unity.Mathematics/*
+Folder.DotSettings.user
+Folder.DotSettings.user.meta
