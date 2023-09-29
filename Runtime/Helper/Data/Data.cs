@@ -70,7 +70,7 @@ namespace JFramework
         /// <returns></returns>
         public static TData[] GetTable<TData>() where TData : IData
         {
-            if (!dataTable.TryGetValue(typeof(TKey), out Dictionary<TKey, IData> dataList)) return null;
+            if (!dataTable.TryGetValue(typeof(TData), out Dictionary<TKey, IData> dataList)) return null;
             return dataList.Values.Cast<TData>().ToArray();
         }
 
