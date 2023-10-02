@@ -37,7 +37,7 @@ namespace JFramework.Core
                 Debug.Log($"创建 {obj.name.Orange()} 数据文件");
                 await Encrypt(obj, obj.name);
             }
-            
+
             secrets.TryAdd(obj.name, new JsonData());
             if (!secrets[obj.name]) return;
             var saveJson = await Decrypt(await File.ReadAllBytesAsync(filePath), obj.name);
@@ -61,11 +61,11 @@ namespace JFramework.Core
                 Debug.Log($"创建 {name.Orange()} 数据文件");
                 await Encrypt(new T(), name);
             }
-            
+
             try
             {
                 secrets.TryAdd(name, new JsonData());
-                if (!secrets[name]) return default;
+                if (!secrets[name]) return new T();
                 var saveJson = await Decrypt(await File.ReadAllBytesAsync(filePath), name);
                 return !saveJson.IsEmpty() ? JsonConvert.DeserializeObject<T>(saveJson) : default;
             }
