@@ -33,6 +33,11 @@ namespace JFramework.Core
         private static AudioSource audioSource;
 
         /// <summary>
+        /// 是否启用音乐管理器
+        /// </summary>
+        public static bool isActive;
+
+        /// <summary>
         /// 背景音乐
         /// </summary>
         public static float soundVolume => audioData?.soundVolume ?? 1;
@@ -60,7 +65,7 @@ namespace JFramework.Core
         /// <param name="path">背景音乐的路径</param>
         public static async void PlaySound(string path)
         {
-            if (!GlobalManager.Runtime) return;
+            if (!GlobalManager.Runtime || !isActive) return;
             var clip = await AssetManager.LoadAsync<AudioClip>(path);
             audioSource.volume = audioData.soundVolume;
             audioSource.clip = clip;
@@ -95,7 +100,7 @@ namespace JFramework.Core
         /// <param name="path">传入音效路径</param>
         public static async void PlayAudio(string path)
         {
-            if (!GlobalManager.Runtime) return;
+            if (!GlobalManager.Runtime || !isActive) return;
             if (!stacks.TryPop(out var audio))
             {
                 audio = poolManager.gameObject.AddComponent<AudioSource>();
