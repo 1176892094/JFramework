@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Threading.Tasks;
 using UnityEngine;
 
 // ReSharper disable All
@@ -50,13 +49,13 @@ namespace JFramework.Core
         /// <summary>
         /// 音效管理器初始化
         /// </summary>
-        internal static async void Register()
+        internal static void Register()
         {
             poolManager = GlobalManager.Instance.transform.Find("PoolManager");
-            audioData = await JsonManager.Decrypt<AudioData>(nameof(AudioManager));
+            audioData = JsonManager.Decrypt<AudioData>(nameof(AudioManager));
             audioSource = poolManager.GetComponent<AudioSource>();
-            await SetSound(audioData.soundVolume);
-            await SetAudio(audioData.audioVolume);
+            SetSound(audioData.soundVolume);
+            SetAudio(audioData.audioVolume);
         }
 
         /// <summary>
@@ -77,12 +76,12 @@ namespace JFramework.Core
         /// 设置背景音乐
         /// </summary>
         /// <param name="soundVolume">音量的大小</param>
-        public static async Task SetSound(float soundVolume)
+        public static void SetSound(float soundVolume)
         {
             if (!GlobalManager.Runtime) return;
             audioData.soundVolume = soundVolume;
             audioSource.volume = soundVolume;
-            await JsonManager.Encrypt(audioData, nameof(AudioManager));
+            JsonManager.Encrypt(audioData, nameof(AudioManager));
         }
 
         /// <summary>
@@ -118,7 +117,7 @@ namespace JFramework.Core
         /// 设置音量
         /// </summary>
         /// <param name="audioVolume">传入音量大小</param>
-        public static async Task SetAudio(float audioVolume)
+        public static void SetAudio(float audioVolume)
         {
             if (!GlobalManager.Runtime) return;
             audioData.audioVolume = audioVolume;
@@ -127,7 +126,7 @@ namespace JFramework.Core
                 audio.volume = audioVolume;
             }
 
-            await JsonManager.Encrypt(audioData, nameof(AudioManager));
+            JsonManager.Encrypt(audioData, nameof(AudioManager));
         }
 
         /// <summary>
