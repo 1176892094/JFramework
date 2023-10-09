@@ -19,12 +19,12 @@ namespace JFramework.Editor
         /// 资源编辑器单例
         /// </summary>
         private static GlobalEditor instance;
-        
+
         /// <summary>
         /// 资源标签导入器
         /// </summary>
         private static AssetImporter importer;
-        
+
         /// <summary>
         /// 存储本地加载的资源字典
         /// </summary>
@@ -138,7 +138,8 @@ namespace JFramework.Editor
                 Directory.CreateDirectory(GlobalSetting.localSavePath);
             }
 
-            BuildPipeline.BuildAssetBundles(GlobalSetting.localSavePath, BuildAssetBundleOptions.ChunkBasedCompression, GlobalManager.target);
+            BuildPipeline.BuildAssetBundles(GlobalSetting.localSavePath, BuildAssetBundleOptions.ChunkBasedCompression,
+                GlobalManager.target);
             var directory = Directory.CreateDirectory(GlobalSetting.localSavePath);
             var fileInfos = directory.GetFiles();
             var fileList = new List<AssetData>();
@@ -176,6 +177,19 @@ namespace JFramework.Editor
             PoolManager.Push(builder);
             builder.Clear();
             return result;
+        }
+
+        /// <summary>
+        /// 将Excel转化成ScriptableObject
+        /// </summary>
+        [MenuItem("Tools/JFramework/Update DataTable", priority = 4)]
+        public static void ExcelToScripts()
+        {
+            var assembly = Reflection.GetAssembly("JFramework.Editor");
+            if (assembly == null) return;
+            var type = assembly.GetType("JFramework.Editor.DataEditor");
+            var method = type?.GetMethod("ExcelToScripts", Reflection.Static);
+            method?.Invoke(null, null);
         }
 
         /// <summary>
