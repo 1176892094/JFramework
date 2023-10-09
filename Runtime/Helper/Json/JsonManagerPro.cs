@@ -20,7 +20,7 @@ namespace JFramework.Core
         {
             var filePath = GetPath(name);
             var saveJson = obj is ScriptableObject ? JsonUtility.ToJson(obj) : JsonConvert.SerializeObject(obj);
-            File.WriteAllBytesAsync(filePath, Encrypt(saveJson, name));
+            File.WriteAllBytes(filePath, Encrypt(saveJson, name));
         }
 
         /// <summary>
@@ -66,7 +66,7 @@ namespace JFramework.Core
                 secrets.TryAdd(name, new JsonData());
                 if (!secrets[name]) return new T();
                 var saveJson = Decrypt(File.ReadAllBytes(filePath), name);
-                return !saveJson.IsEmpty() ? JsonConvert.DeserializeObject<T>(saveJson) : default;
+                return !saveJson.IsEmpty() ? JsonConvert.DeserializeObject<T>(saveJson) : new T();
             }
             catch (Exception)
             {

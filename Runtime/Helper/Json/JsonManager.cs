@@ -27,7 +27,7 @@ namespace JFramework.Core
         {
             var filePath = GetPath(name);
             var saveJson = obj is ScriptableObject ? JsonUtility.ToJson(obj) : JsonConvert.SerializeObject(obj);
-            File.WriteAllTextAsync(filePath, saveJson);
+            File.WriteAllText(filePath, saveJson);
         }
 
         /// <summary>
@@ -66,7 +66,7 @@ namespace JFramework.Core
             try
             {
                 var saveJson = File.ReadAllText(filePath);
-                return !saveJson.IsEmpty() ? JsonConvert.DeserializeObject<T>(saveJson) : default;
+                return !saveJson.IsEmpty() ? JsonConvert.DeserializeObject<T>(saveJson) : new T();
             }
             catch (Exception)
             {

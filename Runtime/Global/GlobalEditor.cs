@@ -137,9 +137,8 @@ namespace JFramework.Editor
             {
                 Directory.CreateDirectory(GlobalSetting.localSavePath);
             }
-
-            BuildPipeline.BuildAssetBundles(GlobalSetting.localSavePath, BuildAssetBundleOptions.ChunkBasedCompression,
-                GlobalManager.target);
+           
+            BuildPipeline.BuildAssetBundles(GlobalSetting.localSavePath, BuildAssetBundleOptions.ChunkBasedCompression, (BuildTarget)GlobalManager.Platform);
             var directory = Directory.CreateDirectory(GlobalSetting.localSavePath);
             var fileInfos = directory.GetFiles();
             var fileList = new List<AssetData>();

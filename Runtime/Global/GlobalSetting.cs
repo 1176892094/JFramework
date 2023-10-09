@@ -1,3 +1,4 @@
+using JFramework.Core;
 using UnityEngine;
 
 namespace JFramework
@@ -8,7 +9,7 @@ namespace JFramework
         /// 构建平台
         /// </summary>
         internal const AssetPlatform PLATFORM =
-#if UNITY_STANDALONE_WINDOWS
+#if UNITY_STANDALONE_WIN
             AssetPlatform.StandaloneWindows;
 #elif UNITY_STANDALONE_OSX
             AssetPlatform.StandaloneOSX;
@@ -58,16 +59,18 @@ namespace JFramework
         /// </summary>
         public static readonly string serverInfoPath = $"{Application.persistentDataPath}/{serverInfoName}";
 
+#if UNITY_EDITOR
         /// <summary>
         /// 本地构建存储路径
         /// </summary>
-        public static readonly string localSavePath = $"{SAVE_PATH}/{PLATFORM}";
+        public static readonly string localSavePath = $"{SAVE_PATH}/{GlobalManager.Platform}";
 
         /// <summary>
         /// 本地构建校验文件
         /// </summary>
-        public static readonly string localSaveInfo = $"{SAVE_PATH}/{PLATFORM}/{clientInfoName}";
-
+        public static readonly string localSaveInfo = $"{SAVE_PATH}/{GlobalManager.Platform}/{clientInfoName}";
+#endif
+        
         /// <summary>
         /// 本地校验文件路径
         /// </summary>

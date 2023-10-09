@@ -14,7 +14,11 @@ namespace JFramework.Core
     public sealed partial class GlobalManager
     {
         [ShowInInspector, LabelText("资源构建平台"), FoldoutGroup("设置管理器")]
-        internal static BuildTarget target => (BuildTarget)GlobalSetting.PLATFORM;
+        internal static AssetPlatform Platform
+        {
+            get => (AssetPlatform)EditorPrefs.GetInt("AssetPlatform", (int)AssetPlatform.StandaloneWindows);
+            set => EditorPrefs.SetInt("AssetPlatform", (int)value);
+        }
 
         [HideInInspector] public bool isRemote;
 

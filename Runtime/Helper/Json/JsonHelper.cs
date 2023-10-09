@@ -35,7 +35,7 @@ namespace JFramework.Core
             {
                 using var aes = Aes.Create();
                 secrets[name] = new JsonData(aes.Key, aes.IV);
-                var cryptoTransform = aes.CreateEncryptor(aes.Key, aes.IV);
+                using var cryptoTransform = aes.CreateEncryptor(aes.Key, aes.IV);
                 using var memoryStream = new MemoryStream();
                 using var cryptoStream = new CryptoStream(memoryStream, cryptoTransform, CryptoStreamMode.Write);
                 using (var streamWriter = new StreamWriter(cryptoStream))
@@ -70,7 +70,7 @@ namespace JFramework.Core
                 using var aes = Aes.Create();
                 aes.Key = secrets[name].key;
                 aes.IV = secrets[name].iv;
-                var cryptoTransform = aes.CreateDecryptor(aes.Key, aes.IV);
+                using var cryptoTransform = aes.CreateDecryptor(aes.Key, aes.IV);
                 using var memoryStream = new MemoryStream(json);
                 using var cryptoStream = new CryptoStream(memoryStream, cryptoTransform, CryptoStreamMode.Read);
                 using var streamReader = new StreamReader(cryptoStream);
