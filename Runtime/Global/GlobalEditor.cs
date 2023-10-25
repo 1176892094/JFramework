@@ -209,15 +209,12 @@ namespace JFramework.Editor
         [MenuItem("Tools/JFramework/StreamingAssetsPath", priority = 13)]
         private static void StreamingAssetsPath()
         {
-            if (Directory.Exists(Application.streamingAssetsPath))
-            {
-                Process.Start(Application.streamingAssetsPath);
-            }
-            else
+            if (!Directory.Exists(Application.streamingAssetsPath))
             {
                 Directory.CreateDirectory(Application.dataPath + "/StreamingAssets");
-                Process.Start(Application.streamingAssetsPath);
             }
+
+            Process.Start(Application.streamingAssetsPath);
         }
 
         /// <summary>
@@ -226,45 +223,20 @@ namespace JFramework.Editor
         /// <param name="isRemote"></param>
         internal static void AddSceneToBuildSettings(bool isRemote)
         {
-            var sceneAssets = new HashSet<string>();
-            foreach (var scene in EditorBuildSettings.scenes)
-            {
-                sceneAssets.Add(scene.path);
-            }
-
+            var sceneAssets = EditorBuildSettings.scenes.Select(scene => scene.path).ToList();
             foreach (var scenePath in Instance.sceneAssets)
             {
-                bool sceneFound = sceneAssets.Contains(scenePath);
-                if (sceneFound)
+                if (sceneAssets.Contains(scenePath))
                 {
-                    if (isRemote)
-                    {
-                        var oldScenes = EditorBuildSettings.scenes;
-                        var newScenes = new EditorBuildSettingsScene[oldScenes.Length - 1];
-                        int newIndex = 0;
-
-                        foreach (var scene in oldScenes)
-                        {
-                            if (scene.path != scenePath)
-                            {
-                                newScenes[newIndex] = scene;
-                                newIndex++;
-                            }
-                        }
-
-                        EditorBuildSettings.scenes = newScenes;
-                    }
+                    if (!isRemote) continue;
+                    var scenes = EditorBuildSettings.scenes.Where(scene => scene.path != scenePath);
+                    EditorBuildSettings.scenes = scenes.ToArray();
                 }
                 else
                 {
-                    var scenes = new EditorBuildSettingsScene[EditorBuildSettings.scenes.Length + 1];
-                    for (int i = 0; i < EditorBuildSettings.scenes.Length; i++)
-                    {
-                        scenes[i] = EditorBuildSettings.scenes[i];
-                    }
-
-                    scenes[EditorBuildSettings.scenes.Length] = new EditorBuildSettingsScene(scenePath, true);
-                    EditorBuildSettings.scenes = scenes;
+                    var scenes = EditorBuildSettings.scenes.ToList();
+                    scenes.Add(new EditorBuildSettingsScene(scenePath, true));
+                    EditorBuildSettings.scenes = scenes.ToArray();
                 }
             }
         }
