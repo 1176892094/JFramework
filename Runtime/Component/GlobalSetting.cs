@@ -11,7 +11,6 @@
 #if UNITY_EDITOR
 using System;
 using System.Collections.Generic;
-using JFramework.Editor;
 using JFramework.Interface;
 using Sirenix.OdinInspector;
 using UnityEngine;
@@ -22,14 +21,6 @@ namespace JFramework.Core
 
     public sealed partial class GlobalManager
     {
-        [HideInInspector] public bool isRemote;
-
-        [PropertyOrder(-1), Button("关闭远端加载"), ShowIf("isRemote"), GUIColor(1f, 0.5f, 0.5f), FoldoutGroup("设置管理器")]
-        public void LocalButton() => EditorSetting.AddSceneToBuildSettings(isRemote = !isRemote);
-
-        [PropertyOrder(-1), Button("开启远端加载"), HideIf("isRemote"), GUIColor(1f, 1f, 1f), FoldoutGroup("设置管理器")]
-        public void RemoteButton() => EditorSetting.AddSceneToBuildSettings(isRemote = !isRemote);
-
         [ShowInInspector, LabelText("游戏组件列表"), FoldoutGroup("对象池管理器")]
         private Dictionary<ICharacter, Components> characters => ControllerManager.characters;
 

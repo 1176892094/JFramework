@@ -10,6 +10,9 @@
 
 using JFramework.Core;
 using UnityEngine;
+#if UNITY_EDITOR
+using JFramework.Editor;
+#endif
 
 namespace JFramework
 {
@@ -38,7 +41,7 @@ namespace JFramework
                     if (instance != null) return instance;
                 }
 #if UNITY_EDITOR
-                instance = Editor.EditorSetting.Register<T>();
+                instance = EditorSetting.Register<T>();
 #endif
                 return instance;
             }

@@ -68,7 +68,7 @@ namespace JFramework
         /// </summary>
         [ShowInInspector]
         public static string streamingInfoPath =>
-#if UNITY_ANDROID
+#if UNITY_ANDROID && !UNITY_EDITOR
             $"file://{Application.streamingAssetsPath}/{Instance.platform}/{clientInfoName}";
 #else
             $"{Application.streamingAssetsPath}/{Instance.platform}/{clientInfoName}";
