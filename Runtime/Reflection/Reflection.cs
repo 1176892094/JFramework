@@ -1,3 +1,13 @@
+// *********************************************************************************
+// # Project: JFramework
+// # Unity: 2022.3.5f1c1
+// # Author: Charlotte
+// # Version: 1.0.0
+// # History: 2023-10-24  23:42
+// # Copyright: 2023, Charlotte
+// # Description: This is an automatically generated comment.
+// *********************************************************************************
+
 using System;
 using System.Linq;
 using System.Reflection;
@@ -18,7 +28,7 @@ namespace JFramework
         /// 静态类
         /// </summary>
         public const BindingFlags Static = BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic;
-
+        
         /// <summary>
         /// 获取指定名称的程序集
         /// </summary>

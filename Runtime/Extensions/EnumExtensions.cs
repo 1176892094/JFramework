@@ -1,7 +1,20 @@
+// *********************************************************************************
+// # Project: JFramework
+// # Unity: 2022.3.5f1c1
+// # Author: Charlotte
+// # Version: 1.0.0
+// # History: 2023-10-24  23:40
+// # Copyright: 2023, Charlotte
+// # Description: This is an automatically generated comment.
+// *********************************************************************************
+
 using System;
 
 namespace JFramework
 {
+    /// <summary>
+    /// 枚举拓展
+    /// </summary>
     public static partial class Extensions
     {
         /// <summary>

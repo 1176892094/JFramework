@@ -1,9 +1,15 @@
-using System.IO;
+// *********************************************************************************
+// # Project: JFramework
+// # Unity: 2022.3.5f1c1
+// # Author: Charlotte
+// # Version: 1.0.0
+// # History: 2023-10-24  23:44
+// # Copyright: 2023, Charlotte
+// # Description: This is an automatically generated comment.
+// *********************************************************************************
+
 using JFramework.Core;
 using UnityEngine;
-#if UNITY_EDITOR
-using UnityEditor;
-#endif
 
 namespace JFramework
 {
@@ -26,27 +32,18 @@ namespace JFramework
             get
             {
                 if (instance != null) return instance;
-                var name = typeof(T).Name;
                 if (GlobalManager.Runtime)
                 {
-                    instance ??= AssetManager.Load<T>($"Settings/{name}");
+                    instance ??= AssetManager.Load<T>($"Settings/{typeof(T).Name}");
                     if (instance != null) return instance;
                 }
 #if UNITY_EDITOR
-                var path = $"{GlobalSetting.FILE_PATH}/Settings";
-                var asset = $"{path}/{name}.asset";
-                instance = AssetDatabase.LoadAssetAtPath<T>(asset);
-                if (instance != null) return instance;
-                if (!Directory.Exists(path)) Directory.CreateDirectory(path);
-                instance = CreateInstance<T>();
-                AssetDatabase.CreateAsset(instance, asset);
-                AssetDatabase.Refresh();
-                Debug.Log($"创建 {name.Red()} 单例资源。路径: {path.Yellow()}");
+                instance = Editor.EditorSetting.Register<T>();
 #endif
                 return instance;
             }
         }
-        
+
         /// <summary>
         /// 单例初始化
         /// </summary>
