@@ -153,7 +153,7 @@ namespace JFramework.Editor
         internal async Task<AsyncOperation> LoadSceneAsync(string sceneName)
         {
             await Task.Yield();
-            return UnitySceneManager.LoadSceneAsync(sceneName, LoadSceneMode.Single);
+            return UnitySceneManager.LoadSceneAsync(sceneName.Split('/')[1], LoadSceneMode.Single);
         }
     }
 }

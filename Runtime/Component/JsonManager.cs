@@ -29,11 +29,6 @@ namespace JFramework.Core
         private static Dictionary<string, JsonData> secrets;
 
         /// <summary>
-        /// 静态构造获取密钥
-        /// </summary>
-        static JsonManager() => secrets = Load<Dictionary<string, JsonData>>(nameof(JsonManager));
-
-        /// <summary>
         /// 存储数据
         /// </summary>
         /// <param name="obj">保存的数据</param>
@@ -92,6 +87,7 @@ namespace JFramework.Core
         public static T Decrypt<T>(string name) where T : new()
         {
             var filePath = GetPath(name);
+            secrets ??= Load<Dictionary<string, JsonData>>(nameof(JsonManager));
             if (!File.Exists(filePath))
             {
                 Debug.Log($"创建 {name.Orange()} 数据文件");
@@ -138,6 +134,7 @@ namespace JFramework.Core
         internal static void Decrypt(ScriptableObject obj)
         {
             var filePath = GetPath(obj.name);
+            secrets ??= Load<Dictionary<string, JsonData>>(nameof(JsonManager));
             if (!File.Exists(filePath))
             {
                 Debug.Log($"创建 {obj.name.Orange()} 数据文件");
