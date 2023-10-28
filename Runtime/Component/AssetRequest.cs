@@ -15,8 +15,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using JFramework.Core;
 using Newtonsoft.Json;
-using UnityEngine;
 using UnityEngine.Networking;
+using Debug = UnityEngine.Debug;
 
 namespace JFramework
 {
@@ -167,7 +167,12 @@ namespace JFramework
         {
             using var request = UnityWebRequest.Get(GlobalSetting.GetRemoteFilePath(fileName));
             request.timeout = 5;
-            await request.SendWebRequest();
+            var result = request.SendWebRequest();
+            while (!result.isDone && GlobalManager.Runtime)
+            {
+                await Task.Yield();
+            }
+            
             if (request.result != UnityWebRequest.Result.Success)
             {
                 Debug.Log($"下载 {fileName} 文件失败\n");

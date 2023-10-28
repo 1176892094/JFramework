@@ -27,7 +27,7 @@ namespace JFramework.Core
         /// ReSharper disable once MemberCanBePrivate.Global
         /// </summary>
         public static string localScene => UnitySceneManager.GetActiveScene().name;
-        
+
 
         /// <summary>
         /// 异步加载场景的进度条
@@ -42,10 +42,10 @@ namespace JFramework.Core
                 if (!GlobalManager.Runtime) return;
                 var localTime = Time.time;
                 var operation = await AssetManager.LoadSceneAsync(path);
-                while (!operation.isDone)
+                while (!operation.isDone && GlobalManager.Runtime)
                 {
                     OnLoadProgress?.Invoke(operation.progress);
-                    await new WaitForFixedUpdate();
+                    await Task.Yield();
                 }
 
                 var totalTime = (Time.time - localTime).ToString("F");

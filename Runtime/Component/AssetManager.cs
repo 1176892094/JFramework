@@ -182,8 +182,8 @@ namespace JFramework.Core
                 depends.Add(bundleName, assetBundle);
             }
 
-            var obj = await assetBundle.LoadAssetAsync<T>(assetName);
-            return obj is GameObject ? (T)Object.Instantiate(obj) : (T)obj;
+            var obj = assetBundle.LoadAssetAsync<T>(assetName);
+            return obj.asset is GameObject ? (T)Object.Instantiate(obj.asset) : (T)obj.asset;
         }
 
         /// <summary>
@@ -239,12 +239,24 @@ namespace JFramework.Core
         {
             if (File.Exists(GlobalSetting.GetPersistentPath(assetBundle)))
             {
-                return await AssetBundle.LoadFromFileAsync(GlobalSetting.GetPersistentPath(assetBundle));
+                var request = AssetBundle.LoadFromFileAsync(GlobalSetting.GetPersistentPath(assetBundle));
+                while (!request.isDone && GlobalManager.Runtime)
+                {
+                    await Task.Yield();
+                }
+
+                return request.assetBundle;
             }
 
             if (File.Exists(GlobalSetting.GetStreamingPath(assetBundle)))
             {
-                return await AssetBundle.LoadFromFileAsync(GlobalSetting.GetStreamingPath(assetBundle));
+                var request = AssetBundle.LoadFromFileAsync(GlobalSetting.GetStreamingPath(assetBundle));
+                while (!request.isDone && GlobalManager.Runtime)
+                {
+                    await Task.Yield();
+                }
+
+                return request.assetBundle;
             }
 
             return null;

@@ -137,7 +137,18 @@ namespace JFramework.Editor
         /// 本地构建校验文件
         /// </summary>
         [ShowInInspector]
-        public static string assetBundleInfo => $"{Instance.buildPath}/{GlobalSetting.Instance.platform}/{GlobalSetting.clientInfoName}";
+        public static string assetBundleInfo
+        {
+            get
+            {
+                if (!Instance.isRemoteBuild)
+                {
+                    return $"{Application.streamingAssetsPath}/{GlobalSetting.Instance.platform}/{GlobalSetting.clientInfoName}";
+                }
+
+                return $"{Instance.buildPath}/{GlobalSetting.Instance.platform}/{GlobalSetting.clientInfoName}";
+            }
+        }
 
         /// <summary>
         /// 设置保存

@@ -64,7 +64,7 @@ namespace JFramework.Editor
                         tree.Add(path, item, EditorIcons.Bell);
                         break;
                     default:
-                        tree.Add(path, item,EditorIcons.Folder);
+                        tree.Add(path, item, EditorIcons.Folder);
                         break;
                 }
             }
@@ -150,14 +150,9 @@ namespace JFramework.Editor
         private static void BuildAsset()
         {
             UpdateAsset();
-            if (!Directory.Exists(AssetSetting.platformPath))
-            {
-                Directory.CreateDirectory(AssetSetting.platformPath);
-            }
-
+            var directory = Directory.CreateDirectory(AssetSetting.platformPath);
             var assetBundleOption = BuildAssetBundleOptions.ChunkBasedCompression;
             BuildPipeline.BuildAssetBundles(AssetSetting.platformPath, assetBundleOption, (BuildTarget)GlobalSetting.Instance.platform);
-            var directory = Directory.CreateDirectory(AssetSetting.platformPath);
             var fileInfos = directory.GetFiles().Where(info => info.Extension == "").ToList();
             var fileList = fileInfos.Select(info => new AssetData(GetMD5(info.FullName), info.Name, info.Length)).ToList();
             var saveJson = JsonConvert.SerializeObject(fileList);
