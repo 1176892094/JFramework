@@ -71,11 +71,11 @@ namespace JFramework.Core
         /// <summary>
         /// 播放背景音乐
         /// </summary>
-        /// <param name="path">背景音乐的路径</param>
-        public static async void PlaySound(string path)
+        /// <param name="name">背景音乐的路径</param>
+        public static async void PlaySound(string name)
         {
             if (!GlobalManager.Runtime || !isActive) return;
-            var clip = await AssetManager.LoadAsync<AudioClip>(path);
+            var clip = await AssetManager.LoadAsync<AudioClip>(GlobalSetting.Instance.audioBundle + "/" + name);
             audioSource.volume = audioData.soundVolume;
             audioSource.clip = clip;
             audioSource.loop = true;
@@ -106,8 +106,8 @@ namespace JFramework.Core
         /// <summary>
         /// 播放音效
         /// </summary>
-        /// <param name="path">传入音效路径</param>
-        public static async void PlayAudio(string path)
+        /// <param name="name">传入音效路径</param>
+        public static async void PlayAudio(string name)
         {
             if (!GlobalManager.Runtime || !isActive) return;
             if (!stacks.TryPop(out var audio))
@@ -115,7 +115,7 @@ namespace JFramework.Core
                 audio = poolManager.gameObject.AddComponent<AudioSource>();
             }
 
-            var clip = await AssetManager.LoadAsync<AudioClip>(path);
+            var clip = await AssetManager.LoadAsync<AudioClip>(GlobalSetting.Instance.audioBundle + "/" + name);
             audios.Add(audio);
             audio.volume = audioData.audioVolume;
             audio.clip = clip;

@@ -252,9 +252,8 @@ namespace JFramework.Editor
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
-        public static T Register<T>() where T : ScriptableObject
+        public static T Register<T>(string path) where T : ScriptableObject
         {
-            var path = $"{AssetSetting.Instance.assetPath}/Settings";
             var asset = $"{path}/{typeof(T).Name}.asset";
             var instance = AssetDatabase.LoadAssetAtPath<T>(asset);
             if (instance != null) return instance;

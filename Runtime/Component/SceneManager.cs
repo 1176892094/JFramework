@@ -32,16 +32,16 @@ namespace JFramework.Core
         /// <summary>
         /// 异步加载场景的进度条
         /// </summary>
-        /// <param name="path">场景名称</param>
+        /// <param name="name">场景名称</param>
         /// <param name="action"></param>
         /// <returns>返回场景加载迭代器</returns>
-        public static async void LoadSceneAsync(string path, Action action = null)
+        public static async void LoadSceneAsync(string name, Action action = null)
         {
             try
             {
                 if (!GlobalManager.Runtime) return;
                 var localTime = Time.time;
-                var operation = await AssetManager.LoadSceneAsync(path);
+                var operation = await AssetManager.LoadSceneAsync(GlobalSetting.Instance.sceneBundle + "/" + name);
                 while (!operation.isDone && GlobalManager.Runtime)
                 {
                     OnLoadProgress?.Invoke(operation.progress);
@@ -49,12 +49,12 @@ namespace JFramework.Core
                 }
 
                 var totalTime = (Time.time - localTime).ToString("F");
-                Debug.Log($"异步加载 {path.Green()} 场景完成, 耗时 {totalTime.Yellow()} 秒");
+                Debug.Log($"异步加载 {name.Green()} 场景完成, 耗时 {totalTime.Yellow()} 秒");
                 action?.Invoke();
             }
             catch (Exception e)
             {
-                Debug.LogWarning($"异步加载 {path.Red()} 场景失败\n{e}");
+                Debug.LogWarning($"异步加载 {name.Red()} 场景失败\n{e}");
             }
         }
 

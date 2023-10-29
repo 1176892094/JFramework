@@ -37,11 +37,11 @@ namespace JFramework
                 if (instance != null) return instance;
                 if (GlobalManager.Runtime)
                 {
-                    instance ??= AssetManager.Load<T>($"Settings/{typeof(T).Name}");
+                    instance ??= AssetManager.Load<T>($"{GlobalSetting.Instance.settingBundle}/{typeof(T).Name}");
                     if (instance != null) return instance;
                 }
 #if UNITY_EDITOR
-                instance = EditorSetting.Register<T>();
+                instance = EditorSetting.Register<T>($"{AssetSetting.Instance.assetPath}/{GlobalSetting.Instance.settingBundle}");
 #endif
                 return instance;
             }

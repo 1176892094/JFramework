@@ -66,6 +66,26 @@ namespace JFramework
         public string remotePath = "http://192.168.0.3:8000/AssetBundles";
 
         /// <summary>
+        /// 存放UI的AB包
+        /// </summary>
+        public string UIBundle = "Prefabs";
+        
+        /// <summary>
+        /// 存放场景的AB包
+        /// </summary>
+        public string sceneBundle = "Scenes";
+
+        /// <summary>
+        /// 存放音效的AB包
+        /// </summary>
+        public string audioBundle = "Audios";
+
+        /// <summary>
+        /// 存放ScriptableObject的AB包
+        /// </summary>
+        public string settingBundle = "Settings";
+        
+        /// <summary>
         /// 客户端校验文件名称
         /// </summary>
         [ShowInInspector]

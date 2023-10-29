@@ -127,7 +127,7 @@ namespace JFramework.Core
                 return default;
             }
 
-            var obj = await AssetManager.LoadAsync<GameObject>("Prefabs/" + typeof(TPanel).Name);
+            var obj = await AssetManager.LoadAsync<GameObject>(GlobalSetting.Instance.UIBundle + "/" + typeof(TPanel).Name);
             if (!obj.TryGetComponent<TPanel>(out var panel))
             {
                 Debug.LogWarning($"加载 {typeof(TPanel).Name.Red()} 失败，面板挂载没有组件!");
