@@ -129,7 +129,7 @@ namespace JFramework.Editor
                 AssetSetting.Instance.objects[name] = obj;
             }
 
-            AssetSetting.Instance.SetDirty();
+            AssetSetting.Instance.Save();
             Debug.Log($"更新 AssetBundles 完成。".Green());
             AssetDatabase.Refresh();
         }

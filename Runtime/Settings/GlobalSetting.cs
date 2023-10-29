@@ -120,5 +120,15 @@ namespace JFramework
         /// <param name="fileName"></param>
         /// <returns></returns>
         public static string GetRemoteFilePath(string fileName) => $"{Instance.remotePath}/{Instance.platform}/{fileName}";
+
+#if UNITY_EDITOR
+        [Button("保存设置")]
+        public void Save()
+        {
+            var asset = Resources.Load<TextAsset>(nameof(GlobalSetting));
+            var json = JsonUtility.ToJson(instance);
+            File.WriteAllText(UnityEditor.AssetDatabase.GetAssetPath(asset), json);
+        }
+#endif
     }
 }

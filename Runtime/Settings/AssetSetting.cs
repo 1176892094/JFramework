@@ -80,40 +80,7 @@ namespace JFramework.Editor
         /// <summary>
         /// 是否远端构建
         /// </summary>
-        [HideInInspector] public bool isRemoteBuild;
-
-        [Button("远端资源构建"), ShowIf("isRemoteBuild"), GUIColor(1f, 0.5f, 0.5f)]
-        public void LocalBuild()
-        {
-            isRemoteBuild = !isRemoteBuild;
-            AssetSetting.Instance.SetDirty();
-        }
-
-        [Button("本地资源构建"), HideIf("isRemoteBuild"), GUIColor(1f, 1f, 1f)]
-        public void RemoteBuild()
-        {
-            isRemoteBuild = !isRemoteBuild;
-            AssetSetting.Instance.SetDirty();
-        }
-
-        /// <summary>
-        /// 是否远端加载
-        /// </summary>
-        [HideInInspector] public bool isRemoteLoad;
-
-        [Button("远端资源加载"), ShowIf("isRemoteLoad"), GUIColor(1f, 0.5f, 0.5f)]
-        public void LocalLoad()
-        {
-            EditorSetting.AddSceneToBuildSettings(isRemoteLoad = !isRemoteLoad);
-            AssetSetting.Instance.SetDirty();
-        }
-
-        [Button("本地资源加载"), HideIf("isRemoteLoad"), GUIColor(1f, 1f, 1f)]
-        public void RemoteLoad()
-        {
-            EditorSetting.AddSceneToBuildSettings(isRemoteLoad = !isRemoteLoad);
-            AssetSetting.Instance.SetDirty();
-        }
+        [HideInInspector] public bool remoteBuild;
 
         /// <summary>
         /// 本地构建存储路径
@@ -123,7 +90,7 @@ namespace JFramework.Editor
         {
             get
             {
-                if (!Instance.isRemoteBuild)
+                if (!Instance.remoteBuild)
                 {
                     return $"{Application.streamingAssetsPath}/{GlobalSetting.Instance.platform}";
                 }
@@ -140,7 +107,7 @@ namespace JFramework.Editor
         {
             get
             {
-                if (!Instance.isRemoteBuild)
+                if (!Instance.remoteBuild)
                 {
                     return $"{Application.streamingAssetsPath}/{GlobalSetting.Instance.platform}/{GlobalSetting.clientInfoName}";
                 }
@@ -149,16 +116,51 @@ namespace JFramework.Editor
             }
         }
 
+
+        [Button("远端资源构建"), ShowIf("remoteBuild"), GUIColor(1f, 0.5f, 0.5f)]
+        public void LocalBuild()
+        {
+            remoteBuild = !remoteBuild;
+            AssetSetting.Instance.Save();
+        }
+
+        [Button("本地资源构建"), HideIf("remoteBuild"), GUIColor(1f, 1f, 1f)]
+        public void RemoteBuild()
+        {
+            remoteBuild = !remoteBuild;
+            AssetSetting.Instance.Save();
+        }
+
+        /// <summary>
+        /// 是否远端加载
+        /// </summary>
+        [HideInInspector] public bool isRemote;
+
+        [Button("远端资源加载"), ShowIf("isRemote"), GUIColor(1f, 0.5f, 0.5f)]
+        public void LocalLoad()
+        {
+            EditorSetting.AddSceneToBuildSettings(isRemote = !isRemote);
+            AssetSetting.Instance.Save();
+        }
+
+        [Button("本地资源加载"), HideIf("isRemote"), GUIColor(1f, 1f, 1f)]
+        public void RemoteLoad()
+        {
+            EditorSetting.AddSceneToBuildSettings(isRemote = !isRemote);
+            AssetSetting.Instance.Save();
+        }
+
         /// <summary>
         /// 设置保存
         /// </summary>
-        public void SetDirty() => EditorPrefs.SetString(nameof(AssetSetting), JsonUtility.ToJson(instance));
+        [Button("保存设置")]
+        public void Save() => EditorPrefs.SetString(nameof(AssetSetting), JsonUtility.ToJson(instance));
 
         /// <summary>
         /// 更新构建模式
         /// </summary>
         [InitializeOnLoadMethod]
-        public static void GetLoadMode() => EditorSetting.AddSceneToBuildSettings(Instance.isRemoteLoad);
+        public static void GetLoadMode() => EditorSetting.AddSceneToBuildSettings(Instance.isRemote);
 
         /// <summary>
         /// 同步加载

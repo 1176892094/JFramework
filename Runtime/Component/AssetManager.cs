@@ -79,7 +79,7 @@ namespace JFramework.Core
         {
             if (!GlobalManager.Runtime) return null;
 #if UNITY_EDITOR
-            if (!AssetSetting.Instance.isRemoteLoad) return AssetSetting.Instance.Load<T>(path);
+            if (!AssetSetting.Instance.isRemote) return AssetSetting.Instance.Load<T>(path);
 #endif
             if (assets.TryGetValue(path, out var asset))
             {
@@ -102,7 +102,7 @@ namespace JFramework.Core
         {
             if (!GlobalManager.Runtime) return null;
 #if UNITY_EDITOR
-            if (!AssetSetting.Instance.isRemoteLoad) return AssetSetting.Instance.LoadAsync<T>(path);
+            if (!AssetSetting.Instance.isRemote) return AssetSetting.Instance.LoadAsync<T>(path);
 #endif
             if (assets.TryGetValue(path, out var asset))
             {
@@ -124,7 +124,7 @@ namespace JFramework.Core
         {
             if (!GlobalManager.Runtime) return null;
 #if UNITY_EDITOR
-            if (!AssetSetting.Instance.isRemoteLoad) return AssetSetting.Instance.LoadSceneAsync(path);
+            if (!AssetSetting.Instance.isRemote) return AssetSetting.Instance.LoadSceneAsync(path);
 #endif
             if (assets.TryGetValue(path, out var asset))
             {
