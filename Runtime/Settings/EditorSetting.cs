@@ -191,7 +191,7 @@ namespace JFramework.Editor
         {
             var assembly = Reflection.GetAssembly("JFramework.Editor");
             if (assembly == null) return;
-            var type = assembly.GetType("JFramework.Editor.ExcelEditor");
+            var type = assembly.GetType("JFramework.Editor.ExcelHelper");
             var method = type?.GetMethod("ExcelToScripts", Reflection.Static);
             method?.Invoke(null, null);
         }

@@ -45,6 +45,7 @@ namespace JFramework
         /// </summary>
         public static event Action<string, int, int> OnLoadProgress;
 
+        
         /// <summary>
         /// 检测是否需要更新
         /// </summary>
@@ -62,7 +63,7 @@ namespace JFramework
                 var jsonData = JsonConvert.DeserializeObject<List<AssetData>>(remoteInfo);
                 remoteDataList = jsonData.ToDictionary(data => data.name);
                 Debug.Log("解析远端对比文件完成");
-
+            
                 if (File.Exists(GlobalSetting.clientInfoPath))
                 {
                     var clientInfo = await File.ReadAllTextAsync(GlobalSetting.clientInfoPath);
@@ -75,7 +76,7 @@ namespace JFramework
                     jsonData = JsonConvert.DeserializeObject<List<AssetData>>(clientInfo);
                     clientDataList = jsonData.ToDictionary(data => data.name);
                 }
-
+            
                 Debug.Log("解析本地对比文件完成");
                 foreach (var fileName in remoteDataList.Keys)
                 {
@@ -89,18 +90,18 @@ namespace JFramework
                         {
                             assetDataList.Add(fileName);
                         }
-
+            
                         clientDataList.Remove(fileName);
                     }
                 }
-
+            
                 Debug.Log("删除无用的AB包文件");
                 var files = clientDataList.Keys.Where(file => File.Exists(GlobalSetting.GetPersistentPath(file)));
                 foreach (var file in files)
                 {
                     File.Delete(GlobalSetting.GetPersistentPath(file));
                 }
-
+            
                 Debug.Log("下载和更新AB包文件");
                 success = await GetAssetBundles();
                 if (success)

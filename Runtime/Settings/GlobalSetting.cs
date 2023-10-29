@@ -8,13 +8,39 @@
 // # Description: This is an automatically generated comment.
 // *********************************************************************************
 
+using System.IO;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
+// ReSharper disable All
+
 namespace JFramework
 {
-    internal class GlobalSetting : AssetSingleton<GlobalSetting>
+    internal class GlobalSetting
     {
+        private static GlobalSetting instance;
+
+        public static GlobalSetting Instance
+        {
+            get
+            {
+                if (instance != null) return instance;
+                var asset = Resources.Load<TextAsset>(nameof(GlobalSetting));
+                var json = asset != null ? asset.text : string.Empty;
+#if UNITY_EDITOR
+                if (string.IsNullOrEmpty(json))
+                {
+                    instance = new GlobalSetting();
+                    json = JsonUtility.ToJson(instance);
+                    File.WriteAllText(UnityEditor.AssetDatabase.GetAssetPath(asset), json);
+                    return instance;
+                }
+#endif
+                instance = JsonUtility.FromJson<GlobalSetting>(json);
+                return instance;
+            }
+        }
+
         /// <summary>
         /// 构建平台
         /// </summary>

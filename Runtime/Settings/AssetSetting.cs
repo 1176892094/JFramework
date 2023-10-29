@@ -11,7 +11,6 @@
 #if UNITY_EDITOR
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Newtonsoft.Json;
 using Sirenix.OdinInspector;
 using UnityEditor;
 using UnityEngine;
@@ -41,13 +40,13 @@ namespace JFramework.Editor
                 if (string.IsNullOrEmpty(json))
                 {
                     instance = new AssetSetting();
-                    json = JsonConvert.SerializeObject(instance);
+                    json = JsonUtility.ToJson(instance);
                     EditorPrefs.SetString(nameof(AssetSetting), json);
                     EditorSetting.Add(3, "资源", instance);
                     return instance;
                 }
 
-                instance = JsonConvert.DeserializeObject<AssetSetting>(json);
+                instance = JsonUtility.FromJson<AssetSetting>(json);
                 EditorSetting.Add(3, "资源", instance);
                 return instance;
             }
