@@ -43,9 +43,9 @@ namespace JFramework
         /// <summary>
         /// 资源加载进度
         /// </summary>
-        public static event Action<string, int, int> OnLoadProgress;
+        public static event Action<string, float> OnLoadProgress;
 
-        
+
         /// <summary>
         /// 检测是否需要更新
         /// </summary>
@@ -63,7 +63,7 @@ namespace JFramework
                 var jsonData = JsonConvert.DeserializeObject<List<AssetData>>(remoteInfo);
                 remoteDataList = jsonData.ToDictionary(data => data.name);
                 Debug.Log("解析远端对比文件完成");
-            
+
                 if (File.Exists(GlobalSetting.clientInfoPath))
                 {
                     var clientInfo = await File.ReadAllTextAsync(GlobalSetting.clientInfoPath);
@@ -76,7 +76,7 @@ namespace JFramework
                     jsonData = JsonConvert.DeserializeObject<List<AssetData>>(clientInfo);
                     clientDataList = jsonData.ToDictionary(data => data.name);
                 }
-            
+
                 Debug.Log("解析本地对比文件完成");
                 foreach (var fileName in remoteDataList.Keys)
                 {
@@ -90,18 +90,18 @@ namespace JFramework
                         {
                             assetDataList.Add(fileName);
                         }
-            
+
                         clientDataList.Remove(fileName);
                     }
                 }
-            
+
                 Debug.Log("删除无用的AB包文件");
                 var files = clientDataList.Keys.Where(file => File.Exists(GlobalSetting.GetPersistentPath(file)));
                 foreach (var file in files)
                 {
                     File.Delete(GlobalSetting.GetPersistentPath(file));
                 }
-            
+
                 Debug.Log("下载和更新AB包文件");
                 success = await GetAssetBundles();
                 if (success)
@@ -137,21 +137,21 @@ namespace JFramework
         private static async Task<bool> GetAssetBundles()
         {
             var reloads = 5;
-            var curProgress = 0;
+            var curProgress = 0f;
             var maxProgress = assetDataList.Count;
             var copyList = assetDataList.ToList();
             while (assetDataList.Count > 0 && reloads-- > 0)
             {
                 foreach (var fileName in copyList)
                 {
-                    var success = await GetRequest(fileName, GlobalSetting.GetPersistentPath(fileName));
+                    var success = await GetRequest(fileName, GlobalSetting.GetPersistentPath(fileName), curProgress++, maxProgress);
                     if (!success) continue;
                     if (assetDataList.Contains(fileName))
                     {
                         assetDataList.Remove(fileName);
                     }
 
-                    OnLoadProgress?.Invoke(fileName, ++curProgress, maxProgress);
+                    //     OnLoadProgress?.Invoke(fileName, curProgress / maxProgress);
                 }
             }
 
@@ -163,25 +163,52 @@ namespace JFramework
         /// </summary>
         /// <param name="fileName"></param>
         /// <param name="localPath"></param>
+        /// <param name="curProgress"></param>
+        /// <param name="maxProgress"></param>
         /// <returns></returns>
-        private static async Task<bool> GetRequest(string fileName, string localPath)
+        private static async Task<bool> GetRequest(string fileName, string localPath, float curProgress = 0, float maxProgress = 0)
         {
-            using var request = UnityWebRequest.Get(GlobalSetting.GetRemoteFilePath(fileName));
-            request.timeout = 5;
-            var result = request.SendWebRequest();
-            while (!result.isDone && GlobalManager.Runtime)
+            var fileUri = GlobalSetting.GetRemoteFilePath(fileName);
+            using (var request = UnityWebRequest.Head(fileUri))
             {
-                await Task.Yield();
-            }
-            
-            if (request.result != UnityWebRequest.Result.Success)
-            {
-                Debug.Log($"下载 {fileName} 文件失败\n");
-                return false;
+                request.timeout = 1;
+                var result = request.SendWebRequest();
+                while (!result.isDone && GlobalManager.Runtime)
+                {
+                    await Task.Yield();
+                }
+
+                if (request.result != UnityWebRequest.Result.Success)
+                {
+                    Debug.Log($"下载 {fileName} 文件失败\n");
+                    return false;
+                }
             }
 
-            await File.WriteAllBytesAsync(localPath, request.downloadHandler.data);
-            Debug.Log($"下载 {fileName} 文件成功");
+            using (var request = UnityWebRequest.Get(fileUri))
+            {
+                var result = request.SendWebRequest();
+                while (!result.isDone && GlobalManager.Runtime)
+                {
+                    if (maxProgress != 0)
+                    {
+                        var value = curProgress / maxProgress + request.downloadProgress / maxProgress;
+                        OnLoadProgress?.Invoke(fileName, Math.Clamp(value, 0f, 1f));
+                    }
+
+                    await Task.Yield();
+                }
+
+                if (request.result != UnityWebRequest.Result.Success)
+                {
+                    Debug.Log($"下载 {fileName} 文件失败\n");
+                    return false;
+                }
+
+                await File.WriteAllBytesAsync(localPath, request.downloadHandler.data);
+                Debug.Log($"下载 {fileName} 文件成功");
+            }
+
             return true;
         }
     }
