@@ -55,12 +55,15 @@ namespace JFramework
         /// 对象推入
         /// </summary>
         /// <param name="obj">推入对象</param>
-        public void Push(T obj)
+        public bool Push(T obj)
         {
             if (!pool.Contains(obj))
             {
                 pool.Push(obj);
+                return true;
             }
+
+            return false;
         }
 
         /// <summary>

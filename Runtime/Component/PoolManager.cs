@@ -101,17 +101,17 @@ namespace JFramework.Core
         /// 对象池管理器推入对象
         /// </summary>
         /// <param name="obj">对象的实例</param>
-        public static void Push(GameObject obj)
+        public static bool Push(GameObject obj)
         {
-            if (!GlobalManager.Runtime) return;
-            if (obj == null) return;
+            if (!GlobalManager.Runtime) return false;
+            if (obj == null) return false;
             if (pools.TryGetValue(obj.name, out var pool))
             {
-                ((IPool<GameObject>)pool).Push(obj);
+                if (!((IPool<GameObject>)pool).Push(obj)) return false;
                 obj.SetActive(false);
                 obj.transform.SetParent(parents[obj.name].transform);
                 obj.GetComponent<IPush>()?.OnPush();
-                return;
+                return true;
             }
 
             parents[obj.name] = new GameObject(obj.name + "-Pool");
@@ -120,6 +120,7 @@ namespace JFramework.Core
             obj.transform.SetParent(parents[obj.name].transform);
             obj.GetComponent<IPush>()?.OnPush();
             pools.Add(obj.name, new Pool<GameObject>(obj));
+            return true;
         }
 
         /// <summary>
