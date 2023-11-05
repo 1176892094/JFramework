@@ -54,27 +54,6 @@ namespace JFramework.Core
         }
 
         /// <summary>
-        /// 获取角色控制器
-        /// </summary>
-        /// <param name="character"></param>
-        /// <typeparam name="T"></typeparam>
-        /// <returns></returns>
-        public static T Get<T>(ICharacter character) where T : ScriptableObject, IController
-        {
-            if (!characters.TryGetValue(character, out Components components))
-            {
-                return null;
-            }
-            
-            if (!components.ContainsKey(typeof(T)))
-            {
-                return null;
-            }
-
-            return (T)characters[character][typeof(T)];
-        }
-
-        /// <summary>
         /// 销毁指定控制器
         /// </summary>
         /// <param name="character"></param>
@@ -100,7 +79,7 @@ namespace JFramework.Core
             var copies = characters.Keys.ToList();
             foreach (var character in copies)
             {
-                character.UnRegister();
+                character.Destroy();
             }
 
             characters.Clear();

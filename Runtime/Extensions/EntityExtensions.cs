@@ -43,25 +43,16 @@ namespace JFramework
         /// 角色接口的控制器注册
         /// </summary>
         /// <param name="character"></param>
-        public static T Register<T>(this ICharacter character) where T : ScriptableObject, IController
+        public static T Get<T>(this ICharacter character) where T : ScriptableObject, IController
         {
             return ControllerManager.Register<T>(character);
         }
         
         /// <summary>
-        /// 角色接口的控制器获取
-        /// </summary>
-        /// <param name="character"></param>
-        public static T Get<T>(this ICharacter character) where T : ScriptableObject, IController
-        {
-            return ControllerManager.Get<T>(character);
-        }
-
-        /// <summary>
         /// 角色接口的控制器卸载
         /// </summary>
         /// <param name="character"></param>
-        public static void UnRegister(this ICharacter character)
+        public static void Destroy(this ICharacter character)
         {
             ControllerManager.UnRegister(character);
         }
