@@ -55,17 +55,17 @@ namespace JFramework.Editor
         /// <summary>
         /// 构建 AssetBundle 存放的路径
         /// </summary>
-        public string buildPath = "AssetBundles";
+        [FolderPath] public string buildPath = "AssetBundles";
 
         /// <summary>
         /// 存放要构建成 AssetBundle 的文件路径
         /// </summary>
-        public string assetPath = "Assets/Template";
+        [FolderPath] public string assetPath = "Assets/Template";
 
         /// <summary>
         /// 存放要构建成 AssetBundle 的文件路径
         /// </summary>
-        public string editorPath = "Assets/Editor/Resources";
+        [FolderPath] public string editorPath = "Assets/Editor/Resources";
 
         /// <summary>
         /// 场景资源

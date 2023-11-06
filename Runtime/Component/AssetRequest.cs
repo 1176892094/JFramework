@@ -150,8 +150,6 @@ namespace JFramework
                     {
                         assetDataList.Remove(fileName);
                     }
-
-                    //     OnLoadProgress?.Invoke(fileName, curProgress / maxProgress);
                 }
             }
 

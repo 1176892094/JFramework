@@ -75,7 +75,17 @@ namespace JFramework.Core
         /// 对象池管理器异步获取对象
         /// </summary>
         /// <param name="path">弹出对象的路径</param>
-        public static async Task<T> Pop<T>(string path) where T : Component
+        public static async Task<T> PopAsync<T>(string path) where T : Component
+        {
+            var obj = await PopAsync(path);
+            return obj.GetComponent<T>();
+        }
+
+        /// <summary>
+        /// 对象池管理器异步获取对象
+        /// </summary>
+        /// <param name="path">弹出对象的路径</param>
+        public static async Task<GameObject> PopAsync(string path)
         {
             if (!GlobalManager.Runtime) return null;
             if (pools.TryGetValue(path, out var pool) && pool.Count > 0)
@@ -86,7 +96,7 @@ namespace JFramework.Core
                     pop.SetActive(true);
                     pop.transform.SetParent(null);
                     pop.GetComponent<IPop>()?.OnPop();
-                    return pop.GetComponent<T>();
+                    return pop;
                 }
             }
 
@@ -94,7 +104,7 @@ namespace JFramework.Core
             obj.name = path;
             Object.DontDestroyOnLoad(obj);
             obj.GetComponent<IPop>()?.OnPop();
-            return obj.GetComponent<T>();
+            return obj;
         }
 
         /// <summary>
