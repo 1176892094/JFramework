@@ -240,6 +240,7 @@ namespace JFramework.Editor
                 }
                 else
                 {
+                    if (isRemote) continue;
                     var scenes = EditorBuildSettings.scenes.ToList();
                     scenes.Add(new EditorBuildSettingsScene(scenePath, true));
                     EditorBuildSettings.scenes = scenes.ToArray();
