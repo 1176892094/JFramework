@@ -68,11 +68,25 @@ namespace JFramework.Editor
         /// 远端资源构建
         /// </summary>
         [LabelText("Remote Build")] public bool remoteBuild;
+        
+        /// <summary>
+        /// 远端资源加载
+        /// </summary>
+        [HideInInspector] public bool remoteLoad;
 
         /// <summary>
         /// 是否远端加载
         /// </summary>
-        [LabelText("Remote Load")] public bool isRemote;
+        [ShowInInspector, LabelText("Remote Load")]
+        public bool isRemote
+        {
+            get => remoteLoad;
+            set
+            {
+                remoteLoad = !remoteLoad;
+                EditorSetting.AddSceneToBuildSettings(remoteLoad);
+            }
+        }
 
         /// <summary>
         /// 构建 AssetBundle 文件夹路径
