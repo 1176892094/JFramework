@@ -18,7 +18,7 @@ namespace JFramework
         /// <summary>
         /// 背景音乐大小
         /// </summary>
-        public float soundVolume = 0.5f;
+        public float musicVolume = 0.5f;
 
         /// <summary>
         /// 游戏音乐大小

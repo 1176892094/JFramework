@@ -8,6 +8,7 @@
 // # Description: This is an automatically generated comment.
 // *********************************************************************************
 
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -49,7 +50,7 @@ namespace JFramework.Core
         /// <summary>
         /// 背景音乐
         /// </summary>
-        public static float soundVolume => audioData?.soundVolume ?? 1;
+        public static float musicVolume => audioData?.musicVolume ?? 1;
 
         /// <summary>
         /// 游戏声音
@@ -64,7 +65,7 @@ namespace JFramework.Core
             poolManager = GlobalManager.Instance.transform.Find("PoolManager");
             audioData = JsonManager.Decrypt<AudioData>(nameof(AudioManager));
             audioSource = poolManager.GetComponent<AudioSource>();
-            SetSound(audioData.soundVolume);
+            SetMusic(audioData.musicVolume);
             SetAudio(audioData.audioVolume);
         }
 
@@ -72,11 +73,11 @@ namespace JFramework.Core
         /// 播放背景音乐
         /// </summary>
         /// <param name="name">背景音乐的路径</param>
-        public static async void PlaySound(string name)
+        public static async void PlayMusic(string name)
         {
             if (!GlobalManager.Runtime || !isActive) return;
             var clip = await AssetManager.LoadAsync<AudioClip>(GlobalSetting.Instance.audioBundle + "/" + name);
-            audioSource.volume = audioData.soundVolume;
+            audioSource.volume = audioData.musicVolume;
             audioSource.clip = clip;
             audioSource.loop = true;
             audioSource.Play();
@@ -86,10 +87,10 @@ namespace JFramework.Core
         /// 设置背景音乐
         /// </summary>
         /// <param name="soundVolume">音量的大小</param>
-        public static void SetSound(float soundVolume)
+        public static void SetMusic(float soundVolume)
         {
             if (!GlobalManager.Runtime) return;
-            audioData.soundVolume = soundVolume;
+            audioData.musicVolume = soundVolume;
             audioSource.volume = soundVolume;
             JsonManager.Encrypt(audioData, nameof(AudioManager));
         }
@@ -97,17 +98,25 @@ namespace JFramework.Core
         /// <summary>
         /// 暂停背景音乐
         /// </summary>
-        public static void StopSound()
+        public static void StopMusic(bool pause = true)
         {
             if (!GlobalManager.Runtime) return;
-            audioSource.Pause();
+            if (pause)
+            {
+                audioSource.Pause();
+            }
+            else
+            {
+                audioSource.Stop();
+            }
         }
 
         /// <summary>
-        /// 播放音效
+        /// 播放一次音效
         /// </summary>
         /// <param name="name">传入音效路径</param>
-        public static async void PlayAudio(string name)
+        /// <param name="action">音效播放事件</param>
+        public static async void PlayOnce(string name, Action<AudioSource> action = null)
         {
             if (!GlobalManager.Runtime || !isActive) return;
             if (!stacks.TryPop(out var audio))
@@ -120,7 +129,30 @@ namespace JFramework.Core
             audio.volume = audioData.audioVolume;
             audio.clip = clip;
             audio.Play();
+            action?.Invoke(audio);
             TimerManager.Pop(clip.length).Invoke(() => StopAudio(audio));
+        }
+
+        /// <summary>
+        /// 播放循环音效
+        /// </summary>
+        /// <param name="name">传入音效路径</param>
+        /// <param name="action">音效播放事件</param>
+        public static async void PlayLoop(string name, Action<AudioSource> action = null)
+        {
+            if (!GlobalManager.Runtime || !isActive) return;
+            if (!stacks.TryPop(out var audio))
+            {
+                audio = poolManager.gameObject.AddComponent<AudioSource>();
+            }
+
+            var clip = await AssetManager.LoadAsync<AudioClip>(GlobalSetting.Instance.audioBundle + "/" + name);
+            audios.Add(audio);
+            audio.volume = audioData.audioVolume;
+            audio.clip = clip;
+            audio.loop = true;
+            audio.Play();
+            action?.Invoke(audio);
         }
 
         /// <summary>

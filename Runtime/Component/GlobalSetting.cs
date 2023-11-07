@@ -64,7 +64,7 @@ namespace JFramework.Core
         private LinkedList<ITimer> timers => TimerManager.timers;
 
         [ShowInInspector, LabelText("背景音乐大小"), FoldoutGroup("音效管理器")]
-        private float soundVolume => AudioManager.soundVolume;
+        private float soundVolume => AudioManager.musicVolume;
 
         [ShowInInspector, LabelText("游戏音效大小"), FoldoutGroup("音效管理器")]
         private float audioVolume => AudioManager.audioVolume;
