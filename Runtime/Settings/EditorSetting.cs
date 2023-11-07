@@ -97,19 +97,19 @@ namespace JFramework.Editor
             }
 
             AssetSetting.Instance.sceneAssets.Clear();
-            foreach (var assetBundle in AssetSetting.Instance.assetBundles)
+            foreach (var folderAsset in AssetSetting.folderAssets)
             {
-                var folderPath = AssetDatabase.GetAssetPath(assetBundle);
+                var folderPath = AssetDatabase.GetAssetPath(folderAsset);
                 var guids = AssetDatabase.FindAssets("t:Object", new[] { folderPath });
                 var paths = guids.Select(AssetDatabase.GUIDToAssetPath).Where(path => !AssetDatabase.IsValidFolder(path)).ToList();
                 foreach (var path in paths)
                 {
                     var importer = AssetImporter.GetAtPath(path);
                     if (importer == null) continue;
-                    if (importer.assetBundleName != assetBundle.name.ToLower())
+                    if (importer.assetBundleName != folderAsset.name.ToLower())
                     {
                         Debug.Log($"增加 AssetBundles 资源: {path.Green()}");
-                        importer.assetBundleName = assetBundle.name;
+                        importer.assetBundleName = folderAsset.name;
                         importer.SaveAndReimport();
                     }
 
@@ -120,7 +120,7 @@ namespace JFramework.Editor
                     }
 
                     if (obj == null) continue;
-                    var name = $"{assetBundle.name}/{obj.name}";
+                    var name = $"{folderAsset.name}/{obj.name}";
                     AssetSetting.Instance.objects[name] = obj;
                 }
             }

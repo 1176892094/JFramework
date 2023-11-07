@@ -10,6 +10,7 @@
 
 #if UNITY_EDITOR
 using System.Collections.Generic;
+using System.IO;
 using System.Threading.Tasks;
 using Sirenix.OdinInspector;
 using UnityEditor;
@@ -36,12 +37,13 @@ namespace JFramework.Editor
             get
             {
                 if (instance != null) return instance;
-                var json = EditorPrefs.GetString(nameof(AssetSetting));
+                var asset = Resources.Load<TextAsset>(nameof(AssetSetting));
+                var json = asset != null ? asset.text : string.Empty;
                 if (string.IsNullOrEmpty(json))
                 {
                     instance = new AssetSetting();
                     json = JsonUtility.ToJson(instance);
-                    EditorPrefs.SetString(nameof(AssetSetting), json);
+                    File.WriteAllText(AssetDatabase.GetAssetPath(asset), json);
                     EditorSetting.Add(3, "资源", instance);
                     return instance;
                 }
@@ -63,9 +65,45 @@ namespace JFramework.Editor
         [FolderPath] public string editorPath = "Assets/Editor/Resources";
 
         /// <summary>
-        /// 文件夹资源
+        /// 远端资源构建
         /// </summary>
-        [PropertyOrder(1)] public List<DefaultAsset> assetBundles = new List<DefaultAsset>();
+        [LabelText("Remote Build")] public bool remoteBuild;
+
+        /// <summary>
+        /// 是否远端加载
+        /// </summary>
+        [LabelText("Remote Load")] public bool isRemote;
+
+        /// <summary>
+        /// 构建 AssetBundle 文件夹路径
+        /// </summary>
+        [HideInInspector] public List<string> bundlePaths = new List<string>();
+
+        /// <summary>
+        /// AssetBundle 的文件夹资源
+        /// </summary>
+        [PropertyOrder(1), ShowInInspector] public static List<DefaultAsset> assetBundles = new List<DefaultAsset>();
+
+        /// <summary>
+        /// 获取 AssetBundle 的文件夹
+        /// </summary>
+        /// <returns></returns>
+        public static List<DefaultAsset> folderAssets
+        {
+            get
+            {
+                if (Instance.bundlePaths.Count > 0)
+                {
+                    assetBundles.Clear();
+                    foreach (var path in Instance.bundlePaths)
+                    {
+                        assetBundles.Add(AssetDatabase.LoadAssetAtPath<DefaultAsset>(path));
+                    }
+                }
+
+                return assetBundles;
+            }
+        }
 
         /// <summary>
         /// 场景资源
@@ -76,11 +114,6 @@ namespace JFramework.Editor
         /// 存储本地加载的资源字典
         /// </summary>
         public Dictionary<string, Object> objects = new Dictionary<string, Object>();
-
-        /// <summary>
-        /// 是否远端构建
-        /// </summary>
-        [HideInInspector] public bool remoteBuild;
 
         /// <summary>
         /// 本地构建存储路径
@@ -117,14 +150,9 @@ namespace JFramework.Editor
         }
 
 
-        [PropertyOrder(2), Button("远端资源构建"), ShowIf("remoteBuild"), GUIColor(1f, 0.5f, 0.5f)]
-        public void LocalBuild()
-        {
-            remoteBuild = !remoteBuild;
-            AssetSetting.Instance.Save();
-        }
-
-        [PropertyOrder(2), Button("本地资源构建"), HideIf("remoteBuild"), GUIColor(1f, 1f, 1f)]
+        /// <summary>
+        /// 是否远端资源构建
+        /// </summary>
         public void RemoteBuild()
         {
             remoteBuild = !remoteBuild;
@@ -132,18 +160,8 @@ namespace JFramework.Editor
         }
 
         /// <summary>
-        /// 是否远端加载
+        /// 是否远端资源加载
         /// </summary>
-        [HideInInspector] public bool isRemote;
-
-        [PropertyOrder(2), Button("远端资源加载"), ShowIf("isRemote"), GUIColor(1f, 0.5f, 0.5f)]
-        public void LocalLoad()
-        {
-            EditorSetting.AddSceneToBuildSettings(isRemote = !isRemote);
-            AssetSetting.Instance.Save();
-        }
-
-        [PropertyOrder(2), Button("本地资源加载"), HideIf("isRemote"), GUIColor(1f, 1f, 1f)]
         public void RemoteLoad()
         {
             EditorSetting.AddSceneToBuildSettings(isRemote = !isRemote);
@@ -154,13 +172,36 @@ namespace JFramework.Editor
         /// 设置保存
         /// </summary>
         [PropertyOrder(2), Button("保存设置")]
-        public void Save() => EditorPrefs.SetString(nameof(AssetSetting), JsonUtility.ToJson(instance));
+        public void Save()
+        {
+            Instance.bundlePaths.Clear();
+            foreach (var bundle in assetBundles)
+            {
+                Instance.bundlePaths.Add(AssetDatabase.GetAssetPath(bundle));
+            }
+
+            var asset = Resources.Load<TextAsset>(nameof(AssetSetting));
+            var json = JsonUtility.ToJson(instance);
+            File.WriteAllText(AssetDatabase.GetAssetPath(asset), json);
+        }
 
         /// <summary>
         /// 更新构建模式
         /// </summary>
         [InitializeOnLoadMethod]
-        public static void GetLoadMode() => EditorSetting.AddSceneToBuildSettings(Instance.isRemote);
+        public static void InitializeOnLoad()
+        {
+            if (Instance.bundlePaths.Count > 0)
+            {
+                assetBundles.Clear();
+                foreach (var path in Instance.bundlePaths)
+                {
+                    assetBundles.Add(AssetDatabase.LoadAssetAtPath<DefaultAsset>(path));
+                }
+            }
+
+            EditorSetting.AddSceneToBuildSettings(Instance.isRemote);
+        }
 
         /// <summary>
         /// 同步加载
