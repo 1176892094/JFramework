@@ -22,12 +22,12 @@ namespace JFramework
         /// <summary>
         /// UI层级
         /// </summary>
-        public UILayer layer { get; protected set; } = UILayer.Normal;
+        public UILayer layer { get; protected set; }
 
         /// <summary>
         /// UI隐藏类型
         /// </summary>
-        public UIState state { get; protected set; } = UIState.Default;
+        public UIState state { get; protected set; }
 
         /// <summary>
         /// 开始时查找所有控件

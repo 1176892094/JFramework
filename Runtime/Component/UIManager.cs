@@ -11,7 +11,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using JFramework.Interface;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -37,11 +36,6 @@ namespace JFramework.Core
         internal static readonly Dictionary<Type, IPanel> panels = new Dictionary<Type, IPanel>();
 
         /// <summary>
-        /// 拷贝面板列表
-        /// </summary>
-        private static readonly List<Type> copies = new List<Type>();
-
-        /// <summary>
         /// UI画布
         /// </summary>
         public static Canvas canvas;
@@ -61,10 +55,10 @@ namespace JFramework.Core
         }
 
         /// <summary>
-        /// UI管理器显示UI面板
+        /// UI管理器显示UI面板 (无委托值)
         /// </summary>
         /// <typeparam name="TPanel">可以使用所有继承IPanel的对象</typeparam>
-        public static async void ShowPanel<TPanel>() where TPanel : IPanel
+        public static void ShowPanel<TPanel>() where TPanel : Component, IPanel
         {
             if (!GlobalManager.Runtime) return;
             if (panels.TryGetValue(typeof(TPanel), out var panel))
@@ -73,15 +67,14 @@ namespace JFramework.Core
                 return;
             }
 
-            panel = await LoadPanel<TPanel>();
-            panel.Show();
+            LoadPanel<TPanel>(null);
         }
 
         /// <summary>
         /// UI管理器显示UI面板 (无委托值)
         /// </summary>
         /// <typeparam name="TPanel">可以使用所有继承IPanel的对象</typeparam>
-        public static async void ShowPanel<TPanel>(Action action) where TPanel : IPanel
+        public static void ShowPanel<TPanel>(Action action) where TPanel : Component, IPanel
         {
             if (!GlobalManager.Runtime) return;
             if (panels.TryGetValue(typeof(TPanel), out var panel))
@@ -91,16 +84,14 @@ namespace JFramework.Core
                 return;
             }
 
-            panel = await LoadPanel<TPanel>();
-            panel.Show();
-            action?.Invoke();
+            LoadPanel<TPanel>(panel => action?.Invoke());
         }
 
         /// <summary>
         /// UI管理器显示UI面板 (有委托值)
         /// </summary>
         /// <typeparam name="TPanel">可以使用所有继承IPanel的对象</typeparam>
-        public static async void ShowPanel<TPanel>(Action<TPanel> action) where TPanel : IPanel
+        public static void ShowPanel<TPanel>(Action<TPanel> action) where TPanel : Component, IPanel
         {
             if (!GlobalManager.Runtime) return;
             if (panels.TryGetValue(typeof(TPanel), out var panel))
@@ -110,39 +101,38 @@ namespace JFramework.Core
                 return;
             }
 
-            panel = await LoadPanel<TPanel>();
-            panel.Show();
-            action?.Invoke((TPanel)panel);
+            LoadPanel<TPanel>(action);
         }
 
         /// <summary>
         /// UI管理器加载面板
         /// </summary>
         /// <typeparam name="TPanel">可以使用所有继承IPanel的对象</typeparam>
-        private static async Task<TPanel> LoadPanel<TPanel>() where TPanel : IPanel
+        private static async void LoadPanel<TPanel>(Action<TPanel> action) where TPanel : Component, IPanel
         {
             if (panels.ContainsKey(typeof(TPanel)))
             {
                 Debug.LogWarning($"加载  {typeof(TPanel).Name.Red()} 失败，面板已经加载!");
-                return default;
+                return;
             }
 
             var obj = await AssetManager.LoadAsync<GameObject>(GlobalSetting.Instance.UIBundle + "/" + typeof(TPanel).Name);
             if (!obj.TryGetComponent<TPanel>(out var panel))
             {
-                Debug.LogWarning($"加载 {typeof(TPanel).Name.Red()} 失败，面板挂载没有组件!");
-                return default;
+                obj.AddComponent<TPanel>();
+                return;
             }
 
             panel.transform.SetParent(GetLayer(panel.layer), false);
             panels.Add(typeof(TPanel), panel);
-            return panel;
+            panel.Show();
+            action?.Invoke((TPanel)panel);
         }
 
         /// <summary>
         /// UI管理器隐藏UI面板
         /// </summary>
-        public static void HidePanel<TPanel>(bool destroy = false) where TPanel : IPanel
+        public static void HidePanel<TPanel>(bool destroy = false) where TPanel : Component, IPanel
         {
             if (!GlobalManager.Runtime) return;
             if (panels.TryGetValue(typeof(TPanel), out var panel))
@@ -165,7 +155,7 @@ namespace JFramework.Core
         /// </summary>
         /// <typeparam name="TPanel">可以使用所有继承IPanel的对象</typeparam>
         /// <returns>返回获取到的UI面板</returns>
-        public static TPanel GetPanel<TPanel>() where TPanel : IPanel => (TPanel)GetPanel(typeof(TPanel));
+        public static TPanel GetPanel<TPanel>() where TPanel : Component, IPanel => (TPanel)GetPanel(typeof(TPanel));
 
         /// <summary>
         /// UI管理器得到UI面板
@@ -178,14 +168,14 @@ namespace JFramework.Core
         /// </summary>
         /// <param name="panel"></param>
         /// <typeparam name="TPanel"></typeparam>
-        public static void Register<TPanel>(TPanel panel) where TPanel : IPanel => panels[typeof(TPanel)] = panel;
+        public static void Register<TPanel>(TPanel panel) where TPanel : Component, IPanel => panels[typeof(TPanel)] = panel;
 
         /// <summary>
         /// UI面板是否活跃
         /// </summary>
         /// <typeparam name="TPanel"></typeparam>
         /// <returns></returns>
-        public static bool IsActive<TPanel>() where TPanel : IPanel
+        public static bool IsActive<TPanel>() where TPanel : Component, IPanel
         {
             return panels.TryGetValue(typeof(TPanel), out var panel) ? panel.gameObject.activeInHierarchy : false;
         }
@@ -202,7 +192,7 @@ namespace JFramework.Core
         public static void Clear()
         {
             if (!GlobalManager.Runtime) return;
-            copies.AddRange(panels.Keys.Where(type => panels.ContainsKey(type)));
+            var copies = panels.Keys.Where(type => panels.ContainsKey(type)).ToList();
             foreach (var type in copies)
             {
                 if (panels[type].state != UIState.DontDestroy)
@@ -211,8 +201,6 @@ namespace JFramework.Core
                     panels.Remove(type);
                 }
             }
-
-            copies.Clear();
         }
 
         /// <summary>
@@ -236,7 +224,6 @@ namespace JFramework.Core
         internal static void UnRegister()
         {
             canvas = null;
-            copies.Clear();
             panels.Clear();
             layers.Clear();
         }

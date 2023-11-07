@@ -148,13 +148,7 @@ namespace JFramework.Core
             if (!depends.TryGetValue(bundleName, out var assetBundle))
             {
                 assetBundle = LoadFromFile(bundleName);
-                if (assetBundle == null)
-                {
-                    Debug.LogWarning($"加载 {bundleName.Red()} 资源失败");
-                    return null;
-                }
-
-                depends.Add(bundleName, assetBundle);
+                if (!TryAddFile(bundleName, assetBundle)) return null;
             }
 
             var obj = assetBundle.LoadAsset<T>(assetName);
@@ -173,13 +167,7 @@ namespace JFramework.Core
             if (!depends.TryGetValue(bundleName, out var assetBundle))
             {
                 assetBundle = await LoadFromFileAsync(bundleName);
-                if (assetBundle == null)
-                {
-                    Debug.LogWarning($"加载 {bundleName.Red()} 资源失败");
-                    return null;
-                }
-
-                depends.Add(bundleName, assetBundle);
+                if (!TryAddFile(bundleName, assetBundle)) return null;
             }
 
             var obj = assetBundle.LoadAssetAsync<T>(assetName);
@@ -197,17 +185,23 @@ namespace JFramework.Core
             if (!depends.TryGetValue(bundleName, out var assetBundle))
             {
                 assetBundle = await LoadFromFileAsync(bundleName);
-                if (assetBundle == null)
-                {
-                    Debug.LogWarning($"加载 {bundleName.Red()} 资源失败");
-                    return null;
-                }
-
-                depends.Add(bundleName, assetBundle);
+                if (!TryAddFile(bundleName, assetBundle)) return null;
             }
 
             if (!GlobalManager.Runtime) return null;
             return UnitySceneManager.LoadSceneAsync(sceneName, LoadSceneMode.Single);
+        }
+
+        private static bool TryAddFile(string bundleName, AssetBundle assetBundle)
+        {
+            if (assetBundle == null)
+            {
+                Debug.LogWarning($"加载 {bundleName.Red()} 资源失败");
+                return false;
+            }
+
+            depends.Add(bundleName, assetBundle);
+            return true;
         }
 
         /// <summary>

@@ -60,12 +60,12 @@ namespace JFramework.Editor
         /// <summary>
         /// 存放要构建成 AssetBundle 的文件路径
         /// </summary>
-        [FolderPath] public string assetPath = "Assets/Template";
+        [FolderPath] public string editorPath = "Assets/Editor/Resources";
 
         /// <summary>
-        /// 存放要构建成 AssetBundle 的文件路径
+        /// 文件夹资源
         /// </summary>
-        [FolderPath] public string editorPath = "Assets/Editor/Resources";
+        [PropertyOrder(1)] public List<DefaultAsset> assetBundles = new List<DefaultAsset>();
 
         /// <summary>
         /// 场景资源
@@ -117,14 +117,14 @@ namespace JFramework.Editor
         }
 
 
-        [Button("远端资源构建"), ShowIf("remoteBuild"), GUIColor(1f, 0.5f, 0.5f)]
+        [PropertyOrder(2), Button("远端资源构建"), ShowIf("remoteBuild"), GUIColor(1f, 0.5f, 0.5f)]
         public void LocalBuild()
         {
             remoteBuild = !remoteBuild;
             AssetSetting.Instance.Save();
         }
 
-        [Button("本地资源构建"), HideIf("remoteBuild"), GUIColor(1f, 1f, 1f)]
+        [PropertyOrder(2), Button("本地资源构建"), HideIf("remoteBuild"), GUIColor(1f, 1f, 1f)]
         public void RemoteBuild()
         {
             remoteBuild = !remoteBuild;
@@ -136,14 +136,14 @@ namespace JFramework.Editor
         /// </summary>
         [HideInInspector] public bool isRemote;
 
-        [Button("远端资源加载"), ShowIf("isRemote"), GUIColor(1f, 0.5f, 0.5f)]
+        [PropertyOrder(2), Button("远端资源加载"), ShowIf("isRemote"), GUIColor(1f, 0.5f, 0.5f)]
         public void LocalLoad()
         {
             EditorSetting.AddSceneToBuildSettings(isRemote = !isRemote);
             AssetSetting.Instance.Save();
         }
 
-        [Button("本地资源加载"), HideIf("isRemote"), GUIColor(1f, 1f, 1f)]
+        [PropertyOrder(2), Button("本地资源加载"), HideIf("isRemote"), GUIColor(1f, 1f, 1f)]
         public void RemoteLoad()
         {
             EditorSetting.AddSceneToBuildSettings(isRemote = !isRemote);
@@ -153,7 +153,7 @@ namespace JFramework.Editor
         /// <summary>
         /// 设置保存
         /// </summary>
-        [Button("保存设置")]
+        [PropertyOrder(2), Button("保存设置")]
         public void Save() => EditorPrefs.SetString(nameof(AssetSetting), JsonUtility.ToJson(instance));
 
         /// <summary>

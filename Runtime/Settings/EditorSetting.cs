@@ -96,41 +96,37 @@ namespace JFramework.Editor
                 }
             }
 
-            if (!Directory.Exists(AssetSetting.Instance.assetPath))
-            {
-                Directory.CreateDirectory(AssetSetting.Instance.assetPath);
-            }
-
-            var guids = AssetDatabase.FindAssets("t:Object", new[] { AssetSetting.Instance.assetPath });
-            var paths = guids.Select(AssetDatabase.GUIDToAssetPath).Where(p => !AssetDatabase.IsValidFolder(p)).ToList();
             AssetSetting.Instance.sceneAssets.Clear();
-            foreach (var path in paths)
+            foreach (var assetBundle in AssetSetting.Instance.assetBundles)
             {
-                var array = path.Replace('\\', '/').Split('/');
-                var importer = AssetImporter.GetAtPath(path);
-                if (importer == null) continue;
-                var bundleName = importer.assetBundleName;
-                var bundle = array[2];
-                if (bundleName != bundle.ToLower())
+                var folderPath = AssetDatabase.GetAssetPath(assetBundle);
+                var guids = AssetDatabase.FindAssets("t:Object", new[] { folderPath });
+                var paths = guids.Select(AssetDatabase.GUIDToAssetPath).Where(path => !AssetDatabase.IsValidFolder(path)).ToList();
+                foreach (var path in paths)
                 {
-                    Debug.Log($"增加 AssetBundles 资源: {path.Green()}");
-                    importer.assetBundleName = bundle;
-                    importer.SaveAndReimport();
-                }
+                    var importer = AssetImporter.GetAtPath(path);
+                    if (importer == null) continue;
+                    if (importer.assetBundleName != assetBundle.name.ToLower())
+                    {
+                        Debug.Log($"增加 AssetBundles 资源: {path.Green()}");
+                        importer.assetBundleName = assetBundle.name;
+                        importer.SaveAndReimport();
+                    }
 
-                var obj = AssetDatabase.LoadAssetAtPath<Object>(path);
-                if (obj is SceneAsset)
-                {
-                    AssetSetting.Instance.sceneAssets.Add(path);
-                }
+                    var obj = AssetDatabase.LoadAssetAtPath<Object>(path);
+                    if (obj is SceneAsset)
+                    {
+                        AssetSetting.Instance.sceneAssets.Add(path);
+                    }
 
-                if (obj == null) continue;
-                var name = $"{bundle}/{obj.name}";
-                AssetSetting.Instance.objects[name] = obj;
+                    if (obj == null) continue;
+                    var name = $"{assetBundle.name}/{obj.name}";
+                    AssetSetting.Instance.objects[name] = obj;
+                }
             }
 
-            AssetSetting.Instance.Save();
             Debug.Log($"更新 AssetBundles 完成。".Green());
+            AssetSetting.Instance.Save();
             AssetDatabase.Refresh();
         }
 

@@ -41,7 +41,7 @@ namespace JFramework
                     if (instance != null) return instance;
                 }
 #if UNITY_EDITOR
-                instance = EditorSetting.Register<T>($"{AssetSetting.Instance.assetPath}/{GlobalSetting.Instance.settingBundle}");
+                instance = EditorSetting.Register<T>($"Assets/{GlobalSetting.Instance.settingBundle}");
 #endif
                 return instance;
             }
