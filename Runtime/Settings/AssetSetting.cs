@@ -9,13 +9,14 @@
 // *********************************************************************************
 
 #if UNITY_EDITOR
+using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Threading.Tasks;
 using Sirenix.OdinInspector;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using Object = UnityEngine.Object;
 using UnitySceneManager = UnityEngine.SceneManagement.SceneManager;
 
 // ReSharper disable All
@@ -68,7 +69,7 @@ namespace JFramework.Editor
         /// 远端资源构建
         /// </summary>
         [LabelText("Remote Build")] public bool remoteBuild;
-        
+
         /// <summary>
         /// 远端资源加载
         /// </summary>
@@ -233,7 +234,14 @@ namespace JFramework.Editor
                     return (T)obj;
                 }
 
-                return obj is GameObject ? Object.Instantiate((T)obj) : (T)obj;
+                if (typeof(T).IsSubclassOf(typeof(Component)))
+                {
+                    return ((GameObject)Object.Instantiate(obj)).GetComponent<T>();
+                }
+                else
+                {
+                    return obj is GameObject ? Object.Instantiate((T)obj) : (T)obj;
+                }
             }
 
             return null;
@@ -243,34 +251,25 @@ namespace JFramework.Editor
         /// 异步加载
         /// </summary>
         /// <param name="path"></param>
+        /// <param name="action"></param>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
-        internal async Task<T> LoadAsync<T>(string path) where T : Object
+        internal void LoadAsync<T>(string path, Action<T> action) where T : Object
         {
-            await Task.Yield();
-            if (objects.TryGetValue(path, out var obj))
-            {
-                if (obj is Texture2D texture)
-                {
-                    obj = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), Vector2.one * 0.5f);
-                    return (T)obj;
-                }
-
-                return obj is GameObject ? Object.Instantiate((T)obj) : (T)obj;
-            }
-
-            return null;
+            var asset = Load<T>(path);
+            action?.Invoke(asset);
         }
 
         /// <summary>
         /// 异步加载场景
         /// </summary>
         /// <param name="sceneName"></param>
+        /// <param name="action"></param>
         /// <returns></returns>
-        internal async Task<AsyncOperation> LoadSceneAsync(string sceneName)
+        internal void LoadSceneAsync(string sceneName, Action<AsyncOperation> action)
         {
-            await Task.Yield();
-            return UnitySceneManager.LoadSceneAsync(sceneName.Split('/')[1], LoadSceneMode.Single);
+            var asset = UnitySceneManager.LoadSceneAsync(sceneName.Split('/')[1], LoadSceneMode.Single);
+            action?.Invoke(asset);
         }
     }
 }

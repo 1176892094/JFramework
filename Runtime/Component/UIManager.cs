@@ -108,7 +108,7 @@ namespace JFramework.Core
         /// UI管理器加载面板
         /// </summary>
         /// <typeparam name="TPanel">可以使用所有继承IPanel的对象</typeparam>
-        private static async void LoadPanel<TPanel>(Action<TPanel> action) where TPanel : Component, IPanel
+        private static void LoadPanel<TPanel>(Action<TPanel> action) where TPanel : Component, IPanel
         {
             if (panels.ContainsKey(typeof(TPanel)))
             {
@@ -116,17 +116,18 @@ namespace JFramework.Core
                 return;
             }
 
-            var obj = await AssetManager.LoadAsync<GameObject>(GlobalSetting.Instance.UIBundle + "/" + typeof(TPanel).Name);
-            if (!obj.TryGetComponent<TPanel>(out var panel))
+            AssetManager.LoadAsync<GameObject>(GlobalSetting.Instance.UIBundle + "/" + typeof(TPanel).Name, obj =>
             {
-                obj.AddComponent<TPanel>();
-                return;
-            }
+                if (!obj.TryGetComponent<TPanel>(out var panel))
+                {
+                    obj.AddComponent<TPanel>();
+                }
 
-            panel.transform.SetParent(GetLayer(panel.layer), false);
-            panels.Add(typeof(TPanel), panel);
-            panel.Show();
-            action?.Invoke((TPanel)panel);
+                panel.transform.SetParent(GetLayer(panel.layer), false);
+                panels.Add(typeof(TPanel), panel);
+                panel.Show();
+                action?.Invoke((TPanel)panel);
+            });
         }
 
         /// <summary>

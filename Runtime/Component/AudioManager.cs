@@ -73,14 +73,16 @@ namespace JFramework.Core
         /// 播放背景音乐
         /// </summary>
         /// <param name="name">背景音乐的路径</param>
-        public static async void PlayMusic(string name)
+        public static void PlayMusic(string name)
         {
             if (!GlobalManager.Runtime || !isActive) return;
-            var clip = await AssetManager.LoadAsync<AudioClip>(GlobalSetting.Instance.audioBundle + "/" + name);
-            audioSource.volume = audioData.musicVolume;
-            audioSource.clip = clip;
-            audioSource.loop = true;
-            audioSource.Play();
+            AssetManager.LoadAsync<AudioClip>(GlobalSetting.Instance.audioBundle + "/" + name, clip =>
+            {
+                audioSource.volume = audioData.musicVolume;
+                audioSource.clip = clip;
+                audioSource.loop = true;
+                audioSource.Play();
+            });
         }
 
         /// <summary>
@@ -116,7 +118,7 @@ namespace JFramework.Core
         /// </summary>
         /// <param name="name">传入音效路径</param>
         /// <param name="action">音效播放事件</param>
-        public static async void PlayOnce(string name, Action<AudioSource> action = null)
+        public static void PlayOnce(string name, Action<AudioSource> action = null)
         {
             if (!GlobalManager.Runtime || !isActive) return;
             if (!stacks.TryPop(out var audio))
@@ -124,13 +126,15 @@ namespace JFramework.Core
                 audio = poolManager.gameObject.AddComponent<AudioSource>();
             }
 
-            var clip = await AssetManager.LoadAsync<AudioClip>(GlobalSetting.Instance.audioBundle + "/" + name);
-            audios.Add(audio);
-            audio.volume = audioData.audioVolume;
-            audio.clip = clip;
-            audio.Play();
-            action?.Invoke(audio);
-            TimerManager.Pop(clip.length).Invoke(() => StopAudio(audio));
+            AssetManager.LoadAsync<AudioClip>(GlobalSetting.Instance.audioBundle + "/" + name, clip =>
+            {
+                audios.Add(audio);
+                audio.volume = audioData.audioVolume;
+                audio.clip = clip;
+                audio.Play();
+                action?.Invoke(audio);
+                TimerManager.Pop(clip.length).Invoke(() => StopAudio(audio));
+            });
         }
 
         /// <summary>
@@ -138,7 +142,7 @@ namespace JFramework.Core
         /// </summary>
         /// <param name="name">传入音效路径</param>
         /// <param name="action">音效播放事件</param>
-        public static async void PlayLoop(string name, Action<AudioSource> action = null)
+        public static void PlayLoop(string name, Action<AudioSource> action = null)
         {
             if (!GlobalManager.Runtime || !isActive) return;
             if (!stacks.TryPop(out var audio))
@@ -146,13 +150,15 @@ namespace JFramework.Core
                 audio = poolManager.gameObject.AddComponent<AudioSource>();
             }
 
-            var clip = await AssetManager.LoadAsync<AudioClip>(GlobalSetting.Instance.audioBundle + "/" + name);
-            audios.Add(audio);
-            audio.volume = audioData.audioVolume;
-            audio.clip = clip;
-            audio.loop = true;
-            audio.Play();
-            action?.Invoke(audio);
+            AssetManager.LoadAsync<AudioClip>(GlobalSetting.Instance.audioBundle + "/" + name, clip =>
+            {
+                audios.Add(audio);
+                audio.volume = audioData.audioVolume;
+                audio.clip = clip;
+                audio.loop = true;
+                audio.Play();
+                action?.Invoke(audio);
+            });
         }
 
         /// <summary>

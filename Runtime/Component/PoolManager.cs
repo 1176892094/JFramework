@@ -8,10 +8,11 @@
 // # Description: This is an automatically generated comment.
 // *********************************************************************************
 
+using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 using JFramework.Interface;
 using UnityEngine;
+using Object = UnityEngine.Object;
 
 namespace JFramework.Core
 {
@@ -75,36 +76,30 @@ namespace JFramework.Core
         /// 对象池管理器异步获取对象
         /// </summary>
         /// <param name="path">弹出对象的路径</param>
-        public static async Task<T> PopAsync<T>(string path) where T : Component
+        /// <param name="action"></param>
+        public static void PopAsync<T>(string path, Action<T> action) where T : Object
         {
-            var obj = await PopAsync(path);
-            return obj.GetComponent<T>();
-        }
-
-        /// <summary>
-        /// 对象池管理器异步获取对象
-        /// </summary>
-        /// <param name="path">弹出对象的路径</param>
-        public static async Task<GameObject> PopAsync(string path)
-        {
-            if (!GlobalManager.Runtime) return null;
+            if (!GlobalManager.Runtime) return;
             if (pools.TryGetValue(path, out var pool) && pool.Count > 0)
             {
-                var pop = ((IPool<GameObject>)pool).Pop();
-                if (pop != null)
+                var obj = ((IPool<GameObject>)pool).Pop();
+                if (obj != null)
                 {
-                    pop.SetActive(true);
-                    pop.transform.SetParent(null);
-                    pop.GetComponent<IPop>()?.OnPop();
-                    return pop;
+                    obj.SetActive(true);
+                    obj.transform.SetParent(null);
+                    obj.GetComponent<IPop>()?.OnPop();
+                    action?.Invoke(obj.GetComponent<T>());
+                    return;
                 }
             }
 
-            var obj = await AssetManager.LoadAsync<GameObject>(path);
-            obj.name = path;
-            Object.DontDestroyOnLoad(obj);
-            obj.GetComponent<IPop>()?.OnPop();
-            return obj;
+            AssetManager.LoadAsync<GameObject>(path, obj =>
+            {
+                obj.name = path;
+                Object.DontDestroyOnLoad(obj);
+                obj.GetComponent<IPop>()?.OnPop();
+                action?.Invoke(obj.GetComponent<T>());
+            });
         }
 
         /// <summary>

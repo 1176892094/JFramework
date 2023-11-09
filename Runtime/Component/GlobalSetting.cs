@@ -37,10 +37,10 @@ namespace JFramework.Core
         private Dictionary<KeyCode, IInput> inputs => InputManager.inputs;
 
         [ShowInInspector, LabelText("资源依赖数据"), FoldoutGroup("基本管理器")]
-        private Dictionary<string, AssetBundle> depends => AssetManager.depends;
+        private Dictionary<string, AssetBundle> bundles => AssetManager.bundles;
 
         [ShowInInspector, LabelText("资源加载数据"), FoldoutGroup("基本管理器")]
-        private Dictionary<string, (string, string)> assets => AssetManager.assets;
+        private Dictionary<string, AssetManager.AssetData> assets => AssetManager.assets;
 
         [ShowInInspector, LabelText("用户界面管理"), FoldoutGroup("面板管理器")]
         private Dictionary<Type, IPanel> panels => UIManager.panels;
