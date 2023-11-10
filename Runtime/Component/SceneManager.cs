@@ -52,8 +52,8 @@ namespace JFramework.Core
                     }
 
                     var totalTime = (Time.time - localTime).ToString("F");
-                    Debug.Log($"异步加载 {name.Green()} 场景完成, 耗时 {totalTime.Yellow()} 秒");
                     action?.Invoke();
+                    Debug.Log($"异步加载 {name.Green()} 场景完成, 耗时 {totalTime.Yellow()} 秒");
                 }
             }
             catch (Exception e)
