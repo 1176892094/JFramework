@@ -11,7 +11,7 @@ namespace JFramework
     /// </summary>
     /// <typeparam name="TItem">数据类</typeparam>
     /// <typeparam name="TGrid">格子类</typeparam>
-    public class UIScroll<TItem, TGrid> where TGrid : IGrid<TItem>
+    public class UIScroll<TItem, TGrid> where TGrid : IGrid<TItem> where TItem : IItem
     {
         /// <summary>
         /// 存储格子的字典
