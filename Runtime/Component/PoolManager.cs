@@ -77,7 +77,7 @@ namespace JFramework.Core
         /// </summary>
         /// <param name="path">弹出对象的路径</param>
         /// <param name="action"></param>
-        public static void PopAsync<T>(string path, Action<T> action) where T : Object
+        public static void PopAsync<T>(string path, Action<T> action) where T : Component
         {
             if (!GlobalManager.Runtime) return;
             if (pools.TryGetValue(path, out var pool) && pool.Count > 0)
@@ -99,6 +99,36 @@ namespace JFramework.Core
                 Object.DontDestroyOnLoad(obj);
                 obj.GetComponent<IPop>()?.OnPop();
                 action?.Invoke(obj.GetComponent<T>());
+            });
+        }
+
+        /// <summary>
+        /// 对象池管理器异步获取对象
+        /// </summary>
+        /// <param name="path">弹出对象的路径</param>
+        /// <param name="action"></param>
+        public static void PopAsync(string path, Action<GameObject> action)
+        {
+            if (!GlobalManager.Runtime) return;
+            if (pools.TryGetValue(path, out var pool) && pool.Count > 0)
+            {
+                var obj = ((IPool<GameObject>)pool).Pop();
+                if (obj != null)
+                {
+                    obj.SetActive(true);
+                    obj.transform.SetParent(null);
+                    obj.GetComponent<IPop>()?.OnPop();
+                    action?.Invoke(obj);
+                    return;
+                }
+            }
+
+            AssetManager.LoadAsync<GameObject>(path, obj =>
+            {
+                obj.name = path;
+                Object.DontDestroyOnLoad(obj);
+                obj.GetComponent<IPop>()?.OnPop();
+                action?.Invoke(obj);
             });
         }
 
