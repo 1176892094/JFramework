@@ -17,7 +17,7 @@ namespace JFramework
     /// 状态的抽象类
     /// </summary>
     [Serializable]
-    public abstract class State<T> : IState<T> where T : IEntity
+    public abstract class State<T> : IState where T : IEntity
     {
         /// <summary>
         /// 基本状态机的接口

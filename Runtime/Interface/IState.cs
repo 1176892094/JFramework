@@ -26,16 +26,4 @@ namespace JFramework.Interface
         /// <param name="machine">状态机</param>
         void OnAwake(IStateMachine machine);
     }
-
-    /// <summary>
-    /// 泛型状态接口
-    /// </summary>
-    /// <typeparam name="T">传入状态的所有者</typeparam>
-    public interface IState<out T> : IState where T : IEntity
-    {
-        /// <summary>
-        /// 泛型状态机
-        /// </summary>
-        IStateMachine<T> machine { get; }
-    }
 }

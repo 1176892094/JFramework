@@ -46,10 +46,7 @@ namespace JFramework
         /// <returns></returns>
         public static implicit operator bool(JsonData jsonData)
         {
-            if (jsonData.key == null) return false;
-            if (jsonData.key.Length == 0) return false;
-            if (jsonData.iv == null) return false;
-            return jsonData.iv.Length != 0;
+            return jsonData.key != null && jsonData.key.Length != 0 && jsonData.iv != null && jsonData.iv.Length != 0;
         }
     }
 }

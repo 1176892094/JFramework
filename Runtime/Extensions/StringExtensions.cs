@@ -8,6 +8,8 @@
 // # Description: This is an automatically generated comment.
 // *********************************************************************************
 
+// ReSharper disable All
+
 namespace JFramework
 {
     /// <summary>

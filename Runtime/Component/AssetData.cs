@@ -53,10 +53,7 @@ namespace JFramework
         /// <param name="a"></param>
         /// <param name="b"></param>
         /// <returns></returns>
-        public static bool operator ==(AssetData a, AssetData b)
-        {
-            return a.code == b.code;
-        }
+        public static bool operator ==(AssetData a, AssetData b) => a.code == b.code;
 
         /// <summary>
         /// 重载运算符 !=
@@ -64,38 +61,26 @@ namespace JFramework
         /// <param name="a"></param>
         /// <param name="b"></param>
         /// <returns></returns>
-        public static bool operator !=(AssetData a, AssetData b)
-        {
-            return !(a == b);
-        }
+        public static bool operator !=(AssetData a, AssetData b) => !(a == b);
 
         /// <summary>
         /// 同类型比较
         /// </summary>
         /// <param name="other"></param>
         /// <returns></returns>
-        private bool Equals(AssetData other)
-        {
-            return size == other.size && code == other.code && name == other.name;
-        }
+        private bool Equals(AssetData other) => size == other.size && code == other.code && name == other.name;
 
         /// <summary>
         /// 不同类型比较
         /// </summary>
         /// <param name="obj"></param>
         /// <returns></returns>
-        public override bool Equals(object obj)
-        {
-            return obj is AssetData other && Equals(other);
-        }
+        public override bool Equals(object obj) => obj is AssetData other && Equals(other);
 
         /// <summary>
         /// 哈希码
         /// </summary>
         /// <returns></returns>
-        public override int GetHashCode()
-        {
-            return HashCode.Combine(size, code, name);
-        }
+        public override int GetHashCode() => HashCode.Combine(size, code, name);
     }
 }

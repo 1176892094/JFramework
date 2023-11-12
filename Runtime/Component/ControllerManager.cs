@@ -27,60 +27,39 @@ namespace JFramework.Core
         /// <summary>
         /// 全局控制器容器
         /// </summary>
-        public static readonly Dictionary<IEntity, Components> characters = new Dictionary<IEntity, Components>();
+        public static readonly Dictionary<IEntity, Components> entities = new Dictionary<IEntity, Components>();
 
         /// <summary>
         /// 注册并返回控制器
         /// </summary>
-        /// <param name="character"></param>
-        /// <param name="action"></param>
+        /// <param name="entity"></param>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
-        public static void Register<T>(IEntity character, Action<T> action) where T : ScriptableObject, IController
+        public static T Register<T>(IEntity entity) where T : ScriptableObject, IController
         {
-            if (!characters.TryGetValue(character, out Components components))
+            if (!entities.TryGetValue(entity, out Components components))
             {
                 components = new Components();
-                characters.Add(character, components);
+                entities.Add(entity, components);
             }
 
             if (!components.ContainsKey(typeof(T)))
             {
                 var component = ScriptableObject.CreateInstance<T>();
                 components.Add(typeof(T), component);
-                component.Register(character);
-                action?.Invoke(component);
-            }
-        }
-
-        /// <summary>
-        /// 获取控制器
-        /// </summary>
-        /// <param name="character"></param>
-        /// <typeparam name="T"></typeparam>
-        /// <returns></returns>
-        public static T Get<T>(IEntity character) where T : ScriptableObject, IController
-        {
-            if (!characters.TryGetValue(character, out Components components))
-            {
-                return default;
+                component.Register(entity);
             }
 
-            if (!components.ContainsKey(typeof(T)))
-            {
-                return default;
-            }
-
-            return (T)characters[character][typeof(T)];
+            return (T)entities[entity][typeof(T)];
         }
 
         /// <summary>
         /// 销毁指定控制器
         /// </summary>
-        /// <param name="character"></param>
-        public static void UnRegister(IEntity character)
+        /// <param name="entity"></param>
+        public static void UnRegister(IEntity entity)
         {
-            if (characters.TryGetValue(character, out Components components))
+            if (entities.TryGetValue(entity, out Components components))
             {
                 foreach (var component in components.Values)
                 {
@@ -88,7 +67,7 @@ namespace JFramework.Core
                 }
 
                 components.Clear();
-                characters.Remove(character);
+                entities.Remove(entity);
             }
         }
 
@@ -97,13 +76,13 @@ namespace JFramework.Core
         /// </summary>
         internal static void Clear()
         {
-            var copies = characters.Keys.ToList();
-            foreach (var character in copies)
+            var copies = entities.Keys.ToList();
+            foreach (var entity in copies)
             {
-                character.UnRegister();
+                entity.UnRegister();
             }
 
-            characters.Clear();
+            entities.Clear();
         }
     }
 }

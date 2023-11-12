@@ -24,10 +24,8 @@ namespace JFramework.Core
 
         /// <summary>
         /// 当前场景名称
-        /// ReSharper disable once MemberCanBePrivate.Global
         /// </summary>
         public static string localScene => UnitySceneManager.GetActiveScene().name;
-
 
         /// <summary>
         /// 异步加载场景的进度条

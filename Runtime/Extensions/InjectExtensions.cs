@@ -38,7 +38,7 @@ namespace JFramework
                 {
                     fieldName = char.ToUpper(field.Name[0]) + field.Name[1..];
                 }
-                
+
                 var target = inject.transform.GetChild(fieldName);
                 if (target == null) continue;
 
@@ -80,10 +80,7 @@ namespace JFramework
             }
             else
             {
-                button.onClick.AddListener(() =>
-                {
-                    inject.transform.SendMessage(name);
-                });
+                button.onClick.AddListener(() => inject.transform.SendMessage(name));
             }
         }
 
@@ -105,10 +102,7 @@ namespace JFramework
             }
             else
             {
-                toggle.onValueChanged.AddListener(value =>
-                {
-                    inject.transform.SendMessage(name, value);
-                });
+                toggle.onValueChanged.AddListener(value => inject.transform.SendMessage(name, value));
             }
         }
 

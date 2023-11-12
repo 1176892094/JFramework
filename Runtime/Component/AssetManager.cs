@@ -27,10 +27,10 @@ namespace JFramework.Core
     public static class AssetManager
     {
         /// <summary>
-        /// 资源数据
+        /// 资源信息
         /// </summary>
         [Serializable]
-        internal struct AssetData
+        internal struct AssetInfo
         {
             /// <summary>
             /// 所在资源包名称
@@ -46,7 +46,7 @@ namespace JFramework.Core
             /// 分割包名和资源名
             /// </summary>
             /// <param name="path"></param>
-            public AssetData(string path)
+            public AssetInfo(string path)
             {
                 var array = path.Split('/');
                 bundleName = array[0].ToLower();
@@ -63,7 +63,7 @@ namespace JFramework.Core
         /// <summary>
         /// 存储AB包的名称和资源
         /// </summary>
-        internal static readonly Dictionary<string, AssetData> assets = new Dictionary<string, AssetData>();
+        internal static readonly Dictionary<string, AssetInfo> assets = new Dictionary<string, AssetInfo>();
 
         /// <summary>
         /// 主包
@@ -86,7 +86,7 @@ namespace JFramework.Core
                 mainAsset = LoadFromFile(GlobalSetting.Instance.platform.ToString());
                 manifest = mainAsset.LoadAsset<AssetBundleManifest>(nameof(AssetBundleManifest));
             }
-            
+
             var dependencies = manifest.GetAllDependencies(bundleName);
             foreach (var dependency in dependencies)
             {
@@ -114,7 +114,7 @@ namespace JFramework.Core
 #endif
             if (!assets.TryGetValue(path, out var assetData))
             {
-                assetData = new AssetData(path);
+                assetData = new AssetInfo(path);
             }
 
             return Load<T>(assetData.bundleName, assetData.assetName);
@@ -139,7 +139,7 @@ namespace JFramework.Core
 #endif
             if (!assets.TryGetValue(path, out var assetData))
             {
-                assetData = new AssetData(path);
+                assetData = new AssetInfo(path);
             }
 
             var asset = await LoadAsync<T>(assetData.bundleName, assetData.assetName);
@@ -164,7 +164,7 @@ namespace JFramework.Core
 #endif
             if (!assets.TryGetValue(path, out var assetData))
             {
-                assetData = new AssetData(path);
+                assetData = new AssetInfo(path);
             }
 
             var asset = await LoadSceneAsync(assetData.bundleName, assetData.assetName);
@@ -225,7 +225,7 @@ namespace JFramework.Core
 
                 bundles[bundleName] = assetBundle;
             }
-            
+
             if (typeof(T).IsSubclassOf(typeof(Component)))
             {
                 var obj = assetBundle.LoadAssetAsync<GameObject>(assetName);

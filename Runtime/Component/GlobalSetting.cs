@@ -22,7 +22,7 @@ namespace JFramework.Core
     public sealed partial class GlobalManager
     {
         [ShowInInspector, LabelText("游戏组件列表"), FoldoutGroup("对象池管理器")]
-        private Dictionary<IEntity, Components> characters => ControllerManager.characters;
+        private Dictionary<IEntity, Components> entities => ControllerManager.entities;
 
         [ShowInInspector, LabelText("游戏对象数据"), FoldoutGroup("对象池管理器")]
         private Dictionary<string, IPool> pools => PoolManager.pools;
@@ -40,7 +40,7 @@ namespace JFramework.Core
         private Dictionary<string, AssetBundle> bundles => AssetManager.bundles;
 
         [ShowInInspector, LabelText("资源加载数据"), FoldoutGroup("基本管理器")]
-        private Dictionary<string, AssetManager.AssetData> assets => AssetManager.assets;
+        private Dictionary<string, AssetManager.AssetInfo> assets => AssetManager.assets;
 
         [ShowInInspector, LabelText("用户界面管理"), FoldoutGroup("面板管理器")]
         private Dictionary<Type, IPanel> panels => UIManager.panels;

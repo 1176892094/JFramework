@@ -13,7 +13,8 @@ using System.Collections.Generic;
 using System.Linq;
 using JFramework.Interface;
 using UnityEngine;
-using UnityEngine.EventSystems;
+using UnityEngine.Events;
+using UnityEngine.UI;
 using Object = UnityEngine.Object;
 
 // ReSharper disable All
@@ -38,7 +39,7 @@ namespace JFramework.Core
         /// <summary>
         /// UI画布
         /// </summary>
-        public static Canvas canvas;
+        public static Canvas canvas { get; private set; }
 
         /// <summary>
         /// UI管理器初始化
@@ -133,7 +134,7 @@ namespace JFramework.Core
         /// <summary>
         /// UI管理器隐藏UI面板
         /// </summary>
-        public static void HidePanel<TPanel>(bool destroy = false) where TPanel : Component, IPanel
+        public static void HidePanel<TPanel>() where TPanel : Component, IPanel
         {
             if (!GlobalManager.Runtime) return;
             if (panels.TryGetValue(typeof(TPanel), out var panel))
@@ -141,12 +142,6 @@ namespace JFramework.Core
                 if (IsActive<TPanel>())
                 {
                     panel.Hide();
-                }
-
-                if (destroy)
-                {
-                    Object.Destroy(panel.gameObject);
-                    panels.Remove(typeof(TPanel));
                 }
             }
         }
@@ -165,13 +160,6 @@ namespace JFramework.Core
         public static IPanel GetPanel(Type key) => panels.TryGetValue(key, out var panel) ? panel : null;
 
         /// <summary>
-        /// 手动注册到UI管理器
-        /// </summary>
-        /// <param name="panel"></param>
-        /// <typeparam name="TPanel"></typeparam>
-        public static void Register<TPanel>(TPanel panel) where TPanel : Component, IPanel => panels[typeof(TPanel)] = panel;
-
-        /// <summary>
         /// UI面板是否活跃
         /// </summary>
         /// <typeparam name="TPanel"></typeparam>
@@ -188,6 +176,34 @@ namespace JFramework.Core
         public static Transform GetLayer(UILayer type) => panels != null ? layers[type] : null;
 
         /// <summary>
+        /// 注册按钮组
+        /// </summary>
+        /// <param name="buttonGroup"></param>
+        /// <param name="action"></param>
+        public static void SetButtons(Component buttonGroup, UnityAction action)
+        {
+            var buttons = buttonGroup.GetComponentsInChildren<Button>();
+            foreach (var button in buttons)
+            {
+                button.onClick.AddListener(action);
+            }
+        }
+
+        /// <summary>
+        /// 注册开关组
+        /// </summary>
+        /// <param name="buttonGroup"></param>
+        /// <param name="action"></param>
+        public static void SetToggles(Component buttonGroup, UnityAction<bool> action)
+        {
+            var toggles = buttonGroup.GetComponentsInChildren<Toggle>();
+            foreach (var toggle in toggles)
+            {
+                toggle.onValueChanged.AddListener(action);
+            }
+        }
+
+        /// <summary>
         /// UI管理器清除可销毁的面板
         /// </summary>
         public static void Clear()
@@ -202,21 +218,6 @@ namespace JFramework.Core
                     panels.Remove(type);
                 }
             }
-        }
-
-        /// <summary>
-        /// UI管理器侦听UI面板事件
-        /// </summary>
-        /// <param name="target">传入的UI对象</param>
-        /// <param name="type">事件触发类型</param>
-        /// <param name="action">事件触发后的回调</param>
-        public static void Listen(Component target, EventTriggerType type, Action<PointerEventData> action)
-        {
-            var trigger = target.GetComponent<EventTrigger>();
-            if (trigger == null) trigger = target.gameObject.AddComponent<EventTrigger>();
-            var entry = new EventTrigger.Entry { eventID = type };
-            entry.callback.AddListener(eventData => action?.Invoke((PointerEventData)eventData));
-            trigger.triggers.Add(entry);
         }
 
         /// <summary>
