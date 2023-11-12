@@ -8,6 +8,7 @@
 // # Description: This is an automatically generated comment.
 // *********************************************************************************
 
+using System;
 using JFramework.Core;
 using JFramework.Interface;
 using UnityEngine;
@@ -39,20 +40,31 @@ namespace JFramework
             GlobalManager.OnUpdate -= entity.OnUpdate;
         }
 
+
         /// <summary>
-        /// 角色接口的控制器注册
+        /// 实体控制器注册
         /// </summary>
+        /// <param name="action"></param>
         /// <param name="character"></param>
-        public static T Get<T>(this ICharacter character) where T : ScriptableObject, IController
+        public static void Register<T>(this IEntity character, Action<T> action) where T : ScriptableObject, IController
         {
-            return ControllerManager.Register<T>(character);
+            ControllerManager.Register(character, action);
         }
-        
+
         /// <summary>
-        /// 角色接口的控制器卸载
+        /// 实体控制器获取
         /// </summary>
         /// <param name="character"></param>
-        public static void Destroy(this ICharacter character)
+        public static T Get<T>(this IEntity character) where T : ScriptableObject, IController
+        {
+            return ControllerManager.Get<T>(character);
+        }
+
+        /// <summary>
+        /// 实体卸载控制器
+        /// </summary>
+        /// <param name="character"></param>
+        public static void UnRegister(this IEntity character)
         {
             ControllerManager.UnRegister(character);
         }

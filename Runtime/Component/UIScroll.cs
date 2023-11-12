@@ -11,12 +11,12 @@ namespace JFramework
     /// </summary>
     /// <typeparam name="TItem">数据类</typeparam>
     /// <typeparam name="TGrid">格子类</typeparam>
-    public class UIScroll<TItem, TGrid> where TGrid : IGrid<TItem> where TItem : IItem
+    public class UIScroll<TItem, TGrid> where TGrid : IGrid<TItem> where TItem : new()
     {
         /// <summary>
         /// 存储格子的字典
         /// </summary>
-        private readonly Dictionary<int, GameObject> grids = new Dictionary<int, GameObject>();
+        private readonly Dictionary<int, TGrid> grids = new Dictionary<int, TGrid>();
 
         /// <summary>
         /// 履带对象
@@ -61,22 +61,12 @@ namespace JFramework
         /// <summary>
         /// 初始化Content
         /// </summary>
-        /// <param name="content"></param>
-        public void SetContent(RectTransform content)
-        {
-            this.content = content;
-        }
-
-        /// <summary>
-        /// 初始化数据来源 并且把content的高初始化
-        /// </summary>
-        /// <param name="items"></param>
         /// <param name="path"></param>
-        public void InitItems(List<TItem> items, string path)
+        /// <param name="content"></param>
+        public void SetContent(RectTransform content, string path)
         {
             this.path = path;
-            this.items = items;
-            content.sizeDelta = new Vector2(0, Mathf.CeilToInt((float)items.Count / column) * (rect.height + rect.y) + 1);
+            this.content = content;
         }
 
         /// <summary>
@@ -89,7 +79,30 @@ namespace JFramework
         {
             this.rect = rect;
             this.column = column;
-            this.row = (int)(row * rect.height);
+            this.row = (int)(row * (rect.height + rect.y));
+        }
+
+        /// <summary>
+        /// 刷新格子数据
+        /// </summary>
+        /// <param name="items"></param>
+        public void Refresh(List<TItem> items)
+        {
+            foreach (var (index, grid) in grids)
+            {
+                if (index < items.Count && items[index] != null)
+                {
+                    grid.SetItem(items[index]);
+                }
+                else
+                {
+                    grid.Dispose();
+                }
+            }
+
+            this.items = items;
+            content.anchoredPosition = Vector2.zero;
+            content.sizeDelta = new Vector2(0, Mathf.CeilToInt((float)items.Count / column) * (rect.height + rect.y) + 1);
         }
 
         /// <summary>
@@ -97,9 +110,11 @@ namespace JFramework
         /// </summary>
         public void OnUpdate()
         {
+            var width = rect.width + rect.x;
+            var height = rect.height + rect.y;
             var position = content.anchoredPosition;
-            int minIndex = Math.Max(0, (int)(position.y / (rect.height + rect.y)) * column);
-            int maxIndex = Math.Min((int)((position.y + row) / (rect.height + rect.y)) * column + column - 1, items.Count - 1);
+            var minIndex = Math.Max(0, (int)(position.y / height) * column);
+            var maxIndex = Math.Min((int)((position.y + row) / height) * column + column - 1, items.Count - 1);
 
             if (minIndex != oldMinIndex || maxIndex != oldMaxIndex)
             {
@@ -109,7 +124,7 @@ namespace JFramework
                     {
                         if (grid != null)
                         {
-                            PoolManager.Push(grid);
+                            PoolManager.Push(grid.gameObject);
                         }
 
                         grids.Remove(i);
@@ -122,7 +137,7 @@ namespace JFramework
                     {
                         if (grid != null)
                         {
-                            PoolManager.Push(grid);
+                            PoolManager.Push(grid.gameObject);
                         }
 
                         grids.Remove(i);
@@ -138,18 +153,22 @@ namespace JFramework
                 if (grids.ContainsKey(i)) continue;
 
                 var index = i;
-                grids.Add(index, null);
+                grids.Add(index, default);
                 PoolManager.PopAsync(path, obj =>
                 {
                     obj.transform.SetParent(content);
                     obj.transform.localScale = Vector3.one;
-                    var posX = index % column * (rect.width + rect.x) + rect.width / 2;
-                    var posY = -(index / column) * (rect.height + rect.y) - rect.height / 2;
+                    var posX = index % column * width + rect.width / 2;
+                    var posY = -(index / column) * height - rect.height / 2;
                     obj.transform.localPosition = new Vector3(posX, posY, 0);
-                    obj.GetComponent<TGrid>().SetItem(items[index]);
+                    if (obj.TryGetComponent(out TGrid grid))
+                    {
+                        grid.SetItem(items[index]);
+                    }
+
                     if (grids.ContainsKey(index))
                     {
-                        grids[index] = obj;
+                        grids[index] = grid;
                     }
                     else
                     {

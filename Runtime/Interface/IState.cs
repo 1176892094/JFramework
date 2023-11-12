@@ -16,10 +16,26 @@ namespace JFramework.Interface
     public interface IState : IEnter, IUpdate, IExit
     {
         /// <summary>
+        /// 状态是否活跃
+        /// </summary>
+        bool isActive { get; }
+
+        /// <summary>
         /// 状态的初始化方法
         /// </summary>
-        /// <param name="owner">状态的所有者</param>
         /// <param name="machine">状态机</param>
-        void OnAwake(ICharacter owner, IStateMachine machine);
+        void OnAwake(IStateMachine machine);
+    }
+
+    /// <summary>
+    /// 泛型状态接口
+    /// </summary>
+    /// <typeparam name="T">传入状态的所有者</typeparam>
+    public interface IState<out T> : IState where T : IEntity
+    {
+        /// <summary>
+        /// 泛型状态机
+        /// </summary>
+        IStateMachine<T> machine { get; }
     }
 }

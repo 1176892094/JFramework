@@ -33,7 +33,13 @@ namespace JFramework
                 var attribute = field.GetCustomAttribute<InjectAttribute>(true);
                 if (attribute == null) continue;
 
-                var target = inject.transform.GetChild(attribute.name);
+                var fieldName = attribute.name;
+                if (string.IsNullOrEmpty(fieldName))
+                {
+                    fieldName = char.ToUpper(field.Name[0]) + field.Name[1..];
+                }
+                
+                var target = inject.transform.GetChild(fieldName);
                 if (target == null) continue;
 
                 var component = target.GetComponent(field.FieldType);
@@ -42,16 +48,16 @@ namespace JFramework
                     field.SetValue(inject, component);
                 }
 
-                var method = type.GetMethod(attribute.name, Reflection.Instance);
+                var method = type.GetMethod(fieldName, Reflection.Instance);
                 if (method == null) continue;
 
                 if (target.TryGetComponent(out Button button) && component == button)
                 {
-                    inject.SetButton(attribute.name, button);
+                    inject.SetButton(fieldName, button);
                 }
                 else if (target.TryGetComponent(out Toggle toggle) && component == toggle)
                 {
-                    inject.SetToggle(attribute.name, toggle);
+                    inject.SetToggle(fieldName, toggle);
                 }
             }
         }

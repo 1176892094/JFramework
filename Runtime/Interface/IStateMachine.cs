@@ -10,8 +10,17 @@
 
 namespace JFramework.Interface
 {
+    /// <summary>
+    /// 状态机接口
+    /// </summary>
     public interface IStateMachine
     {
+        /// <summary>
+        /// 状态机是否为指定类型状态
+        /// </summary>
+        /// <typeparam name="TState"></typeparam>
+        bool IsActive<TState>() where TState : IState, new();
+
         /// <summary>
         /// 状态机添加状态
         /// </summary>
@@ -37,5 +46,13 @@ namespace JFramework.Interface
         /// <param name="duration">延迟时间</param>
         /// <typeparam name="TState">可传入任何继承IState的对象</typeparam>
         void ChangeState<TState>(float duration) where TState : IState;
+    }
+
+    /// <summary>
+    /// 泛型状态机接口
+    /// </summary>
+    /// <typeparam name="T">传入状态机的所有者</typeparam>
+    public interface IStateMachine<out T> : IController<T>, IStateMachine where T : IEntity
+    {
     }
 }

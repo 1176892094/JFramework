@@ -27,15 +27,16 @@ namespace JFramework.Core
         /// <summary>
         /// 全局控制器容器
         /// </summary>
-        public static readonly Dictionary<ICharacter, Components> characters = new Dictionary<ICharacter, Components>();
+        public static readonly Dictionary<IEntity, Components> characters = new Dictionary<IEntity, Components>();
 
         /// <summary>
         /// 注册并返回控制器
         /// </summary>
         /// <param name="character"></param>
+        /// <param name="action"></param>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
-        public static T Register<T>(ICharacter character) where T : ScriptableObject, IController
+        public static void Register<T>(IEntity character, Action<T> action) where T : ScriptableObject, IController
         {
             if (!characters.TryGetValue(character, out Components components))
             {
@@ -48,6 +49,26 @@ namespace JFramework.Core
                 var component = ScriptableObject.CreateInstance<T>();
                 components.Add(typeof(T), component);
                 component.Register(character);
+                action?.Invoke(component);
+            }
+        }
+
+        /// <summary>
+        /// 获取控制器
+        /// </summary>
+        /// <param name="character"></param>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
+        public static T Get<T>(IEntity character) where T : ScriptableObject, IController
+        {
+            if (!characters.TryGetValue(character, out Components components))
+            {
+                return default;
+            }
+
+            if (!components.ContainsKey(typeof(T)))
+            {
+                return default;
             }
 
             return (T)characters[character][typeof(T)];
@@ -57,7 +78,7 @@ namespace JFramework.Core
         /// 销毁指定控制器
         /// </summary>
         /// <param name="character"></param>
-        public static void UnRegister(ICharacter character)
+        public static void UnRegister(IEntity character)
         {
             if (characters.TryGetValue(character, out Components components))
             {
@@ -79,7 +100,7 @@ namespace JFramework.Core
             var copies = characters.Keys.ToList();
             foreach (var character in copies)
             {
-                character.Destroy();
+                character.UnRegister();
             }
 
             characters.Clear();

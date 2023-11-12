@@ -16,7 +16,7 @@ namespace JFramework.Interface
     /// 格子对象
     /// </summary>
     /// <typeparam name="T">可以传入任何数据源</typeparam>
-    public interface IGrid<T> : IDisposable where T : IItem
+    public interface IGrid<T> : IEntity, IDisposable
     {
         /// <summary>
         /// 格子数据
@@ -28,33 +28,10 @@ namespace JFramework.Interface
         /// </summary>
         /// <param name="item">传入数据源</param>
         void SetItem(T item);
-    }
 
-    /// <summary>
-    /// 格子拓展
-    /// </summary>
-    public static partial class Extensions
-    {
         /// <summary>
-        /// 更新格子对象
+        /// 选中格子
         /// </summary>
-        /// <param name="grids"></param>
-        /// <param name="items"></param>
-        /// <typeparam name="TGird"></typeparam>
-        /// <typeparam name="TItem"></typeparam>
-        public static void Update<TGird, TItem>(this TGird[] grids, TItem[] items) where TGird : IGrid<TItem> where TItem : IItem
-        {
-            for (int i = 0; i < grids.Length; i++)
-            {
-                if (grids[i].item != null)
-                {
-                    grids[i].SetItem(items[i]);
-                }
-                else
-                {
-                    grids[i].Dispose();
-                }
-            }
-        }
+        void Select();
     }
 }

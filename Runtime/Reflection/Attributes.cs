@@ -29,6 +29,8 @@ namespace JFramework
     public class InjectAttribute : Attribute
     {
         public readonly string name;
+        
+        public InjectAttribute() => name = "";
 
         public InjectAttribute(string name) => this.name = name;
     }

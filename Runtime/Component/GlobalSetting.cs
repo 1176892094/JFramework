@@ -22,7 +22,7 @@ namespace JFramework.Core
     public sealed partial class GlobalManager
     {
         [ShowInInspector, LabelText("游戏组件列表"), FoldoutGroup("对象池管理器")]
-        private Dictionary<ICharacter, Components> characters => ControllerManager.characters;
+        private Dictionary<IEntity, Components> characters => ControllerManager.characters;
 
         [ShowInInspector, LabelText("游戏对象数据"), FoldoutGroup("对象池管理器")]
         private Dictionary<string, IPool> pools => PoolManager.pools;

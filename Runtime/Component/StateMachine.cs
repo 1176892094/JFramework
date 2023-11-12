@@ -20,9 +20,9 @@ namespace JFramework
     /// <summary>
     /// 状态机类
     /// </summary>
-    /// <typeparam name="TCharacter"></typeparam>
+    /// <typeparam name="T"></typeparam>
     [Serializable]
-    public abstract class StateMachine<TCharacter> : Controller<TCharacter>, IStateMachine where TCharacter : ICharacter
+    public abstract class StateMachine<T> : Controller<T>, IStateMachine<T> where T : IEntity
     {
         /// <summary>
         /// 存储状态的字典
@@ -32,12 +32,22 @@ namespace JFramework
         /// <summary>
         /// 状态的接口
         /// </summary>
-        protected IState state;
+        private IState state;
 
         /// <summary>
         /// 状态机更新
         /// </summary>
-        public virtual void OnUpdate() => state?.OnUpdate();
+        public void OnUpdate() => state?.OnUpdate();
+
+        /// <summary>
+        /// 状态机是否为指定状态
+        /// </summary>
+        /// <typeparam name="TState"></typeparam>
+        /// <returns></returns>
+        public bool IsActive<TState>() where TState : IState, new()
+        {
+            return states.TryGetValue(typeof(TState), out var state) && state.isActive;
+        }
 
         /// <summary>
         /// 状态机添加状态
@@ -46,7 +56,7 @@ namespace JFramework
         public void AddState<TState>() where TState : IState, new()
         {
             var state = new TState();
-            state.OnAwake(owner, this);
+            state.OnAwake(this);
             states[typeof(TState)] = state;
         }
 
@@ -58,7 +68,7 @@ namespace JFramework
         public void AddState<TState, TValue>() where TState : IState where TValue : IState, new()
         {
             var state = new TValue();
-            state.OnAwake(owner, this);
+            state.OnAwake(this);
             states[typeof(TState)] = state;
         }
 
