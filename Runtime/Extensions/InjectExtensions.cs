@@ -9,6 +9,7 @@
 // *********************************************************************************
 
 using System.Reflection;
+using JFramework.Core;
 using JFramework.Interface;
 using UnityEngine;
 using UnityEngine.UI;
@@ -39,25 +40,33 @@ namespace JFramework
                     fieldName = char.ToUpper(field.Name[0]) + field.Name[1..];
                 }
 
-                var target = inject.transform.GetChild(fieldName);
-                if (target == null) continue;
-
-                var component = target.GetComponent(field.FieldType);
-                if (component != null)
+                if (typeof(IController).IsAssignableFrom(field.FieldType))
                 {
-                    field.SetValue(inject, component);
+                    var obj = ControllerManager.Register(inject, field.FieldType);
+                    field.SetValue(inject, obj);
                 }
-
-                var method = type.GetMethod(fieldName, Reflection.Instance);
-                if (method == null) continue;
-
-                if (target.TryGetComponent(out Button button) && component == button)
+                else
                 {
-                    inject.SetButton(fieldName, button);
-                }
-                else if (target.TryGetComponent(out Toggle toggle) && component == toggle)
-                {
-                    inject.SetToggle(fieldName, toggle);
+                    var target = inject.transform.GetChild(fieldName);
+                    if (target == null) continue;
+
+                    var component = target.GetComponent(field.FieldType);
+                    if (component != null)
+                    {
+                        field.SetValue(inject, component);
+                    }
+
+                    var method = type.GetMethod(fieldName, Reflection.Instance);
+                    if (method == null) continue;
+
+                    if (target.TryGetComponent(out Button button) && component == button)
+                    {
+                        inject.SetButton(fieldName, button);
+                    }
+                    else if (target.TryGetComponent(out Toggle toggle) && component == toggle)
+                    {
+                        inject.SetToggle(fieldName, toggle);
+                    }
                 }
             }
         }

@@ -28,14 +28,14 @@ namespace JFramework.Core
         /// 全局控制器容器
         /// </summary>
         public static readonly Dictionary<IEntity, Components> entities = new Dictionary<IEntity, Components>();
-
+        
         /// <summary>
         /// 注册并返回控制器
         /// </summary>
         /// <param name="entity"></param>
-        /// <typeparam name="T"></typeparam>
+        /// <param name="type"></param>
         /// <returns></returns>
-        public static T Register<T>(IEntity entity) where T : ScriptableObject, IController
+        public static ScriptableObject Register(IEntity entity, Type type)
         {
             if (!entities.TryGetValue(entity, out Components components))
             {
@@ -43,14 +43,14 @@ namespace JFramework.Core
                 entities.Add(entity, components);
             }
 
-            if (!components.ContainsKey(typeof(T)))
+            if (!components.ContainsKey(type))
             {
-                var component = ScriptableObject.CreateInstance<T>();
-                components.Add(typeof(T), component);
-                component.Register(entity);
+                var component = ScriptableObject.CreateInstance(type);
+                components.Add(type, component);
+                ((IController)component).Register(entity);
             }
 
-            return (T)entities[entity][typeof(T)];
+            return entities[entity][type];
         }
 
         /// <summary>

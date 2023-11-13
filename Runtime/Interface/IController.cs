@@ -21,16 +21,4 @@ namespace JFramework.Interface
         /// <param name="owner"></param>
         void Register(IEntity owner);
     }
-
-    /// <summary>
-    /// 泛型控制器接口
-    /// </summary>
-    /// <typeparam name="T">传入控制器的所有者</typeparam>
-    public interface IController<out T> : IController where T : IEntity
-    {
-        /// <summary>
-        /// 控制器的所有者
-        /// </summary>
-        T owner { get; }
-    }
 }

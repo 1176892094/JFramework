@@ -20,19 +20,19 @@ namespace JFramework
     public abstract class State<T> : IState where T : IEntity
     {
         /// <summary>
+        /// 状态的所有者
+        /// </summary>
+        public T owner { get; private set; }
+
+        /// <summary>
         /// 基本状态机的接口
         /// </summary>
-        public IStateMachine<T> machine { get; private set; }
+        public IStateMachine machine { get; private set; }
 
         /// <summary>
         /// 状态是否活跃
         /// </summary>
         public bool isActive { get; private set; }
-
-        /// <summary>
-        /// 状态的所有者
-        /// </summary>
-        public T owner => machine.owner;
 
         /// <summary>
         /// 状态初始化
@@ -59,10 +59,12 @@ namespace JFramework
         /// <summary>
         /// 状态机醒来
         /// </summary>
+        /// <param name="owner"></param>
         /// <param name="machine">基本状态机</param>
-        void IState.OnAwake(IStateMachine machine)
+        void IState.OnAwake(IEntity owner, IStateMachine machine)
         {
-            this.machine = (IStateMachine<T>)machine;
+            this.owner = (T)owner;
+            this.machine = machine;
             OnAwake();
         }
 

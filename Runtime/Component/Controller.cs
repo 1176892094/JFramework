@@ -19,7 +19,7 @@ namespace JFramework
     /// 控制器的抽象类
     /// </summary>
     /// <typeparam name="T">实现了IEntity接口的类型</typeparam>
-    public abstract class Controller<T> : ScriptableObject, IController<T> where T : IEntity
+    public abstract class Controller<T> : ScriptableObject, IController where T : IEntity
     {
         /// <summary>
         /// 控制器的所有者

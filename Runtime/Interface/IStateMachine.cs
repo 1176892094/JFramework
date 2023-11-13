@@ -47,12 +47,4 @@ namespace JFramework.Interface
         /// <typeparam name="TState">可传入任何继承IState的对象</typeparam>
         void ChangeState<TState>(float duration) where TState : IState;
     }
-
-    /// <summary>
-    /// 泛型状态机接口
-    /// </summary>
-    /// <typeparam name="T">传入状态机的所有者</typeparam>
-    public interface IStateMachine<out T> : IController<T>, IStateMachine where T : IEntity
-    {
-    }
 }

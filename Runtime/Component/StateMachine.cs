@@ -22,7 +22,7 @@ namespace JFramework
     /// </summary>
     /// <typeparam name="T"></typeparam>
     [Serializable]
-    public abstract class StateMachine<T> : Controller<T>, IStateMachine<T> where T : IEntity
+    public abstract class StateMachine<T> : Controller<T>, IStateMachine where T : IEntity
     {
         /// <summary>
         /// 存储状态的字典
@@ -56,7 +56,7 @@ namespace JFramework
         public void AddState<TState>() where TState : IState, new()
         {
             var state = new TState();
-            state.OnAwake(this);
+            state.OnAwake(owner, this);
             states[typeof(TState)] = state;
         }
 
@@ -68,7 +68,7 @@ namespace JFramework
         public void AddState<TState, TValue>() where TState : IState where TValue : IState, new()
         {
             var state = new TValue();
-            state.OnAwake(this);
+            state.OnAwake(owner, this);
             states[typeof(TState)] = state;
         }
 

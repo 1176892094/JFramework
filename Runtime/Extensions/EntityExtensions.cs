@@ -43,7 +43,7 @@ namespace JFramework
         /// <param name="entity"></param>
         public static T Get<T>(this IEntity entity) where T : ScriptableObject, IController
         {
-            return ControllerManager.Register<T>(entity);
+            return (T)ControllerManager.Register(entity, typeof(T));
         }
 
         /// <summary>

@@ -18,13 +18,18 @@ namespace JFramework
     /// 实体的抽象类
     /// </summary>
     [Serializable]
-    public abstract class Entity : MonoBehaviour, IEntity
+    public abstract class Entity : MonoBehaviour, IInject
     {
+        /// <summary>
+        /// 实体初始化注入
+        /// </summary>
+        protected virtual void Awake() => this.Inject();
+
         /// <summary>
         /// 实体启用
         /// </summary>
         protected virtual void OnEnable() => GetComponent<IUpdate>()?.Listen();
-        
+
         /// <summary>
         /// 实体禁用
         /// </summary>
