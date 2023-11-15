@@ -11,6 +11,9 @@
 using System.IO;
 using Sirenix.OdinInspector;
 using UnityEngine;
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 
 // ReSharper disable All
 
@@ -18,25 +21,32 @@ namespace JFramework
 {
     internal class GlobalSetting
     {
+        /// <summary>
+        /// 单例自身
+        /// </summary>
         private static GlobalSetting instance;
 
+        /// <summary>
+        /// 安全的单例调用
+        /// </summary>
         public static GlobalSetting Instance
         {
             get
             {
                 if (instance != null) return instance;
                 var asset = Resources.Load<TextAsset>(nameof(GlobalSetting));
-                var json = asset != null ? asset.text : string.Empty;
+                var contents = asset != null ? asset.text : string.Empty;
 #if UNITY_EDITOR
-                if (string.IsNullOrEmpty(json))
+                if (string.IsNullOrEmpty(contents))
                 {
                     instance = new GlobalSetting();
-                    json = JsonUtility.ToJson(instance);
-                    File.WriteAllText(UnityEditor.AssetDatabase.GetAssetPath(asset), json);
+                    contents = JsonUtility.ToJson(instance);
+                    var path = AssetDatabase.GetAssetPath(asset);
+                    File.WriteAllText(path, contents);
                     return instance;
                 }
 #endif
-                instance = JsonUtility.FromJson<GlobalSetting>(json);
+                instance = JsonUtility.FromJson<GlobalSetting>(contents);
                 return instance;
             }
         }
@@ -44,16 +54,7 @@ namespace JFramework
         /// <summary>
         /// 构建平台
         /// </summary>
-        public AssetPlatform platform =
-#if UNITY_STANDALONE_WIN
-            AssetPlatform.StandaloneWindows;
-#elif UNITY_STANDALONE_OSX
-            AssetPlatform.StandaloneOSX;
-#elif UNITY_ANDROID
-            AssetPlatform.Android;
-#elif UNITY_IPHONE
-            AssetPlatform.IOS;
-#endif
+        public AssetPlatform platform = AssetPlatform.StandaloneWindows;
 
         /// <summary>
         /// AssetBundle 校验文件名称
@@ -69,11 +70,6 @@ namespace JFramework
         /// 存放UI的AB包
         /// </summary>
         public string UIBundle = "Prefabs";
-        
-        /// <summary>
-        /// 存放场景的AB包
-        /// </summary>
-        public string sceneBundle = "Scenes";
 
         /// <summary>
         /// 存放音效的AB包
@@ -81,73 +77,104 @@ namespace JFramework
         public string audioBundle = "Audios";
 
         /// <summary>
-        /// 存放ScriptableObject的AB包
+        /// 存放场景的AB包
         /// </summary>
-        public string settingBundle = "Settings";
-        
-        /// <summary>
-        /// 客户端校验文件名称
-        /// </summary>
-        [ShowInInspector]
-        public static string clientInfoName => $"{Instance.assetInfo}.json";
+        public string sceneBundle = "Scenes";
 
         /// <summary>
         /// 客户端校验文件名称
         /// </summary>
         [ShowInInspector]
-        private static string remoteInfoName => $"{Instance.assetInfo}_TMP.json";
+        public static string clientInfoName => Instance.assetInfo + ".json";
+
+        /// <summary>
+        /// 客户端校验文件名称
+        /// </summary>
+        [ShowInInspector]
+        private static string remoteInfoName => Instance.assetInfo + "_TMP.json";
 
         /// <summary>
         /// 客户端校对文件路径
         /// </summary>
         [ShowInInspector]
-        public static string clientInfoPath => $"{Application.persistentDataPath}/{clientInfoName}";
+        public static string clientInfoPath => GetPersistentPath(clientInfoName);
 
         /// <summary>
         /// 服务器校对文件路径
         /// </summary>
         [ShowInInspector]
-        public static string remoteInfoPath => $"{Application.persistentDataPath}/{remoteInfoName}";
+        public static string remoteInfoPath => GetPersistentPath(remoteInfoName);
 
         /// <summary>
         /// 本地校验文件路径
         /// </summary>
         [ShowInInspector]
-        public static string streamingInfoPath =>
-#if UNITY_ANDROID && !UNITY_EDITOR
-            $"file://{Application.streamingAssetsPath}/{Instance.platform}/{clientInfoName}";
-#else
-            $"{Application.streamingAssetsPath}/{Instance.platform}/{clientInfoName}";
-#endif
+        public static string streamingInfoPath => GetStreamingPath(clientInfoName);
+
+        /// <summary>
+        /// 获取UI资源
+        /// </summary>
+        /// <param name="assetName"></param>
+        /// <returns></returns>
+        public static string GetUIPath(string assetName) => Instance.UIBundle + "/" + assetName;
+
+        /// <summary>
+        /// 获取音乐资源
+        /// </summary>
+        /// <param name="assetName"></param>
+        /// <returns></returns>
+        public static string GetAudioPath(string assetName) => Instance.audioBundle + "/" + assetName;
+
+        /// <summary>
+        /// 获取场景资源
+        /// </summary>
+        /// <param name="assetName"></param>
+        /// <returns></returns>
+        public static string GetScenePath(string assetName) => Instance.sceneBundle + "/" + assetName;
 
         /// <summary>
         /// 根据 persistentDataPath 获取文件
         /// </summary>
         /// <param name="fileName"></param>
         /// <returns></returns>
-        public static string GetPersistentPath(string fileName) => $"{Application.persistentDataPath}/{fileName}";
+        public static string GetPersistentPath(string fileName) => Path.Combine(Application.persistentDataPath, fileName);
 
         /// <summary>
         /// 根据 streamingAssetsPath 获取文件
         /// </summary>
         /// <param name="fileName"></param>
         /// <returns></returns>
-        public static string GetStreamingPath(string fileName) => $"{Application.streamingAssetsPath}/{Instance.platform}/{fileName}";
+        public static string GetStreamingPath(string fileName)
+        {
+#if !UNITY_EDITOR && UNITY_ANDROID
+            return Path.Combine(Application.streamingAssetsPath, GetPlatform(fileName));
+#else
+            return Path.Combine("file://" + Application.streamingAssetsPath, GetPlatform(fileName));
+#endif
+        }
 
         /// <summary>
         /// 获取远端文件
         /// </summary>
         /// <param name="fileName"></param>
         /// <returns></returns>
-        public static string GetRemoteFilePath(string fileName) => $"{Instance.remotePath}/{Instance.platform}/{fileName}";
+        public static string GetRemoteFilePath(string fileName) => Path.Combine(Instance.remotePath, GetPlatform(fileName));
+
+        /// <summary>
+        /// 获取资源平台
+        /// </summary>
+        /// <param name="fileName"></param>
+        /// <returns></returns>
+        public static string GetPlatform(string fileName) => Path.Combine(Instance.platform.ToString(), fileName);
 
 #if UNITY_EDITOR
         [Button("保存设置")]
         public void Save()
         {
             var asset = Resources.Load<TextAsset>(nameof(GlobalSetting));
-            var json = JsonUtility.ToJson(instance);
-            File.WriteAllText(UnityEditor.AssetDatabase.GetAssetPath(asset), json);
+            var contents = JsonUtility.ToJson(instance);
+            var path = AssetDatabase.GetAssetPath(asset);
+            File.WriteAllText(path, contents);
         }
 #endif
     }

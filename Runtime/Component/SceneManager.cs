@@ -33,26 +33,22 @@ namespace JFramework.Core
         /// <param name="name">场景名称</param>
         /// <param name="action"></param>
         /// <returns>返回场景加载迭代器</returns>
-        public static void LoadSceneAsync(string name, Action action = null)
+        public static async void LoadSceneAsync(string name, Action action = null)
         {
             try
             {
                 if (!GlobalManager.Runtime) return;
-                AssetManager.LoadSceneAsync(GlobalSetting.Instance.sceneBundle + "/" + name, LoadProgress);
-
-                async void LoadProgress(AsyncOperation operation)
+                var localTime = Time.time;
+                var operation = await AssetManager.LoadSceneAsync(GlobalSetting.GetScenePath(name));
+                while (!operation.isDone && GlobalManager.Runtime)
                 {
-                    var localTime = Time.time;
-                    while (!operation.isDone && GlobalManager.Runtime)
-                    {
-                        OnLoadProgress?.Invoke(operation.progress);
-                        await Task.Yield();
-                    }
-
-                    var totalTime = (Time.time - localTime).ToString("F");
-                    action?.Invoke();
-                    Debug.Log($"异步加载 {name.Green()} 场景完成, 耗时 {totalTime.Yellow()} 秒");
+                    OnLoadProgress?.Invoke(operation.progress);
+                    await Task.Yield();
                 }
+
+                var totalTime = (Time.time - localTime).ToString("F");
+                action?.Invoke();
+                Debug.Log($"异步加载 {name.Green()} 场景完成, 耗时 {totalTime.Yellow()} 秒");
             }
             catch (Exception e)
             {

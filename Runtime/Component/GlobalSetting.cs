@@ -40,7 +40,7 @@ namespace JFramework.Core
         private Dictionary<string, AssetBundle> bundles => AssetManager.bundles;
 
         [ShowInInspector, LabelText("资源加载数据"), FoldoutGroup("基本管理器")]
-        private Dictionary<string, AssetManager.AssetInfo> assets => AssetManager.assets;
+        private Dictionary<string, AssetInfo> assets => AssetManager.assets;
 
         [ShowInInspector, LabelText("用户界面管理"), FoldoutGroup("面板管理器")]
         private Dictionary<Type, IPanel> panels => UIManager.panels;

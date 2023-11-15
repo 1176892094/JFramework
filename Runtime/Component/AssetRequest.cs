@@ -41,10 +41,19 @@ namespace JFramework
         private static readonly List<string> assetDataList = new List<string>();
 
         /// <summary>
-        /// 资源加载进度
+        /// 当开始下载资源(资源数量)
         /// </summary>
-        public static event Action<string, float> OnLoadProgress;
+        public static event Action<int> OnLoadStart;
 
+        /// <summary>
+        /// 资源加载进度(资源名称，加载进度)
+        /// </summary>
+        public static event Action<string, float> OnLoadUpdate;
+
+        /// <summary>
+        /// 当资源下载完成
+        /// </summary>
+        public static event Action OnLoadComplete;
 
         /// <summary>
         /// 检测是否需要更新
@@ -59,20 +68,20 @@ namespace JFramework
             var success = await GetRemoteInfo();
             if (success)
             {
+                Debug.Log("解析远端对比文件完成");
                 var remoteInfo = await File.ReadAllTextAsync(GlobalSetting.remoteInfoPath);
                 var jsonData = JsonConvert.DeserializeObject<List<AssetData>>(remoteInfo);
                 remoteDataList = jsonData.ToDictionary(data => data.name);
-                Debug.Log("解析远端对比文件完成");
 
-                if (File.Exists(GlobalSetting.clientInfoPath))
+                if (await HeadRequest(GlobalSetting.clientInfoPath))
                 {
-                    var clientInfo = await File.ReadAllTextAsync(GlobalSetting.clientInfoPath);
+                    var clientInfo = await GetRequest(GlobalSetting.clientInfoPath);
                     jsonData = JsonConvert.DeserializeObject<List<AssetData>>(clientInfo);
                     clientDataList = jsonData.ToDictionary(data => data.name);
                 }
-                else if (File.Exists(GlobalSetting.streamingInfoPath))
+                else if (await HeadRequest(GlobalSetting.streamingInfoPath))
                 {
-                    var clientInfo = await File.ReadAllTextAsync(GlobalSetting.streamingInfoPath);
+                    var clientInfo = await GetRequest(GlobalSetting.streamingInfoPath);
                     jsonData = JsonConvert.DeserializeObject<List<AssetData>>(clientInfo);
                     clientDataList = jsonData.ToDictionary(data => data.name);
                 }
@@ -95,19 +104,18 @@ namespace JFramework
                     }
                 }
 
-                Debug.Log("删除无用的AB包文件");
+                Debug.Log("删除弃用的资源文件");
                 var files = clientDataList.Keys.Where(file => File.Exists(GlobalSetting.GetPersistentPath(file)));
                 foreach (var file in files)
                 {
                     File.Delete(GlobalSetting.GetPersistentPath(file));
                 }
 
-                Debug.Log("下载和更新AB包文件");
                 success = await GetAssetBundles();
                 if (success)
                 {
-                    Debug.Log("更新本地AB包对比文件为最新");
                     await File.WriteAllTextAsync(GlobalSetting.clientInfoPath, remoteInfo);
+                    OnLoadComplete?.Invoke();
                     return true;
                 }
             }
@@ -125,7 +133,11 @@ namespace JFramework
             var success = false;
             while (!success && reloads-- > 0)
             {
-                success = await GetRequest(GlobalSetting.clientInfoName, GlobalSetting.remoteInfoPath);
+                var fileUri = GlobalSetting.GetRemoteFilePath(GlobalSetting.clientInfoName);
+                if (!await HeadRequest(fileUri)) continue;
+                var contents = await GetRequest(fileUri);
+                await File.WriteAllTextAsync(GlobalSetting.remoteInfoPath, contents);
+                success = true;
             }
 
             return success;
@@ -137,15 +149,18 @@ namespace JFramework
         private static async Task<bool> GetAssetBundles()
         {
             var reloads = 5;
-            var curProgress = 0f;
-            var maxProgress = assetDataList.Count;
             var copyList = assetDataList.ToList();
+            OnLoadStart?.Invoke(assetDataList.Count);
             while (assetDataList.Count > 0 && reloads-- > 0)
             {
                 foreach (var fileName in copyList)
                 {
-                    var success = await GetRequest(fileName, GlobalSetting.GetPersistentPath(fileName), curProgress++, maxProgress);
-                    if (!success) continue;
+                    var fileUri = GlobalSetting.GetRemoteFilePath(fileName);
+                    if (!await HeadRequest(fileUri)) continue;
+                    var contents = await GetRequest(fileUri, fileName);
+                    if (contents == null) continue;
+                    var path = GlobalSetting.GetPersistentPath(fileName);
+                    await File.WriteAllBytesAsync(path, contents);
                     if (assetDataList.Contains(fileName))
                     {
                         assetDataList.Remove(fileName);
@@ -157,57 +172,60 @@ namespace JFramework
         }
 
         /// <summary>
-        /// 下载文件
+        /// 获取Head请求
         /// </summary>
-        /// <param name="fileName"></param>
-        /// <param name="localPath"></param>
-        /// <param name="curProgress"></param>
-        /// <param name="maxProgress"></param>
+        /// <param name="fileUri"></param>
         /// <returns></returns>
-        private static async Task<bool> GetRequest(string fileName, string localPath, float curProgress = 0, float maxProgress = 0)
+        private static async Task<bool> HeadRequest(string fileUri)
         {
-            var fileUri = GlobalSetting.GetRemoteFilePath(fileName);
-            using (var request = UnityWebRequest.Head(fileUri))
-            {
-                request.timeout = 1;
-                var result = request.SendWebRequest();
-                while (!result.isDone && GlobalManager.Runtime)
-                {
-                    await Task.Yield();
-                }
+            using var request = UnityWebRequest.Head(fileUri);
+            request.timeout = 1;
+            await request.SendWebRequest();
+            return request.result == UnityWebRequest.Result.Success;
+        }
 
-                if (request.result != UnityWebRequest.Result.Success)
-                {
-                    Debug.Log($"下载 {fileName} 文件失败\n");
-                    return false;
-                }
+        /// <summary>
+        /// 获取对比文件请求
+        /// </summary>
+        /// <param name="fileUri"></param>
+        /// <returns></returns>
+        private static async Task<string> GetRequest(string fileUri)
+        {
+            using var request = UnityWebRequest.Get(fileUri);
+            await request.SendWebRequest();
+            if (request.result != UnityWebRequest.Result.Success)
+            {
+                Debug.Log($"下载 对比文件 失败\n");
+                return null;
             }
 
-            using (var request = UnityWebRequest.Get(fileUri))
+            return request.downloadHandler.text;
+        }
+
+        /// <summary>
+        /// 下载文件请求
+        /// </summary>
+        /// <param name="fileUri"></param>
+        /// <param name="fileName"></param>
+        /// <returns></returns>
+        private static async Task<byte[]> GetRequest(string fileUri, string fileName)
+        {
+            using var request = UnityWebRequest.Get(fileUri);
+            var result = request.SendWebRequest();
+            while (!result.isDone && GlobalManager.Runtime)
             {
-                var result = request.SendWebRequest();
-                while (!result.isDone && GlobalManager.Runtime)
-                {
-                    if (maxProgress != 0)
-                    {
-                        var value = curProgress / maxProgress + request.downloadProgress / maxProgress;
-                        OnLoadProgress?.Invoke(fileName, Math.Clamp(value, 0f, 1f));
-                    }
-
-                    await Task.Yield();
-                }
-
-                if (request.result != UnityWebRequest.Result.Success)
-                {
-                    Debug.Log($"下载 {fileName} 文件失败\n");
-                    return false;
-                }
-
-                await File.WriteAllBytesAsync(localPath, request.downloadHandler.data);
-                Debug.Log($"下载 {fileName} 文件成功");
+                OnLoadUpdate?.Invoke(fileName, request.downloadProgress);
+                await Task.Yield();
             }
 
-            return true;
+            OnLoadUpdate?.Invoke(fileName, 1);
+            if (request.result != UnityWebRequest.Result.Success)
+            {
+                Debug.Log($"下载 {fileName} 文件失败\n");
+                return null;
+            }
+
+            return request.downloadHandler.data;
         }
     }
 }

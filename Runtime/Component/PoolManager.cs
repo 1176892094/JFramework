@@ -123,6 +123,7 @@ namespace JFramework.Core
                 }
             }
 
+
             AssetManager.LoadAsync<GameObject>(path, obj =>
             {
                 obj.name = path;

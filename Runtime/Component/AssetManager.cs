@@ -10,10 +10,10 @@
 
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using UnityEngine;
+using UnityEngine.Networking;
 using UnityEngine.SceneManagement;
 using Debug = UnityEngine.Debug;
 using Object = UnityEngine.Object;
@@ -27,33 +27,9 @@ namespace JFramework.Core
     public static class AssetManager
     {
         /// <summary>
-        /// 资源信息
+        /// 存储AB包的名称和资源
         /// </summary>
-        [Serializable]
-        internal struct AssetInfo
-        {
-            /// <summary>
-            /// 所在资源包名称
-            /// </summary>
-            public string bundleName;
-
-            /// <summary>
-            /// 资源名称
-            /// </summary>
-            public string assetName;
-
-            /// <summary>
-            /// 分割包名和资源名
-            /// </summary>
-            /// <param name="path"></param>
-            public AssetInfo(string path)
-            {
-                var array = path.Split('/');
-                bundleName = array[0].ToLower();
-                assetName = array[1];
-                assets.Add(path, this);
-            }
-        }
+        internal static readonly Dictionary<string, AssetInfo> assets = new Dictionary<string, AssetInfo>();
 
         /// <summary>
         /// 存储AB包的字典
@@ -61,9 +37,9 @@ namespace JFramework.Core
         internal static readonly Dictionary<string, AssetBundle> bundles = new Dictionary<string, AssetBundle>();
 
         /// <summary>
-        /// 存储AB包的名称和资源
+        /// 异步加载AB包的任务
         /// </summary>
-        internal static readonly Dictionary<string, AssetInfo> assets = new Dictionary<string, AssetInfo>();
+        private static readonly Dictionary<string, Task<AssetBundle>> tasks = new Dictionary<string, Task<AssetBundle>>();
 
         /// <summary>
         /// 主包
@@ -76,48 +52,82 @@ namespace JFramework.Core
         private static AssetBundleManifest manifest;
 
         /// <summary>
-        /// 加载指定包的依赖包
+        /// 异步加载AB依赖包
         /// </summary>
-        /// <param name="bundleName"></param>
-        private static void LoadDependencies(string bundleName)
+        /// <param name="bundle"></param>
+        private static async Task LoadDependency(string bundle)
         {
-            if (mainAsset == null)
-            {
-                mainAsset = LoadFromFile(GlobalSetting.Instance.platform.ToString());
-                manifest = mainAsset.LoadAsset<AssetBundleManifest>(nameof(AssetBundleManifest));
-            }
-
-            var dependencies = manifest.GetAllDependencies(bundleName);
+            if (mainAsset != null) return;
+            mainAsset = await LoadAssetBundleTask(GlobalSetting.Instance.platform.ToString());
+            manifest = mainAsset.LoadAsset<AssetBundleManifest>(nameof(AssetBundleManifest));
+            var dependencies = manifest.GetAllDependencies(bundle);
             foreach (var dependency in dependencies)
             {
                 if (!bundles.ContainsKey(dependency))
                 {
-                    bundles.Add(dependency, LoadFromFile(dependency));
+                    await LoadAssetBundleTask(dependency);
                 }
             }
         }
 
         /// <summary>
-        /// 根据路径加载
+        /// 异步加载AB包任务
         /// </summary>
-        /// <param name="path"></param>
-        /// <typeparam name="T"></typeparam>
+        /// <param name="bundle"></param>
         /// <returns></returns>
-        public static T Load<T>(string path) where T : Object
+        private static async Task<AssetBundle> LoadAssetBundleTask(string bundle)
         {
-            if (!GlobalManager.Runtime) return null;
-#if UNITY_EDITOR
-            if (!AssetSetting.Instance.isRemote)
+            if (tasks.TryGetValue(bundle, out var task))
             {
-                return AssetSetting.Instance.Load<T>(path);
-            }
-#endif
-            if (!assets.TryGetValue(path, out var assetData))
-            {
-                assetData = new AssetInfo(path);
+                return await task;
             }
 
-            return Load<T>(assetData.bundleName, assetData.assetName);
+            var newTask = LoadAssetBundleAsync(bundle);
+            tasks[bundle] = newTask;
+
+            try
+            {
+                return await newTask;
+            }
+            finally
+            {
+                tasks.Remove(bundle);
+            }
+        }
+
+        /// <summary>
+        /// 异步加载AB包
+        /// </summary>
+        /// <param name="bundle"></param>
+        /// <returns></returns>
+        private static async Task<AssetBundle> LoadAssetBundleAsync(string bundle)
+        {
+            var path = GlobalSetting.GetPersistentPath(bundle);
+            using (var request = UnityWebRequestAssetBundle.GetAssetBundle(path))
+            {
+                await request.SendWebRequest();
+                if (request.result == UnityWebRequest.Result.Success)
+                {
+                    var assetBundle = DownloadHandlerAssetBundle.GetContent(request);
+                    bundles.Add(bundle, assetBundle);
+                    return assetBundle;
+                }
+            }
+
+            path = GlobalSetting.GetStreamingPath(bundle);
+            using (var request = UnityWebRequestAssetBundle.GetAssetBundle(path))
+            {
+                await request.SendWebRequest();
+                if (request.result == UnityWebRequest.Result.Success)
+                {
+                    var assetBundle = DownloadHandlerAssetBundle.GetContent(request);
+                    bundles.Add(bundle, assetBundle);
+                    return assetBundle;
+                }
+            }
+
+            Debug.LogWarning($"加载 {bundle} 资源包失败");
+            return null;
         }
 
         /// <summary>
@@ -142,24 +152,40 @@ namespace JFramework.Core
                 assetData = new AssetInfo(path);
             }
 
-            var asset = await LoadAsync<T>(assetData.bundleName, assetData.assetName);
-            action?.Invoke(asset);
+            await LoadDependency(assetData.bundle);
+            if (!bundles.TryGetValue(assetData.bundle, out var assetBundle))
+            {
+                assetBundle = await LoadAssetBundleTask(assetData.bundle);
+                if (assetBundle == null)
+                {
+                    return;
+                }
+            }
+
+            if (typeof(T).IsSubclassOf(typeof(Component)))
+            {
+                var obj = assetBundle.LoadAssetAsync<GameObject>(assetData.asset);
+                action?.Invoke(((GameObject)Object.Instantiate(obj.asset)).GetComponent<T>());
+            }
+            else
+            {
+                var obj = assetBundle.LoadAssetAsync<T>(assetData.asset);
+                action?.Invoke(obj.asset is GameObject ? (T)Object.Instantiate(obj.asset) : (T)obj.asset);
+            }
         }
 
         /// <summary>
         /// 根据路径加载
         /// </summary>
         /// <param name="path"></param>
-        /// <param name="action"></param>
         /// <returns></returns>
-        internal static async void LoadSceneAsync(string path, Action<AsyncOperation> action = null)
+        internal static async Task<AsyncOperation> LoadSceneAsync(string path)
         {
-            if (!GlobalManager.Runtime) return;
+            if (!GlobalManager.Runtime) return null;
 #if UNITY_EDITOR
             if (!AssetSetting.Instance.isRemote)
             {
-                AssetSetting.Instance.LoadSceneAsync(path, action);
-                return;
+                return UnitySceneManager.LoadSceneAsync(path.Split('/')[1], LoadSceneMode.Single);
             }
 #endif
             if (!assets.TryGetValue(path, out var assetData))
@@ -167,169 +193,34 @@ namespace JFramework.Core
                 assetData = new AssetInfo(path);
             }
 
-            var asset = await LoadSceneAsync(assetData.bundleName, assetData.assetName);
-            action?.Invoke(asset);
-        }
-
-        /// <summary>
-        /// 泛型资源同步加载
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <returns></returns>
-        private static T Load<T>(string bundleName, string assetName) where T : Object
-        {
-            LoadDependencies(bundleName);
-            if (!bundles.TryGetValue(bundleName, out var assetBundle))
+            await LoadDependency(assetData.bundle);
+            if (!bundles.TryGetValue(assetData.bundle, out var assetBundle))
             {
-                assetBundle = LoadFromFile(bundleName);
+                assetBundle = await LoadAssetBundleTask(assetData.bundle);
                 if (assetBundle == null)
                 {
-                    Debug.LogWarning($"加载 {bundleName.Red()} 资源失败");
                     return null;
                 }
-
-                bundles[bundleName] = assetBundle;
             }
 
-            if (typeof(T).IsSubclassOf(typeof(Component)))
-            {
-                var obj = assetBundle.LoadAsset<GameObject>(assetName);
-                return Object.Instantiate(obj).GetComponent<T>();
-            }
-            else
-            {
-                var obj = assetBundle.LoadAsset<T>(assetName);
-                return obj is GameObject ? Object.Instantiate(obj) : obj;
-            }
-        }
-
-        /// <summary>
-        /// 泛型异步加载资源
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="bundleName"></param>
-        /// <param name="assetName"></param>
-        private static async Task<T> LoadAsync<T>(string bundleName, string assetName) where T : Object
-        {
-            LoadDependencies(bundleName);
-            if (!bundles.TryGetValue(bundleName, out var assetBundle))
-            {
-                bundles.Add(bundleName, null);
-                assetBundle = await LoadFromFileAsync(bundleName);
-                if (assetBundle == null)
-                {
-                    bundles.Remove(bundleName);
-                    Debug.LogWarning($"加载 {bundleName.Red()} 资源失败");
-                    return null;
-                }
-
-                bundles[bundleName] = assetBundle;
-            }
-
-            if (typeof(T).IsSubclassOf(typeof(Component)))
-            {
-                var obj = assetBundle.LoadAssetAsync<GameObject>(assetName);
-                return ((GameObject)Object.Instantiate(obj.asset)).GetComponent<T>();
-            }
-            else
-            {
-                var obj = assetBundle.LoadAssetAsync<T>(assetName);
-                return obj.asset is GameObject ? (T)Object.Instantiate(obj.asset) : (T)obj.asset;
-            }
-        }
-
-        /// <summary>
-        /// 异步加载场景
-        /// </summary>
-        /// <param name="bundleName"></param>
-        /// <param name="assetName"></param>
-        private static async Task<AsyncOperation> LoadSceneAsync(string bundleName, string assetName)
-        {
-            LoadDependencies(bundleName);
-            if (!bundles.TryGetValue(bundleName, out var assetBundle))
-            {
-                bundles.Add(bundleName, null);
-                assetBundle = await LoadFromFileAsync(bundleName);
-                if (assetBundle == null)
-                {
-                    bundles.Remove(bundleName);
-                    Debug.LogWarning($"加载 {bundleName.Red()} 资源失败");
-                    return null;
-                }
-
-                bundles[bundleName] = assetBundle;
-            }
-
-            return UnitySceneManager.LoadSceneAsync(assetName, LoadSceneMode.Single);
-        }
-
-        /// <summary>
-        /// 同步加载AB包
-        /// </summary>
-        /// <param name="assetBundle"></param>
-        /// <returns></returns>
-        private static AssetBundle LoadFromFile(string assetBundle)
-        {
-            if (File.Exists(GlobalSetting.GetPersistentPath(assetBundle)))
-            {
-                return AssetBundle.LoadFromFile(GlobalSetting.GetPersistentPath(assetBundle));
-            }
-
-            if (File.Exists(GlobalSetting.GetStreamingPath(assetBundle)))
-            {
-                return AssetBundle.LoadFromFile(GlobalSetting.GetStreamingPath(assetBundle));
-            }
-
-            return null;
-        }
-
-        /// <summary>
-        /// 异步加载AB包路径
-        /// </summary>
-        /// <param name="assetBundle"></param>
-        /// <returns></returns>
-        private static async Task<AssetBundle> LoadFromFileAsync(string assetBundle)
-        {
-            if (File.Exists(GlobalSetting.GetPersistentPath(assetBundle)))
-            {
-                var request = AssetBundle.LoadFromFileAsync(GlobalSetting.GetPersistentPath(assetBundle));
-                while (!request.isDone && GlobalManager.Runtime)
-                {
-                    await Task.Yield();
-                }
-
-                return request.assetBundle;
-            }
-
-            if (File.Exists(GlobalSetting.GetStreamingPath(assetBundle)))
-            {
-                var request = AssetBundle.LoadFromFileAsync(GlobalSetting.GetStreamingPath(assetBundle));
-                while (!request.isDone && GlobalManager.Runtime)
-                {
-                    await Task.Yield();
-                }
-
-                return request.assetBundle;
-            }
-
-            return null;
+            return UnitySceneManager.LoadSceneAsync(assetData.asset, LoadSceneMode.Single);
         }
 
         /// <summary>
         /// 卸载AB包的方法
         /// </summary>
-        /// <param name="bundleName"></param>
-        public static void Unload(string bundleName)
+        /// <param name="labelName"></param>
+        public static void Unload(string labelName)
         {
-            if (bundles.TryGetValue(bundleName, out var assetBundle))
+            if (bundles.TryGetValue(labelName, out var assetBundle))
             {
                 assetBundle.Unload(false);
-                foreach (var asset in assets.Values.Where(asset => asset.bundleName == bundleName))
+                foreach (var asset in assets.Values.Where(asset => asset.bundle == labelName))
                 {
-                    assets.Remove($"{asset.bundleName}/{asset.assetName}");
+                    assets.Remove($"{asset.bundle}/{asset.asset}");
                 }
 
-                bundles.Remove(bundleName);
+                bundles.Remove(labelName);
             }
         }
 
@@ -339,6 +230,7 @@ namespace JFramework.Core
         internal static void Clear()
         {
             AssetBundle.UnloadAllAssetBundles(true);
+            tasks.Clear();
             assets.Clear();
             bundles.Clear();
             manifest = null;

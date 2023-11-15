@@ -37,28 +37,31 @@ namespace JFramework.Core
             {
                 try
                 {
-                    var table = (IDataTable)AssetManager.Load<ScriptableObject>($"DataTable/{type.Name}");
-                    if (type.FullName == null) continue;
-                    var data = assembly.GetType(type.FullName[..^5]);
-                    var field = Reflection.GetField<KeyAttribute>(data);
-                    if (field == null)
+                    AssetManager.LoadAsync<ScriptableObject>($"DataTable/{type.Name}", obj =>
                     {
-                        Debug.LogWarning($"{data.Name.Red()} 缺少主键。");
-                        continue;
-                    }
+                        var table = (IDataTable)obj;
+                        if (type.FullName == null) return;
+                        var data = assembly.GetType(type.FullName[..^5]);
+                        var field = Reflection.GetField<KeyAttribute>(data);
+                        if (field == null)
+                        {
+                            Debug.LogWarning($"{data.Name.Red()} 缺少主键。");
+                            return;
+                        }
 
-                    if (field.FieldType.IsEnum)
-                    {
-                        Data<Enum>.Add(data, field, table);
-                    }
-                    else if (field.FieldType == typeof(int))
-                    {
-                        Data<int>.Add(data, field, table);
-                    }
-                    else if (field.FieldType == typeof(string))
-                    {
-                        Data<string>.Add(data, field, table);
-                    }
+                        if (field.FieldType.IsEnum)
+                        {
+                            Data<Enum>.Add(data, field, table);
+                        }
+                        else if (field.FieldType == typeof(int))
+                        {
+                            Data<int>.Add(data, field, table);
+                        }
+                        else if (field.FieldType == typeof(string))
+                        {
+                            Data<string>.Add(data, field, table);
+                        }
+                    });
                 }
                 catch (Exception e)
                 {

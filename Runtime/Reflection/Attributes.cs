@@ -9,6 +9,7 @@
 // *********************************************************************************
 
 using System;
+using UnityEngine;
 
 // ReSharper disable All
 
@@ -23,7 +24,7 @@ namespace JFramework
     }
 
     /// <summary>
-    /// 根据 对象名称 进行赋值
+    /// 注入组件
     /// </summary>
     [AttributeUsage(AttributeTargets.Field)]
     public class InjectAttribute : Attribute
@@ -33,5 +34,13 @@ namespace JFramework
         public InjectAttribute() => name = "";
 
         public InjectAttribute(string name) => this.name = name;
+    }
+
+    /// <summary>
+    /// 资源路径
+    /// </summary>
+    [AttributeUsage(AttributeTargets.Field)]
+    public class AssetPathAttribute : PropertyAttribute
+    {
     }
 }

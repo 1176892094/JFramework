@@ -15,9 +15,7 @@ using System.IO;
 using Sirenix.OdinInspector;
 using UnityEditor;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 using Object = UnityEngine.Object;
-using UnitySceneManager = UnityEngine.SceneManagement.SceneManager;
 
 // ReSharper disable All
 
@@ -31,7 +29,7 @@ namespace JFramework.Editor
         private static AssetSetting instance;
 
         /// <summary>
-        /// 公开的单例访问
+        /// 安全的单例调用
         /// </summary>
         public static AssetSetting Instance
         {
@@ -39,18 +37,17 @@ namespace JFramework.Editor
             {
                 if (instance != null) return instance;
                 var asset = Resources.Load<TextAsset>(nameof(AssetSetting));
-                var json = asset != null ? asset.text : string.Empty;
-                if (string.IsNullOrEmpty(json))
+                var contents = asset != null ? asset.text : string.Empty;
+                if (string.IsNullOrEmpty(contents))
                 {
                     instance = new AssetSetting();
-                    json = JsonUtility.ToJson(instance);
-                    File.WriteAllText(AssetDatabase.GetAssetPath(asset), json);
-                    EditorSetting.Add(3, "资源", instance);
+                    contents = JsonUtility.ToJson(instance);
+                    var path = AssetDatabase.GetAssetPath(asset);
+                    File.WriteAllText(path, contents);
                     return instance;
                 }
 
-                instance = JsonUtility.FromJson<AssetSetting>(json);
-                EditorSetting.Add(3, "资源", instance);
+                instance = JsonUtility.FromJson<AssetSetting>(contents);
                 return instance;
             }
         }
@@ -92,33 +89,7 @@ namespace JFramework.Editor
         /// <summary>
         /// 构建 AssetBundle 文件夹路径
         /// </summary>
-        [HideInInspector] public List<string> bundlePaths = new List<string>();
-
-        /// <summary>
-        /// AssetBundle 的文件夹资源
-        /// </summary>
-        [PropertyOrder(1), ShowInInspector] public static List<DefaultAsset> assetBundles = new List<DefaultAsset>();
-
-        /// <summary>
-        /// 获取 AssetBundle 的文件夹
-        /// </summary>
-        /// <returns></returns>
-        public static List<DefaultAsset> folderAssets
-        {
-            get
-            {
-                if (Instance.bundlePaths.Count > 0)
-                {
-                    assetBundles.Clear();
-                    foreach (var path in Instance.bundlePaths)
-                    {
-                        assetBundles.Add(AssetDatabase.LoadAssetAtPath<DefaultAsset>(path));
-                    }
-                }
-
-                return assetBundles;
-            }
-        }
+        [PropertyOrder(1), AssetPath] public List<string> folderPaths = new List<string>();
 
         /// <summary>
         /// 场景资源
@@ -140,10 +111,10 @@ namespace JFramework.Editor
             {
                 if (!Instance.remoteBuild)
                 {
-                    return $"{Application.streamingAssetsPath}/{GlobalSetting.Instance.platform}";
+                    return Path.Combine(Application.streamingAssetsPath, GlobalSetting.Instance.platform.ToString());
                 }
 
-                return $"{Instance.buildPath}/{GlobalSetting.Instance.platform}";
+                return Path.Combine(Instance.buildPath, GlobalSetting.Instance.platform.ToString());
             }
         }
 
@@ -157,10 +128,10 @@ namespace JFramework.Editor
             {
                 if (!Instance.remoteBuild)
                 {
-                    return $"{Application.streamingAssetsPath}/{GlobalSetting.Instance.platform}/{GlobalSetting.clientInfoName}";
+                    return Path.Combine(Application.streamingAssetsPath, GlobalSetting.GetPlatform(GlobalSetting.clientInfoName));
                 }
 
-                return $"{Instance.buildPath}/{GlobalSetting.Instance.platform}/{GlobalSetting.clientInfoName}";
+                return Path.Combine(Instance.buildPath, GlobalSetting.GetPlatform(GlobalSetting.clientInfoName));
             }
         }
 
@@ -189,62 +160,9 @@ namespace JFramework.Editor
         [PropertyOrder(2), Button("保存设置")]
         public void Save()
         {
-            Instance.bundlePaths.Clear();
-            foreach (var bundle in assetBundles)
-            {
-                Instance.bundlePaths.Add(AssetDatabase.GetAssetPath(bundle));
-            }
-
             var asset = Resources.Load<TextAsset>(nameof(AssetSetting));
             var json = JsonUtility.ToJson(instance);
             File.WriteAllText(AssetDatabase.GetAssetPath(asset), json);
-        }
-
-        /// <summary>
-        /// 更新构建模式
-        /// </summary>
-        [InitializeOnLoadMethod]
-        public static void InitializeOnLoad()
-        {
-            if (Instance.bundlePaths.Count > 0)
-            {
-                assetBundles.Clear();
-                foreach (var path in Instance.bundlePaths)
-                {
-                    assetBundles.Add(AssetDatabase.LoadAssetAtPath<DefaultAsset>(path));
-                }
-            }
-
-            EditorSetting.AddSceneToBuildSettings(Instance.isRemote);
-        }
-
-        /// <summary>
-        /// 同步加载
-        /// </summary>
-        /// <param name="path"></param>
-        /// <typeparam name="T"></typeparam>
-        /// <returns></returns>
-        internal T Load<T>(string path) where T : Object
-        {
-            if (objects.TryGetValue(path, out var obj))
-            {
-                if (obj is Texture2D texture)
-                {
-                    obj = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), Vector2.one * 0.5f);
-                    return (T)obj;
-                }
-
-                if (typeof(T).IsSubclassOf(typeof(Component)))
-                {
-                    return ((GameObject)Object.Instantiate(obj)).GetComponent<T>();
-                }
-                else
-                {
-                    return obj is GameObject ? Object.Instantiate((T)obj) : (T)obj;
-                }
-            }
-
-            return null;
         }
 
         /// <summary>
@@ -256,20 +174,23 @@ namespace JFramework.Editor
         /// <returns></returns>
         internal void LoadAsync<T>(string path, Action<T> action) where T : Object
         {
-            var asset = Load<T>(path);
-            action?.Invoke(asset);
-        }
+            if (objects.TryGetValue(path, out var obj))
+            {
+                if (obj is Texture2D texture)
+                {
+                    obj = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), Vector2.one * 0.5f);
+                    action?.Invoke((T)obj);
+                }
 
-        /// <summary>
-        /// 异步加载场景
-        /// </summary>
-        /// <param name="sceneName"></param>
-        /// <param name="action"></param>
-        /// <returns></returns>
-        internal void LoadSceneAsync(string sceneName, Action<AsyncOperation> action)
-        {
-            var asset = UnitySceneManager.LoadSceneAsync(sceneName.Split('/')[1], LoadSceneMode.Single);
-            action?.Invoke(asset);
+                if (typeof(T).IsSubclassOf(typeof(Component)))
+                {
+                    action?.Invoke(((GameObject)Object.Instantiate(obj)).GetComponent<T>());
+                }
+                else
+                {
+                    action?.Invoke(obj is GameObject ? Object.Instantiate((T)obj) : (T)obj);
+                }
+            }
         }
     }
 }

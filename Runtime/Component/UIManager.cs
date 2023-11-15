@@ -117,14 +117,16 @@ namespace JFramework.Core
                 return;
             }
 
-            AssetManager.LoadAsync<GameObject>(GlobalSetting.Instance.UIBundle + "/" + typeof(TPanel).Name, obj =>
+            AssetManager.LoadAsync<GameObject>(GlobalSetting.GetUIPath(typeof(TPanel).Name), obj =>
             {
                 if (!obj.TryGetComponent<TPanel>(out var panel))
                 {
                     obj.AddComponent<TPanel>();
                 }
 
-                panel.transform.SetParent(GetLayer(panel.layer), false);
+                panel.transform.SetParent(GetLayer(panel.layer));
+                panel.transform.localPosition = Vector3.zero;
+                panel.transform.localScale = Vector3.one;
                 panels.Add(typeof(TPanel), panel);
                 panel.Show();
                 action?.Invoke((TPanel)panel);

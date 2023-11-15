@@ -43,9 +43,8 @@ namespace JFramework
                     {
                         instance ??= FindObjectOfType<T>();
                         instance ??= new GameObject(typeof(T).Name).AddComponent<T>();
+                        instance.Register();
                     }
-
-                    instance.Awake();
                 }
 
                 return instance;
@@ -53,9 +52,9 @@ namespace JFramework
         }
 
         /// <summary>
-        /// 单例初始化
+        /// 初始化单例
         /// </summary>
-        protected virtual void Awake()
+        private void Register()
         {
             if (instance == null)
             {
@@ -69,6 +68,14 @@ namespace JFramework
             }
         }
 
+        /// <summary>
+        /// 单例初始化
+        /// </summary>
+        protected virtual void Awake() => Register();
+
+        /// <summary>
+        /// 销毁单例
+        /// </summary>
         protected virtual void OnDestroy() => instance = null;
     }
 }

@@ -42,9 +42,8 @@ namespace JFramework
                     lock (locked)
                     {
                         instance ??= FindObjectOfType<T>();
+                        instance.Register();
                     }
-
-                    instance.Awake();
                 }
 
                 return instance;
@@ -52,9 +51,9 @@ namespace JFramework
         }
 
         /// <summary>
-        /// 单例初始化
+        /// 初始化单例
         /// </summary>
-        protected virtual void Awake()
+        private void Register()
         {
             if (instance == null)
             {
@@ -62,9 +61,15 @@ namespace JFramework
             }
             else if (instance != this)
             {
+                Debug.LogWarning(typeof(T) + "单例重复！");
                 Destroy(this);
             }
         }
+
+        /// <summary>
+        /// 单例初始化
+        /// </summary>
+        protected virtual void Awake() => Register();
 
         /// <summary>
         /// 销毁单例
