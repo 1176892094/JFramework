@@ -48,8 +48,8 @@ namespace JFramework.Core
         {
             var transform = GlobalManager.Instance.transform;
             canvas = transform.Find("UICanvas").GetComponent<Canvas>();
-            layers[UILayer.Normal] = canvas.transform.Find("Layer1");
-            layers[UILayer.Bottom] = canvas.transform.Find("Layer2");
+            layers[UILayer.Bottom] = canvas.transform.Find("Layer1");
+            layers[UILayer.Normal] = canvas.transform.Find("Layer2");
             layers[UILayer.Middle] = canvas.transform.Find("Layer3");
             layers[UILayer.Height] = canvas.transform.Find("Layer4");
             layers[UILayer.Ignore] = canvas.transform.Find("Layer5");
