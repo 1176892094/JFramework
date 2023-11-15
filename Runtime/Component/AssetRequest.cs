@@ -14,7 +14,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using JFramework.Core;
-using Newtonsoft.Json;
+using UnityEngine;
 using UnityEngine.Networking;
 using Debug = UnityEngine.Debug;
 
@@ -70,20 +70,20 @@ namespace JFramework
             {
                 Debug.Log("解析远端对比文件完成");
                 var remoteInfo = await File.ReadAllTextAsync(GlobalSetting.remoteInfoPath);
-                var jsonData = JsonConvert.DeserializeObject<List<AssetData>>(remoteInfo);
-                remoteDataList = jsonData.ToDictionary(data => data.name);
-
+                var jsonData = JsonUtility.FromJson<Variable<List<AssetData>>>(remoteInfo);
+                remoteDataList = jsonData.value.ToDictionary(data => data.name);
+                
                 if (await HeadRequest(GlobalSetting.clientInfoPath))
                 {
                     var clientInfo = await GetRequest(GlobalSetting.clientInfoPath);
-                    jsonData = JsonConvert.DeserializeObject<List<AssetData>>(clientInfo);
-                    clientDataList = jsonData.ToDictionary(data => data.name);
+                    jsonData = JsonUtility.FromJson<Variable<List<AssetData>>>(clientInfo);
+                    clientDataList = jsonData.value.ToDictionary(data => data.name);
                 }
                 else if (await HeadRequest(GlobalSetting.streamingInfoPath))
                 {
                     var clientInfo = await GetRequest(GlobalSetting.streamingInfoPath);
-                    jsonData = JsonConvert.DeserializeObject<List<AssetData>>(clientInfo);
-                    clientDataList = jsonData.ToDictionary(data => data.name);
+                    jsonData = JsonUtility.FromJson<Variable<List<AssetData>>>(clientInfo);
+                    clientDataList = jsonData.value.ToDictionary(data => data.name);
                 }
 
                 Debug.Log("解析本地对比文件完成");

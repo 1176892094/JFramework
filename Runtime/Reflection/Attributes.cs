@@ -40,7 +40,7 @@ namespace JFramework
     /// 资源路径
     /// </summary>
     [AttributeUsage(AttributeTargets.Field)]
-    public class AssetPathAttribute : PropertyAttribute
+    public class FolderAttribute : PropertyAttribute
     {
     }
 }

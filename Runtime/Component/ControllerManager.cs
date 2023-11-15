@@ -74,7 +74,7 @@ namespace JFramework.Core
         /// <summary>
         /// 销毁所有控制器
         /// </summary>
-        internal static void Clear()
+        public static void Clear()
         {
             var copies = entities.Keys.ToList();
             foreach (var entity in copies)

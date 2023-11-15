@@ -4,9 +4,6 @@
   "version": "1.0.7",
   "unity": "2022.3",
   "description": "This is the JFramework package",
-  "dependencies": {
-    "com.unity.nuget.newtonsoft-json": "3.0.2"
-  },
   "author": {
     "name": "Charlotte",
     "email": "1176892094@qq..com",

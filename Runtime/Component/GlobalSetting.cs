@@ -11,6 +11,7 @@
 #if UNITY_EDITOR
 using System;
 using System.Collections.Generic;
+using JFramework.Editor;
 using JFramework.Interface;
 using Sirenix.OdinInspector;
 using UnityEngine;
@@ -21,6 +22,9 @@ namespace JFramework.Core
 
     public sealed partial class GlobalManager
     {
+        public static bool isRemote => AssetSetting.Instance.isRemote;
+        public static void Add(int id, string name, object item) => EditorSetting.Add(id, name, item);
+        
         [ShowInInspector, LabelText("游戏组件列表"), FoldoutGroup("对象池管理器")]
         private Dictionary<IEntity, Components> entities => ControllerManager.entities;
 

@@ -161,16 +161,18 @@ namespace JFramework.Core
                     return;
                 }
             }
-
+            
             if (typeof(T).IsSubclassOf(typeof(Component)))
             {
                 var obj = assetBundle.LoadAssetAsync<GameObject>(assetData.asset);
-                action?.Invoke(((GameObject)Object.Instantiate(obj.asset)).GetComponent<T>());
+                var asset = ((GameObject)Object.Instantiate(obj.asset)).GetComponent<T>();
+                action?.Invoke(asset);
             }
             else
             {
                 var obj = assetBundle.LoadAssetAsync<T>(assetData.asset);
-                action?.Invoke(obj.asset is GameObject ? (T)Object.Instantiate(obj.asset) : (T)obj.asset);
+                var asset = obj.asset is GameObject ? (T)Object.Instantiate(obj.asset) : (T)obj.asset;
+                action?.Invoke(asset);
             }
         }
 

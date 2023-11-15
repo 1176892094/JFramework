@@ -17,7 +17,6 @@ using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using JFramework.Core;
-using Newtonsoft.Json;
 using Sirenix.OdinInspector.Editor;
 using Sirenix.Utilities;
 using Sirenix.Utilities.Editor;
@@ -28,7 +27,7 @@ using Object = UnityEngine.Object;
 
 namespace JFramework.Editor
 {
-    public class EditorSetting : OdinMenuEditorWindow
+    internal class EditorSetting : OdinMenuEditorWindow
     {
         /// <summary>
         /// 编辑器窗口列表
@@ -39,19 +38,13 @@ namespace JFramework.Editor
         /// 更新构建模式
         /// </summary>
         [InitializeOnLoadMethod]
-        public static void InitializeOnLoad()
-        {
-            AddSceneToBuildSettings(AssetSetting.Instance.isRemote);
-        }
+        private static void InitializeOnLoad() => UpdateBuildSettings();
 
         /// <summary>
         /// 为本地加载的字典赋值
         /// </summary>
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
-        private static void RuntimeInitializeOnLoad()
-        {
-            UpdateAsset();
-        }
+        private static void RuntimeInitializeOnLoad() => UpdateAsset();
 
         /// <summary>
         /// 调用该方法增加面板
@@ -64,21 +57,20 @@ namespace JFramework.Editor
         /// <summary>
         /// 远端加载移除 BuildSetting 反之 加入到 BuildSetting
         /// </summary>
-        /// <param name="isRemote"></param>
-        public static void AddSceneToBuildSettings(bool isRemote)
+        public static void UpdateBuildSettings()
         {
             var sceneAssets = EditorBuildSettings.scenes.Select(scene => scene.path).ToList();
             foreach (var scenePath in AssetSetting.Instance.sceneAssets)
             {
                 if (sceneAssets.Contains(scenePath))
                 {
-                    if (!isRemote) continue;
+                    if (!AssetSetting.Instance.isRemote) continue;
                     var scenes = EditorBuildSettings.scenes.Where(scene => scene.path != scenePath);
                     EditorBuildSettings.scenes = scenes.ToArray();
                 }
                 else
                 {
-                    if (isRemote) continue;
+                    if (AssetSetting.Instance.isRemote) continue;
                     var scenes = EditorBuildSettings.scenes.ToList();
                     scenes.Add(new EditorBuildSettingsScene(scenePath, true));
                     EditorBuildSettings.scenes = scenes.ToArray();
@@ -155,7 +147,6 @@ namespace JFramework.Editor
         private static void UpdateAsset()
         {
             var bundleNames = AssetDatabase.GetAllAssetBundleNames();
-
             foreach (var bundleName in bundleNames)
             {
                 if (AssetDatabase.GetAssetPathsFromAssetBundle(bundleName).Length == 0)
@@ -207,13 +198,13 @@ namespace JFramework.Editor
         private static void BuildAsset()
         {
             UpdateAsset();
+            var bundleOptions = BuildAssetBundleOptions.ChunkBasedCompression;
             var directory = Directory.CreateDirectory(AssetSetting.platformPath);
-            var assetBundleOption = BuildAssetBundleOptions.ChunkBasedCompression;
-            BuildPipeline.BuildAssetBundles(AssetSetting.platformPath, assetBundleOption, (BuildTarget)GlobalSetting.Instance.platform);
-            var fileInfos = directory.GetFiles().Where(info => info.Extension == "").ToList();
-            var fileList = fileInfos.Select(info => new AssetData(GetMD5(info.FullName), info.Name, info.Length)).ToList();
-            var saveJson = JsonConvert.SerializeObject(fileList);
-            File.WriteAllText(AssetSetting.assetBundleInfo, saveJson);
+            BuildPipeline.BuildAssetBundles(AssetSetting.platformPath, bundleOptions, (BuildTarget)GlobalSetting.Instance.platform);
+            var infoList = directory.GetFiles().Where(info => info.Extension == "").ToList();
+            var fileList = infoList.Select(info => new AssetData(GetMD5(info.FullName), info.Name, info.Length)).ToList();
+            var contents = JsonUtility.ToJson(new Variable<List<AssetData>>(fileList));
+            File.WriteAllText(AssetSetting.assetBundleInfo, contents);
             Debug.Log("构建 AssetBundles 成功!".Green());
             AssetDatabase.Refresh();
         }
@@ -222,7 +213,7 @@ namespace JFramework.Editor
         /// 将Excel转化成ScriptableObject
         /// </summary>
         [MenuItem("Tools/JFramework/Update Data", priority = 4)]
-        public static void ExcelToScripts()
+        private static void ExcelToScripts()
         {
             var assembly = Reflection.GetAssembly("JFramework.Editor");
             if (assembly == null) return;
@@ -232,16 +223,16 @@ namespace JFramework.Editor
         }
 
         /// <summary>
-        /// 当前项目路径
-        /// </summary>
-        [MenuItem("Tools/JFramework/Project Path", priority = 5)]
-        private static void CurrentProjectPath() => Process.Start(Environment.CurrentDirectory);
-
-        /// <summary>
         /// 持久化路径
         /// </summary>
-        [MenuItem("Tools/JFramework/PersistentData", priority = 6)]
+        [MenuItem("Tools/JFramework/PersistentData", priority = 5)]
         private static void PersistentDataPath() => Process.Start(Application.persistentDataPath);
+
+        /// <summary>
+        /// 当前项目路径
+        /// </summary>
+        [MenuItem("Tools/JFramework/ProjectDirectory", priority = 6)]
+        private static void ProjectDirectory() => Process.Start(Environment.CurrentDirectory);
 
         /// <summary>
         /// 资源流路径

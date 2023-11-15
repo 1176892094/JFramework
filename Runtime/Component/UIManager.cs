@@ -124,9 +124,7 @@ namespace JFramework.Core
                     obj.AddComponent<TPanel>();
                 }
 
-                panel.transform.SetParent(GetLayer(panel.layer));
-                panel.transform.localPosition = Vector3.zero;
-                panel.transform.localScale = Vector3.one;
+                panel.transform.SetParent(GetLayer(panel.layer), false);
                 panels.Add(typeof(TPanel), panel);
                 panel.Show();
                 action?.Invoke((TPanel)panel);

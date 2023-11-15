@@ -37,7 +37,7 @@ namespace JFramework.Core
             {
                 try
                 {
-                    AssetManager.LoadAsync<ScriptableObject>($"DataTable/{type.Name}", obj =>
+                    AssetManager.LoadAsync<ScriptableObject>(GlobalSetting.GetTablePath(type.Name), obj =>
                     {
                         var table = (IDataTable)obj;
                         if (type.FullName == null) return;

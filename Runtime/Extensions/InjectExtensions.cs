@@ -19,7 +19,7 @@ namespace JFramework
     /// <summary>
     /// 注入接口的拓展
     /// </summary>
-    public static class InjectExtensions
+    public static partial class Extensions
     {
         /// <summary>
         /// 对自身进行依赖注入

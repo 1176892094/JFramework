@@ -16,11 +16,28 @@ namespace JFramework
     /// 属性数值类
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    public class Variable<T> : IVariable where T : struct
+    public class Variable<T> : IVariable where T : new()
     {
         /// <summary>
         /// 泛型数值
         /// </summary>
         public T value;
+
+        /// <summary>
+        /// 构造函数初始化
+        /// </summary>
+        public Variable()
+        {
+            value = new T();
+        }
+
+        /// <summary>
+        /// 构造函数初始化
+        /// </summary>
+        /// <param name="value"></param>
+        public Variable(T value)
+        {
+            this.value = value;
+        }
     }
 }

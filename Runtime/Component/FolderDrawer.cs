@@ -17,7 +17,7 @@ namespace JFramework.Editor
     /// <summary>
     /// 绘制文件夹
     /// </summary>
-    [CustomPropertyDrawer(typeof(AssetPathAttribute))]
+    [CustomPropertyDrawer(typeof(FolderAttribute))]
     internal class FolderDrawer : PropertyDrawer
     {
         /// <summary>

@@ -11,7 +11,6 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using Newtonsoft.Json;
 using UnityEngine;
 
 // ReSharper disable All
@@ -36,7 +35,7 @@ namespace JFramework.Core
         public static void Save(object obj, string name)
         {
             var filePath = GetPath(name);
-            var saveJson = obj is ScriptableObject ? JsonUtility.ToJson(obj) : JsonConvert.SerializeObject(obj);
+            var saveJson = JsonUtility.ToJson(obj);
             File.WriteAllText(filePath, saveJson);
         }
 
@@ -48,7 +47,7 @@ namespace JFramework.Core
         public static void Encrypt(object obj, string name)
         {
             var filePath = GetPath(name);
-            var saveJson = obj is ScriptableObject ? JsonUtility.ToJson(obj) : JsonConvert.SerializeObject(obj);
+            var saveJson = JsonUtility.ToJson(obj);
             File.WriteAllBytes(filePath, Encrypt(saveJson, name));
         }
 
@@ -70,7 +69,7 @@ namespace JFramework.Core
             try
             {
                 var saveJson = File.ReadAllText(filePath);
-                return !saveJson.IsEmpty() ? JsonConvert.DeserializeObject<T>(saveJson) : new T();
+                return !saveJson.IsEmpty() ? JsonUtility.FromJson<T>(saveJson) : new T();
             }
             catch (Exception)
             {
@@ -99,7 +98,7 @@ namespace JFramework.Core
                 secrets.TryAdd(name, new JsonData());
                 if (!secrets[name]) return new T();
                 var saveJson = Decrypt(File.ReadAllBytes(filePath), name);
-                return !saveJson.IsEmpty() ? JsonConvert.DeserializeObject<T>(saveJson) : new T();
+                return !saveJson.IsEmpty() ? JsonUtility.FromJson<T>(saveJson) : new T();
             }
             catch (Exception)
             {

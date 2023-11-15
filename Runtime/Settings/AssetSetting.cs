@@ -17,11 +17,11 @@ using UnityEditor;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
-// ReSharper disable All
 
 namespace JFramework.Editor
 {
-    public class AssetSetting
+    [Serializable]
+    internal class AssetSetting
     {
         /// <summary>
         /// 单例自身
@@ -65,7 +65,21 @@ namespace JFramework.Editor
         /// <summary>
         /// 远端资源构建
         /// </summary>
-        [LabelText("Remote Build")] public bool remoteBuild;
+        [HideInInspector] public bool remoteBuild;
+
+        /// <summary>
+        /// 是否远端构建
+        /// </summary>
+        [ShowInInspector, LabelText("Remote Build")]
+        public bool isRemoteBuild
+        {
+            get => remoteBuild;
+            set
+            {
+                remoteBuild = value;
+                Instance.Save();
+            }
+        }
 
         /// <summary>
         /// 远端资源加载
@@ -81,15 +95,16 @@ namespace JFramework.Editor
             get => remoteLoad;
             set
             {
-                remoteLoad = !remoteLoad;
-                EditorSetting.AddSceneToBuildSettings(remoteLoad);
+                remoteLoad = value;
+                Instance.Save();
+                EditorSetting.UpdateBuildSettings();
             }
         }
 
         /// <summary>
-        /// 构建 AssetBundle 文件夹路径
+        /// 存储本地加载的资源字典
         /// </summary>
-        [PropertyOrder(1), AssetPath] public List<string> folderPaths = new List<string>();
+        public Dictionary<string, Object> objects = new Dictionary<string, Object>();
 
         /// <summary>
         /// 场景资源
@@ -97,9 +112,9 @@ namespace JFramework.Editor
         [HideInInspector] public List<string> sceneAssets = new List<string>();
 
         /// <summary>
-        /// 存储本地加载的资源字典
+        /// 构建 AssetBundle 文件夹路径
         /// </summary>
-        public Dictionary<string, Object> objects = new Dictionary<string, Object>();
+        [PropertyOrder(1), Folder] public List<string> folderPaths = new List<string>();
 
         /// <summary>
         /// 本地构建存储路径
@@ -135,25 +150,6 @@ namespace JFramework.Editor
             }
         }
 
-
-        /// <summary>
-        /// 是否远端资源构建
-        /// </summary>
-        public void RemoteBuild()
-        {
-            remoteBuild = !remoteBuild;
-            AssetSetting.Instance.Save();
-        }
-
-        /// <summary>
-        /// 是否远端资源加载
-        /// </summary>
-        public void RemoteLoad()
-        {
-            EditorSetting.AddSceneToBuildSettings(isRemote = !isRemote);
-            AssetSetting.Instance.Save();
-        }
-
         /// <summary>
         /// 设置保存
         /// </summary>
@@ -172,7 +168,7 @@ namespace JFramework.Editor
         /// <param name="action"></param>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
-        internal void LoadAsync<T>(string path, Action<T> action) where T : Object
+        public void LoadAsync<T>(string path, Action<T> action) where T : Object
         {
             if (objects.TryGetValue(path, out var obj))
             {
@@ -184,11 +180,13 @@ namespace JFramework.Editor
 
                 if (typeof(T).IsSubclassOf(typeof(Component)))
                 {
-                    action?.Invoke(((GameObject)Object.Instantiate(obj)).GetComponent<T>());
+                    var asset = ((GameObject)Object.Instantiate(obj)).GetComponent<T>();
+                    action?.Invoke(asset);
                 }
                 else
                 {
-                    action?.Invoke(obj is GameObject ? Object.Instantiate((T)obj) : (T)obj);
+                    var asset = obj is GameObject ? Object.Instantiate((T)obj) : (T)obj;
+                    action?.Invoke(asset);
                 }
             }
         }

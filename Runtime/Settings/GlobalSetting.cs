@@ -80,6 +80,11 @@ namespace JFramework
         /// 存放场景的AB包
         /// </summary>
         public string sceneBundle = "Scenes";
+        
+        /// <summary>
+        /// 存放音效的AB包
+        /// </summary>
+        public string tableBundle = "DataTable";
 
         /// <summary>
         /// 客户端校验文件名称
@@ -117,7 +122,7 @@ namespace JFramework
         /// <param name="assetName"></param>
         /// <returns></returns>
         public static string GetUIPath(string assetName) => Instance.UIBundle + "/" + assetName;
-
+        
         /// <summary>
         /// 获取音乐资源
         /// </summary>
@@ -131,6 +136,14 @@ namespace JFramework
         /// <param name="assetName"></param>
         /// <returns></returns>
         public static string GetScenePath(string assetName) => Instance.sceneBundle + "/" + assetName;
+        
+        /// <summary>
+        /// 获取UI资源
+        /// </summary>
+        /// <param name="assetName"></param>
+        /// <returns></returns>
+        public static string GetTablePath(string assetName) => Instance.tableBundle + "/" + assetName;
+
 
         /// <summary>
         /// 根据 persistentDataPath 获取文件
