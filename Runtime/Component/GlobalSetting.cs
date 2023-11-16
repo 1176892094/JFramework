@@ -37,9 +37,6 @@ namespace JFramework.Core
         [ShowInInspector, LabelText("事件管理数据"), FoldoutGroup("基本管理器")]
         private Dictionary<Type, HashSet<IEvent>> observers => EventManager.observers;
 
-        [ShowInInspector, LabelText("玩家输入数据"), FoldoutGroup("基本管理器")]
-        private Dictionary<KeyCode, IInput> inputs => InputManager.inputs;
-
         [ShowInInspector, LabelText("资源依赖数据"), FoldoutGroup("基本管理器")]
         private Dictionary<string, AssetBundle> bundles => AssetManager.bundles;
 
