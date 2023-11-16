@@ -11,12 +11,15 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using UnityEngine;
 
 // ReSharper disable All
 
 namespace JFramework.Core
 {
+    using JsonSetting = Variable<List<JsonData>>;
+
     /// <summary>
     /// Json管理器
     /// </summary>
@@ -62,8 +65,8 @@ namespace JFramework.Core
             var filePath = GetPath(name);
             if (!File.Exists(filePath))
             {
-                Debug.Log($"创建 {name.Orange()} 数据文件");
                 Save(new T(), name);
+                Debug.Log($"创建 {name.Orange()} 数据文件");
             }
 
             try
@@ -85,25 +88,30 @@ namespace JFramework.Core
         /// <returns>返回解密的数据</returns>
         public static T Decrypt<T>(string name) where T : new()
         {
+            secrets ??= Load<JsonSetting>(nameof(JsonManager)).value.ToDictionary(data => data.name);
             var filePath = GetPath(name);
-            secrets ??= Load<Dictionary<string, JsonData>>(nameof(JsonManager));
             if (!File.Exists(filePath))
             {
-                Debug.Log($"创建 {name.Orange()} 数据文件");
                 Encrypt(new T(), name);
+                Debug.Log($"创建 {name.Orange()} 数据文件");
+            }
+
+            if (!secrets.TryGetValue(name, out var jsonData))
+            {
+                jsonData = new JsonData();
+                Save(new JsonSetting(secrets.Values.ToList()), nameof(JsonManager));
+                return new T();
             }
 
             try
             {
-                secrets.TryAdd(name, new JsonData());
-                if (!secrets[name]) return new T();
                 var saveJson = Decrypt(File.ReadAllBytes(filePath), name);
                 return !saveJson.IsEmpty() ? JsonUtility.FromJson<T>(saveJson) : new T();
             }
             catch (Exception)
             {
-                secrets[name] = new JsonData();
-                Save(secrets, nameof(JsonManager));
+                jsonData = new JsonData();
+                Save(new JsonSetting(secrets.Values.ToList()), nameof(JsonManager));
                 return new T();
             }
         }
@@ -132,16 +140,21 @@ namespace JFramework.Core
         /// <param name="obj">加载的数据</param>
         internal static void Decrypt(ScriptableObject obj)
         {
+            secrets ??= Load<JsonSetting>(nameof(JsonManager)).value.ToDictionary(data => data.name);
             var filePath = GetPath(obj.name);
-            secrets ??= Load<Dictionary<string, JsonData>>(nameof(JsonManager));
             if (!File.Exists(filePath))
             {
                 Debug.Log($"创建 {obj.name.Orange()} 数据文件");
                 Encrypt(obj, obj.name);
             }
 
-            secrets.TryAdd(obj.name, new JsonData());
-            if (!secrets[obj.name]) return;
+            if (!secrets.TryGetValue(obj.name, out var jsonData))
+            {
+                jsonData = new JsonData();
+                Save(new JsonSetting(secrets.Values.ToList()), nameof(JsonManager));
+                return;
+            }
+
             var saveJson = Decrypt(File.ReadAllBytes(filePath), obj.name);
             if (saveJson.IsEmpty()) return;
             JsonUtility.FromJsonOverwrite(saveJson, obj);

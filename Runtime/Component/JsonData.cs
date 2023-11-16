@@ -19,6 +19,11 @@ namespace JFramework
     internal struct JsonData
     {
         /// <summary>
+        /// 加密数据的名称
+        /// </summary>
+        public string name;
+
+        /// <summary>
         /// 加密数据的键值
         /// </summary>
         public byte[] key;
@@ -31,12 +36,14 @@ namespace JFramework
         /// <summary>
         /// 构造密钥
         /// </summary>
+        /// <param name="name">名称</param>
         /// <param name="key">密钥</param>
         /// <param name="iv">向量</param>
-        public JsonData(byte[] key, byte[] iv)
+        public JsonData(string name, byte[] key, byte[] iv)
         {
-            this.key = key;
             this.iv = iv;
+            this.key = key;
+            this.name = name;
         }
 
         /// <summary>

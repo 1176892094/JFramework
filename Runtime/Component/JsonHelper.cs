@@ -9,12 +9,19 @@
 // *********************************************************************************
 
 using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Security.Cryptography;
 using UnityEngine;
 
 namespace JFramework.Core
 {
+    using JsonSetting = Variable<List<JsonData>>;
+
+    /// <summary>
+    /// Json管理器
+    /// </summary>
     public static partial class JsonManager
     {
         /// <summary>
@@ -44,7 +51,7 @@ namespace JFramework.Core
             try
             {
                 using var aes = Aes.Create();
-                secrets[name] = new JsonData(aes.Key, aes.IV);
+                secrets[name] = new JsonData(name, aes.Key, aes.IV);
                 using var cryptoTransform = aes.CreateEncryptor(aes.Key, aes.IV);
                 using var memoryStream = new MemoryStream();
                 using var cryptoStream = new CryptoStream(memoryStream, cryptoTransform, CryptoStreamMode.Write);
@@ -63,7 +70,7 @@ namespace JFramework.Core
             }
             finally
             {
-                Save(secrets, nameof(JsonManager));
+                Save(new JsonSetting(secrets.Values.ToList()), nameof(JsonManager));
             }
         }
 
@@ -90,7 +97,7 @@ namespace JFramework.Core
             {
                 Debug.LogWarning($"存档 {name.Red()} 丢失!\n{e}");
                 secrets[name] = new JsonData();
-                Save(secrets, nameof(JsonManager));
+                Save(new JsonSetting(secrets.Values.ToList()), nameof(JsonManager));
                 return null;
             }
         }
