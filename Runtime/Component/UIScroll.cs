@@ -90,13 +90,10 @@ namespace JFramework
         {
             foreach (var (index, grid) in grids)
             {
+                grid.Dispose();
                 if (index < items.Count && items[index] != null)
                 {
                     grid.SetItem(items[index]);
-                }
-                else
-                {
-                    grid.Dispose();
                 }
             }
 
@@ -158,7 +155,7 @@ namespace JFramework
                 {
                     obj.transform.SetParent(content);
                     obj.transform.localScale = Vector3.one;
-                    var posX = index % column * width + rect.width / 2;
+                    var posX = index % column * width;
                     var posY = -(index / column) * height - rect.height / 2;
                     obj.transform.localPosition = new Vector3(posX, posY, 0);
                     if (obj.TryGetComponent(out TGrid grid))
