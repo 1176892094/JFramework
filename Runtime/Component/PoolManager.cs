@@ -77,7 +77,7 @@ namespace JFramework.Core
         /// </summary>
         /// <param name="path">弹出对象的路径</param>
         /// <param name="action"></param>
-        public static void PopAsync<T>(string path, Action<T> action) where T : Component
+        public static void PopAsync<T>(string path, Action<T> action)
         {
             if (!GlobalManager.Runtime) return;
             if (pools.TryGetValue(path, out var pool) && pool.Count > 0)
