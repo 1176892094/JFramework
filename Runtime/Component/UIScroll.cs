@@ -107,7 +107,6 @@ namespace JFramework
         /// </summary>
         public void OnUpdate()
         {
-            var width = rect.width + rect.x;
             var height = rect.height + rect.y;
             var position = content.anchoredPosition;
             var minIndex = Math.Max(0, (int)(position.y / height) * column);
@@ -155,7 +154,7 @@ namespace JFramework
                 {
                     obj.transform.SetParent(content);
                     obj.transform.localScale = Vector3.one;
-                    var posX = index % column * width;
+                    var posX = index % column * (rect.width + rect.x);
                     var posY = -(index / column) * height - rect.height / 2;
                     obj.transform.localPosition = new Vector3(posX, posY, 0);
                     if (obj.TryGetComponent(out TGrid grid))
