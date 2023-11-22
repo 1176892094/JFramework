@@ -41,7 +41,7 @@ namespace JFramework
         /// 实体控制器获取
         /// </summary>
         /// <param name="entity"></param>
-        public static T Get<T>(this IEntity entity) where T : ScriptableObject, IController
+        public static T GetComponent<T>(this IEntity entity) where T : ScriptableObject, IController
         {
             return (T)ControllerManager.Register(entity, typeof(T));
         }
