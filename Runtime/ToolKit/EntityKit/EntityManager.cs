@@ -22,7 +22,7 @@ namespace JFramework.Core
     /// <summary>
     /// 控制器管理器
     /// </summary>
-    internal static class ControllerManager
+    internal static class EntityManager
     {
         /// <summary>
         /// 全局控制器容器
@@ -74,7 +74,7 @@ namespace JFramework.Core
         /// <summary>
         /// 销毁所有控制器
         /// </summary>
-        public static void Clear()
+        public static void Dispose()
         {
             var copies = entities.Keys.ToList();
             foreach (var entity in copies)

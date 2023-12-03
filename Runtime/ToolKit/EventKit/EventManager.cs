@@ -67,7 +67,7 @@ namespace JFramework.Core
         /// <summary>
         /// 事件管理器在开始游戏前重置
         /// </summary>
-        internal static void Clear()
+        internal static void Dispose()
         {
             foreach (var observer in observers.Values)
             {

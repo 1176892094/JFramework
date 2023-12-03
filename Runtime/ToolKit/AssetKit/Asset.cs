@@ -3,41 +3,39 @@
 // # Unity: 2022.3.5f1c1
 // # Author: Charlotte
 // # Version: 1.0.0
-// # History: 2023-11-15  18:32
+// # History: 2023-12-03  13:53
 // # Copyright: 2023, Charlotte
 // # Description: This is an automatically generated comment.
 // *********************************************************************************
 
-using JFramework.Interface;
+using System;
 
 namespace JFramework
 {
     /// <summary>
-    /// 属性数值类
+    /// 资源信息
     /// </summary>
-    /// <typeparam name="T"></typeparam>
-    public class Variable<T> : IVariable where T : struct
+    [Serializable]
+    internal struct Asset
     {
         /// <summary>
-        /// 泛型数值
+        /// 资源名称
         /// </summary>
-        public T value;
+        public string asset;
 
         /// <summary>
-        /// 构造函数初始化
+        /// 资源标签
         /// </summary>
-        public Variable()
-        {
-            value = new T();
-        }
+        public string bundle;
 
         /// <summary>
-        /// 构造函数初始化
+        /// 分割包名和资源名
         /// </summary>
-        /// <param name="value"></param>
-        public Variable(T value)
+        /// <param name="path"></param>
+        public Asset(string path)
         {
-            this.value = value;
+            asset = path.Split('/')[1];
+            bundle = path.Split('/')[0].ToLower();
         }
     }
 }

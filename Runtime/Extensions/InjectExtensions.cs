@@ -42,7 +42,7 @@ namespace JFramework
 
                 if (typeof(IController).IsAssignableFrom(field.FieldType))
                 {
-                    var obj = ControllerManager.Register(inject, field.FieldType);
+                    var obj = EntityManager.Register(inject, field.FieldType);
                     field.SetValue(inject, obj);
                 }
                 else

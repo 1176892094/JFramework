@@ -59,7 +59,7 @@ namespace JFramework.Core
         /// <summary>
         /// 场景管理器在开始游戏前清空
         /// </summary>
-        internal static void Clear()
+        internal static void Dispose()
         {
             OnLoadProgress = null;
         }

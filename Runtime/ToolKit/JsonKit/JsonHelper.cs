@@ -9,7 +9,6 @@
 // *********************************************************************************
 
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
@@ -17,7 +16,7 @@ using UnityEngine;
 
 namespace JFramework.Core
 {
-    using JsonSetting = Variable<List<JsonData>>;
+    using JsonSetting = Variables<JsonData>;
 
     /// <summary>
     /// Json管理器

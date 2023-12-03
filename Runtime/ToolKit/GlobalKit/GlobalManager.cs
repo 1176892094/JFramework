@@ -9,12 +9,20 @@
 // *********************************************************************************
 
 using System;
+using System.Collections.Generic;
+using JFramework.Interface;
+using Sirenix.OdinInspector;
 using UnityEngine;
+#if UNITY_EDITOR
+using JFramework.Editor;
+#endif
 
 // ReSharper disable All
 
 namespace JFramework.Core
 {
+    using Components = Dictionary<Type, ScriptableObject>;
+
     [AddComponentMenu(""), DefaultExecutionOrder(-10)]
     public sealed partial class GlobalManager : MonoBehaviour
     {
@@ -22,7 +30,7 @@ namespace JFramework.Core
         /// 安全的单例调用
         /// </summary>
         internal static GlobalManager Instance { get; private set; }
-        
+
         /// <summary>
         /// 是否在运行模式
         /// </summary>
@@ -37,7 +45,7 @@ namespace JFramework.Core
         /// 全局管理器更新事件
         /// </summary>
         public static event Action OnUpdate;
-        
+
         /// <summary>
         /// 应用程序退出事件
         /// </summary>
@@ -50,44 +58,6 @@ namespace JFramework.Core
         {
             Runtime = true;
             Instance = this;
-            Register();
-        }
-
-        /// <summary>
-        /// 全剧管理器开始事件
-        /// </summary>
-        private void Start() => OnStart?.Invoke();
-
-        /// <summary>
-        /// 广播管理器更新事件
-        /// </summary>
-        private void Update() => OnUpdate?.Invoke();
-
-        /// <summary>
-        /// 当应用退出
-        /// </summary>
-        private void OnApplicationQuit()
-        {
-            Runtime = false;
-            Instance = null;
-            OnQuit?.Invoke();
-        }
-
-        /// <summary>
-        /// 全剧管理器销毁
-        /// </summary>
-        private void OnDestroy()
-        {
-            Clear();
-            UnRegister();
-            GC.Collect();
-        }
-
-        /// <summary>
-        /// 注册
-        /// </summary>
-        private static void Register()
-        {
             UIManager.Register();
             PoolManager.Register();
             AudioManager.Register();
@@ -95,31 +65,133 @@ namespace JFramework.Core
         }
 
         /// <summary>
-        /// 取消注册
+        /// 全剧管理器开始事件
         /// </summary>
-        private static void UnRegister()
+        private void Start()
         {
+            try
+            {
+                OnStart?.Invoke();
+            }
+            catch (Exception e)
+            {
+                Debug.Log(e.ToString());
+            }
+        }
+
+        /// <summary>
+        /// 广播管理器更新事件
+        /// </summary>
+        private void Update()
+        {
+            try
+            {
+                OnUpdate?.Invoke();
+            }
+            catch (Exception e)
+            {
+                Debug.Log(e.ToString());
+            }
+        }
+
+        /// <summary>
+        /// 当应用退出
+        /// </summary>
+        private void OnApplicationQuit()
+        {
+            try
+            {
+                Runtime = false;
+                Instance = null;
+                OnQuit?.Invoke();
+            }
+            catch (Exception e)
+            {
+                Debug.Log(e.ToString());
+            }
+        }
+
+        /// <summary>
+        /// 全剧管理器销毁
+        /// </summary>
+        private void OnDestroy()
+        {
+            Dispose();
+            OnQuit = null;
+            OnStart = null;
+            OnUpdate = null;
             UIManager.UnRegister();
             PoolManager.UnRegister();
             AudioManager.UnRegister();
             TimerManager.UnRegister();
+            GC.Collect();
         }
 
         /// <summary>
         /// 在游戏运行前初始化静态类
         /// </summary>
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
-        private static void Clear()
+        private static void Dispose()
         {
-            OnQuit = null;
-            OnStart = null;
-            OnUpdate = null;
-            JsonManager.Clear();
-            DataManager.Clear();
-            SceneManager.Clear();
-            EventManager.Clear();
-            AssetManager.Clear();
-            ControllerManager.Clear();
+            JsonManager.Dispose();
+            DataManager.Dispose();
+            SceneManager.Dispose();
+            EventManager.Dispose();
+            AssetManager.Dispose();
+            EntityManager.Dispose();
         }
     }
+
+#if UNITY_EDITOR
+    public sealed partial class GlobalManager
+    {
+        public static bool isRemote => AssetSetting.Instance.isRemote;
+        public static void Add(int id, string name, object item) => EditorSetting.Add(id, name, item);
+
+        [ShowInInspector, LabelText("单位")]
+        private Dictionary<IEntity, Components> entities => EntityManager.entities;
+
+        [ShowInInspector, LabelText("对象池")]
+        private Dictionary<string, IPool> pools => PoolManager.pools;
+
+        [ShowInInspector, LabelText("事件中心")]
+        private Dictionary<Type, HashSet<IEvent>> observers => EventManager.observers;
+
+        [ShowInInspector, LabelText("资源包")]
+        private Dictionary<string, AssetBundle> bundles => AssetManager.bundles;
+
+        [ShowInInspector, LabelText("动态资源")]
+        private Dictionary<string, Asset> assets => AssetManager.assets;
+
+        [ShowInInspector, LabelText("用户界面")]
+        private Dictionary<Type, IPanel> panels => UIManager.panels;
+
+        [ShowInInspector, LabelText("数据表 (int)")]
+        private Dictionary<Type, Dictionary<int, IData>> intDataTable => Data<int>.dataTable;
+
+        [ShowInInspector, LabelText("数据表 (enum)")]
+        private Dictionary<Type, Dictionary<Enum, IData>> enmDataTable => Data<Enum>.dataTable;
+
+        [ShowInInspector, LabelText("数据表 (string)")]
+        private Dictionary<Type, Dictionary<string, IData>> strDataTable => Data<string>.dataTable;
+
+        [ShowInInspector, LabelText("计时器 (已完成)")]
+        private Queue<ITimer> queues => TimerManager.queues;
+
+        [ShowInInspector, LabelText("计时器 (运行中)")]
+        private LinkedList<ITimer> timers => TimerManager.timers;
+
+        [ShowInInspector, LabelText("游戏音效 (已完成)")]
+        private Stack<AudioSource> stacks => AudioManager.stacks;
+
+        [ShowInInspector, LabelText("游戏音效 (播放中)")]
+        private HashSet<AudioSource> audios => AudioManager.audios;
+        
+        [ShowInInspector, LabelText("背景音乐大小")]
+        private float soundVolume => AudioManager.audioData.musicVolume;
+
+        [ShowInInspector, LabelText("游戏音效大小")]
+        private float audioVolume => AudioManager.audioData.audioVolume;
+    }
+#endif
 }

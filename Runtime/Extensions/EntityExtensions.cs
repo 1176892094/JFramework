@@ -43,7 +43,7 @@ namespace JFramework
         /// <param name="entity"></param>
         public static T GetComponent<T>(this IEntity entity) where T : ScriptableObject, IController
         {
-            return (T)ControllerManager.Register(entity, typeof(T));
+            return (T)EntityManager.Register(entity, typeof(T));
         }
 
         /// <summary>
@@ -52,7 +52,7 @@ namespace JFramework
         /// <param name="entity"></param>
         public static void UnRegister(this IEntity entity)
         {
-            ControllerManager.UnRegister(entity);
+            EntityManager.UnRegister(entity);
         }
     }
 }

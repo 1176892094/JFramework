@@ -9,7 +9,6 @@
 // *********************************************************************************
 
 using System;
-using JFramework.Core;
 
 // ReSharper disable All
 
@@ -83,34 +82,5 @@ namespace JFramework
         /// </summary>
         /// <returns></returns>
         public override int GetHashCode() => HashCode.Combine(size, code, name);
-    }
-
-    /// <summary>
-    /// 资源信息
-    /// </summary>
-    [Serializable]
-    internal struct AssetInfo
-    {
-        /// <summary>
-        /// 资源标签
-        /// </summary>
-        public string bundle;
-
-        /// <summary>
-        /// 资源名称
-        /// </summary>
-        public string asset;
-
-        /// <summary>
-        /// 分割包名和资源名
-        /// </summary>
-        /// <param name="path"></param>
-        public AssetInfo(string path)
-        {
-            var array = path.Split('/');
-            bundle = array[0].ToLower();
-            asset = array[1];
-            AssetManager.assets.Add(path, this);
-        }
     }
 }

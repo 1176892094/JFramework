@@ -30,7 +30,7 @@ namespace JFramework.Core
         /// <summary>
         /// 游戏音效设置
         /// </summary>
-        private static AudioData audioData = new AudioData();
+        internal static AudioData audioData = new AudioData();
 
         /// <summary>
         /// 音效挂载对象
@@ -46,16 +46,6 @@ namespace JFramework.Core
         /// 是否启用音乐管理器
         /// </summary>
         public static bool isActive;
-
-        /// <summary>
-        /// 背景音乐
-        /// </summary>
-        public static float musicVolume => audioData?.musicVolume ?? 1;
-
-        /// <summary>
-        /// 游戏声音
-        /// </summary>
-        public static float audioVolume => audioData?.audioVolume ?? 1;
 
         /// <summary>
         /// 音效管理器初始化

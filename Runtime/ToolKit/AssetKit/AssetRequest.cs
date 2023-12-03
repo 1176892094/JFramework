@@ -28,17 +28,17 @@ namespace JFramework
         /// <summary>
         /// 本地数据列表
         /// </summary>
-        private static Dictionary<string, AssetData> clientDataList = new Dictionary<string, AssetData>();
+        private static Dictionary<string, AssetData> clientAssets = new Dictionary<string, AssetData>();
 
         /// <summary>
         /// 远端数据列表
         /// </summary>
-        private static Dictionary<string, AssetData> remoteDataList = new Dictionary<string, AssetData>();
+        private static Dictionary<string, AssetData> remoteAssets = new Dictionary<string, AssetData>();
 
         /// <summary>
         /// 资源数据列表
         /// </summary>
-        private static readonly List<string> assetDataList = new List<string>();
+        private static readonly List<string> changeAssets = new List<string>();
 
         /// <summary>
         /// 当开始下载资源(资源数量)
@@ -62,50 +62,50 @@ namespace JFramework
         public static async Task<bool> UpdateAssetBundles()
         {
             if (!GlobalManager.Runtime) return false;
-            assetDataList.Clear();
-            clientDataList.Clear();
-            remoteDataList.Clear();
+            changeAssets.Clear();
+            clientAssets.Clear();
+            remoteAssets.Clear();
             var success = await GetRemoteInfo();
             if (success)
             {
                 Debug.Log("解析远端对比文件完成");
                 var remoteInfo = await File.ReadAllTextAsync(GlobalSetting.remoteInfoPath);
-                var jsonData = JsonUtility.FromJson<Variable<List<AssetData>>>(remoteInfo);
-                remoteDataList = jsonData.value.ToDictionary(data => data.name);
+                var jsonData = JsonUtility.FromJson<Variables<AssetData>>(remoteInfo);
+                remoteAssets = jsonData.value.ToDictionary(data => data.name);
                 
                 if (await HeadRequest(GlobalSetting.clientInfoPath))
                 {
                     var clientInfo = await GetRequest(GlobalSetting.clientInfoPath);
-                    jsonData = JsonUtility.FromJson<Variable<List<AssetData>>>(clientInfo);
-                    clientDataList = jsonData.value.ToDictionary(data => data.name);
+                    jsonData = JsonUtility.FromJson<Variables<AssetData>>(clientInfo);
+                    clientAssets = jsonData.value.ToDictionary(data => data.name);
                 }
                 else if (await HeadRequest(GlobalSetting.streamingInfoPath))
                 {
                     var clientInfo = await GetRequest(GlobalSetting.streamingInfoPath);
-                    jsonData = JsonUtility.FromJson<Variable<List<AssetData>>>(clientInfo);
-                    clientDataList = jsonData.value.ToDictionary(data => data.name);
+                    jsonData = JsonUtility.FromJson<Variables<AssetData>>(clientInfo);
+                    clientAssets = jsonData.value.ToDictionary(data => data.name);
                 }
 
                 Debug.Log("解析本地对比文件完成");
-                foreach (var fileName in remoteDataList.Keys)
+                foreach (var fileName in remoteAssets.Keys)
                 {
-                    if (!clientDataList.ContainsKey(fileName))
+                    if (!clientAssets.ContainsKey(fileName))
                     {
-                        assetDataList.Add(fileName);
+                        changeAssets.Add(fileName);
                     }
                     else
                     {
-                        if (clientDataList[fileName] != remoteDataList[fileName])
+                        if (clientAssets[fileName] != remoteAssets[fileName])
                         {
-                            assetDataList.Add(fileName);
+                            changeAssets.Add(fileName);
                         }
 
-                        clientDataList.Remove(fileName);
+                        clientAssets.Remove(fileName);
                     }
                 }
 
                 Debug.Log("删除弃用的资源文件");
-                var files = clientDataList.Keys.Where(file => File.Exists(GlobalSetting.GetPersistentPath(file)));
+                var files = clientAssets.Keys.Where(file => File.Exists(GlobalSetting.GetPersistentPath(file)));
                 foreach (var file in files)
                 {
                     File.Delete(GlobalSetting.GetPersistentPath(file));
@@ -149,9 +149,9 @@ namespace JFramework
         private static async Task<bool> GetAssetBundles()
         {
             var reloads = 5;
-            var copyList = assetDataList.ToList();
-            OnLoadStart?.Invoke(assetDataList.Count);
-            while (assetDataList.Count > 0 && reloads-- > 0)
+            var copyList = changeAssets.ToList();
+            OnLoadStart?.Invoke(changeAssets.Count);
+            while (changeAssets.Count > 0 && reloads-- > 0)
             {
                 foreach (var fileName in copyList)
                 {
@@ -161,14 +161,14 @@ namespace JFramework
                     if (contents == null) continue;
                     var path = GlobalSetting.GetPersistentPath(fileName);
                     await File.WriteAllBytesAsync(path, contents);
-                    if (assetDataList.Contains(fileName))
+                    if (changeAssets.Contains(fileName))
                     {
-                        assetDataList.Remove(fileName);
+                        changeAssets.Remove(fileName);
                     }
                 }
             }
 
-            return assetDataList.Count == 0;
+            return changeAssets.Count == 0;
         }
 
         /// <summary>

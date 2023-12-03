@@ -29,7 +29,7 @@ namespace JFramework.Core
         /// <summary>
         /// 存储AB包的名称和资源
         /// </summary>
-        internal static readonly Dictionary<string, AssetInfo> assets = new Dictionary<string, AssetInfo>();
+        internal static readonly Dictionary<string, Asset> assets = new Dictionary<string, Asset>();
 
         /// <summary>
         /// 存储AB包的字典
@@ -149,7 +149,8 @@ namespace JFramework.Core
 #endif
             if (!assets.TryGetValue(path, out var assetData))
             {
-                assetData = new AssetInfo(path);
+                assetData = new Asset(path);
+                assets.Add(path, assetData);
             }
 
             await LoadDependency(assetData.bundle);
@@ -192,7 +193,8 @@ namespace JFramework.Core
 #endif
             if (!assets.TryGetValue(path, out var assetData))
             {
-                assetData = new AssetInfo(path);
+                assetData = new Asset(path);
+                assets.Add(path, assetData);
             }
 
             await LoadDependency(assetData.bundle);
@@ -229,7 +231,7 @@ namespace JFramework.Core
         /// <summary>
         /// 清空AB包的方法
         /// </summary>
-        internal static void Clear()
+        internal static void Dispose()
         {
             AssetBundle.UnloadAllAssetBundles(true);
             tasks.Clear();

@@ -29,7 +29,7 @@ namespace JFramework.Core
         /// <summary>
         /// UI层级字典
         /// </summary>
-        internal static readonly Dictionary<UILayer, Transform> layers = new Dictionary<UILayer, Transform>();
+        private static readonly Dictionary<UILayer, Transform> layers = new Dictionary<UILayer, Transform>();
 
         /// <summary>
         /// 存储所有UI的字典

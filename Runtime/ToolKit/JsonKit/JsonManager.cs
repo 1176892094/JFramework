@@ -18,7 +18,7 @@ using UnityEngine;
 
 namespace JFramework.Core
 {
-    using JsonSetting = Variable<List<JsonData>>;
+    using JsonSetting = Variables<JsonData>;
 
     /// <summary>
     /// Json管理器
@@ -163,7 +163,7 @@ namespace JFramework.Core
         /// <summary>
         /// 清空管理器
         /// </summary>
-        internal static void Clear()
+        internal static void Dispose()
         {
             secrets = null;
         }

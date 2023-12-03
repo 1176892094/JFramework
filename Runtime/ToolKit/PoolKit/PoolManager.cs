@@ -21,7 +21,7 @@ namespace JFramework.Core
         /// <summary>
         /// 对象池组
         /// </summary>
-        internal static readonly Dictionary<string, GameObject> parents = new Dictionary<string, GameObject>();
+        private static readonly Dictionary<string, GameObject> parents = new Dictionary<string, GameObject>();
 
         /// <summary>
         /// 对象池容器
@@ -168,7 +168,7 @@ namespace JFramework.Core
             {
                 pool.Clear();
             }
-
+            
             pools.Clear();
             parents.Clear();
         }

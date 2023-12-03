@@ -203,7 +203,7 @@ namespace JFramework.Editor
             BuildPipeline.BuildAssetBundles(AssetSetting.platformPath, bundleOptions, (BuildTarget)GlobalSetting.Instance.platform);
             var infoList = directory.GetFiles().Where(info => info.Extension == "").ToList();
             var fileList = infoList.Select(info => new AssetData(GetMD5(info.FullName), info.Name, info.Length)).ToList();
-            var contents = JsonUtility.ToJson(new Variable<List<AssetData>>(fileList));
+            var contents = JsonUtility.ToJson(new Variables<AssetData>(fileList));
             File.WriteAllText(AssetSetting.assetBundleInfo, contents);
             Debug.Log("构建 AssetBundles 成功!".Green());
             AssetDatabase.Refresh();

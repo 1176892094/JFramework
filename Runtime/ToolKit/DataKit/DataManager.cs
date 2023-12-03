@@ -113,7 +113,7 @@ namespace JFramework.Core
         /// <summary>
         /// 清除数据管理器
         /// </summary>
-        internal static void Clear()
+        internal static void Dispose()
         {
             Data<int>.Clear();
             Data<Enum>.Clear();
