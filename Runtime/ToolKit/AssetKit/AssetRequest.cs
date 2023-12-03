@@ -69,19 +69,10 @@ namespace JFramework
                 var remoteInfo = await File.ReadAllTextAsync(GlobalSetting.remoteInfoPath);
                 var jsonData = JsonUtility.FromJson<Variables<AssetData>>(remoteInfo);
                 remoteAssets = jsonData.value.ToDictionary(data => data.name);
-                
-                if (await HeadRequest(GlobalSetting.clientInfoPath))
-                {
-                    var clientInfo = await GetRequest(GlobalSetting.clientInfoPath);
-                    jsonData = JsonUtility.FromJson<Variables<AssetData>>(clientInfo);
-                    clientAssets = jsonData.value.ToDictionary(data => data.name);
-                }
-                else if (await HeadRequest(GlobalSetting.streamingInfoPath))
-                {
-                    var clientInfo = await GetRequest(GlobalSetting.streamingInfoPath);
-                    jsonData = JsonUtility.FromJson<Variables<AssetData>>(clientInfo);
-                    clientAssets = jsonData.value.ToDictionary(data => data.name);
-                }
+
+                var clientInfo = await GetClientInfo();
+                jsonData = JsonUtility.FromJson<Variables<AssetData>>(clientInfo);
+                clientAssets = jsonData.value.ToDictionary(data => data.name);
 
                 Debug.Log("解析本地对比文件完成");
                 foreach (var fileName in remoteAssets.Keys)
@@ -102,10 +93,9 @@ namespace JFramework
                 }
 
                 Debug.Log("删除弃用的资源文件");
-                var files = clientAssets.Keys.Where(file => File.Exists(GlobalSetting.GetPersistentPath(file)));
-                foreach (var file in files)
+                foreach (var path in clientAssets.Keys.Select(GlobalSetting.GetPersistentPath).Where(File.Exists))
                 {
-                    File.Delete(GlobalSetting.GetPersistentPath(file));
+                    File.Delete(path);
                 }
 
                 success = await GetAssetBundles();
@@ -131,13 +121,61 @@ namespace JFramework
             while (!success && reloads-- > 0)
             {
                 var fileUri = GlobalSetting.GetRemoteFilePath(GlobalSetting.clientInfoName);
-                if (!await HeadRequest(fileUri)) continue;
-                var contents = await GetRequest(fileUri);
-                await File.WriteAllTextAsync(GlobalSetting.remoteInfoPath, contents);
+                using (var request = UnityWebRequest.Head(fileUri))
+                {
+                    request.timeout = 1;
+                    await request.SendWebRequest();
+                    if (request.result != UnityWebRequest.Result.Success)
+                    {
+                        Debug.Log($"校验 {GlobalSetting.Instance.assetInfo} 失败\n");
+                        continue;
+                    }
+                }
+
+                using (var request = UnityWebRequest.Get(fileUri))
+                {
+                    await request.SendWebRequest();
+                    if (request.result != UnityWebRequest.Result.Success)
+                    {
+                        Debug.Log($"下载 {GlobalSetting.Instance.assetInfo} 失败\n");
+                        continue;
+                    }
+
+                    var contents = request.downloadHandler.text;
+                    await File.WriteAllTextAsync(GlobalSetting.remoteInfoPath, contents);
+                }
+
                 success = true;
             }
 
             return success;
+        }
+
+        /// <summary>
+        /// 异步读取文件
+        /// </summary>
+        /// <returns></returns>
+        private static async Task<string> GetClientInfo()
+        {
+            if (File.Exists(GlobalSetting.clientInfoPath))
+            {
+                return await File.ReadAllTextAsync(GlobalSetting.clientInfoPath);
+            }
+
+#if UNITY_ANDROID && !UNITY_EDITOR
+            using var request = UnityWebRequest.Get(GlobalSetting.streamingInfoPath);
+            await request.SendWebRequest();
+            if (request.result == UnityWebRequest.Result.Success)
+            {
+                return request.downloadHandler.text;
+            }
+#else
+            if (File.Exists(GlobalSetting.streamingInfoPath))
+            {
+                return await File.ReadAllTextAsync(GlobalSetting.streamingInfoPath);
+            }
+#endif
+            return null;
         }
 
         /// <summary>
@@ -153,11 +191,26 @@ namespace JFramework
                 foreach (var fileName in copyList)
                 {
                     var fileUri = GlobalSetting.GetRemoteFilePath(fileName);
-                    if (!await HeadRequest(fileUri)) continue;
-                    var contents = await GetRequest(fileUri, fileName);
-                    if (contents == null) continue;
-                    var path = GlobalSetting.GetPersistentPath(fileName);
-                    await File.WriteAllBytesAsync(path, contents);
+                    using (var request = UnityWebRequest.Get(fileUri))
+                    {
+                        var result = request.SendWebRequest();
+                        while (!result.isDone && GlobalManager.Runtime)
+                        {
+                            OnLoadUpdate?.Invoke(fileName, request.downloadProgress);
+                            await Task.Yield();
+                        }
+
+                        OnLoadUpdate?.Invoke(fileName, 1);
+                        if (request.result != UnityWebRequest.Result.Success)
+                        {
+                            Debug.Log($"下载 {fileName} 文件失败\n");
+                            continue;
+                        }
+
+                        var contents = request.downloadHandler.text;
+                        await File.WriteAllTextAsync(GlobalSetting.GetPersistentPath(fileName), contents);
+                    }
+
                     if (updateAssets.Contains(fileName))
                     {
                         updateAssets.Remove(fileName);
@@ -168,63 +221,6 @@ namespace JFramework
             return updateAssets.Count == 0;
         }
 
-        /// <summary>
-        /// 获取Head请求
-        /// </summary>
-        /// <param name="fileUri"></param>
-        /// <returns></returns>
-        private static async Task<bool> HeadRequest(string fileUri)
-        {
-            using var request = UnityWebRequest.Head(fileUri);
-            request.timeout = 1;
-            await request.SendWebRequest();
-            return request.result == UnityWebRequest.Result.Success;
-        }
-
-        /// <summary>
-        /// 获取对比文件请求
-        /// </summary>
-        /// <param name="fileUri"></param>
-        /// <returns></returns>
-        private static async Task<string> GetRequest(string fileUri)
-        {
-            using var request = UnityWebRequest.Get(fileUri);
-            await request.SendWebRequest();
-            if (request.result != UnityWebRequest.Result.Success)
-            {
-                Debug.Log($"下载 对比文件 失败\n");
-                return null;
-            }
-
-            return request.downloadHandler.text;
-        }
-
-        /// <summary>
-        /// 下载文件请求
-        /// </summary>
-        /// <param name="fileUri"></param>
-        /// <param name="fileName"></param>
-        /// <returns></returns>
-        private static async Task<byte[]> GetRequest(string fileUri, string fileName)
-        {
-            using var request = UnityWebRequest.Get(fileUri);
-            var result = request.SendWebRequest();
-            while (!result.isDone && GlobalManager.Runtime)
-            {
-                OnLoadUpdate?.Invoke(fileName, request.downloadProgress);
-                await Task.Yield();
-            }
-
-            OnLoadUpdate?.Invoke(fileName, 1);
-            if (request.result != UnityWebRequest.Result.Success)
-            {
-                Debug.Log($"下载 {fileName} 文件失败\n");
-                return null;
-            }
-
-            return request.downloadHandler.data;
-        }
-        
         /// <summary>
         /// 释放资源
         /// </summary>

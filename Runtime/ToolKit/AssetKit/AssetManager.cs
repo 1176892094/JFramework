@@ -10,6 +10,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using UnityEngine;
@@ -99,31 +100,23 @@ namespace JFramework.Core
         }
 
         /// <summary>
-        /// 异步加载AB包
+        /// 异步读取文件
         /// </summary>
         /// <param name="bundle"></param>
         /// <returns></returns>
         private static async Task<AssetBundle> LoadAssetBundleAsync(string bundle)
         {
             var path = GlobalSetting.GetPersistentPath(bundle);
-#if UNITY_EDITOR
-            path = "file://" + path;
-#endif
-            using (var request = UnityWebRequestAssetBundle.GetAssetBundle(path))
+            if (File.Exists(path))
             {
-                await request.SendWebRequest();
-                if (request.result == UnityWebRequest.Result.Success)
-                {
-                    var assetBundle = DownloadHandlerAssetBundle.GetContent(request);
-                    bundles.Add(bundle, assetBundle);
-                    return assetBundle;
-                }
+                var request = await AssetBundle.LoadFromFileAsync(path);
+                var assetBundle = request.assetBundle;
+                bundles.Add(bundle, assetBundle);
+                return assetBundle;
             }
 
             path = GlobalSetting.GetStreamingPath(bundle);
-#if UNITY_EDITOR
-            path = "file://" + path;
-#endif
+#if UNITY_ANDROID && !UNITY_EDITOR
             using (var request = UnityWebRequestAssetBundle.GetAssetBundle(path))
             {
                 await request.SendWebRequest();
@@ -134,7 +127,15 @@ namespace JFramework.Core
                     return assetBundle;
                 }
             }
-
+#else
+            if (File.Exists(path))
+            {
+                var request = await AssetBundle.LoadFromFileAsync(path);
+                var assetBundle = request.assetBundle;
+                bundles.Add(bundle, assetBundle);
+                return assetBundle;
+            }
+#endif
             Debug.LogWarning($"加载 {bundle} 资源包失败");
             return null;
         }

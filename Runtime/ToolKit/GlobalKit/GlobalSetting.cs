@@ -150,20 +150,14 @@ namespace JFramework
         /// </summary>
         /// <param name="fileName"></param>
         /// <returns></returns>
-        public static string GetPersistentPath(string fileName)
-        {
-            return Path.Combine(Application.persistentDataPath, fileName);
-        }
+        public static string GetPersistentPath(string fileName) => Path.Combine(Application.persistentDataPath, fileName);
 
         /// <summary>
         /// 根据 streamingAssetsPath 获取文件
         /// </summary>
         /// <param name="fileName"></param>
         /// <returns></returns>
-        public static string GetStreamingPath(string fileName)
-        {
-            return Path.Combine(Application.streamingAssetsPath, GetPlatform(fileName));
-        }
+        public static string GetStreamingPath(string fileName) => Path.Combine(Application.streamingAssetsPath, GetPlatform(fileName));
 
         /// <summary>
         /// 获取远端文件
