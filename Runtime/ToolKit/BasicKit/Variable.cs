@@ -8,6 +8,7 @@
 // # Description: This is an automatically generated comment.
 // *********************************************************************************
 
+using System;
 using JFramework.Interface;
 
 namespace JFramework
@@ -16,6 +17,7 @@ namespace JFramework
     /// 属性数值类
     /// </summary>
     /// <typeparam name="T"></typeparam>
+    [Serializable]
     public class Variable<T> : IVariable where T : struct
     {
         /// <summary>

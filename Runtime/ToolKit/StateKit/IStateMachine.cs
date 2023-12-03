@@ -8,6 +8,8 @@
 // # Description: This is an automatically generated comment.
 // *********************************************************************************
 
+using UnityEngine;
+
 namespace JFramework.Interface
 {
     /// <summary>
@@ -19,7 +21,7 @@ namespace JFramework.Interface
         /// 状态机是否为指定类型状态
         /// </summary>
         /// <typeparam name="TState"></typeparam>
-        bool IsActive<TState>() where TState : IState, new();
+        bool IsActive<TState>() where TState : IState;
 
         /// <summary>
         /// 状态机添加状态

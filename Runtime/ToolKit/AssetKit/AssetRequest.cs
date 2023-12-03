@@ -38,7 +38,7 @@ namespace JFramework
         /// <summary>
         /// 资源数据列表
         /// </summary>
-        private static readonly List<string> changeAssets = new List<string>();
+        private static readonly List<string> updateAssets = new List<string>();
 
         /// <summary>
         /// 当开始下载资源(资源数量)
@@ -62,9 +62,6 @@ namespace JFramework
         public static async Task<bool> UpdateAssetBundles()
         {
             if (!GlobalManager.Runtime) return false;
-            changeAssets.Clear();
-            clientAssets.Clear();
-            remoteAssets.Clear();
             var success = await GetRemoteInfo();
             if (success)
             {
@@ -91,13 +88,13 @@ namespace JFramework
                 {
                     if (!clientAssets.ContainsKey(fileName))
                     {
-                        changeAssets.Add(fileName);
+                        updateAssets.Add(fileName);
                     }
                     else
                     {
                         if (clientAssets[fileName] != remoteAssets[fileName])
                         {
-                            changeAssets.Add(fileName);
+                            updateAssets.Add(fileName);
                         }
 
                         clientAssets.Remove(fileName);
@@ -149,9 +146,9 @@ namespace JFramework
         private static async Task<bool> GetAssetBundles()
         {
             var reloads = 5;
-            var copyList = changeAssets.ToList();
-            OnLoadStart?.Invoke(changeAssets.Count);
-            while (changeAssets.Count > 0 && reloads-- > 0)
+            var copyList = updateAssets.ToList();
+            OnLoadStart?.Invoke(updateAssets.Count);
+            while (updateAssets.Count > 0 && reloads-- > 0)
             {
                 foreach (var fileName in copyList)
                 {
@@ -161,14 +158,14 @@ namespace JFramework
                     if (contents == null) continue;
                     var path = GlobalSetting.GetPersistentPath(fileName);
                     await File.WriteAllBytesAsync(path, contents);
-                    if (changeAssets.Contains(fileName))
+                    if (updateAssets.Contains(fileName))
                     {
-                        changeAssets.Remove(fileName);
+                        updateAssets.Remove(fileName);
                     }
                 }
             }
 
-            return changeAssets.Count == 0;
+            return updateAssets.Count == 0;
         }
 
         /// <summary>
@@ -226,6 +223,19 @@ namespace JFramework
             }
 
             return request.downloadHandler.data;
+        }
+        
+        /// <summary>
+        /// 释放资源
+        /// </summary>
+        internal static void Dispose()
+        {
+            OnLoadStart = null;
+            OnLoadUpdate = null;
+            OnLoadComplete = null;
+            updateAssets.Clear();
+            clientAssets.Clear();
+            remoteAssets.Clear();
         }
     }
 }

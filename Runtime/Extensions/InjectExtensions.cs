@@ -34,38 +34,46 @@ namespace JFramework
                 var attribute = field.GetCustomAttribute<InjectAttribute>(true);
                 if (attribute == null) continue;
 
-                var fieldName = attribute.name;
-                if (string.IsNullOrEmpty(fieldName))
-                {
-                    fieldName = char.ToUpper(field.Name[0]) + field.Name[1..];
-                }
-
                 if (typeof(IController).IsAssignableFrom(field.FieldType))
                 {
                     var obj = EntityManager.Register(inject, field.FieldType);
                     field.SetValue(inject, obj);
                 }
-                else
+                else if (typeof(Component).IsAssignableFrom(field.FieldType))
                 {
-                    var target = inject.transform.GetChild(fieldName);
-                    if (target == null) continue;
-
-                    var component = target.GetComponent(field.FieldType);
-                    if (component != null)
+                    var fieldName = attribute.name;
+                    if (string.IsNullOrEmpty(fieldName))
                     {
-                        field.SetValue(inject, component);
+                        var component = inject.transform.GetComponent(field.FieldType);
+                        if (component != null)
+                        {
+                            field.SetValue(inject, component);
+                        }
                     }
-
-                    var method = type.GetMethod(fieldName, Reflection.Instance);
-                    if (method == null) continue;
-
-                    if (target.TryGetComponent(out Button button) && component == button)
+                    else
                     {
-                        inject.SetButton(fieldName, button);
-                    }
-                    else if (target.TryGetComponent(out Toggle toggle) && component == toggle)
-                    {
-                        inject.SetToggle(fieldName, toggle);
+                        var target = inject.transform.GetChild(fieldName);
+                        if (target != null)
+                        {
+                            var component = target.GetComponent(field.FieldType);
+                            if (component != null)
+                            {
+                                field.SetValue(inject, component);
+                            }
+
+                            var method = type.GetMethod(fieldName, Reflection.Instance);
+                            if (method != null)
+                            {
+                                if (component is Button button)
+                                {
+                                    inject.SetButton(fieldName, button);
+                                }
+                                else if (component is Toggle toggle)
+                                {
+                                    inject.SetToggle(fieldName, toggle);
+                                }
+                            }
+                        }
                     }
                 }
             }

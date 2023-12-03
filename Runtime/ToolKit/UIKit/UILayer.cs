@@ -13,14 +13,14 @@ namespace JFramework
     public enum UILayer
     {
         /// <summary>
-        /// 默认层
-        /// </summary>
-        Normal = 0,
-
-        /// <summary>
         /// 底层
         /// </summary>
-        Bottom = 1,
+        Bottom = 0,
+        
+        /// <summary>
+        /// 默认层
+        /// </summary>
+        Normal = 1,
 
         /// <summary>
         /// 中层

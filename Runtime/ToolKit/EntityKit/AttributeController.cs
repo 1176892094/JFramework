@@ -11,6 +11,7 @@
 using System;
 using System.Collections.Generic;
 using JFramework.Interface;
+using Sirenix.OdinInspector;
 
 namespace JFramework
 {
@@ -24,7 +25,7 @@ namespace JFramework
         /// <summary>
         /// 存储 实体所持有的属性
         /// </summary>
-        private readonly Dictionary<TAttribute, IVariable> attributes = new Dictionary<TAttribute, IVariable>();
+        [ShowInInspector] private readonly Dictionary<TAttribute, IVariable> attributes = new Dictionary<TAttribute, IVariable>();
 
         /// <summary>
         /// 获取属性

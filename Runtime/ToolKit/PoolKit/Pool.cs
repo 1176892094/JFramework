@@ -20,7 +20,7 @@ namespace JFramework
     /// </summary>
     /// <typeparam name="T"></typeparam>
     [Serializable]
-    internal readonly struct Pool<T> : IPool<T> where T : new()
+    internal readonly struct Pool<T> : IPool<T>
     {
         /// <summary>
         /// 静态对象池
@@ -48,7 +48,7 @@ namespace JFramework
         /// <returns>返回对象</returns>
         public T Pop()
         {
-            return pool.TryPop(out var obj) ? obj : new T();
+            return pool.TryPop(out var obj) ? obj : Activator.CreateInstance<T>();
         }
 
         /// <summary>
@@ -69,6 +69,6 @@ namespace JFramework
         /// <summary>
         /// 清空对象池
         /// </summary>
-        public void Clear() => pool.Clear();
+        public void Dispose() => pool.Clear();
     }
 }

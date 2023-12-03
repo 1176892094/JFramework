@@ -10,6 +10,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using JFramework.Interface;
 using Sirenix.OdinInspector;
 using UnityEngine;
@@ -133,11 +134,13 @@ namespace JFramework.Core
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
         private static void Dispose()
         {
+            StreamPool.Dispose();
             JsonManager.Dispose();
             DataManager.Dispose();
             SceneManager.Dispose();
             EventManager.Dispose();
             AssetManager.Dispose();
+            AssetRequest.Dispose();
             EntityManager.Dispose();
         }
     }
@@ -145,23 +148,23 @@ namespace JFramework.Core
 #if UNITY_EDITOR
     public sealed partial class GlobalManager
     {
-        public static bool isRemote => AssetSetting.Instance.isRemote;
+        public static bool isRemote => BuildSetting.Instance.isRemote;
         public static void Add(int id, string name, object item) => EditorSetting.Add(id, name, item);
 
-        [ShowInInspector, LabelText("单位")]
-        private Dictionary<IEntity, Components> entities => EntityManager.entities;
+        [ShowInInspector, LabelText("数据池")]
+        private Dictionary<Type, IPool> streams => StreamPool.streams;
 
         [ShowInInspector, LabelText("对象池")]
         private Dictionary<string, IPool> pools => PoolManager.pools;
-
-        [ShowInInspector, LabelText("事件中心")]
-        private Dictionary<Type, HashSet<IEvent>> observers => EventManager.observers;
-
-        [ShowInInspector, LabelText("资源包")]
-        private Dictionary<string, AssetBundle> bundles => AssetManager.bundles;
+        
+        [ShowInInspector, LabelText("实体单位")]
+        private Dictionary<IEntity, Components> entities => EntityManager.entities;
 
         [ShowInInspector, LabelText("动态资源")]
         private Dictionary<string, Asset> assets => AssetManager.assets;
+        
+        [ShowInInspector, LabelText("事件中心")]
+        private Dictionary<Type, HashSet<IEvent>> observers => EventManager.observers;
 
         [ShowInInspector, LabelText("用户界面")]
         private Dictionary<Type, IPanel> panels => UIManager.panels;
@@ -182,10 +185,10 @@ namespace JFramework.Core
         private LinkedList<ITimer> timers => TimerManager.timers;
 
         [ShowInInspector, LabelText("游戏音效 (已完成)")]
-        private Stack<AudioSource> stacks => AudioManager.stacks;
+        private List<AudioClip> stacks => AudioManager.stacks.Select(audio => audio.clip).ToList();
 
         [ShowInInspector, LabelText("游戏音效 (播放中)")]
-        private HashSet<AudioSource> audios => AudioManager.audios;
+        private List<AudioClip> audios => AudioManager.audios.Select(audio => audio.clip).ToList();
         
         [ShowInInspector, LabelText("背景音乐大小")]
         private float soundVolume => AudioManager.audioData.musicVolume;

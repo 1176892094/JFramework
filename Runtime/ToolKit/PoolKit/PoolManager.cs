@@ -42,37 +42,6 @@ namespace JFramework.Core
         }
 
         /// <summary>
-        /// 弹出对象池
-        /// </summary>
-        /// <typeparam name="T">任何可以被new的对象</typeparam>
-        /// <returns>返回弹出对象</returns>
-        public static T Pop<T>() where T : new()
-        {
-            if (pools.TryGetValue(typeof(T).Name, out var pool) && pool.Count > 0)
-            {
-                return ((IPool<T>)pool).Pop();
-            }
-
-            return new T();
-        }
-
-        /// <summary>
-        /// 推入对象池
-        /// </summary>
-        /// <param name="obj">传入对象</param>
-        /// <typeparam name="T">任何可以被new的对象</typeparam>
-        public static void Push<T>(T obj) where T : new()
-        {
-            if (pools.TryGetValue(typeof(T).Name, out var pool))
-            {
-                ((IPool<T>)pool).Push(obj);
-                return;
-            }
-
-            pools.Add(typeof(T).Name, new Pool<T>(obj));
-        }
-
-        /// <summary>
         /// 对象池管理器异步获取对象
         /// </summary>
         /// <param name="path">弹出对象的路径</param>
@@ -166,7 +135,7 @@ namespace JFramework.Core
         {
             foreach (var pool in pools.Values)
             {
-                pool.Clear();
+                pool.Dispose();
             }
             
             pools.Clear();

@@ -16,7 +16,6 @@ using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
-using JFramework.Core;
 using Sirenix.OdinInspector.Editor;
 using Sirenix.Utilities;
 using Sirenix.Utilities.Editor;
@@ -60,17 +59,17 @@ namespace JFramework.Editor
         public static void UpdateBuildSettings()
         {
             var sceneAssets = EditorBuildSettings.scenes.Select(scene => scene.path).ToList();
-            foreach (var scenePath in AssetSetting.Instance.sceneAssets)
+            foreach (var scenePath in BuildSetting.Instance.sceneAssets)
             {
                 if (sceneAssets.Contains(scenePath))
                 {
-                    if (!AssetSetting.Instance.isRemote) continue;
+                    if (!BuildSetting.Instance.isRemote) continue;
                     var scenes = EditorBuildSettings.scenes.Where(scene => scene.path != scenePath);
                     EditorBuildSettings.scenes = scenes.ToArray();
                 }
                 else
                 {
-                    if (AssetSetting.Instance.isRemote) continue;
+                    if (BuildSetting.Instance.isRemote) continue;
                     var scenes = EditorBuildSettings.scenes.ToList();
                     scenes.Add(new EditorBuildSettingsScene(scenePath, true));
                     EditorBuildSettings.scenes = scenes.ToArray();
@@ -83,20 +82,20 @@ namespace JFramework.Editor
         /// </summary>
         protected override OdinMenuTree BuildMenuTree()
         {
-            Add(3, "资源", AssetSetting.Instance);
-            Add(2, "设置", GlobalSetting.Instance);
+            Add(2, "资源", BuildSetting.Instance);
+            Add(1, "设置", GlobalSetting.Instance);
             var tree = new OdinMenuTree(false);
             foreach (var (id, (path, item)) in windows)
             {
                 switch (id)
                 {
-                    case 1:
+                    case 0:
                         tree.Add(path, item, EditorIcons.House);
                         break;
-                    case 2:
+                    case 1:
                         tree.Add(path, item, EditorIcons.SettingsCog);
                         break;
-                    case 3:
+                    case 2:
                         tree.Add(path, item, EditorIcons.Bell);
                         break;
                     default:
@@ -118,14 +117,14 @@ namespace JFramework.Editor
             using var file = new FileStream(filePath, FileMode.Open);
             var md5 = new MD5CryptoServiceProvider();
             var md5Info = md5.ComputeHash(file);
-            var builder = PoolManager.Pop<StringBuilder>();
+            var builder = StreamPool.Pop<StringBuilder>();
             foreach (var info in md5Info)
             {
                 builder.Append(info.ToString("X2"));
             }
 
             var result = builder.ToString();
-            PoolManager.Push(builder);
+            StreamPool.Push(builder);
             builder.Clear();
             return result;
         }
@@ -155,8 +154,8 @@ namespace JFramework.Editor
                 }
             }
 
-            AssetSetting.Instance.sceneAssets.Clear();
-            foreach (var folderPath in AssetSetting.Instance.folderPaths)
+            BuildSetting.Instance.sceneAssets.Clear();
+            foreach (var folderPath in BuildSetting.Instance.folderPaths)
             {
                 if (string.IsNullOrEmpty(folderPath)) continue;
                 var folder = Path.GetFileNameWithoutExtension(folderPath);
@@ -178,16 +177,16 @@ namespace JFramework.Editor
                     var asset = AssetDatabase.LoadAssetAtPath<Object>(path);
                     if (asset is SceneAsset)
                     {
-                        AssetSetting.Instance.sceneAssets.Add(path);
+                        BuildSetting.Instance.sceneAssets.Add(path);
                     }
 
                     if (asset == null) continue;
-                    AssetSetting.Instance.objects[$"{folder}/{asset.name}"] = asset;
+                    BuildSetting.Instance.objects[$"{folder}/{asset.name}"] = asset;
                 }
             }
 
             Debug.Log($"更新 AssetBundles 完成。".Green());
-            AssetSetting.Instance.Save();
+            BuildSetting.Instance.Save();
             AssetDatabase.Refresh();
         }
 
@@ -199,12 +198,13 @@ namespace JFramework.Editor
         {
             UpdateAsset();
             var bundleOptions = BuildAssetBundleOptions.ChunkBasedCompression;
-            var directory = Directory.CreateDirectory(AssetSetting.platformPath);
-            BuildPipeline.BuildAssetBundles(AssetSetting.platformPath, bundleOptions, (BuildTarget)GlobalSetting.Instance.platform);
+            var directory = Directory.CreateDirectory(BuildSetting.platformPath);
+            BuildPipeline.BuildAssetBundles(BuildSetting.platformPath, bundleOptions, (BuildTarget)GlobalSetting.Instance.platform);
             var infoList = directory.GetFiles().Where(info => info.Extension == "").ToList();
-            var fileList = infoList.Select(info => new AssetData(GetMD5(info.FullName), info.Name, info.Length)).ToList();
-            var contents = JsonUtility.ToJson(new Variables<AssetData>(fileList));
-            File.WriteAllText(AssetSetting.assetBundleInfo, contents);
+            var fileList = infoList.Select(info => new AssetData(GetMD5(info.FullName), info.Name, info.Length.ToString())).ToList();
+            var contents = JsonUtility.ToJson(new Variables<AssetData>(fileList), true);
+            Debug.Log(contents);
+            File.WriteAllText(BuildSetting.assetBundleInfo, contents);
             Debug.Log("构建 AssetBundles 成功!".Green());
             AssetDatabase.Refresh();
         }

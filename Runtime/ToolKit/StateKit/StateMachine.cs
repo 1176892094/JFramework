@@ -10,6 +10,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using JFramework.Core;
 using JFramework.Interface;
 
@@ -44,7 +45,7 @@ namespace JFramework
         /// </summary>
         /// <typeparam name="TState"></typeparam>
         /// <returns></returns>
-        public bool IsActive<TState>() where TState : IState, new()
+        public bool IsActive<TState>() where TState : IState
         {
             return states.TryGetValue(typeof(TState), out var state) && state.isActive;
         }
@@ -55,7 +56,7 @@ namespace JFramework
         /// <typeparam name="TState">可传入任何继承IState的对象</typeparam>
         public void AddState<TState>() where TState : IState, new()
         {
-            var state = new TState();
+            var state = StreamPool.Pop<TState>();
             state.OnAwake(owner, this);
             states[typeof(TState)] = state;
         }
@@ -67,7 +68,7 @@ namespace JFramework
         /// <typeparam name="TValue">用于重写状态</typeparam>
         public void AddState<TState, TValue>() where TState : IState where TValue : IState, new()
         {
-            var state = new TValue();
+            var state = StreamPool.Pop<TValue>();
             state.OnAwake(owner, this);
             states[typeof(TState)] = state;
         }
@@ -91,6 +92,20 @@ namespace JFramework
         public void ChangeState<TState>(float duration) where TState : IState
         {
             TimerManager.Pop(duration).Invoke(ChangeState<TState>);
+        }
+
+        /// <summary>
+        /// 当状态机销毁
+        /// </summary>
+        protected virtual void OnDestroy()
+        {
+            var copies = states.Values.ToList();
+            foreach (var state in copies)
+            {
+                StreamPool.Push(state, state.GetType());
+            }
+
+            states.Clear();
         }
     }
 }

@@ -37,12 +37,12 @@ public abstract class EditorSingleton<T> : ScriptableObject where T : EditorSing
             if (instance != null) return instance;
             instance = Resources.Load<T>(typeof(T).Name);
             if (instance != null) return instance;
-            var asset = $"{AssetSetting.Instance.editorPath}/{typeof(T).Name}.asset";
+            var asset = $"{BuildSetting.Instance.editorPath}/{typeof(T).Name}.asset";
             instance = AssetDatabase.LoadAssetAtPath<T>(asset);
             if (instance != null) return instance;
-            if (!Directory.Exists(AssetSetting.Instance.editorPath))
+            if (!Directory.Exists(BuildSetting.Instance.editorPath))
             {
-                Directory.CreateDirectory(AssetSetting.Instance.editorPath);
+                Directory.CreateDirectory(BuildSetting.Instance.editorPath);
             }
 
             instance = CreateInstance<T>();

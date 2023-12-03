@@ -29,12 +29,13 @@ namespace JFramework
         /// <summary>
         /// 持续时间
         /// </summary>
-        private float duration;
+        [ShowInInspector]
+        public float duration { get; set; }
 
         /// <summary>
         /// 当前时间+持续时间
         /// </summary>
-        private float waitTime;
+        public float waitTime { get; set; }
 
         /// <summary>
         /// 是否受TimeScale影响
@@ -44,13 +45,13 @@ namespace JFramework
         /// <summary>
         /// 计时器的状态
         /// </summary>
-        [ShowInInspector] private TimerState state;
+        private TimerState state;
 
         /// <summary>
         /// 完成时执行的事件
         /// </summary>
-        [ShowInInspector] private Action OnFinish;
-        
+        private Action OnFinish;
+
         /// <summary>
         /// 计时器执行方法
         /// </summary>

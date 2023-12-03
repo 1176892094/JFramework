@@ -21,33 +21,33 @@ using Object = UnityEngine.Object;
 namespace JFramework.Editor
 {
     [Serializable]
-    internal class AssetSetting
+    internal class BuildSetting
     {
         /// <summary>
         /// 单例自身
         /// </summary>
-        private static AssetSetting instance;
+        private static BuildSetting instance;
 
         /// <summary>
         /// 安全的单例调用
         /// </summary>
-        public static AssetSetting Instance
+        public static BuildSetting Instance
         {
             get
             {
                 if (instance != null) return instance;
-                var asset = Resources.Load<TextAsset>(nameof(AssetSetting));
+                var asset = Resources.Load<TextAsset>(nameof(BuildSetting));
                 var contents = asset != null ? asset.text : string.Empty;
                 if (string.IsNullOrEmpty(contents))
                 {
-                    instance = new AssetSetting();
+                    instance = new BuildSetting();
                     contents = JsonUtility.ToJson(instance);
                     var path = AssetDatabase.GetAssetPath(asset);
                     File.WriteAllText(path, contents);
                     return instance;
                 }
 
-                instance = JsonUtility.FromJson<AssetSetting>(contents);
+                instance = JsonUtility.FromJson<BuildSetting>(contents);
                 return instance;
             }
         }
@@ -156,7 +156,7 @@ namespace JFramework.Editor
         [PropertyOrder(2), Button("保存设置")]
         public void Save()
         {
-            var asset = Resources.Load<TextAsset>(nameof(AssetSetting));
+            var asset = Resources.Load<TextAsset>(nameof(BuildSetting));
             var json = JsonUtility.ToJson(instance);
             File.WriteAllText(AssetDatabase.GetAssetPath(asset), json);
         }

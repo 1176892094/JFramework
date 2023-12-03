@@ -178,11 +178,11 @@ namespace JFramework.Core
         /// <summary>
         /// 注册按钮组
         /// </summary>
-        /// <param name="buttonGroup"></param>
+        /// <param name="group"></param>
         /// <param name="action"></param>
-        public static void SetButtons(Component buttonGroup, UnityAction action)
+        public static void SetButtons(Component group, UnityAction action)
         {
-            var buttons = buttonGroup.GetComponentsInChildren<Button>();
+            var buttons = group.GetComponentsInChildren<Button>();
             foreach (var button in buttons)
             {
                 button.onClick.AddListener(action);
@@ -192,11 +192,11 @@ namespace JFramework.Core
         /// <summary>
         /// 注册开关组
         /// </summary>
-        /// <param name="buttonGroup"></param>
+        /// <param name="group"></param>
         /// <param name="action"></param>
-        public static void SetToggles(Component buttonGroup, UnityAction<bool> action)
+        public static void SetToggles(Component group, UnityAction<bool> action)
         {
-            var toggles = buttonGroup.GetComponentsInChildren<Toggle>();
+            var toggles = group.GetComponentsInChildren<Toggle>();
             foreach (var toggle in toggles)
             {
                 toggle.onValueChanged.AddListener(action);

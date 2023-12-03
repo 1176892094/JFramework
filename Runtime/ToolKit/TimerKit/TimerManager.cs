@@ -97,6 +97,8 @@ namespace JFramework.Core
         /// </summary>
         internal static void UnRegister()
         {
+            next = null;
+            first = null;
             queues.Clear();
             timers.Clear();
         }

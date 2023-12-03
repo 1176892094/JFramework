@@ -80,7 +80,7 @@ namespace JFramework
         /// 存放场景的AB包
         /// </summary>
         public string sceneBundle = "Scenes";
-        
+
         /// <summary>
         /// 存放音效的AB包
         /// </summary>
@@ -122,7 +122,7 @@ namespace JFramework
         /// <param name="assetName"></param>
         /// <returns></returns>
         public static string GetUIPath(string assetName) => Instance.UIBundle + "/" + assetName;
-        
+
         /// <summary>
         /// 获取音乐资源
         /// </summary>
@@ -136,7 +136,7 @@ namespace JFramework
         /// <param name="assetName"></param>
         /// <returns></returns>
         public static string GetScenePath(string assetName) => Instance.sceneBundle + "/" + assetName;
-        
+
         /// <summary>
         /// 获取UI资源
         /// </summary>
@@ -150,7 +150,10 @@ namespace JFramework
         /// </summary>
         /// <param name="fileName"></param>
         /// <returns></returns>
-        public static string GetPersistentPath(string fileName) => Path.Combine(Application.persistentDataPath, fileName);
+        public static string GetPersistentPath(string fileName)
+        {
+            return Path.Combine(Application.persistentDataPath, fileName);
+        }
 
         /// <summary>
         /// 根据 streamingAssetsPath 获取文件
@@ -159,11 +162,7 @@ namespace JFramework
         /// <returns></returns>
         public static string GetStreamingPath(string fileName)
         {
-#if !UNITY_EDITOR && UNITY_ANDROID
             return Path.Combine(Application.streamingAssetsPath, GetPlatform(fileName));
-#else
-            return Path.Combine("file://" + Application.streamingAssetsPath, GetPlatform(fileName));
-#endif
         }
 
         /// <summary>

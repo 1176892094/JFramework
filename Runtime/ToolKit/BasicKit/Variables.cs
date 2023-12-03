@@ -20,7 +20,7 @@ namespace JFramework
     /// </summary>
     /// <typeparam name="T"></typeparam>
     [Serializable]
-    public sealed class Variables<T> : IVariable where T : struct
+    public class Variables<T> : IVariable where T : struct
     {
         /// <summary>
         /// 泛型列表数值

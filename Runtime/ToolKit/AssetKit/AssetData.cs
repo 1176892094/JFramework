@@ -17,6 +17,7 @@ namespace JFramework
     /// <summary>
     /// 资源数据
     /// </summary>
+    [Serializable]
     internal struct AssetData
     {
         /// <summary>
@@ -32,7 +33,7 @@ namespace JFramework
         /// <summary>
         /// 资源大小
         /// </summary>
-        public long size;
+        public string size;
 
         /// <summary>
         /// 初始化
@@ -40,7 +41,7 @@ namespace JFramework
         /// <param name="code"></param>
         /// <param name="name"></param>
         /// <param name="size"></param>
-        public AssetData(string code, string name, long size)
+        public AssetData(string code, string name, string size)
         {
             this.code = code;
             this.name = name;

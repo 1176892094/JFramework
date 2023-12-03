@@ -34,7 +34,7 @@ namespace JFramework.Core
         /// <summary>
         /// 存储AB包的字典
         /// </summary>
-        internal static readonly Dictionary<string, AssetBundle> bundles = new Dictionary<string, AssetBundle>();
+        private static readonly Dictionary<string, AssetBundle> bundles = new Dictionary<string, AssetBundle>();
 
         /// <summary>
         /// 异步加载AB包的任务
@@ -57,9 +57,12 @@ namespace JFramework.Core
         /// <param name="bundle"></param>
         private static async Task LoadDependency(string bundle)
         {
-            if (mainAsset != null) return;
-            mainAsset = await LoadAssetBundleTask(GlobalSetting.Instance.platform.ToString());
-            manifest = mainAsset.LoadAsset<AssetBundleManifest>(nameof(AssetBundleManifest));
+            if (mainAsset == null)
+            {
+                mainAsset = await LoadAssetBundleTask(GlobalSetting.Instance.platform.ToString());
+                manifest = mainAsset.LoadAsset<AssetBundleManifest>(nameof(AssetBundleManifest));
+            }
+
             var dependencies = manifest.GetAllDependencies(bundle);
             foreach (var dependency in dependencies)
             {
@@ -103,6 +106,9 @@ namespace JFramework.Core
         private static async Task<AssetBundle> LoadAssetBundleAsync(string bundle)
         {
             var path = GlobalSetting.GetPersistentPath(bundle);
+#if UNITY_EDITOR
+            path = "file://" + path;
+#endif
             using (var request = UnityWebRequestAssetBundle.GetAssetBundle(path))
             {
                 await request.SendWebRequest();
@@ -115,6 +121,9 @@ namespace JFramework.Core
             }
 
             path = GlobalSetting.GetStreamingPath(bundle);
+#if UNITY_EDITOR
+            path = "file://" + path;
+#endif
             using (var request = UnityWebRequestAssetBundle.GetAssetBundle(path))
             {
                 await request.SendWebRequest();
@@ -141,9 +150,9 @@ namespace JFramework.Core
         {
             if (!GlobalManager.Runtime) return;
 #if UNITY_EDITOR
-            if (!AssetSetting.Instance.isRemote)
+            if (!BuildSetting.Instance.isRemote)
             {
-                AssetSetting.Instance.LoadAsync(path, action);
+                BuildSetting.Instance.LoadAsync(path, action);
                 return;
             }
 #endif
@@ -162,7 +171,7 @@ namespace JFramework.Core
                     return;
                 }
             }
-            
+
             if (typeof(T).IsSubclassOf(typeof(Component)))
             {
                 var obj = assetBundle.LoadAssetAsync<GameObject>(assetData.asset);
@@ -186,7 +195,7 @@ namespace JFramework.Core
         {
             if (!GlobalManager.Runtime) return null;
 #if UNITY_EDITOR
-            if (!AssetSetting.Instance.isRemote)
+            if (!BuildSetting.Instance.isRemote)
             {
                 return UnitySceneManager.LoadSceneAsync(path.Split('/')[1], LoadSceneMode.Single);
             }

@@ -23,6 +23,16 @@ namespace JFramework.Interface
         int count { get; }
         
         /// <summary>
+        /// 持续时间
+        /// </summary>
+        float duration { get; set; }
+
+        /// <summary>
+        /// 当前时间+持续时间
+        /// </summary>
+        float waitTime { get; set; }
+        
+        /// <summary>
         /// 计时器执行方法
         /// </summary>
         /// <param name="action">传入委托</param>
