@@ -10,8 +10,6 @@
 
 using System;
 using JFramework.Core;
-using JFramework.Interface;
-using Sirenix.OdinInspector;
 using UnityEngine;
 
 namespace JFramework
@@ -19,23 +17,23 @@ namespace JFramework
     /// <summary>
     /// 计时器
     /// </summary>
-    internal sealed partial class Timer : ITimer
+    [Serializable]
+    public sealed partial class Timer
     {
         /// <summary>
         /// 剩余循环次数
         /// </summary>
-        public int count { get; private set; }
+        public int count;
 
         /// <summary>
         /// 持续时间
         /// </summary>
-        [ShowInInspector]
-        public float duration { get; set; }
+        public float duration;
 
         /// <summary>
         /// 当前时间+持续时间
         /// </summary>
-        public float waitTime { get; set; }
+        public float waitTime;
 
         /// <summary>
         /// 是否受TimeScale影响
@@ -50,40 +48,110 @@ namespace JFramework
         /// <summary>
         /// 完成时执行的事件
         /// </summary>
-        private Action OnFinish;
+        private event Action OnComplete;
 
         /// <summary>
         /// 计时器执行方法
         /// </summary>
-        /// <param name="OnFinish"></param>
-        public ITimer Invoke(Action OnFinish)
+        /// <param name="OnComplete"></param>
+        public Timer Invoke(Action OnComplete)
         {
-            this.OnFinish = OnFinish;
+            this.OnComplete = OnComplete;
             return this;
         }
 
         /// <summary>
         /// 计时器执行方法
         /// </summary>
-        /// <param name="OnFinish"></param>
-        public ITimer Invoke(Action<ITimer> OnFinish)
+        /// <param name="OnComplete"></param>
+        public Timer Invoke(Action<Timer> OnComplete)
         {
-            this.OnFinish = () => OnFinish(this);
+            this.OnComplete = () => OnComplete(this);
             return this;
         }
 
         /// <summary>
-        /// 当更新时执行的方法
+        /// 计时器开始计时
         /// </summary>
-        /// <param name="current">当前游戏时间</param>
-        private void Update(float current)
+        /// <returns>返回自身</returns>
+        public Timer Play()
         {
-            if (current <= waitTime) return;
+            state = TimerState.Run;
+            return this;
+        }
+
+        /// <summary>
+        /// 计时器暂停计时
+        /// </summary>
+        /// <returns>返回自身</returns>
+        public Timer Stop()
+        {
+            state = TimerState.Stop;
+            return this;
+        }
+
+        /// <summary>
+        /// 设置计时器的循环
+        /// </summary>
+        /// <param name="count">计时器循环次数</param>
+        /// <returns>返回自身</returns>
+        public Timer Loops(int count = 0)
+        {
+            this.count = count;
+            return this;
+        }
+
+        /// <summary>
+        /// 设置计时器是否受TimeScale影响
+        /// </summary>
+        /// <returns>返回自身</returns>
+        public Timer Unscale()
+        {
+            unscaled = true;
+            waitTime = Time.unscaledTime + duration;
+            return this;
+        }
+    }
+
+    /// <summary>
+    /// 计时器内部方法
+    /// </summary>
+    public sealed partial class Timer
+    {
+        /// <summary>
+        /// 开启计时器
+        /// </summary>
+        /// <param name="duration">延迟时间</param>
+        internal void Start(float duration)
+        {
+            count = 1;
+            unscaled = false;
+            state = TimerState.Run;
+            this.duration = duration;
+            waitTime = Time.time + duration;
+        }
+
+        /// <summary>
+        /// 计时器更新
+        /// </summary>
+        internal void Update()
+        {
+            if (state != TimerState.Run)
+            {
+                return;
+            }
+
+            var current = unscaled ? Time.unscaledTime : Time.time;
+            if (current <= waitTime)
+            {
+                return;
+            }
+
             waitTime = current + duration;
             try
             {
                 count--;
-                OnFinish?.Invoke();
+                OnComplete?.Invoke();
                 if (count == 0)
                 {
                     TimerManager.Push(this);
@@ -96,85 +164,13 @@ namespace JFramework
         }
 
         /// <summary>
-        /// 计时器开始计时
-        /// </summary>
-        /// <returns>返回自身</returns>
-        public ITimer Play()
-        {
-            state = TimerState.Run;
-            return this;
-        }
-
-        /// <summary>
-        /// 计时器暂停计时
-        /// </summary>
-        /// <returns>返回自身</returns>
-        public ITimer Stop()
-        {
-            state = TimerState.Stop;
-            return this;
-        }
-
-        /// <summary>
-        /// 设置计时器的循环
-        /// </summary>
-        /// <param name="count">计时器循环次数</param>
-        /// <returns>返回自身</returns>
-        public ITimer Loops(int count)
-        {
-            this.count = count;
-            return this;
-        }
-
-        /// <summary>
-        /// 设置计时器是否受TimeScale影响
-        /// </summary>
-        /// <returns>返回自身</returns>
-        public ITimer Unscale()
-        {
-            unscaled = !unscaled;
-            waitTime = Time.unscaledTime + duration;
-            return this;
-        }
-    }
-
-    /// <summary>
-    /// 计时器内部方法
-    /// </summary>
-    internal sealed partial class Timer
-    {
-        /// <summary>
-        /// 开启计时器
-        /// </summary>
-        /// <param name="duration">延迟时间</param>
-        void ITimer.Start(float duration)
-        {
-            count = 1;
-            unscaled = false;
-            state = TimerState.Run;
-            this.duration = duration;
-            waitTime = Time.time + duration;
-        }
-
-        /// <summary>
-        /// 计时器更新
-        /// </summary>
-        void ITimer.Update()
-        {
-            if (state == TimerState.Run)
-            {
-                Update(unscaled ? Time.unscaledTime : Time.time);
-            }
-        }
-
-        /// <summary>
         /// 计时器回收
         /// </summary>
-        void ITimer.Close()
+        internal void Close()
         {
-            OnFinish = null;
             unscaled = false;
-            state = TimerState.Finish;
+            OnComplete = null;
+            state = TimerState.Complete;
         }
     }
 }

@@ -56,7 +56,7 @@ namespace JFramework
         /// <typeparam name="TState">可传入任何继承IState的对象</typeparam>
         public void AddState<TState>() where TState : IState, new()
         {
-            var state = StreamPool.Pop<TState>();
+            var state = StreamPool.Pop<IState>(typeof(TState));
             state.OnAwake(owner, this);
             states[typeof(TState)] = state;
         }
@@ -68,7 +68,7 @@ namespace JFramework
         /// <typeparam name="TValue">用于重写状态</typeparam>
         public void AddState<TState, TValue>() where TState : IState where TValue : IState, new()
         {
-            var state = StreamPool.Pop<TValue>();
+            var state = StreamPool.Pop<IState>(typeof(TValue));
             state.OnAwake(owner, this);
             states[typeof(TState)] = state;
         }

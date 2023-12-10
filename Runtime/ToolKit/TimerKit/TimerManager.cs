@@ -9,7 +9,6 @@
 // *********************************************************************************
 
 using System.Collections.Generic;
-using JFramework.Interface;
 
 namespace JFramework.Core
 {
@@ -21,22 +20,22 @@ namespace JFramework.Core
         /// <summary>
         /// 存储已经完成的计时器
         /// </summary>
-        internal static readonly Queue<ITimer> queues = new Queue<ITimer>();
+        internal static readonly Queue<Timer> queues = new Queue<Timer>();
 
         /// <summary>
         /// 存储正在执行的计时器
         /// </summary>
-        internal static readonly LinkedList<ITimer> timers = new LinkedList<ITimer>();
+        internal static readonly LinkedList<Timer> timers = new LinkedList<Timer>();
+        
+        /// <summary>
+        /// 下个计时器节点
+        /// </summary>
+        private static LinkedListNode<Timer> next;
 
         /// <summary>
         /// 一号计时器节点
         /// </summary>
-        private static LinkedListNode<ITimer> first;
-
-        /// <summary>
-        /// 下个计时器节点
-        /// </summary>
-        private static LinkedListNode<ITimer> next;
+        private static LinkedListNode<Timer> first;
 
         /// <summary>
         /// 注册
@@ -65,14 +64,14 @@ namespace JFramework.Core
         /// 计时器管理器侦听计时器
         /// </summary>
         /// <param name="time">持续时间</param>
-        public static ITimer Pop(float time)
+        public static Timer Pop(float time = 1)
         {
             if (!GlobalManager.Runtime) return null;
             if (!queues.TryDequeue(out var timer))
             {
                 timer = new Timer();
             }
-            
+
             timer.Start(time);
             timers.AddLast(timer);
             return timer;
@@ -82,7 +81,7 @@ namespace JFramework.Core
         /// 计时器管理器移除计时器
         /// </summary>
         /// <param name="timer">传入需要移除的计时器</param>
-        public static void Push(ITimer timer)
+        public static void Push(Timer timer)
         {
             if (!GlobalManager.Runtime) return;
             if (timers.Remove(timer))

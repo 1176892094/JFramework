@@ -179,10 +179,10 @@ namespace JFramework.Core
         private Dictionary<Type, Dictionary<string, IData>> strDataTable => Data<string>.dataTable;
 
         [ShowInInspector, LabelText("计时器 (已完成)")]
-        private Queue<ITimer> queues => TimerManager.queues;
+        private Queue<Timer> queues => TimerManager.queues;
 
         [ShowInInspector, LabelText("计时器 (运行中)")]
-        private LinkedList<ITimer> timers => TimerManager.timers;
+        private LinkedList<Timer> timers => TimerManager.timers;
 
         [ShowInInspector, LabelText("游戏音效 (已完成)")]
         private List<AudioClip> stacks => AudioManager.stacks.Select(audio => audio.clip).ToList();

@@ -28,6 +28,6 @@ namespace JFramework
         /// <summary>
         /// 完成状态
         /// </summary>
-        Finish = 2,
+        Complete = 2,
     }
 }

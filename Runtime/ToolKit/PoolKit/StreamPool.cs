@@ -51,7 +51,7 @@ namespace JFramework
                 return ((IPool<T>)stream).Pop();
             }
 
-            return Activator.CreateInstance<T>();
+            return (T)Activator.CreateInstance(type);
         }
 
         /// <summary>
