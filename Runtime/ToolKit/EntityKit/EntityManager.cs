@@ -46,6 +46,7 @@ namespace JFramework.Core
             if (!components.ContainsKey(type))
             {
                 var component = ScriptableObject.CreateInstance(type);
+                component.name = type.Name;
                 components.Add(type, component);
                 ((IController)component).Register(entity);
             }

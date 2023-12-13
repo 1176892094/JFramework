@@ -121,7 +121,7 @@ namespace JFramework.Core
             {
                 if (!obj.TryGetComponent<TPanel>(out var panel))
                 {
-                    obj.AddComponent<TPanel>();
+                    panel = obj.AddComponent<TPanel>();
                 }
 
                 panel.transform.SetParent(GetLayer(panel.layer), false);

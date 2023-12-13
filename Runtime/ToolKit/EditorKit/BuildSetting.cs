@@ -36,18 +36,16 @@ namespace JFramework.Editor
             get
             {
                 if (instance != null) return instance;
-                var asset = Resources.Load<TextAsset>(nameof(BuildSetting));
-                var contents = asset != null ? asset.text : string.Empty;
-                if (string.IsNullOrEmpty(contents))
+                var json = EditorPrefs.GetString(nameof(BuildSetting));
+                if (string.IsNullOrEmpty(json))
                 {
                     instance = new BuildSetting();
-                    contents = JsonUtility.ToJson(instance);
-                    var path = AssetDatabase.GetAssetPath(asset);
-                    File.WriteAllText(path, contents);
+                    json = JsonUtility.ToJson(instance);
+                    EditorPrefs.SetString(nameof(BuildSetting), json);
                     return instance;
                 }
 
-                instance = JsonUtility.FromJson<BuildSetting>(contents);
+                instance = JsonUtility.FromJson<BuildSetting>(json);
                 return instance;
             }
         }
@@ -156,9 +154,7 @@ namespace JFramework.Editor
         [PropertyOrder(2), Button("保存设置")]
         public void Save()
         {
-            var asset = Resources.Load<TextAsset>(nameof(BuildSetting));
-            var json = JsonUtility.ToJson(instance);
-            File.WriteAllText(AssetDatabase.GetAssetPath(asset), json);
+            EditorPrefs.SetString(nameof(BuildSetting), JsonUtility.ToJson(instance));
         }
 
         /// <summary>

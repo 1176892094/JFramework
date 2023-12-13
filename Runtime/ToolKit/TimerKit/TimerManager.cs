@@ -64,7 +64,7 @@ namespace JFramework.Core
         /// 计时器管理器侦听计时器
         /// </summary>
         /// <param name="time">持续时间</param>
-        public static Timer Pop(float time = 1)
+        public static Timer Pop(float time)
         {
             if (!GlobalManager.Runtime) return null;
             if (!queues.TryDequeue(out var timer))
