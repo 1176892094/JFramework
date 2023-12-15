@@ -107,6 +107,7 @@ namespace JFramework
         /// </summary>
         public void OnUpdate()
         {
+            if (items == null) return;
             var height = rect.height + rect.y;
             var position = content.anchoredPosition;
             var minIndex = Math.Max(0, (int)(position.y / height) * column);
