@@ -28,12 +28,12 @@ namespace JFramework
         /// <summary>
         /// 持续时间
         /// </summary>
-        public float duration;
+        private float duration;
 
         /// <summary>
         /// 当前时间+持续时间
         /// </summary>
-        public float waitTime;
+        private float waitTime;
 
         /// <summary>
         /// 是否受TimeScale影响
@@ -109,6 +109,28 @@ namespace JFramework
         {
             unscaled = true;
             waitTime = Time.unscaledTime + duration;
+            return this;
+        }
+
+        /// <summary>
+        /// 重新设置间隔
+        /// </summary>
+        /// <returns></returns>
+        public Timer Set(float duration)
+        {
+            this.duration = duration;
+            waitTime = unscaled ? Time.unscaledTime : Time.time;
+            waitTime += duration;
+            return this;
+        }
+        
+        /// <summary>
+        /// 重新设置间隔
+        /// </summary>
+        /// <returns></returns>
+        public Timer Add(float duration)
+        {
+            waitTime += duration;
             return this;
         }
     }
