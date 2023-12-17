@@ -9,6 +9,7 @@
 // *********************************************************************************
 
 using System.Collections.Generic;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using JFramework.Interface;
 
@@ -49,7 +50,8 @@ namespace JFramework
         /// <param name="message"></param>
         public static void Invoke(T message)
         {
-            foreach (var @event in events)
+            var copies = events.ToHashSet();
+            foreach (var @event in copies)
             {
                 ((IEvent<T>)@event)?.Execute(message);
             }
