@@ -13,6 +13,7 @@ using System.Collections.Generic;
 using System.Linq;
 using JFramework.Core;
 using JFramework.Interface;
+using Sirenix.OdinInspector;
 
 // ReSharper disable All
 
@@ -28,12 +29,12 @@ namespace JFramework
         /// <summary>
         /// 存储状态的字典
         /// </summary>
-        private Dictionary<Type, IState> states = new Dictionary<Type, IState>();
+        [ShowInInspector] private Dictionary<Type, IState> states = new Dictionary<Type, IState>();
 
         /// <summary>
         /// 状态的接口
         /// </summary>
-        private IState state;
+        [ShowInInspector] private IState state;
 
         /// <summary>
         /// 状态机更新
