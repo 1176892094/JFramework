@@ -26,7 +26,7 @@ namespace JFramework.Core
         /// <summary>
         /// 对象池容器
         /// </summary>
-        internal static readonly Dictionary<string, IPool> pools = new Dictionary<string, IPool>();
+        internal static readonly Dictionary<string, IPool<GameObject>> pools = new Dictionary<string, IPool<GameObject>>();
 
         /// <summary>
         /// 对象池管理器
@@ -51,12 +51,11 @@ namespace JFramework.Core
             if (!GlobalManager.Runtime) return;
             if (pools.TryGetValue(path, out var pool) && pool.Count > 0)
             {
-                var obj = ((IPool<GameObject>)pool).Pop();
+                var obj = pool.Pop();
                 if (obj != null)
                 {
                     obj.SetActive(true);
                     obj.transform.SetParent(null);
-                    obj.GetComponent<IPop>()?.OnPop();
                     action?.Invoke(obj.GetComponent<T>());
                     return;
                 }
@@ -66,7 +65,6 @@ namespace JFramework.Core
             {
                 obj.name = path;
                 Object.DontDestroyOnLoad(obj);
-                obj.GetComponent<IPop>()?.OnPop();
                 action?.Invoke(obj.GetComponent<T>());
             });
         }
@@ -81,23 +79,20 @@ namespace JFramework.Core
             if (!GlobalManager.Runtime) return;
             if (pools.TryGetValue(path, out var pool) && pool.Count > 0)
             {
-                var obj = ((IPool<GameObject>)pool).Pop();
+                var obj = pool.Pop();
                 if (obj != null)
                 {
                     obj.SetActive(true);
                     obj.transform.SetParent(null);
-                    obj.GetComponent<IPop>()?.OnPop();
                     action?.Invoke(obj);
                     return;
                 }
             }
 
-
             AssetManager.LoadAsync<GameObject>(path, obj =>
             {
                 obj.name = path;
                 Object.DontDestroyOnLoad(obj);
-                obj.GetComponent<IPop>()?.OnPop();
                 action?.Invoke(obj);
             });
         }
@@ -106,26 +101,27 @@ namespace JFramework.Core
         /// 对象池管理器推入对象
         /// </summary>
         /// <param name="obj">对象的实例</param>
-        public static bool Push(GameObject obj)
+        public static void Push(GameObject obj)
         {
-            if (!GlobalManager.Runtime) return false;
-            if (obj == null) return false;
-            if (pools.TryGetValue(obj.name, out var pool))
+            if (!GlobalManager.Runtime) return;
+            if (obj == null) return;
+            if (!parents.TryGetValue(obj.name, out var parent))
             {
-                if (!((IPool<GameObject>)pool).Push(obj)) return false;
+                parent = new GameObject(obj.name + "-Pool");
+                parent.transform.SetParent(poolManager);
+                pools.Add(obj.name, new Pool<GameObject>(obj));
+                obj.transform.SetParent(parent.transform);
+                parents.Add(obj.name, parent);
                 obj.SetActive(false);
-                obj.transform.SetParent(parents[obj.name].transform);
-                obj.GetComponent<IPush>()?.OnPush();
-                return true;
+                return;
             }
 
-            parents[obj.name] = new GameObject(obj.name + "-Pool");
-            parents[obj.name].transform.SetParent(poolManager);
-            obj.SetActive(false);
-            obj.transform.SetParent(parents[obj.name].transform);
-            obj.GetComponent<IPush>()?.OnPush();
-            pools.Add(obj.name, new Pool<GameObject>(obj));
-            return true;
+            if (pools.TryGetValue(obj.name, out var pool))
+            {
+                if (!pool.Push(obj)) return;
+                obj.transform.SetParent(parent.transform);
+                obj.SetActive(false);
+            }
         }
 
         /// <summary>
@@ -137,7 +133,7 @@ namespace JFramework.Core
             {
                 pool.Dispose();
             }
-            
+
             pools.Clear();
             parents.Clear();
         }

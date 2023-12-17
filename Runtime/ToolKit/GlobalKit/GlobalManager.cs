@@ -155,7 +155,7 @@ namespace JFramework.Core
         private Dictionary<Type, IPool> streams => StreamPool.streams;
 
         [ShowInInspector, LabelText("对象池")]
-        private Dictionary<string, IPool> pools => PoolManager.pools;
+        private Dictionary<string, IPool<GameObject>> pools => PoolManager.pools;
         
         [ShowInInspector, LabelText("实体单位")]
         private Dictionary<IEntity, Components> entities => EntityManager.entities;
