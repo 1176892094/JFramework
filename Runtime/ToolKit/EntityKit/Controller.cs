@@ -29,7 +29,9 @@ namespace JFramework
         /// <summary>
         /// 控制器注册角色
         /// </summary>
-        protected abstract void Register();
+        protected virtual void Register()
+        {
+        }
 
         /// <summary>
         /// 控制器注册角色

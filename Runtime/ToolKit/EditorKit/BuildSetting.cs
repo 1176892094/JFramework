@@ -156,6 +156,37 @@ namespace JFramework.Editor
         {
             EditorPrefs.SetString(nameof(BuildSetting), JsonUtility.ToJson(instance));
         }
+        
+        /// <summary>
+        /// 异步加载
+        /// </summary>
+        /// <param name="path"></param>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
+        public T Load<T>(string path) where T : Object
+        {
+            if (objects.TryGetValue(path, out var obj))
+            {
+                if (obj is Texture2D texture)
+                {
+                    obj = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), Vector2.one * 0.5f);
+                    return (T)obj;
+                }
+
+                if (typeof(T).IsSubclassOf(typeof(Component)))
+                {
+                    var asset = ((GameObject)Object.Instantiate(obj)).GetComponent<T>();
+                    return asset;
+                }
+                else
+                {
+                    var asset = obj is GameObject ? Object.Instantiate((T)obj) : (T)obj;
+                    return asset;
+                }
+            }
+
+            return null;
+        }
 
         /// <summary>
         /// 异步加载

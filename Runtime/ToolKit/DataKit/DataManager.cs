@@ -9,6 +9,7 @@
 // *********************************************************************************
 
 using System;
+using System.Threading.Tasks;
 using JFramework.Interface;
 using UnityEngine;
 using Debug = UnityEngine.Debug;
@@ -23,7 +24,7 @@ namespace JFramework.Core
         /// <summary>
         /// 加载数据表
         /// </summary>
-        public static void LoadDataTable()
+        public static async Task LoadDataTable()
         {
             var assembly = Reflection.GetAssembly("HotUpdate");
             if (assembly == null)
@@ -37,31 +38,29 @@ namespace JFramework.Core
             {
                 try
                 {
-                    AssetManager.LoadAsync<ScriptableObject>(GlobalSetting.GetTablePath(type.Name), obj =>
+                    var obj = await AssetManager.Load<ScriptableObject>(GlobalSetting.GetTablePath(type.Name));
+                    var table = (IDataTable)obj;
+                    if (type.FullName == null) return;
+                    var data = assembly.GetType(type.FullName[..^5]);
+                    var field = Reflection.GetField<KeyAttribute>(data);
+                    if (field == null)
                     {
-                        var table = (IDataTable)obj;
-                        if (type.FullName == null) return;
-                        var data = assembly.GetType(type.FullName[..^5]);
-                        var field = Reflection.GetField<KeyAttribute>(data);
-                        if (field == null)
-                        {
-                            Debug.LogWarning($"{data.Name.Red()} 缺少主键。");
-                            return;
-                        }
+                        Debug.LogWarning($"{data.Name.Red()} 缺少主键。");
+                        return;
+                    }
 
-                        if (field.FieldType.IsEnum)
-                        {
-                            Data<Enum>.Add(data, field, table);
-                        }
-                        else if (field.FieldType == typeof(int))
-                        {
-                            Data<int>.Add(data, field, table);
-                        }
-                        else if (field.FieldType == typeof(string))
-                        {
-                            Data<string>.Add(data, field, table);
-                        }
-                    });
+                    if (field.FieldType.IsEnum)
+                    {
+                        Data<Enum>.Add(data, field, table);
+                    }
+                    else if (field.FieldType == typeof(int))
+                    {
+                        Data<int>.Add(data, field, table);
+                    }
+                    else if (field.FieldType == typeof(string))
+                    {
+                        Data<string>.Add(data, field, table);
+                    }
                 }
                 catch (Exception e)
                 {

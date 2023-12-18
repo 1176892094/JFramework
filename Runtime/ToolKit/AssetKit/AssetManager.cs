@@ -139,6 +139,49 @@ namespace JFramework.Core
             Debug.LogWarning($"加载 {bundle} 资源包失败");
             return null;
         }
+        
+        /// <summary>
+        /// 根据路径加载
+        /// </summary>
+        /// <param name="path"></param>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
+        public static async Task<T> Load<T>(string path) where T : Object
+        {
+            if (!GlobalManager.Runtime) return null;
+#if UNITY_EDITOR
+            if (!BuildSetting.Instance.isRemote)
+            {
+                return BuildSetting.Instance.Load<T>(path);
+            }
+#endif
+            if (!assets.TryGetValue(path, out var assetData))
+            {
+                assetData = new Asset(path);
+                assets.Add(path, assetData);
+            }
+
+            await LoadDependency(assetData.bundle);
+            if (!bundles.TryGetValue(assetData.bundle, out var assetBundle))
+            {
+                assetBundle = await LoadAssetBundleTask(assetData.bundle);
+                if (assetBundle == null)
+                {
+                    return null;
+                }
+            }
+
+            if (typeof(T).IsSubclassOf(typeof(Component)))
+            {
+                var obj = assetBundle.LoadAssetAsync<GameObject>(assetData.asset);
+                return ((GameObject)Object.Instantiate(obj.asset)).GetComponent<T>();
+            }
+            else
+            {
+                var obj = assetBundle.LoadAssetAsync<T>(assetData.asset);
+                return obj.asset is GameObject ? (T)Object.Instantiate(obj.asset) : (T)obj.asset;
+            }
+        }
 
         /// <summary>
         /// 根据路径加载
