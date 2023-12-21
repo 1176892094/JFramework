@@ -10,6 +10,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using JFramework.Interface;
 using UnityEngine;
 using Object = UnityEngine.Object;
@@ -39,6 +40,54 @@ namespace JFramework.Core
         internal static void Register()
         {
             poolManager = GlobalManager.Instance.transform.Find("PoolManager");
+        }
+        
+        /// <summary>
+        /// 对象池管理器异步获取对象
+        /// </summary>
+        /// <param name="path">弹出对象的路径</param>
+        public static async Task<GameObject> Pop(string path)
+        {
+            if (!GlobalManager.Runtime) return default;
+            if (pools.TryGetValue(path, out var pool) && pool.Count > 0)
+            {
+                var obj = pool.Pop();
+                if (obj != null)
+                {
+                    obj.SetActive(true);
+                    obj.transform.SetParent(null);
+                    return obj;
+                }
+            }
+            
+            var o = await AssetManager.Load<GameObject>(path);
+            Object.DontDestroyOnLoad(o);
+            o.name = path;
+            return o;
+        }
+
+        /// <summary>
+        /// 对象池管理器异步获取对象
+        /// </summary>
+        /// <param name="path">弹出对象的路径</param>
+        public static async Task<T> Pop<T>(string path)
+        {
+            if (!GlobalManager.Runtime) return default;
+            if (pools.TryGetValue(path, out var pool) && pool.Count > 0)
+            {
+                var obj = pool.Pop();
+                if (obj != null)
+                {
+                    obj.SetActive(true);
+                    obj.transform.SetParent(null);
+                    return obj.GetComponent<T>();
+                }
+            }
+            
+            var o = await AssetManager.Load<GameObject>(path);
+            Object.DontDestroyOnLoad(o);
+            o.name = path;
+            return o.GetComponent<T>();
         }
 
         /// <summary>
