@@ -156,7 +156,7 @@ namespace JFramework.Editor
         {
             EditorPrefs.SetString(nameof(BuildSetting), JsonUtility.ToJson(instance));
         }
-        
+
         /// <summary>
         /// 异步加载
         /// </summary>

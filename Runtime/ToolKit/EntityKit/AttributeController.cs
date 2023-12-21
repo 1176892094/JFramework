@@ -1,4 +1,14 @@
 // *********************************************************************************
+// # Project: JFramework
+// # Unity: 2022.3.5f1c1
+// # Author: Charlotte
+// # Version: 1.0.0
+// # History: 2023-12-21  23:05
+// # Copyright: 2023, Charlotte
+// # Description: This is an automatically generated comment.
+// *********************************************************************************
+
+// *********************************************************************************
 // # Project: Forest
 // # Unity: 2022.3.5f1c1
 // # Author: Charlotte
@@ -18,9 +28,8 @@ namespace JFramework
     /// <summary>
     /// 属性控制器
     /// </summary>
-    /// <typeparam name="TEntity">控制器的所有者</typeparam>
     /// <typeparam name="TAttribute">持有属性枚举</typeparam>
-    public abstract class AttributeController<TEntity, TAttribute> : Controller<TEntity> where TEntity : IEntity where TAttribute : Enum
+    public abstract class AttributeController<TAttribute> : Controller where TAttribute : Enum
     {
         /// <summary>
         /// 存储 实体所持有的属性

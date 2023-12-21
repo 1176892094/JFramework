@@ -12,179 +12,185 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using JFramework.Interface;
+using Sirenix.OdinInspector;
 using UnityEngine;
-using Object = UnityEngine.Object;
 
-namespace JFramework.Core
+namespace JFramework
 {
-    public static class PoolManager
+    public sealed partial class GlobalManager
     {
-        /// <summary>
-        /// 对象池组
-        /// </summary>
-        private static readonly Dictionary<string, GameObject> parents = new Dictionary<string, GameObject>();
-
-        /// <summary>
-        /// 对象池容器
-        /// </summary>
-        internal static readonly Dictionary<string, IPool<GameObject>> pools = new Dictionary<string, IPool<GameObject>>();
-
         /// <summary>
         /// 对象池管理器
         /// </summary>
-        private static Transform poolManager;
+        public sealed class PoolManager : Controller
+        {
+            /// <summary>
+            /// 对象池组
+            /// </summary>
+            [ShowInInspector] private readonly Dictionary<string, GameObject> parents = new Dictionary<string, GameObject>();
 
-        /// <summary>
-        /// 获取 PoolManager 对象
-        /// </summary>
-        internal static void Register()
-        {
-            poolManager = GlobalManager.Instance.transform.Find("PoolManager");
-        }
-        
-        /// <summary>
-        /// 对象池管理器异步获取对象
-        /// </summary>
-        /// <param name="path">弹出对象的路径</param>
-        public static async Task<GameObject> Pop(string path)
-        {
-            if (!GlobalManager.Runtime) return default;
-            if (pools.TryGetValue(path, out var pool) && pool.Count > 0)
+            /// <summary>
+            /// 对象池容器
+            /// </summary>
+            [ShowInInspector] private readonly Dictionary<string, IPool<GameObject>> pools = new Dictionary<string, IPool<GameObject>>();
+
+            /// <summary>
+            /// 对象池管理器
+            /// </summary>
+            private Transform poolManager;
+
+            /// <summary>
+            /// 获取 PoolManager 对象
+            /// </summary>
+            private void Awake()
             {
-                var obj = pool.Pop();
-                if (obj != null)
-                {
-                    obj.SetActive(true);
-                    obj.transform.SetParent(null);
-                    return obj;
-                }
+                poolManager = owner.transform.Find("PoolManager");
             }
-            
-            var o = await AssetManager.Load<GameObject>(path);
-            Object.DontDestroyOnLoad(o);
-            o.name = path;
-            return o;
-        }
 
-        /// <summary>
-        /// 对象池管理器异步获取对象
-        /// </summary>
-        /// <param name="path">弹出对象的路径</param>
-        public static async Task<T> Pop<T>(string path)
-        {
-            if (!GlobalManager.Runtime) return default;
-            if (pools.TryGetValue(path, out var pool) && pool.Count > 0)
+            /// <summary>
+            /// 对象池管理器异步获取对象
+            /// </summary>
+            /// <param name="path">弹出对象的路径</param>
+            public async Task<GameObject> Pop(string path)
             {
-                var obj = pool.Pop();
-                if (obj != null)
+                if (!Runtime) return default;
+                if (pools.TryGetValue(path, out var pool) && pool.Count > 0)
                 {
-                    obj.SetActive(true);
-                    obj.transform.SetParent(null);
-                    return obj.GetComponent<T>();
+                    var obj = pool.Pop();
+                    if (obj != null)
+                    {
+                        obj.SetActive(true);
+                        obj.transform.SetParent(null);
+                        return obj;
+                    }
                 }
-            }
-            
-            var o = await AssetManager.Load<GameObject>(path);
-            Object.DontDestroyOnLoad(o);
-            o.name = path;
-            return o.GetComponent<T>();
-        }
 
-        /// <summary>
-        /// 对象池管理器异步获取对象
-        /// </summary>
-        /// <param name="path">弹出对象的路径</param>
-        /// <param name="action"></param>
-        public static void PopAsync<T>(string path, Action<T> action)
-        {
-            if (!GlobalManager.Runtime) return;
-            if (pools.TryGetValue(path, out var pool) && pool.Count > 0)
+                var o = await Asset.Load<GameObject>(path);
+                DontDestroyOnLoad(o);
+                o.name = path;
+                return o;
+            }
+
+            /// <summary>
+            /// 对象池管理器异步获取对象
+            /// </summary>
+            /// <param name="path">弹出对象的路径</param>
+            public async Task<T> Pop<T>(string path)
             {
-                var obj = pool.Pop();
-                if (obj != null)
+                if (!Runtime) return default;
+                if (pools.TryGetValue(path, out var pool) && pool.Count > 0)
                 {
-                    obj.SetActive(true);
-                    obj.transform.SetParent(null);
+                    var obj = pool.Pop();
+                    if (obj != null)
+                    {
+                        obj.SetActive(true);
+                        obj.transform.SetParent(null);
+                        return obj.GetComponent<T>();
+                    }
+                }
+
+                var o = await Asset.Load<GameObject>(path);
+                DontDestroyOnLoad(o);
+                o.name = path;
+                return o.GetComponent<T>();
+            }
+
+            /// <summary>
+            /// 对象池管理器异步获取对象
+            /// </summary>
+            /// <param name="path">弹出对象的路径</param>
+            /// <param name="action"></param>
+            public void PopAsync<T>(string path, Action<T> action)
+            {
+                if (!Runtime) return;
+                if (pools.TryGetValue(path, out var pool) && pool.Count > 0)
+                {
+                    var obj = pool.Pop();
+                    if (obj != null)
+                    {
+                        obj.SetActive(true);
+                        obj.transform.SetParent(null);
+                        action?.Invoke(obj.GetComponent<T>());
+                        return;
+                    }
+                }
+
+                Asset.LoadAsync<GameObject>(path, obj =>
+                {
+                    obj.name = path;
+                    DontDestroyOnLoad(obj);
                     action?.Invoke(obj.GetComponent<T>());
-                    return;
-                }
+                });
             }
 
-            AssetManager.LoadAsync<GameObject>(path, obj =>
+            /// <summary>
+            /// 对象池管理器异步获取对象
+            /// </summary>
+            /// <param name="path">弹出对象的路径</param>
+            /// <param name="action"></param>
+            public void PopAsync(string path, Action<GameObject> action)
             {
-                obj.name = path;
-                Object.DontDestroyOnLoad(obj);
-                action?.Invoke(obj.GetComponent<T>());
-            });
-        }
-
-        /// <summary>
-        /// 对象池管理器异步获取对象
-        /// </summary>
-        /// <param name="path">弹出对象的路径</param>
-        /// <param name="action"></param>
-        public static void PopAsync(string path, Action<GameObject> action)
-        {
-            if (!GlobalManager.Runtime) return;
-            if (pools.TryGetValue(path, out var pool) && pool.Count > 0)
-            {
-                var obj = pool.Pop();
-                if (obj != null)
+                if (!Runtime) return;
+                if (pools.TryGetValue(path, out var pool) && pool.Count > 0)
                 {
-                    obj.SetActive(true);
-                    obj.transform.SetParent(null);
+                    var obj = pool.Pop();
+                    if (obj != null)
+                    {
+                        obj.SetActive(true);
+                        obj.transform.SetParent(null);
+                        action?.Invoke(obj);
+                        return;
+                    }
+                }
+
+                Asset.LoadAsync<GameObject>(path, obj =>
+                {
+                    obj.name = path;
+                    DontDestroyOnLoad(obj);
                     action?.Invoke(obj);
+                });
+            }
+
+            /// <summary>
+            /// 对象池管理器推入对象
+            /// </summary>
+            /// <param name="obj">对象的实例</param>
+            public void Push(GameObject obj)
+            {
+                if (!Runtime) return;
+                if (obj == null) return;
+                if (!parents.TryGetValue(obj.name, out var parent))
+                {
+                    parent = new GameObject(obj.name + "-Pool");
+                    parent.transform.SetParent(poolManager);
+                    pools.Add(obj.name, new Pool<GameObject>(obj));
+                    obj.transform.SetParent(parent.transform);
+                    parents.Add(obj.name, parent);
+                    obj.SetActive(false);
                     return;
+                }
+
+                if (pools.TryGetValue(obj.name, out var pool))
+                {
+                    if (!pool.Push(obj)) return;
+                    obj.transform.SetParent(parent.transform);
+                    obj.SetActive(false);
                 }
             }
 
-            AssetManager.LoadAsync<GameObject>(path, obj =>
+            /// <summary>
+            /// 控制器销毁
+            /// </summary>
+            private void OnDestroy()
             {
-                obj.name = path;
-                Object.DontDestroyOnLoad(obj);
-                action?.Invoke(obj);
-            });
-        }
+                foreach (var pool in pools.Values)
+                {
+                    pool.Dispose();
+                }
 
-        /// <summary>
-        /// 对象池管理器推入对象
-        /// </summary>
-        /// <param name="obj">对象的实例</param>
-        public static void Push(GameObject obj)
-        {
-            if (!GlobalManager.Runtime) return;
-            if (obj == null) return;
-            if (!parents.TryGetValue(obj.name, out var parent))
-            {
-                parent = new GameObject(obj.name + "-Pool");
-                parent.transform.SetParent(poolManager);
-                pools.Add(obj.name, new Pool<GameObject>(obj));
-                obj.transform.SetParent(parent.transform);
-                parents.Add(obj.name, parent);
-                obj.SetActive(false);
-                return;
+                pools.Clear();
+                parents.Clear();
             }
-
-            if (pools.TryGetValue(obj.name, out var pool))
-            {
-                if (!pool.Push(obj)) return;
-                obj.transform.SetParent(parent.transform);
-                obj.SetActive(false);
-            }
-        }
-
-        /// <summary>
-        /// 管理器卸载
-        /// </summary>
-        internal static void UnRegister()
-        {
-            foreach (var pool in pools.Values)
-            {
-                pool.Dispose();
-            }
-
-            pools.Clear();
-            parents.Clear();
         }
     }
 }

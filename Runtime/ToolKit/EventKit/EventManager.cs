@@ -11,70 +11,74 @@
 using System;
 using System.Collections.Generic;
 using JFramework.Interface;
+using Sirenix.OdinInspector;
 
-namespace JFramework.Core
+namespace JFramework
 {
-    /// <summary>
-    /// 事件管理器
-    /// </summary>
-    public static class EventManager
+    public sealed partial class GlobalManager
     {
         /// <summary>
-        /// 事件观察字典
+        /// 事件管理器
         /// </summary>
-        internal static readonly Dictionary<Type, HashSet<IEvent>> observers = new Dictionary<Type, HashSet<IEvent>>();
-
-        /// <summary>
-        /// 事件管理器侦听事件
-        /// </summary>
-        /// <param name="event">传入观察的游戏对象</param>
-        /// <typeparam name="T">事件类型</typeparam>
-        /// <returns>返回是否能被侦听</returns>
-        public static void Listen<T>(IEvent<T> @event) where T : struct, IEvent
+        public sealed class EventManager : Controller
         {
-            if (!GlobalManager.Runtime) return;
-            if (!observers.ContainsKey(typeof(T)))
+            /// <summary>
+            /// 事件观察字典
+            /// </summary>
+            [ShowInInspector] private readonly Dictionary<Type, HashSet<IEvent>> observers = new Dictionary<Type, HashSet<IEvent>>();
+
+            /// <summary>
+            /// 事件管理器侦听事件
+            /// </summary>
+            /// <param name="event">传入观察的游戏对象</param>
+            /// <typeparam name="T">事件类型</typeparam>
+            /// <returns>返回是否能被侦听</returns>
+            public void Listen<T>(IEvent<T> @event) where T : struct, IEvent
             {
-                observers.Add(typeof(T), Event<T>.events = new HashSet<IEvent>());
-            }
-            
-            Event<T>.Listen(@event);
-        }
+                if (!Runtime) return;
+                if (!observers.ContainsKey(typeof(T)))
+                {
+                    observers.Add(typeof(T), Event<T>.events = new HashSet<IEvent>());
+                }
 
-        /// <summary>
-        /// 事件管理器移除事件
-        /// </summary>
-        /// <param name="event">传入观察的游戏对象</param>
-        /// <typeparam name="T">事件类型</typeparam>
-        /// <returns>返回是否能被移除</returns>
-        public static void Remove<T>(IEvent<T> @event) where T : struct, IEvent
-        {
-            if (!GlobalManager.Runtime) return;
-            Event<T>.Remove(@event);
-        }
-
-        /// <summary>
-        /// 事件管理器广播事件
-        /// </summary>
-        /// <param name="event">传入观察事件数据</param>
-        /// <typeparam name="T">事件类型</typeparam>
-        public static void Invoke<T>(T @event = default) where T : struct, IEvent
-        {
-            if (!GlobalManager.Runtime) return;
-            Event<T>.Invoke(@event);
-        }
-
-        /// <summary>
-        /// 事件管理器在开始游戏前重置
-        /// </summary>
-        internal static void Dispose()
-        {
-            foreach (var observer in observers.Values)
-            {
-                observer.Clear();
+                Event<T>.Listen(@event);
             }
 
-            observers.Clear();
+            /// <summary>
+            /// 事件管理器移除事件
+            /// </summary>
+            /// <param name="event">传入观察的游戏对象</param>
+            /// <typeparam name="T">事件类型</typeparam>
+            /// <returns>返回是否能被移除</returns>
+            public void Remove<T>(IEvent<T> @event) where T : struct, IEvent
+            {
+                if (!Runtime) return;
+                Event<T>.Remove(@event);
+            }
+
+            /// <summary>
+            /// 事件管理器广播事件
+            /// </summary>
+            /// <param name="event">传入观察事件数据</param>
+            /// <typeparam name="T">事件类型</typeparam>
+            public void Invoke<T>(T @event = default) where T : struct, IEvent
+            {
+                if (!Runtime) return;
+                Event<T>.Invoke(@event);
+            }
+
+            /// <summary>
+            /// 事件管理器销毁
+            /// </summary>
+            private void OnDestroy()
+            {
+                foreach (var observer in observers.Values)
+                {
+                    observer.Clear();
+                }
+
+                observers.Clear();
+            }
         }
     }
 }

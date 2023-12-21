@@ -16,7 +16,7 @@ namespace JFramework
         /// 底层
         /// </summary>
         Bottom = 0,
-        
+
         /// <summary>
         /// 默认层
         /// </summary>

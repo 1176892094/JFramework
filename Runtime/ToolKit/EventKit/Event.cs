@@ -50,7 +50,7 @@ namespace JFramework
         /// <param name="message"></param>
         public static void Invoke(T message)
         {
-            var copies = events.ToHashSet();
+            var copies = events.ToList();
             foreach (var @event in copies)
             {
                 ((IEvent<T>)@event)?.Execute(message);

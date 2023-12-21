@@ -10,6 +10,7 @@
 
 using System;
 using JFramework.Interface;
+using UnityEngine;
 
 namespace JFramework
 {
@@ -61,9 +62,9 @@ namespace JFramework
         /// </summary>
         /// <param name="owner"></param>
         /// <param name="machine">基本状态机</param>
-        void IState.OnAwake(IEntity owner, IStateMachine machine)
+        void IState.OnAwake(GameObject owner, IStateMachine machine)
         {
-            this.owner = (T)owner;
+            this.owner = owner.GetComponent<T>();
             this.machine = machine;
             OnAwake();
         }

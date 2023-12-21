@@ -85,13 +85,5 @@ namespace JFramework
 
             streams.Add(type, new Pool<T>(obj));
         }
-
-        /// <summary>
-        /// 清理流数据
-        /// </summary>
-        internal static void Dispose()
-        {
-            streams.Clear();
-        }
     }
 }

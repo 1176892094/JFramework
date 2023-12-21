@@ -8,7 +8,6 @@
 // # Description: This is an automatically generated comment.
 // *********************************************************************************
 
-using JFramework.Core;
 using UnityEngine;
 
 namespace JFramework

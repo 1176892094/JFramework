@@ -3,13 +3,12 @@
 // # Unity: 2022.3.5f1c1
 // # Author: Charlotte
 // # Version: 1.0.0
-// # History: 2023-11-12  22:54
+// # History: 2023-12-21  21:56
 // # Copyright: 2023, Charlotte
 // # Description: This is an automatically generated comment.
 // *********************************************************************************
 
 using System.Collections.Generic;
-using JFramework.Core;
 using JFramework.Interface;
 using UnityEngine;
 using UnityEngine.Events;
@@ -27,7 +26,7 @@ namespace JFramework
         /// <typeparam name="T"></typeparam>
         public static void Register<T>(this T panel) where T : Component, IPanel
         {
-            UIManager.panels.Add(typeof(T), panel);
+            GlobalManager.UI.panels.Add(typeof(T), panel);
         }
 
         /// <summary>
@@ -38,9 +37,9 @@ namespace JFramework
         public static void UnRegister<T>(this T panel) where T : Component, IPanel
         {
             Object.Destroy(panel.gameObject);
-            UIManager.panels.Remove(typeof(T));
+            GlobalManager.UI.panels.Remove(typeof(T));
         }
-        
+
         /// <summary>
         /// 更新格子对象
         /// </summary>

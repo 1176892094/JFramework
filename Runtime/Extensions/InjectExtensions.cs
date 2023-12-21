@@ -3,13 +3,13 @@
 // # Unity: 2022.3.5f1c1
 // # Author: Charlotte
 // # Version: 1.0.0
-// # History: 2023-10-24  23:41
+// # History: 2023-12-21  21:03
 // # Copyright: 2023, Charlotte
 // # Description: This is an automatically generated comment.
 // *********************************************************************************
 
 using System.Reflection;
-using JFramework.Core;
+using JFramework;
 using JFramework.Interface;
 using UnityEngine;
 using UnityEngine.UI;
@@ -28,15 +28,15 @@ namespace JFramework
         public static void Inject(this IInject inject)
         {
             var type = inject.GetType();
-            var fields = type.GetFields(Reflection.Instance);
+            var fields = type.GetFields(Reflection.Instance | BindingFlags.Static);
             foreach (var field in fields)
             {
                 var attribute = field.GetCustomAttribute<InjectAttribute>(true);
                 if (attribute == null) continue;
 
-                if (typeof(IController).IsAssignableFrom(field.FieldType))
+                if (typeof(Controller).IsAssignableFrom(field.FieldType))
                 {
-                    var obj = EntityManager.Register(inject, field.FieldType);
+                    var obj = GlobalManager.Entity.Register(inject.gameObject, field.FieldType);
                     field.SetValue(inject, obj);
                 }
                 else if (typeof(Component).IsAssignableFrom(field.FieldType))

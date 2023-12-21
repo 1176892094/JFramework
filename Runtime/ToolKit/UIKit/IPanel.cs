@@ -16,7 +16,7 @@ namespace JFramework.Interface
         /// UI层级
         /// </summary>
         UILayer layer { get; }
-        
+
         /// <summary>
         /// UI面板状态
         /// </summary>

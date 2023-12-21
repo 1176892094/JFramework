@@ -3,12 +3,13 @@
 // # Unity: 2022.3.5f1c1
 // # Author: Charlotte
 // # Version: 1.0.0
-// # History: 2023-10-24  23:35
+// # History: 2023-12-21  20:54
 // # Copyright: 2023, Charlotte
 // # Description: This is an automatically generated comment.
 // *********************************************************************************
 
 using System;
+using JFramework;
 using JFramework.Interface;
 using UnityEngine;
 
@@ -36,8 +37,8 @@ namespace JFramework
         protected virtual void OnDisable() => GetComponent<IUpdate>()?.Remove();
 
         /// <summary>
-        /// 实体销毁 (如果能获取到角色接口 则销毁角色的控制器)
+        /// 实体销毁 (销毁控制器)
         /// </summary>
-        protected virtual void OnDestroy() => this.UnRegister();
+        protected virtual void OnDestroy() => gameObject.UnRegister();
     }
 }

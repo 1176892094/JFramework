@@ -11,7 +11,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using JFramework.Core;
 using JFramework.Interface;
 using Sirenix.OdinInspector;
 
@@ -23,8 +22,7 @@ namespace JFramework
     /// 状态机类
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    [Serializable]
-    public abstract class StateMachine<T> : Controller<T>, IStateMachine where T : IEntity
+    public abstract class StateMachine<T> : Controller, IStateMachine where T : IEntity
     {
         /// <summary>
         /// 存储状态的字典
@@ -92,7 +90,7 @@ namespace JFramework
         /// <typeparam name="TState">可传入任何继承IState的对象</typeparam>
         public void ChangeState<TState>(float duration) where TState : IState
         {
-            TimerManager.Pop(duration).Invoke(ChangeState<TState>);
+            GlobalManager.Time.Pop(duration).Invoke(ChangeState<TState>);
         }
 
         /// <summary>

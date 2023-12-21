@@ -10,14 +10,14 @@
 
 namespace JFramework.Interface
 {
-      /// <summary>
-       /// 进入接口
-       /// </summary>
-       public interface IEnter
-       {
-           /// <summary>
-           /// 进入状态
-           /// </summary>
-           void OnEnter();
-       }
+    /// <summary>
+    /// 进入接口
+    /// </summary>
+    public interface IEnter
+    {
+        /// <summary>
+        /// 进入状态
+        /// </summary>
+        void OnEnter();
+    }
 }

@@ -8,7 +8,6 @@
 // # Description: This is an automatically generated comment.
 // *********************************************************************************
 
-using JFramework.Core;
 using UnityEngine;
 
 namespace JFramework
@@ -24,7 +23,7 @@ namespace JFramework
         /// <param name="obj">传入ScriptableObject</param>
         public static void Save(this ScriptableObject obj)
         {
-            JsonManager.Save(obj, obj.name);
+            GlobalManager.Json.Save(obj, obj.name);
         }
 
         /// <summary>
@@ -33,7 +32,7 @@ namespace JFramework
         /// <param name="obj">传入ScriptableObject</param>
         public static void Load(this ScriptableObject obj)
         {
-            JsonManager.Load(obj);
+            GlobalManager.Json.Load(obj);
         }
 
         /// <summary>
@@ -42,7 +41,12 @@ namespace JFramework
         /// <param name="obj">传入ScriptableObject</param>
         public static void Encrypt(this ScriptableObject obj)
         {
-            JsonManager.Encrypt(obj, obj.name);
+            if (obj.name.IsEmpty())
+            {
+                obj.name = obj.GetType().Name;
+            }
+
+            GlobalManager.Json.Encrypt(obj, obj.name);
         }
 
         /// <summary>
@@ -51,7 +55,12 @@ namespace JFramework
         /// <param name="obj">传入ScriptableObject</param>
         public static void Decrypt(this ScriptableObject obj)
         {
-            JsonManager.Decrypt(obj);
+            if (obj.name.IsEmpty())
+            {
+                obj.name = obj.GetType().Name;
+            }
+
+            GlobalManager.Json.Decrypt(obj);
         }
     }
 }

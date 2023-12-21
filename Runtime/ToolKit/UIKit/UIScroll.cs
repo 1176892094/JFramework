@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using JFramework.Core;
 using JFramework.Interface;
 using UnityEngine;
 
@@ -121,7 +120,7 @@ namespace JFramework
                     {
                         if (grid != null)
                         {
-                            PoolManager.Push(grid.gameObject);
+                            GlobalManager.Pool.Push(grid.gameObject);
                         }
 
                         grids.Remove(i);
@@ -134,7 +133,7 @@ namespace JFramework
                     {
                         if (grid != null)
                         {
-                            PoolManager.Push(grid.gameObject);
+                            GlobalManager.Pool.Push(grid.gameObject);
                         }
 
                         grids.Remove(i);
@@ -151,7 +150,7 @@ namespace JFramework
 
                 var index = i;
                 grids.Add(index, default);
-                PoolManager.PopAsync(path, obj =>
+                GlobalManager.Pool.PopAsync(path, obj =>
                 {
                     obj.transform.SetParent(content);
                     obj.transform.localScale = Vector3.one;
@@ -169,7 +168,7 @@ namespace JFramework
                     }
                     else
                     {
-                        PoolManager.Push(obj);
+                        GlobalManager.Pool.Push(obj);
                     }
                 });
             }

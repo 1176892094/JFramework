@@ -9,7 +9,6 @@
 // *********************************************************************************
 
 using System;
-using JFramework.Core;
 using UnityEngine;
 
 namespace JFramework
@@ -123,7 +122,7 @@ namespace JFramework
             waitTime += duration;
             return this;
         }
-        
+
         /// <summary>
         /// 重新设置间隔
         /// </summary>
@@ -176,12 +175,12 @@ namespace JFramework
                 OnComplete?.Invoke();
                 if (count == 0)
                 {
-                    TimerManager.Push(this);
+                    GlobalManager.Time.Push(this);
                 }
             }
             catch (Exception)
             {
-                TimerManager.Push(this);
+                GlobalManager.Time.Push(this);
             }
         }
 

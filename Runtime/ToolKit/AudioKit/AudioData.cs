@@ -8,6 +8,8 @@
 // # Description: This is an automatically generated comment.
 // *********************************************************************************
 
+using UnityEngine;
+
 namespace JFramework
 {
     /// <summary>
@@ -18,11 +20,11 @@ namespace JFramework
         /// <summary>
         /// 背景音乐大小
         /// </summary>
-        public float musicVolume = 0.5f;
+        [Range(0, 1f)] public float musicVolume = 0.5f;
 
         /// <summary>
         /// 游戏音乐大小
         /// </summary>
-        public float audioVolume = 0.5f;
+        [Range(0, 1f)] public float audioVolume = 0.5f;
     }
 }

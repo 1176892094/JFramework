@@ -13,154 +13,156 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using JFramework.Core;
+using Sirenix.OdinInspector;
 using UnityEngine;
 using UnityEngine.Networking;
 using Debug = UnityEngine.Debug;
 
 namespace JFramework
 {
-    /// <summary>
-    /// AB包更新相关
-    /// </summary>
-    public static class AssetRequest
+    public sealed partial class GlobalManager
     {
         /// <summary>
-        /// 本地数据列表
+        /// AB包更新相关
         /// </summary>
-        private static Dictionary<string, AssetData> clientAssets = new Dictionary<string, AssetData>();
-
-        /// <summary>
-        /// 远端数据列表
-        /// </summary>
-        private static Dictionary<string, AssetData> remoteAssets = new Dictionary<string, AssetData>();
-
-        /// <summary>
-        /// 资源数据列表
-        /// </summary>
-        private static readonly List<string> updateAssets = new List<string>();
-
-        /// <summary>
-        /// 当开始下载资源(资源数量)
-        /// </summary>
-        public static event Action<int> OnLoadStart;
-
-        /// <summary>
-        /// 资源加载进度(资源名称，加载进度)
-        /// </summary>
-        public static event Action<string, float> OnLoadUpdate;
-
-        /// <summary>
-        /// 当资源下载完成
-        /// </summary>
-        public static event Action OnLoadComplete;
-
-        /// <summary>
-        /// 检测是否需要更新
-        /// </summary>
-        /// <returns></returns>
-        public static async Task<bool> UpdateAssetBundles()
+        public class AssetRequest : Controller
         {
-            if (!GlobalManager.Runtime) return false;
-            var success = await GetRemoteInfo();
-            if (success)
+            /// <summary>
+            /// 远端数据列表
+            /// </summary>
+            [ShowInInspector] private Dictionary<string, AssetData> remoteAssets = new Dictionary<string, AssetData>();
+
+            /// <summary>
+            /// 本地数据列表
+            /// </summary>
+            [ShowInInspector] private Dictionary<string, AssetData> clientAssets = new Dictionary<string, AssetData>();
+
+            /// <summary>
+            /// 资源数据列表
+            /// </summary>
+            private readonly List<string> updateAssets = new List<string>();
+
+            /// <summary>
+            /// 当开始下载资源(资源数量)
+            /// </summary>
+            public event Action<int> OnLoadStart;
+
+            /// <summary>
+            /// 资源加载进度(资源名称，加载进度)
+            /// </summary>
+            public event Action<string, float> OnLoadUpdate;
+
+            /// <summary>
+            /// 当资源下载完成
+            /// </summary>
+            public event Action OnLoadComplete;
+
+            /// <summary>
+            /// 检测是否需要更新
+            /// </summary>
+            /// <returns></returns>
+            public async Task<bool> UpdateAssetBundles()
             {
-                Debug.Log("解析远端对比文件完成");
-                var remoteInfo = await File.ReadAllTextAsync(GlobalSetting.remoteInfoPath);
-                var jsonData = JsonUtility.FromJson<Variables<AssetData>>(remoteInfo);
-                remoteAssets = jsonData.value.ToDictionary(data => data.name);
-
-                var clientInfo = await GetClientInfo();
-                jsonData = JsonUtility.FromJson<Variables<AssetData>>(clientInfo);
-                clientAssets = jsonData.value.ToDictionary(data => data.name);
-
-                Debug.Log("解析本地对比文件完成");
-                foreach (var fileName in remoteAssets.Keys)
+                if (!Runtime) return false;
+                var success = await GetRemoteInfo();
+                if (success)
                 {
-                    if (!clientAssets.ContainsKey(fileName))
+                    Debug.Log("解析远端对比文件完成");
+                    var remoteInfo = await File.ReadAllTextAsync(GlobalSetting.remoteInfoPath);
+                    var jsonData = JsonUtility.FromJson<Variables<AssetData>>(remoteInfo);
+                    remoteAssets = jsonData.value.ToDictionary(data => data.name);
+
+                    var clientInfo = await GetClientInfo();
+                    jsonData = JsonUtility.FromJson<Variables<AssetData>>(clientInfo);
+                    clientAssets = jsonData.value.ToDictionary(data => data.name);
+
+                    Debug.Log("解析本地对比文件完成");
+                    foreach (var fileName in remoteAssets.Keys)
                     {
-                        updateAssets.Add(fileName);
-                    }
-                    else
-                    {
-                        if (clientAssets[fileName] != remoteAssets[fileName])
+                        if (!clientAssets.ContainsKey(fileName))
                         {
                             updateAssets.Add(fileName);
                         }
+                        else
+                        {
+                            if (clientAssets[fileName] != remoteAssets[fileName])
+                            {
+                                updateAssets.Add(fileName);
+                            }
 
-                        clientAssets.Remove(fileName);
+                            clientAssets.Remove(fileName);
+                        }
                     }
-                }
 
-                Debug.Log("删除弃用的资源文件");
-                foreach (var path in clientAssets.Keys.Select(GlobalSetting.GetPersistentPath).Where(File.Exists))
-                {
-                    File.Delete(path);
-                }
-
-                success = await GetAssetBundles();
-                if (success)
-                {
-                    await File.WriteAllTextAsync(GlobalSetting.clientInfoPath, remoteInfo);
-                    OnLoadComplete?.Invoke();
-                    return true;
-                }
-            }
-
-            Debug.Log("更新失败。");
-            return false;
-        }
-
-        /// <summary>
-        /// 从服务器下载校对文件
-        /// </summary>
-        private static async Task<bool> GetRemoteInfo()
-        {
-            var reloads = 5;
-            var success = false;
-            while (!success && reloads-- > 0)
-            {
-                var fileUri = GlobalSetting.GetRemoteFilePath(GlobalSetting.clientInfoName);
-                using (var request = UnityWebRequest.Head(fileUri))
-                {
-                    request.timeout = 1;
-                    await request.SendWebRequest();
-                    if (request.result != UnityWebRequest.Result.Success)
+                    Debug.Log("删除弃用的资源文件");
+                    foreach (var path in clientAssets.Keys.Select(GlobalSetting.GetPersistentPath).Where(File.Exists))
                     {
-                        Debug.Log($"校验 {GlobalSetting.Instance.assetInfo} 失败\n");
-                        continue;
+                        File.Delete(path);
                     }
-                }
 
-                using (var request = UnityWebRequest.Get(fileUri))
-                {
-                    await request.SendWebRequest();
-                    if (request.result != UnityWebRequest.Result.Success)
+                    success = await GetAssetBundles();
+                    if (success)
                     {
-                        Debug.Log($"下载 {GlobalSetting.Instance.assetInfo} 失败\n");
-                        continue;
+                        await File.WriteAllTextAsync(GlobalSetting.clientInfoPath, remoteInfo);
+                        OnLoadComplete?.Invoke();
+                        return true;
                     }
-
-                    var contents = request.downloadHandler.text;
-                    await File.WriteAllTextAsync(GlobalSetting.remoteInfoPath, contents);
                 }
 
-                success = true;
+                Debug.Log("更新失败。");
+                return false;
             }
 
-            return success;
-        }
-
-        /// <summary>
-        /// 异步读取文件
-        /// </summary>
-        /// <returns></returns>
-        private static async Task<string> GetClientInfo()
-        {
-            if (File.Exists(GlobalSetting.clientInfoPath))
+            /// <summary>
+            /// 从服务器下载校对文件
+            /// </summary>
+            private async Task<bool> GetRemoteInfo()
             {
-                return await File.ReadAllTextAsync(GlobalSetting.clientInfoPath);
+                var reloads = 5;
+                var success = false;
+                while (!success && reloads-- > 0)
+                {
+                    var fileUri = GlobalSetting.GetRemoteFilePath(GlobalSetting.clientInfoName);
+                    using (var request = UnityWebRequest.Head(fileUri))
+                    {
+                        request.timeout = 1;
+                        await request.SendWebRequest();
+                        if (request.result != UnityWebRequest.Result.Success)
+                        {
+                            Debug.Log($"校验 {GlobalSetting.Instance.assetInfo} 失败\n");
+                            continue;
+                        }
+                    }
+
+                    using (var request = UnityWebRequest.Get(fileUri))
+                    {
+                        await request.SendWebRequest();
+                        if (request.result != UnityWebRequest.Result.Success)
+                        {
+                            Debug.Log($"下载 {GlobalSetting.Instance.assetInfo} 失败\n");
+                            continue;
+                        }
+
+                        var contents = request.downloadHandler.text;
+                        await File.WriteAllTextAsync(GlobalSetting.remoteInfoPath, contents);
+                    }
+
+                    success = true;
+                }
+
+                return success;
             }
+
+            /// <summary>
+            /// 异步读取文件
+            /// </summary>
+            /// <returns></returns>
+            private async Task<string> GetClientInfo()
+            {
+                if (File.Exists(GlobalSetting.clientInfoPath))
+                {
+                    return await File.ReadAllTextAsync(GlobalSetting.clientInfoPath);
+                }
 
 #if UNITY_ANDROID && !UNITY_EDITOR
             using var request = UnityWebRequest.Get(GlobalSetting.streamingInfoPath);
@@ -170,68 +172,66 @@ namespace JFramework
                 return request.downloadHandler.text;
             }
 #else
-            if (File.Exists(GlobalSetting.streamingInfoPath))
-            {
-                return await File.ReadAllTextAsync(GlobalSetting.streamingInfoPath);
-            }
-#endif
-            return null;
-        }
-
-        /// <summary>
-        /// 下载待下载列表中的AB包文件
-        /// </summary>
-        private static async Task<bool> GetAssetBundles()
-        {
-            var reloads = 5;
-            var copyList = updateAssets.ToList();
-            OnLoadStart?.Invoke(updateAssets.Count);
-            while (updateAssets.Count > 0 && reloads-- > 0)
-            {
-                foreach (var fileName in copyList)
+                if (File.Exists(GlobalSetting.streamingInfoPath))
                 {
-                    var fileUri = GlobalSetting.GetRemoteFilePath(fileName);
-                    using (var request = UnityWebRequest.Get(fileUri))
+                    return await File.ReadAllTextAsync(GlobalSetting.streamingInfoPath);
+                }
+#endif
+                return null;
+            }
+
+            /// <summary>
+            /// 下载待下载列表中的AB包文件
+            /// </summary>
+            private async Task<bool> GetAssetBundles()
+            {
+                var reloads = 5;
+                var copyList = updateAssets.ToList();
+                OnLoadStart?.Invoke(updateAssets.Count);
+                while (updateAssets.Count > 0 && reloads-- > 0)
+                {
+                    foreach (var fileName in copyList)
                     {
-                        var result = request.SendWebRequest();
-                        while (!result.isDone && GlobalManager.Runtime)
+                        var fileUri = GlobalSetting.GetRemoteFilePath(fileName);
+                        using (var request = UnityWebRequest.Get(fileUri))
                         {
-                            OnLoadUpdate?.Invoke(fileName, request.downloadProgress);
-                            await Task.Yield();
+                            var result = request.SendWebRequest();
+                            while (!result.isDone && Runtime)
+                            {
+                                OnLoadUpdate?.Invoke(fileName, request.downloadProgress);
+                                await Task.Yield();
+                            }
+
+                            OnLoadUpdate?.Invoke(fileName, 1);
+                            if (request.result != UnityWebRequest.Result.Success)
+                            {
+                                Debug.Log($"下载 {fileName} 文件失败\n");
+                                continue;
+                            }
+
+                            var contents = request.downloadHandler.text;
+                            await File.WriteAllTextAsync(GlobalSetting.GetPersistentPath(fileName), contents);
                         }
 
-                        OnLoadUpdate?.Invoke(fileName, 1);
-                        if (request.result != UnityWebRequest.Result.Success)
+                        if (updateAssets.Contains(fileName))
                         {
-                            Debug.Log($"下载 {fileName} 文件失败\n");
-                            continue;
+                            updateAssets.Remove(fileName);
                         }
-
-                        var contents = request.downloadHandler.text;
-                        await File.WriteAllTextAsync(GlobalSetting.GetPersistentPath(fileName), contents);
-                    }
-
-                    if (updateAssets.Contains(fileName))
-                    {
-                        updateAssets.Remove(fileName);
                     }
                 }
+
+                return updateAssets.Count == 0;
             }
 
-            return updateAssets.Count == 0;
-        }
-
-        /// <summary>
-        /// 释放资源
-        /// </summary>
-        internal static void Dispose()
-        {
-            OnLoadStart = null;
-            OnLoadUpdate = null;
-            OnLoadComplete = null;
-            updateAssets.Clear();
-            clientAssets.Clear();
-            remoteAssets.Clear();
+            private void OnDestroy()
+            {
+                OnLoadStart = null;
+                OnLoadUpdate = null;
+                OnLoadComplete = null;
+                updateAssets.Clear();
+                clientAssets.Clear();
+                remoteAssets.Clear();
+            }
         }
     }
 }

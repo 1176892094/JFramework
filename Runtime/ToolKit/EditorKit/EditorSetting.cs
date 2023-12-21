@@ -185,7 +185,7 @@ namespace JFramework.Editor
                 }
             }
 
-            Debug.Log($"更新 AssetBundles 完成。".Green());
+            Debug.Log("更新 AssetBundles 完成。".Green());
             BuildSetting.Instance.Save();
             AssetDatabase.Refresh();
         }

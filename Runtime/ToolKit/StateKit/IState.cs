@@ -8,6 +8,8 @@
 // # Description: This is an automatically generated comment.
 // *********************************************************************************
 
+using UnityEngine;
+
 namespace JFramework.Interface
 {
     /// <summary>
@@ -25,6 +27,6 @@ namespace JFramework.Interface
         /// </summary>
         /// <param name="owner"></param>
         /// <param name="machine">状态机</param>
-        void OnAwake(IEntity owner, IStateMachine machine);
+        void OnAwake(GameObject owner, IStateMachine machine);
     }
 }
