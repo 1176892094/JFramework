@@ -52,6 +52,7 @@ namespace JFramework.Core
         /// </summary>
         internal static void Register()
         {
+            isActive = true;
             poolManager = GlobalManager.Instance.transform.Find("PoolManager");
             audioData = JsonManager.Decrypt<AudioData>(nameof(AudioManager));
             audioSource = poolManager.GetComponent<AudioSource>();
