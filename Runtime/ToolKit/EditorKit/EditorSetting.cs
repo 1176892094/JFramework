@@ -26,6 +26,9 @@ using Object = UnityEngine.Object;
 
 namespace JFramework.Editor
 {
+    /// <summary>
+    /// 编辑器设置
+    /// </summary>
     internal class EditorSetting : OdinMenuEditorWindow
     {
         /// <summary>
@@ -84,7 +87,7 @@ namespace JFramework.Editor
         {
             Add(2, "资源", BuildSetting.Instance);
             Add(1, "设置", GlobalSetting.Instance);
-            var tree = new OdinMenuTree(false);
+            var tree = new OdinMenuTree();
             foreach (var (id, (path, item)) in windows)
             {
                 switch (id)

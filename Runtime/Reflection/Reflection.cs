@@ -43,8 +43,8 @@ namespace JFramework
         /// <summary>
         /// 获取所有继承 T 的类型
         /// </summary>
-        /// <param name="assembly"></param>
-        /// <typeparam name="T"></typeparam>
+        /// <param name="assembly">传入程序集</param>
+        /// <typeparam name="T">程序集中的类型</typeparam>
         /// <returns></returns>
         public static Type[] GetTypes<T>(Assembly assembly)
         {

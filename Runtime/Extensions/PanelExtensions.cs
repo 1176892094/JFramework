@@ -8,12 +8,13 @@
 // # Description: This is an automatically generated comment.
 // *********************************************************************************
 
+using System;
 using System.Collections.Generic;
 using JFramework.Interface;
 using UnityEngine;
-using UnityEngine.Events;
 using UnityEngine.EventSystems;
 using EventEntry = UnityEngine.EventSystems.EventTrigger.Entry;
+using Object = UnityEngine.Object;
 
 namespace JFramework
 {
@@ -68,7 +69,7 @@ namespace JFramework
         /// <param name="target"></param>
         /// <param name="type">事件触发类型</param>
         /// <param name="action">事件触发后的回调</param>
-        public static void AddListener(this UIBehaviour target, EventTriggerType type, UnityAction<PointerEventData> action)
+        public static void AddListener(this UIBehaviour target, EventTriggerType type, Action<PointerEventData> action)
         {
             var trigger = target.GetComponent<EventTrigger>();
             if (trigger == null)

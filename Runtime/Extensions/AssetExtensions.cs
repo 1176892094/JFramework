@@ -23,6 +23,11 @@ namespace JFramework
         /// <param name="obj">传入ScriptableObject</param>
         public static void Save(this ScriptableObject obj)
         {
+            if (obj.name.IsEmpty())
+            {
+                obj.name = obj.GetType().Name;
+            }
+
             GlobalManager.Json.Save(obj, obj.name);
         }
 
@@ -32,6 +37,11 @@ namespace JFramework
         /// <param name="obj">传入ScriptableObject</param>
         public static void Load(this ScriptableObject obj)
         {
+            if (obj.name.IsEmpty())
+            {
+                obj.name = obj.GetType().Name;
+            }
+
             GlobalManager.Json.Load(obj);
         }
 

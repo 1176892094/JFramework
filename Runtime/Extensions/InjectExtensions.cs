@@ -9,7 +9,6 @@
 // *********************************************************************************
 
 using System.Reflection;
-using JFramework;
 using JFramework.Interface;
 using UnityEngine;
 using UnityEngine.UI;
@@ -24,7 +23,7 @@ namespace JFramework
         /// <summary>
         /// 对自身进行依赖注入
         /// </summary>
-        /// <param name="inject"></param>
+        /// <param name="inject">对注入接口的拓展</param>
         public static void Inject(this IInject inject)
         {
             var type = inject.GetType();

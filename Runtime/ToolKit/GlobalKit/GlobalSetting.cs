@@ -67,26 +67,6 @@ namespace JFramework
         public string remotePath = "http://192.168.0.3:8000/AssetBundles";
 
         /// <summary>
-        /// 存放UI的AB包
-        /// </summary>
-        public string UIBundle = "Prefabs";
-
-        /// <summary>
-        /// 存放音效的AB包
-        /// </summary>
-        public string audioBundle = "Audios";
-
-        /// <summary>
-        /// 存放场景的AB包
-        /// </summary>
-        public string sceneBundle = "Scenes";
-
-        /// <summary>
-        /// 存放音效的AB包
-        /// </summary>
-        public string tableBundle = "DataTable";
-
-        /// <summary>
         /// 客户端校验文件名称
         /// </summary>
         [ShowInInspector]
@@ -121,28 +101,28 @@ namespace JFramework
         /// </summary>
         /// <param name="assetName"></param>
         /// <returns></returns>
-        public static string GetUIPath(string assetName) => Instance.UIBundle + "/" + assetName;
+        public static string GetUIPath(string assetName) => "Prefabs/" + assetName;
 
         /// <summary>
         /// 获取音乐资源
         /// </summary>
         /// <param name="assetName"></param>
         /// <returns></returns>
-        public static string GetAudioPath(string assetName) => Instance.audioBundle + "/" + assetName;
+        public static string GetAudioPath(string assetName) => "Audios/" + assetName;
 
         /// <summary>
         /// 获取场景资源
         /// </summary>
         /// <param name="assetName"></param>
         /// <returns></returns>
-        public static string GetScenePath(string assetName) => Instance.sceneBundle + "/" + assetName;
+        public static string GetScenePath(string assetName) => "Scenes/" + assetName;
 
         /// <summary>
         /// 获取UI资源
         /// </summary>
         /// <param name="assetName"></param>
         /// <returns></returns>
-        public static string GetTablePath(string assetName) => Instance.tableBundle + "/" + assetName;
+        public static string GetTablePath(string assetName) => "DataTable/" + assetName;
 
 
         /// <summary>

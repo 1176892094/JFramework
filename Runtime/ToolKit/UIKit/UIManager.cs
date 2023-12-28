@@ -41,7 +41,6 @@ namespace JFramework
             /// <summary>
             /// UI画布
             /// </summary>
-            [ShowInInspector]
             public Canvas canvas { get; private set; }
 
             /// <summary>
@@ -111,7 +110,7 @@ namespace JFramework
             /// UI管理器加载面板
             /// </summary>
             /// <typeparam name="TPanel">可以使用所有继承IPanel的对象</typeparam>
-            private void LoadPanel<TPanel>(Action<TPanel> action) where TPanel : Component, IPanel
+            private async void LoadPanel<TPanel>(Action<TPanel> action) where TPanel : Component, IPanel
             {
                 if (panels.ContainsKey(typeof(TPanel)))
                 {
@@ -119,18 +118,16 @@ namespace JFramework
                     return;
                 }
 
-                Asset.LoadAsync<GameObject>(GlobalSetting.GetUIPath(typeof(TPanel).Name), obj =>
+                var obj = await Asset.Load<GameObject>(GlobalSetting.GetUIPath(typeof(TPanel).Name));
+                if (!obj.TryGetComponent<TPanel>(out var panel))
                 {
-                    if (!obj.TryGetComponent<TPanel>(out var panel))
-                    {
-                        panel = obj.AddComponent<TPanel>();
-                    }
+                    panel = obj.AddComponent<TPanel>();
+                }
 
-                    panel.transform.SetParent(GetLayer(panel.layer), false);
-                    panels.Add(typeof(TPanel), panel);
-                    panel.Show();
-                    action?.Invoke((TPanel)panel);
-                });
+                panel.transform.SetParent(GetLayer(panel.layer), false);
+                panels.Add(typeof(TPanel), panel);
+                panel.Show();
+                action?.Invoke((TPanel)panel);
             }
 
             /// <summary>

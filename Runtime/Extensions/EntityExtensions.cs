@@ -8,7 +8,6 @@
 // # Description: This is an automatically generated comment.
 // *********************************************************************************
 
-using JFramework;
 using JFramework.Interface;
 using UnityEngine;
 
@@ -21,8 +20,10 @@ namespace JFramework
         /// </summary>
         public static void Listen(this IUpdate entity)
         {
-            if (!GlobalManager.Runtime) return;
-            GlobalManager.OnUpdate += entity.OnUpdate;
+            if (GlobalManager.Runtime)
+            {
+                GlobalManager.OnUpdate += entity.OnUpdate;
+            }
         }
 
         /// <summary>
@@ -30,8 +31,10 @@ namespace JFramework
         /// </summary>
         public static void Remove(this IUpdate entity)
         {
-            if (!GlobalManager.Runtime) return;
-            GlobalManager.OnUpdate -= entity.OnUpdate;
+            if (GlobalManager.Runtime)
+            {
+                GlobalManager.OnUpdate -= entity.OnUpdate;
+            }
         }
 
         /// <summary>

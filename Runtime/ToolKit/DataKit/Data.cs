@@ -20,13 +20,13 @@ namespace JFramework
     /// <summary>
     /// 泛型数据管理器
     /// </summary>
-    /// <typeparam name="TKey"></typeparam>
-    internal struct Data<TKey>
+    /// <typeparam name="T"></typeparam>
+    internal struct Data<T>
     {
         /// <summary>
         /// 泛型数据字典
         /// </summary>
-        public static readonly Dictionary<Type, Dictionary<TKey, IData>> dataTable = new Dictionary<Type, Dictionary<TKey, IData>>();
+        public static readonly Dictionary<Type, Dictionary<T, IData>> dataTable = new Dictionary<Type, Dictionary<T, IData>>();
 
         /// <summary>
         /// 添加数据
@@ -36,11 +36,11 @@ namespace JFramework
         /// <param name="table"></param>
         public static void Add(Type type, FieldInfo field, IDataTable table)
         {
-            var dataList = new Dictionary<TKey, IData>();
+            var dataList = new Dictionary<T, IData>();
             for (int i = 0; i < table.Count; i++)
             {
                 var data = table.GetData(i);
-                var key = (TKey)field.GetValue(data);
+                var key = (T)field.GetValue(data);
                 if (!dataList.ContainsKey(key))
                 {
                     dataList.Add(key, data);
@@ -60,7 +60,7 @@ namespace JFramework
         /// <param name="key"></param>
         /// <typeparam name="TData"></typeparam>
         /// <returns></returns>
-        public static TData Get<TData>(TKey key) where TData : IData
+        public static TData Get<TData>(T key) where TData : IData
         {
             if (!dataTable.TryGetValue(typeof(TData), out var dataList))
             {

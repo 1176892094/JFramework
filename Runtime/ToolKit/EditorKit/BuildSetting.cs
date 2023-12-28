@@ -20,6 +20,9 @@ using Object = UnityEngine.Object;
 
 namespace JFramework.Editor
 {
+    /// <summary>
+    /// 构建设置
+    /// </summary>
     [Serializable]
     internal class BuildSetting
     {
