@@ -7,6 +7,7 @@
 // # Copyright: 2023, Charlotte
 // # Description: This is an automatically generated comment.
 // *********************************************************************************
+// ReSharper disable All
 
 using System;
 using System.Collections.Generic;

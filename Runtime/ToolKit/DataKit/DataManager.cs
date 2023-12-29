@@ -10,6 +10,8 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 using JFramework.Interface;
 using Sirenix.OdinInspector;
@@ -28,20 +30,20 @@ namespace JFramework
             /// <summary>
             /// 整数键
             /// </summary>
-            [ShowInInspector]
-            private Dictionary<Type, Dictionary<int, IData>> intData => Data<int>.dataTable;
+            [ShowInInspector, LabelText("整数类型")]
+            private Dictionary<Type, Dictionary<int, IData>> intData = new Dictionary<Type, Dictionary<int, IData>>();
 
             /// <summary>
             /// 枚举键
             /// </summary>
-            [ShowInInspector]
-            private Dictionary<Type, Dictionary<Enum, IData>> enumData => Data<Enum>.dataTable;
+            [ShowInInspector, LabelText("枚举类型")]
+            private Dictionary<Type, Dictionary<Enum, IData>> enumData = new Dictionary<Type, Dictionary<Enum, IData>>();
 
             /// <summary>
             /// 字符串键
             /// </summary>
-            [ShowInInspector]
-            private Dictionary<Type, Dictionary<string, IData>> stringData => Data<string>.dataTable;
+            [ShowInInspector, LabelText("字符串类型")]
+            private Dictionary<Type, Dictionary<string, IData>> stringData = new Dictionary<Type, Dictionary<string, IData>>();
 
             /// <summary>
             /// 加载数据表
@@ -73,15 +75,15 @@ namespace JFramework
 
                         if (field.FieldType.IsEnum)
                         {
-                            Data<Enum>.Add(data, field, table);
+                            enumData.Add(data, Add<Enum>(field, table));
                         }
                         else if (field.FieldType == typeof(int))
                         {
-                            Data<int>.Add(data, field, table);
+                            intData.Add(data, Add<int>(field, table));
                         }
                         else if (field.FieldType == typeof(string))
                         {
-                            Data<string>.Add(data, field, table);
+                            stringData.Add(data, Add<string>(field, table));
                         }
                     }
                     catch (Exception e)
@@ -92,12 +94,50 @@ namespace JFramework
             }
 
             /// <summary>
+            /// 添加数据
+            /// </summary>
+            /// <param name="field"></param>
+            /// <param name="table"></param>
+            private static Dictionary<T, IData> Add<T>(FieldInfo field, IDataTable table)
+            {
+                var dataList = new Dictionary<T, IData>();
+                for (int i = 0; i < table.Count; i++)
+                {
+                    var data = table.GetData(i);
+                    var key = (T)field.GetValue(data);
+                    if (!dataList.ContainsKey(key))
+                    {
+                        dataList.Add(key, data);
+                    }
+                    else
+                    {
+                        Debug.LogWarning($"{table.GetType().Name.Orange()} 键值重复。 键值：{key.ToString().Red()}");
+                    }
+                }
+
+                return dataList;
+            }
+
+            /// <summary>
             /// 获取主键为int的数据
             /// </summary>
             /// <param name="key">传入的int主键</param>
             /// <typeparam name="T">可以使用所有继承IData类型的对象</typeparam>
             /// <returns>返回一个数据对象</returns>
-            public T Get<T>(int key) where T : IData => Data<int>.Get<T>(key);
+            public T Get<T>(int key) where T : IData
+            {
+                if (!intData.TryGetValue(typeof(T), out var dataList))
+                {
+                    return default;
+                }
+
+                if (!dataList.TryGetValue(key, out IData data))
+                {
+                    return default;
+                }
+
+                return (T)data;
+            }
 
             /// <summary>
             /// 获取主键为Enum的数据
@@ -105,7 +145,20 @@ namespace JFramework
             /// <param name="key">传入的string主键</param>
             /// <typeparam name="T">要获取数据的类型,必须继承自JFramework.Data</typeparam>
             /// <returns>返回一个数据对象</returns>
-            public T Get<T>(Enum key) where T : IData => Data<Enum>.Get<T>(key);
+            public T Get<T>(Enum key) where T : IData
+            {
+                if (!enumData.TryGetValue(typeof(T), out var dataList))
+                {
+                    return default;
+                }
+
+                if (!dataList.TryGetValue(key, out IData data))
+                {
+                    return default;
+                }
+
+                return (T)data;
+            }
 
             /// <summary>
             /// 获取主键为string的数据
@@ -113,7 +166,20 @@ namespace JFramework
             /// <param name="key">传入的string主键</param>
             /// <typeparam name="T">要获取数据的类型,必须继承自JFramework.Data</typeparam>
             /// <returns>返回一个数据对象</returns>
-            public T Get<T>(string key) where T : IData => Data<string>.Get<T>(key);
+            public T Get<T>(string key) where T : IData
+            {
+                if (!stringData.TryGetValue(typeof(T), out var dataList))
+                {
+                    return default;
+                }
+
+                if (!dataList.TryGetValue(key, out IData data))
+                {
+                    return default;
+                }
+
+                return (T)data;
+            }
 
             /// <summary>
             /// 通过数据管理器得到数据表
@@ -121,12 +187,21 @@ namespace JFramework
             /// <returns>返回一个Data的列表</returns>
             public T[] GetTable<T>() where T : IData
             {
-                var data = Data<int>.GetTable<T>();
-                if (data != null) return data;
-                data = Data<Enum>.GetTable<T>();
-                if (data != null) return data;
-                data = Data<string>.GetTable<T>();
-                if (data != null) return data;
+                if (intData.TryGetValue(typeof(T), out var intList))
+                {
+                    return intList?.Values.Cast<T>().ToArray();
+                }
+
+                if (enumData.TryGetValue(typeof(T), out var enumList))
+                {
+                    return enumList?.Values.Cast<T>().ToArray();
+                }
+
+                if (stringData.TryGetValue(typeof(T), out var stringList))
+                {
+                    return stringList?.Values.Cast<T>().ToArray();
+                }
+
                 Debug.LogWarning($"获取 {typeof(T).Name.Red()} 失败！");
                 return default;
             }
@@ -136,9 +211,9 @@ namespace JFramework
             /// </summary>
             private void OnDestroy()
             {
-                Data<int>.Clear();
-                Data<Enum>.Clear();
-                Data<string>.Clear();
+                intData.Clear();
+                enumData.Clear();
+                stringData.Clear();
             }
         }
     }

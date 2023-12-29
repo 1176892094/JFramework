@@ -49,7 +49,6 @@ namespace JFramework
         /// </summary>
         private void Awake()
         {
-            Entity = ScriptableObject.CreateInstance<EntityManager>();
             this.Inject();
             Runtime = true;
         }
@@ -110,6 +109,15 @@ namespace JFramework
             OnUpdate = null;
             Destroy(Entity);
             GC.Collect();
+        }
+
+        /// <summary>
+        /// 场景加载前
+        /// </summary>
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
+        private static void RuntimeInitializeOnLoad()
+        {
+            Entity = ScriptableObject.CreateInstance<EntityManager>();
         }
     }
 

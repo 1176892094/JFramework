@@ -73,8 +73,11 @@ namespace JFramework
                     remoteAssets = jsonData.value.ToDictionary(data => data.name);
 
                     var clientInfo = await GetClientInfo();
-                    jsonData = JsonUtility.FromJson<Variables<AssetData>>(clientInfo);
-                    clientAssets = jsonData.value.ToDictionary(data => data.name);
+                    if (clientInfo != null)
+                    {
+                        jsonData = JsonUtility.FromJson<Variables<AssetData>>(clientInfo);
+                        clientAssets = jsonData.value.ToDictionary(data => data.name);
+                    }
 
                     Debug.Log("解析本地对比文件完成");
                     foreach (var fileName in remoteAssets.Keys)
@@ -165,17 +168,18 @@ namespace JFramework
                 }
 
 #if UNITY_ANDROID && !UNITY_EDITOR
-            using var request = UnityWebRequest.Get(GlobalSetting.streamingInfoPath);
-            await request.SendWebRequest();
-            if (request.result == UnityWebRequest.Result.Success)
-            {
-                return request.downloadHandler.text;
-            }
+                using var request = UnityWebRequest.Get(GlobalSetting.streamingInfoPath);
+                await request.SendWebRequest();
+                if (request.result == UnityWebRequest.Result.Success)
+                {
+                    return request.downloadHandler.text;
+                }
 #else
                 if (File.Exists(GlobalSetting.streamingInfoPath))
                 {
                     return await File.ReadAllTextAsync(GlobalSetting.streamingInfoPath);
                 }
+
 #endif
                 return null;
             }
@@ -209,8 +213,8 @@ namespace JFramework
                                 continue;
                             }
 
-                            var contents = request.downloadHandler.text;
-                            await File.WriteAllTextAsync(GlobalSetting.GetPersistentPath(fileName), contents);
+                            var contents = request.downloadHandler.data;
+                            await File.WriteAllBytesAsync(GlobalSetting.GetPersistentPath(fileName), contents);
                         }
 
                         if (updateAssets.Contains(fileName))
