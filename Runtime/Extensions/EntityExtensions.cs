@@ -13,6 +13,9 @@ using UnityEngine;
 
 namespace JFramework
 {
+    /// <summary>
+    /// 实体拓展
+    /// </summary>
     public static partial class Extensions
     {
         /// <summary>
@@ -41,7 +44,7 @@ namespace JFramework
         /// 实体控制器获取
         /// </summary>
         /// <param name="gameObject"></param>
-        public static T GetControl<T>(this GameObject gameObject) where T : Controller
+        public static T GetControl<T>(this GameObject gameObject) where T : ScriptableObject, IController
         {
             return (T)GlobalManager.Entity.Register(gameObject, typeof(T));
         }

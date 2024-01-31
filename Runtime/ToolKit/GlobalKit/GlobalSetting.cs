@@ -8,10 +8,14 @@
 // # Description: This is an automatically generated comment.
 // *********************************************************************************
 
+using System;
+using System.Collections.Generic;
 using System.IO;
 using Sirenix.OdinInspector;
 using UnityEngine;
+using Object = UnityEngine.Object;
 #if UNITY_EDITOR
+using JFramework.Editor;
 using UnityEditor;
 #endif
 
@@ -19,7 +23,8 @@ using UnityEditor;
 
 namespace JFramework
 {
-    internal class GlobalSetting
+    [Serializable]
+    internal partial class GlobalSetting
     {
         /// <summary>
         /// 单例自身
@@ -54,7 +59,7 @@ namespace JFramework
         /// <summary>
         /// 构建平台
         /// </summary>
-        public AssetPlatform platform = AssetPlatform.StandaloneWindows;
+        [PropertyOrder(-1)] public AssetPlatform platform = AssetPlatform.StandaloneWindows;
 
         /// <summary>
         /// AssetBundle 校验文件名称
@@ -124,7 +129,6 @@ namespace JFramework
         /// <returns></returns>
         public static string GetTablePath(string assetName) => "DataTable/" + assetName;
 
-
         /// <summary>
         /// 根据 persistentDataPath 获取文件
         /// </summary>
@@ -154,6 +158,89 @@ namespace JFramework
         public static string GetPlatform(string fileName) => Path.Combine(Instance.platform.ToString(), fileName);
 
 #if UNITY_EDITOR
+
+        /// <summary>
+        /// 构建 AssetBundle 存放的路径
+        /// </summary>
+        public string buildPath = "AssetBundles";
+
+        /// <summary>
+        /// 构建资源路径
+        /// </summary>
+        public string assetPath = "Assets/Template";
+
+        /// <summary>
+        /// 存放要构建成 AssetBundle 的文件路径
+        /// </summary>
+        public string editorPath = "Assets/Editor/Resources";
+
+        /// <summary>
+        /// 远端资源加载
+        /// </summary>
+        [HideInInspector] public bool remoteLoad;
+
+        /// <summary>
+        /// 远端资源构建
+        /// </summary>
+        [HideInInspector] public bool remoteBuild;
+
+        /// <summary>
+        /// 是否远端加载
+        /// </summary>
+        [ShowInInspector, LabelText("Remote Load")]
+        public bool RemoteLoad
+        {
+            get => remoteLoad;
+            set
+            {
+                remoteLoad = value;
+                Instance.Save();
+                EditorSetting.UpdateBuildSettings();
+            }
+        }
+
+        /// <summary>
+        /// 是否远端构建
+        /// </summary>
+        [ShowInInspector, LabelText("Remote Build")]
+        public bool RemoteBuild
+        {
+            get => remoteBuild;
+            set
+            {
+                remoteBuild = value;
+                Instance.Save();
+            }
+        }
+
+        /// <summary>
+        /// 存储本地加载的资源字典
+        /// </summary>
+        public Dictionary<string, Object> objects = new Dictionary<string, Object>();
+
+        /// <summary>
+        /// 场景资源
+        /// </summary>
+        [HideInInspector] public List<string> sceneAssets = new List<string>();
+
+        /// <summary>
+        /// 远端构建路径
+        /// </summary>
+        [ShowInInspector]
+        public static string remoteBuildPath => Instance.remoteBuild ? Instance.buildPath : Application.streamingAssetsPath;
+
+        /// <summary>
+        /// 本地构建存储路径
+        /// </summary>
+        [ShowInInspector]
+        public static string platformPath => Path.Combine(remoteBuildPath, Instance.platform.ToString());
+
+        /// <summary>
+        /// 本地构建校验文件
+        /// </summary>
+        [ShowInInspector]
+        public static string assetBundleInfo => Path.Combine(remoteBuildPath, GetPlatform(clientInfoName));
+
         [Button("保存设置")]
         public void Save()
         {
@@ -161,6 +248,29 @@ namespace JFramework
             var contents = JsonUtility.ToJson(instance);
             var path = AssetDatabase.GetAssetPath(asset);
             File.WriteAllText(path, contents);
+        }
+
+        /// <summary>
+        /// 异步加载
+        /// </summary>
+        /// <param name="path"></param>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
+        public T Load<T>(string path) where T : Object
+        {
+            if (objects.TryGetValue(path, out var obj))
+            {
+                if (obj is Texture2D texture)
+                {
+                    obj = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), Vector2.one * 0.5f);
+                    return (T)obj;
+                }
+
+                var asset = obj is GameObject ? Object.Instantiate((T)obj) : (T)obj;
+                return asset;
+            }
+
+            return null;
         }
 #endif
     }

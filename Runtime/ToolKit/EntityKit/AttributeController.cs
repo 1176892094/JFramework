@@ -28,13 +28,15 @@ namespace JFramework
     /// <summary>
     /// 属性控制器
     /// </summary>
+    /// <typeparam name="TEntity">控制器的实体单位</typeparam>
     /// <typeparam name="TAttribute">持有属性枚举</typeparam>
-    public abstract class AttributeController<TAttribute> : Controller where TAttribute : Enum
+    public abstract class AttributeController<TEntity, TAttribute> : Controller<TEntity> where TAttribute : Enum where TEntity : IEntity
     {
         /// <summary>
         /// 存储 实体所持有的属性
         /// </summary>
-        [ShowInInspector] private readonly Dictionary<TAttribute, IVariable> attributes = new Dictionary<TAttribute, IVariable>();
+        [ShowInInspector, LabelText("属性列表")]
+        private readonly Dictionary<TAttribute, IVariable> attributes = new Dictionary<TAttribute, IVariable>();
 
         /// <summary>
         /// 获取属性

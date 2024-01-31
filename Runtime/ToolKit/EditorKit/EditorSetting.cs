@@ -62,17 +62,17 @@ namespace JFramework.Editor
         public static void UpdateBuildSettings()
         {
             var sceneAssets = EditorBuildSettings.scenes.Select(scene => scene.path).ToList();
-            foreach (var scenePath in BuildSetting.Instance.sceneAssets)
+            foreach (var scenePath in GlobalSetting.Instance.sceneAssets)
             {
                 if (sceneAssets.Contains(scenePath))
                 {
-                    if (!BuildSetting.Instance.isRemote) continue;
+                    if (!GlobalSetting.Instance.RemoteLoad) continue;
                     var scenes = EditorBuildSettings.scenes.Where(scene => scene.path != scenePath);
                     EditorBuildSettings.scenes = scenes.ToArray();
                 }
                 else
                 {
-                    if (BuildSetting.Instance.isRemote) continue;
+                    if (GlobalSetting.Instance.RemoteLoad) continue;
                     var scenes = EditorBuildSettings.scenes.ToList();
                     scenes.Add(new EditorBuildSettingsScene(scenePath, true));
                     EditorBuildSettings.scenes = scenes.ToArray();
@@ -85,8 +85,7 @@ namespace JFramework.Editor
         /// </summary>
         protected override OdinMenuTree BuildMenuTree()
         {
-            Add(2, "资源", BuildSetting.Instance);
-            Add(1, "设置", GlobalSetting.Instance);
+            Add(0, "主页", GlobalSetting.Instance);
             var tree = new OdinMenuTree();
             foreach (var (id, (path, item)) in windows)
             {
@@ -157,8 +156,9 @@ namespace JFramework.Editor
                 }
             }
 
-            BuildSetting.Instance.sceneAssets.Clear();
-            foreach (var folderPath in BuildSetting.Instance.folderPaths)
+            GlobalSetting.Instance.sceneAssets.Clear();
+            var folderPaths = AssetDatabase.GetSubFolders(GlobalSetting.Instance.assetPath);
+            foreach (var folderPath in folderPaths)
             {
                 if (string.IsNullOrEmpty(folderPath)) continue;
                 var folder = Path.GetFileNameWithoutExtension(folderPath);
@@ -180,16 +180,16 @@ namespace JFramework.Editor
                     var asset = AssetDatabase.LoadAssetAtPath<Object>(path);
                     if (asset is SceneAsset)
                     {
-                        BuildSetting.Instance.sceneAssets.Add(path);
+                        GlobalSetting.Instance.sceneAssets.Add(path);
                     }
 
                     if (asset == null) continue;
-                    BuildSetting.Instance.objects[$"{folder}/{asset.name}"] = asset;
+                    GlobalSetting.Instance.objects[$"{folder}/{asset.name}"] = asset;
                 }
             }
 
             Debug.Log("更新 AssetBundles 完成。".Green());
-            BuildSetting.Instance.Save();
+            GlobalSetting.Instance.Save();
             AssetDatabase.Refresh();
         }
 
@@ -201,13 +201,13 @@ namespace JFramework.Editor
         {
             UpdateAsset();
             var bundleOptions = BuildAssetBundleOptions.ChunkBasedCompression;
-            var directory = Directory.CreateDirectory(BuildSetting.platformPath);
-            BuildPipeline.BuildAssetBundles(BuildSetting.platformPath, bundleOptions, (BuildTarget)GlobalSetting.Instance.platform);
+            var directory = Directory.CreateDirectory(GlobalSetting.platformPath);
+            BuildPipeline.BuildAssetBundles(GlobalSetting.platformPath, bundleOptions, (BuildTarget)GlobalSetting.Instance.platform);
             var infoList = directory.GetFiles().Where(info => info.Extension == "").ToList();
             var fileList = infoList.Select(info => new AssetData(GetMD5(info.FullName), info.Name, info.Length.ToString())).ToList();
             var contents = JsonUtility.ToJson(new Variables<AssetData>(fileList), true);
             Debug.Log(contents);
-            File.WriteAllText(BuildSetting.assetBundleInfo, contents);
+            File.WriteAllText(GlobalSetting.assetBundleInfo, contents);
             Debug.Log("构建 AssetBundles 成功!".Green());
             AssetDatabase.Refresh();
         }

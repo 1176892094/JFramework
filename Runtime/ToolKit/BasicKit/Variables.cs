@@ -29,18 +29,12 @@ namespace JFramework
         /// <summary>
         /// 构造函数初始化
         /// </summary>
-        public Variables()
-        {
-            value = new List<T>();
-        }
+        public Variables() => value = new List<T>();
 
         /// <summary>
         /// 构造函数初始化
         /// </summary>
         /// <param name="value"></param>
-        public Variables(List<T> value)
-        {
-            this.value = value;
-        }
+        public Variables(List<T> value) => this.value = value;
     }
 }

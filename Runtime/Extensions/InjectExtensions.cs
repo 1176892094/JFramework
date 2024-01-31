@@ -24,7 +24,7 @@ namespace JFramework
         /// 对自身进行依赖注入
         /// </summary>
         /// <param name="inject">对注入接口的拓展</param>
-        public static void Inject(this IInject inject)
+        public static void Inject(this IEntity inject)
         {
             var type = inject.GetType();
             var fields = type.GetFields(Reflection.Instance | BindingFlags.Static);
@@ -33,7 +33,7 @@ namespace JFramework
                 var attribute = field.GetCustomAttribute<InjectAttribute>(true);
                 if (attribute == null) continue;
 
-                if (typeof(Controller).IsAssignableFrom(field.FieldType))
+                if (typeof(IController).IsAssignableFrom(field.FieldType))
                 {
                     var obj = GlobalManager.Entity.Register(inject.gameObject, field.FieldType);
                     field.SetValue(inject, obj);
@@ -84,7 +84,7 @@ namespace JFramework
         /// <param name="inject"></param>
         /// <param name="name"></param>
         /// <param name="button"></param>
-        private static void SetButton(this IInject inject, string name, Button button)
+        private static void SetButton(this IEntity inject, string name, Button button)
         {
             if (inject.transform.TryGetComponent(out IPanel panel))
             {
@@ -106,7 +106,7 @@ namespace JFramework
         /// <param name="inject"></param>
         /// <param name="name"></param>
         /// <param name="toggle"></param>
-        private static void SetToggle(this IInject inject, string name, Toggle toggle)
+        private static void SetToggle(this IEntity inject, string name, Toggle toggle)
         {
             if (inject.transform.TryGetComponent(out IPanel panel))
             {

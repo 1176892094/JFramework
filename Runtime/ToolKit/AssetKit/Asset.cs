@@ -22,9 +22,9 @@ namespace JFramework
         /// 资源名称
         /// </summary>
         public string asset;
-
+        
         /// <summary>
-        /// 资源标签
+        /// 资源组
         /// </summary>
         public string bundle;
 
@@ -34,8 +34,9 @@ namespace JFramework
         /// <param name="path"></param>
         public Asset(string path)
         {
-            asset = path.Split('/')[1];
-            bundle = path.Split('/')[0].ToLower();
+            var split = path.Split('/');
+            bundle = split[0].ToLower();
+            asset = split[1].Trim();
         }
     }
 }

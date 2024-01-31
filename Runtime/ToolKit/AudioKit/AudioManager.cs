@@ -8,196 +8,198 @@
 // # Description: This is an automatically generated comment.
 // *********************************************************************************
 
-using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
 // ReSharper disable All
 
-namespace JFramework
+namespace JFramework.Core
 {
-    public sealed partial class GlobalManager
+    /// <summary>
+    /// 音效管理器
+    /// </summary>
+    public sealed class AudioManager : Controller<GlobalManager>
     {
         /// <summary>
-        /// 音效管理器
+        /// 完成音效列表
         /// </summary>
-        public sealed class AudioManager : Controller
+        [ShowInInspector, LabelText("已完成")] private readonly Stack<AudioSource> stacks = new Stack<AudioSource>();
+
+        /// <summary>
+        /// 播放音效列表
+        /// </summary>
+        [ShowInInspector, LabelText("播放中")] private readonly HashSet<AudioSource> audios = new HashSet<AudioSource>();
+
+        /// <summary>
+        /// 是否启用音乐管理器
+        /// </summary>
+        [SerializeField] private bool isActive;
+
+        /// <summary>
+        /// 背景音乐大小
+        /// </summary>
+        [SerializeField, Range(0, 1f)] private float musicVolume = 0.5f;
+
+        /// <summary>
+        /// 游戏音乐大小
+        /// </summary>
+        [SerializeField, Range(0, 1f)] private float audioVolume = 0.5f;
+
+        /// <summary>
+        /// 音效挂载对象
+        /// </summary>
+        private Transform poolManager;
+
+        /// <summary>
+        /// 背景音乐组件
+        /// </summary>
+        private AudioSource audioSource;
+
+        /// <summary>
+        /// 音效管理器初始化
+        /// </summary>
+        private void Awake()
         {
-            /// <summary>
-            /// 完成音效列表
-            /// </summary>
-            [ShowInInspector] private readonly Stack<AudioSource> stacks = new Stack<AudioSource>();
+            isActive = true;
+            GlobalManager.Json.Load(this);
+            poolManager = owner.transform.Find("PoolManager");
+            audioSource = poolManager.GetComponent<AudioSource>();
+        }
 
-            /// <summary>
-            /// 播放音效列表
-            /// </summary>
-            [ShowInInspector] private readonly HashSet<AudioSource> audios = new HashSet<AudioSource>();
+        /// <summary>
+        /// 设置管理器是否活跃
+        /// </summary>
+        /// <param name="isActive"></param>
+        public void SetActive(bool isActive)
+        {
+            this.isActive = isActive;
+        }
 
-            /// <summary>
-            /// 游戏音效设置
-            /// </summary>
-            [ShowInInspector] private AudioData audioData = new AudioData();
+        /// <summary>
+        /// 播放背景音乐
+        /// </summary>
+        /// <param name="name">背景音乐的路径</param>
+        public async Task<AudioSource> PlayMusic(string name)
+        {
+            if (!GlobalManager.Runtime || !isActive) return null;
+            var clip = await GlobalManager.Asset.Load<AudioClip>(GlobalSetting.GetAudioPath(name));
+            audioSource.volume = musicVolume;
+            audioSource.clip = clip;
+            audioSource.loop = true;
+            audioSource.Play();
+            return audioSource;
+        }
 
-            /// <summary>
-            /// 音效挂载对象
-            /// </summary>
-            private Transform poolManager;
+        /// <summary>
+        /// 设置背景音乐
+        /// </summary>
+        /// <param name="musicVolume">音量的大小</param>
+        public void SetMusic(float musicVolume)
+        {
+            if (!GlobalManager.Runtime) return;
+            this.musicVolume = musicVolume;
+            audioSource.volume = musicVolume;
+            GlobalManager.Json.Save(this);
+        }
 
-            /// <summary>
-            /// 背景音乐组件
-            /// </summary>
-            private AudioSource audioSource;
-
-            /// <summary>
-            /// 是否启用音乐管理器
-            /// </summary>
-            public bool isActive;
-
-            /// <summary>
-            /// 音效管理器初始化
-            /// </summary>
-            private void Awake()
+        /// <summary>
+        /// 暂停背景音乐
+        /// </summary>
+        public void StopMusic(bool pause = true)
+        {
+            if (!GlobalManager.Runtime) return;
+            if (pause)
             {
-                isActive = true;
-                poolManager = owner.transform.Find("PoolManager");
-                audioData = Json.Decrypt<AudioData>(nameof(AudioManager));
-                audioSource = poolManager.GetComponent<AudioSource>();
-                SetMusic(audioData.musicVolume);
-                SetAudio(audioData.audioVolume);
+                audioSource.Pause();
+            }
+            else
+            {
+                audioSource.Stop();
+            }
+        }
+
+        /// <summary>
+        /// 播放一次音效
+        /// </summary>
+        /// <param name="name">传入音效路径</param>
+        public async Task<AudioSource> PlayOnce(string name)
+        {
+            if (!GlobalManager.Runtime || !isActive) return null;
+            if (!stacks.TryPop(out var audio))
+            {
+                audio = poolManager.gameObject.AddComponent<AudioSource>();
             }
 
-            /// <summary>
-            /// 播放背景音乐
-            /// </summary>
-            /// <param name="name">背景音乐的路径</param>
-            public void PlayMusic(string name)
+            var clip = await GlobalManager.Asset.Load<AudioClip>(GlobalSetting.GetAudioPath(name));
+            audios.Add(audio);
+            audio.volume = audioVolume;
+            audio.clip = clip;
+            audio.Play();
+            GlobalManager.Time.Pop(clip.length).Invoke(() => StopAudio(audio));
+            return audio;
+        }
+
+        /// <summary>
+        /// 播放循环音效
+        /// </summary>
+        /// <param name="name">传入音效路径</param>
+        public async Task<AudioSource> PlayLoop(string name)
+        {
+            if (!GlobalManager.Runtime || !isActive) return null;
+            if (!stacks.TryPop(out var audio))
             {
-                if (!Runtime || !isActive) return;
-                Asset.LoadAsync<AudioClip>(GlobalSetting.GetAudioPath(name), clip =>
-                {
-                    audioSource.volume = audioData.musicVolume;
-                    audioSource.clip = clip;
-                    audioSource.loop = true;
-                    audioSource.Play();
-                });
+                audio = poolManager.gameObject.AddComponent<AudioSource>();
             }
 
-            /// <summary>
-            /// 设置背景音乐
-            /// </summary>
-            /// <param name="soundVolume">音量的大小</param>
-            public void SetMusic(float soundVolume)
+            var clip = await GlobalManager.Asset.Load<AudioClip>(GlobalSetting.GetAudioPath(name));
+            audios.Add(audio);
+            audio.volume = audioVolume;
+            audio.clip = clip;
+            audio.loop = true;
+            audio.Play();
+            return audio;
+        }
+
+        /// <summary>
+        /// 设置音量
+        /// </summary>
+        /// <param name="audioVolume">传入音量大小</param>
+        public void SetAudio(float audioVolume)
+        {
+            if (!GlobalManager.Runtime) return;
+            this.audioVolume = audioVolume;
+            foreach (var audio in audios)
             {
-                if (!Runtime) return;
-                audioData.musicVolume = soundVolume;
-                audioSource.volume = soundVolume;
-                Json.Encrypt(audioData, nameof(AudioManager));
+                audio.volume = audioVolume;
             }
 
-            /// <summary>
-            /// 暂停背景音乐
-            /// </summary>
-            public void StopMusic(bool pause = true)
+            GlobalManager.Json.Save(this);
+        }
+
+        /// <summary>
+        /// 停止音效
+        /// </summary>
+        /// <param name="audioSource">传入音效数据</param>
+        public void StopAudio(AudioSource audioSource)
+        {
+            if (!GlobalManager.Runtime) return;
+            if (audios.Contains(audioSource))
             {
-                if (!Runtime) return;
-                if (pause)
-                {
-                    audioSource.Pause();
-                }
-                else
-                {
-                    audioSource.Stop();
-                }
+                audioSource.Stop();
+                audios.Remove(audioSource);
+                stacks.Push(audioSource);
             }
+        }
 
-            /// <summary>
-            /// 播放一次音效
-            /// </summary>
-            /// <param name="name">传入音效路径</param>
-            /// <param name="action">音效播放事件</param>
-            public void PlayOnce(string name, Action<AudioSource> action = null)
-            {
-                if (!Runtime || !isActive) return;
-                if (!stacks.TryPop(out var audio))
-                {
-                    audio = poolManager.gameObject.AddComponent<AudioSource>();
-                }
-
-                Asset.LoadAsync<AudioClip>(GlobalSetting.GetAudioPath(name), clip =>
-                {
-                    audios.Add(audio);
-                    audio.volume = audioData.audioVolume;
-                    audio.clip = clip;
-                    audio.Play();
-                    action?.Invoke(audio);
-                    Time.Pop(clip.length).Invoke(() => StopAudio(audio));
-                });
-            }
-
-            /// <summary>
-            /// 播放循环音效
-            /// </summary>
-            /// <param name="name">传入音效路径</param>
-            /// <param name="action">音效播放事件</param>
-            public void PlayLoop(string name, Action<AudioSource> action = null)
-            {
-                if (!Runtime || !isActive) return;
-                if (!stacks.TryPop(out var audio))
-                {
-                    audio = poolManager.gameObject.AddComponent<AudioSource>();
-                }
-
-                Asset.LoadAsync<AudioClip>(GlobalSetting.GetAudioPath(name), clip =>
-                {
-                    audios.Add(audio);
-                    audio.volume = audioData.audioVolume;
-                    audio.clip = clip;
-                    audio.loop = true;
-                    audio.Play();
-                    action?.Invoke(audio);
-                });
-            }
-
-            /// <summary>
-            /// 设置音量
-            /// </summary>
-            /// <param name="audioVolume">传入音量大小</param>
-            public void SetAudio(float audioVolume)
-            {
-                if (!Runtime) return;
-                audioData.audioVolume = audioVolume;
-                foreach (var audio in audios)
-                {
-                    audio.volume = audioVolume;
-                }
-
-                Json.Encrypt(audioData, nameof(AudioManager));
-            }
-
-            /// <summary>
-            /// 停止音效
-            /// </summary>
-            /// <param name="audioSource">传入音效数据</param>
-            public void StopAudio(AudioSource audioSource)
-            {
-                if (!Runtime) return;
-                if (audios.Contains(audioSource))
-                {
-                    audioSource.Stop();
-                    audios.Remove(audioSource);
-                    stacks.Push(audioSource);
-                }
-            }
-
-            /// <summary>
-            /// 管理器销毁
-            /// </summary>
-            internal void OnDestroy()
-            {
-                audios.Clear();
-                stacks.Clear();
-            }
+        /// <summary>
+        /// 管理器销毁
+        /// </summary>
+        internal void OnDestroy()
+        {
+            audios.Clear();
+            stacks.Clear();
         }
     }
 }

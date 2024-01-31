@@ -18,7 +18,7 @@ namespace JFramework
     /// 实体的抽象类
     /// </summary>
     [Serializable]
-    public abstract class Entity : MonoBehaviour, IInject
+    public abstract class Entity : MonoBehaviour, IEntity
     {
         /// <summary>
         /// 实体初始化注入

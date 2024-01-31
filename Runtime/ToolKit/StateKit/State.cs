@@ -10,7 +10,6 @@
 
 using System;
 using JFramework.Interface;
-using UnityEngine;
 
 namespace JFramework
 {
@@ -29,11 +28,6 @@ namespace JFramework
         /// 基本状态机的接口
         /// </summary>
         public IStateMachine machine { get; private set; }
-
-        /// <summary>
-        /// 状态是否活跃
-        /// </summary>
-        public bool isActive { get; private set; }
 
         /// <summary>
         /// 状态初始化
@@ -62,9 +56,9 @@ namespace JFramework
         /// </summary>
         /// <param name="owner"></param>
         /// <param name="machine">基本状态机</param>
-        void IState.OnAwake(GameObject owner, IStateMachine machine)
+        void IState.OnAwake(IEntity owner, IStateMachine machine)
         {
-            this.owner = owner.GetComponent<T>();
+            this.owner = (T)owner;
             this.machine = machine;
             OnAwake();
         }
@@ -72,11 +66,7 @@ namespace JFramework
         /// <summary>
         /// 受保护的状态进入方法
         /// </summary>
-        void IEnter.OnEnter()
-        {
-            isActive = true;
-            OnEnter();
-        }
+        void IEnter.OnEnter() => OnEnter();
 
         /// <summary>
         /// 受保护的状态更新方法
@@ -86,10 +76,6 @@ namespace JFramework
         /// <summary>
         /// 受保护的状态退出方法
         /// </summary>
-        void IExit.OnExit()
-        {
-            isActive = false;
-            OnExit();
-        }
+        void IExit.OnExit() => OnExit();
     }
 }

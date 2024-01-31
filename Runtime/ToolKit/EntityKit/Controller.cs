@@ -8,6 +8,8 @@
 // # Description: This is an automatically generated comment.
 // *********************************************************************************
 
+using System;
+using JFramework.Interface;
 using UnityEngine;
 
 namespace JFramework
@@ -15,16 +17,21 @@ namespace JFramework
     /// <summary>
     /// 控制器
     /// </summary>
-    public abstract class Controller : ScriptableObject
+    public abstract class Controller<T> : ScriptableObject, IController where T : IEntity
     {
         /// <summary>
         /// 所有者
         /// </summary>
-        private GameObject instance;
+        private T instance;
 
         /// <summary>
         /// 所有者的游戏对象
         /// </summary>
-        public GameObject owner => instance ??= GlobalManager.Entity.instance;
+        public T owner => instance ??= GlobalManager.Entity.instance.GetComponent<T>();
+        
+        /// <summary>
+        /// 注册实体单位
+        /// </summary>
+        void IController.Awake() => instance ??= GlobalManager.Entity.instance.GetComponent<T>();
     }
 }

@@ -10,7 +10,7 @@
 
 #if UNITY_EDITOR
 using System.IO;
-using JFramework.Editor;
+using JFramework;
 using UnityEditor;
 using UnityEngine;
 
@@ -37,12 +37,12 @@ public abstract class EditorSingleton<T> : ScriptableObject where T : EditorSing
             if (instance != null) return instance;
             instance = Resources.Load<T>(typeof(T).Name);
             if (instance != null) return instance;
-            var asset = $"{BuildSetting.Instance.editorPath}/{typeof(T).Name}.asset";
+            var asset = $"{GlobalSetting.Instance.editorPath}/{typeof(T).Name}.asset";
             instance = AssetDatabase.LoadAssetAtPath<T>(asset);
             if (instance != null) return instance;
-            if (!Directory.Exists(BuildSetting.Instance.editorPath))
+            if (!Directory.Exists(GlobalSetting.Instance.editorPath))
             {
-                Directory.CreateDirectory(BuildSetting.Instance.editorPath);
+                Directory.CreateDirectory(GlobalSetting.Instance.editorPath);
             }
 
             instance = CreateInstance<T>();

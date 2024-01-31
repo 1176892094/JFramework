@@ -18,6 +18,9 @@ using Object = UnityEngine.Object;
 
 namespace JFramework
 {
+    /// <summary>
+    /// UI拓展
+    /// </summary>
     public static partial class Extensions
     {
         /// <summary>

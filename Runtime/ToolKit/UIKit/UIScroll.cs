@@ -104,7 +104,7 @@ namespace JFramework
         /// <summary>
         /// 更新格子显示的方法
         /// </summary>
-        public void OnUpdate()
+        public async void OnUpdate()
         {
             if (items == null) return;
             var height = rect.height + rect.y;
@@ -150,27 +150,25 @@ namespace JFramework
 
                 var index = i;
                 grids.Add(index, default);
-                GlobalManager.Pool.PopAsync(path, obj =>
+                var obj = await GlobalManager.Pool.Pop(path);
+                obj.transform.SetParent(content);
+                obj.transform.localScale = Vector3.one;
+                var posX = index % column * (rect.width + rect.x);
+                var posY = -(index / column) * height - rect.height / 2;
+                obj.transform.localPosition = new Vector3(posX, posY, 0);
+                if (obj.TryGetComponent(out TGrid grid))
                 {
-                    obj.transform.SetParent(content);
-                    obj.transform.localScale = Vector3.one;
-                    var posX = index % column * (rect.width + rect.x);
-                    var posY = -(index / column) * height - rect.height / 2;
-                    obj.transform.localPosition = new Vector3(posX, posY, 0);
-                    if (obj.TryGetComponent(out TGrid grid))
-                    {
-                        grid.SetItem(items[index]);
-                    }
+                    grid.SetItem(items[index]);
+                }
 
-                    if (grids.ContainsKey(index))
-                    {
-                        grids[index] = grid;
-                    }
-                    else
-                    {
-                        GlobalManager.Pool.Push(obj);
-                    }
-                });
+                if (grids.ContainsKey(index))
+                {
+                    grids[index] = grid;
+                }
+                else
+                {
+                    GlobalManager.Pool.Push(obj);
+                }
             }
         }
     }

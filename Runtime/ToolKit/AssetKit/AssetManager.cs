@@ -25,279 +25,223 @@ using UnitySceneManager = UnityEngine.SceneManagement.SceneManager;
 using JFramework.Editor;
 #endif
 
-namespace JFramework
+namespace JFramework.Core
 {
-    public sealed partial class GlobalManager
+    using AssetTask = Task<AssetBundle>;
+    
+    public sealed class AssetManager : Controller<GlobalManager>
     {
-        public sealed class AssetManager : Controller
+        /// <summary>
+        /// 存储AB包的名称和资源
+        /// </summary>
+        [ShowInInspector] private readonly Dictionary<string, Asset> assets = new Dictionary<string, Asset>();
+        
+        /// <summary>
+        /// 异步加载AB包的任务
+        /// </summary>
+        [ShowInInspector] private readonly Dictionary<string, AssetTask> awaits = new Dictionary<string, AssetTask>();
+
+        /// <summary>
+        /// 存储AB包的字典
+        /// </summary>
+        [ShowInInspector] private readonly Dictionary<string, AssetBundle> bundles = new Dictionary<string, AssetBundle>();
+        
+        /// <summary>
+        /// 主包
+        /// </summary>
+        private AssetBundle mainAsset;
+
+        /// <summary>
+        /// 声明文件
+        /// </summary>
+        private AssetBundleManifest manifest;
+
+        /// <summary>
+        /// 异步加载AB依赖包
+        /// </summary>
+        /// <param name="bundle"></param>
+        private async Task LoadDependency(string bundle)
         {
-            /// <summary>
-            /// 存储AB包的名称和资源
-            /// </summary>
-            [ShowInInspector] private readonly Dictionary<string, Asset> assets = new Dictionary<string, Asset>();
-
-            /// <summary>
-            /// 存储AB包的字典
-            /// </summary>
-            [ShowInInspector] private readonly Dictionary<string, AssetBundle> bundles = new Dictionary<string, AssetBundle>();
-
-            /// <summary>
-            /// 异步加载AB包的任务
-            /// </summary>
-            private readonly Dictionary<string, Task<AssetBundle>> tasks = new Dictionary<string, Task<AssetBundle>>();
-
-            /// <summary>
-            /// 主包
-            /// </summary>
-            private AssetBundle mainAsset;
-
-            /// <summary>
-            /// 声明文件
-            /// </summary>
-            private AssetBundleManifest manifest;
-
-            /// <summary>
-            /// 异步加载AB依赖包
-            /// </summary>
-            /// <param name="bundle"></param>
-            private async Task LoadDependency(string bundle)
+            if (mainAsset == null)
             {
-                if (mainAsset == null)
-                {
-                    mainAsset = await LoadAssetBundleTask(GlobalSetting.Instance.platform.ToString());
-                    manifest = mainAsset.LoadAsset<AssetBundleManifest>(nameof(AssetBundleManifest));
-                }
-
-                var dependencies = manifest.GetAllDependencies(bundle);
-                foreach (var dependency in dependencies)
-                {
-                    if (!bundles.ContainsKey(dependency))
-                    {
-                        await LoadAssetBundleTask(dependency);
-                    }
-                }
+                mainAsset = await LoadAssetBundleTask(GlobalSetting.Instance.platform.ToString());
+                manifest = mainAsset.LoadAsset<AssetBundleManifest>(nameof(AssetBundleManifest));
             }
 
-            /// <summary>
-            /// 异步加载AB包任务
-            /// </summary>
-            /// <param name="bundle"></param>
-            /// <returns></returns>
-            private async Task<AssetBundle> LoadAssetBundleTask(string bundle)
+            var dependencies = manifest.GetAllDependencies(bundle);
+            foreach (var dependency in dependencies)
             {
-                if (tasks.TryGetValue(bundle, out var task))
+                if (!bundles.ContainsKey(dependency))
                 {
-                    return await task;
-                }
-
-                var newTask = LoadAssetBundleAsync(bundle);
-                tasks[bundle] = newTask;
-
-                try
-                {
-                    return await newTask;
-                }
-                finally
-                {
-                    tasks.Remove(bundle);
+                    await LoadAssetBundleTask(dependency);
                 }
             }
+        }
 
-            /// <summary>
-            /// 异步读取文件
-            /// </summary>
-            /// <param name="bundle"></param>
-            /// <returns></returns>
-            private async Task<AssetBundle> LoadAssetBundleAsync(string bundle)
+        /// <summary>
+        /// 异步加载AB包任务
+        /// </summary>
+        /// <param name="bundle"></param>
+        /// <returns></returns>
+        private async Task<AssetBundle> LoadAssetBundleTask(string bundle)
+        {
+            if (awaits.TryGetValue(bundle, out var task))
             {
-                var path = GlobalSetting.GetPersistentPath(bundle);
-                if (File.Exists(path))
-                {
-                    var request = await AssetBundle.LoadFromFileAsync(path);
-                    var assetBundle = request.assetBundle;
-                    bundles.Add(bundle, assetBundle);
-                    return assetBundle;
-                }
+                return await task;
+            }
 
-                path = GlobalSetting.GetStreamingPath(bundle);
+            var newTask = LoadAssetBundleAsync(bundle);
+            awaits[bundle] = newTask;
+
+            try
+            {
+                return await newTask;
+            }
+            finally
+            {
+                awaits.Remove(bundle);
+            }
+        }
+
+        /// <summary>
+        /// 异步读取文件
+        /// </summary>
+        /// <param name="bundle"></param>
+        /// <returns></returns>
+        private async Task<AssetBundle> LoadAssetBundleAsync(string bundle)
+        {
+            var path = GlobalSetting.GetPersistentPath(bundle);
+            if (File.Exists(path))
+            {
+                var request = await AssetBundle.LoadFromFileAsync(path);
+                var assetBundle = request.assetBundle;
+                bundles.Add(bundle, assetBundle);
+                return assetBundle;
+            }
+
+            path = GlobalSetting.GetStreamingPath(bundle);
 #if UNITY_ANDROID && !UNITY_EDITOR
-                using (var request = UnityWebRequestAssetBundle.GetAssetBundle(path))
+            using (var request = UnityWebRequestAssetBundle.GetAssetBundle(path))
+            {
+                await request.SendWebRequest();
+                if (request.result == UnityWebRequest.Result.Success)
                 {
-                    await request.SendWebRequest();
-                    if (request.result == UnityWebRequest.Result.Success)
-                    {
-                        var assetBundle = DownloadHandlerAssetBundle.GetContent(request);
-                        bundles.Add(bundle, assetBundle);
-                        return assetBundle;
-                    }
-                }
-#else
-                if (File.Exists(path))
-                {
-                    var request = await AssetBundle.LoadFromFileAsync(path);
-                    var assetBundle = request.assetBundle;
+                    var assetBundle = DownloadHandlerAssetBundle.GetContent(request);
                     bundles.Add(bundle, assetBundle);
                     return assetBundle;
                 }
-
-#endif
-                Debug.LogWarning($"加载 {bundle} 资源包失败");
-                return null;
+            }
+#else
+            if (File.Exists(path))
+            {
+                var request = await AssetBundle.LoadFromFileAsync(path);
+                var assetBundle = request.assetBundle;
+                bundles.Add(bundle, assetBundle);
+                return assetBundle;
             }
 
-            /// <summary>
-            /// 根据路径加载
-            /// </summary>
-            /// <param name="path"></param>
-            /// <typeparam name="T"></typeparam>
-            /// <returns></returns>
-            public async Task<T> Load<T>(string path) where T : Object
-            {
-                if (!Runtime) return null;
+#endif
+            Debug.LogWarning($"加载 {bundle} 资源包失败");
+            return null;
+        }
+
+        /// <summary>
+        /// 根据路径加载
+        /// </summary>
+        /// <param name="path"></param>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
+        public async Task<T> Load<T>(string path) where T : Object
+        {
+            if (!GlobalManager.Runtime) return null;
 #if UNITY_EDITOR
-                if (!BuildSetting.Instance.isRemote)
-                {
-                    return BuildSetting.Instance.Load<T>(path);
-                }
+            if (!GlobalSetting.Instance.RemoteLoad)
+            {
+                return GlobalSetting.Instance.Load<T>(path);
+            }
 #endif
-                if (!assets.TryGetValue(path, out var assetData))
-                {
-                    assetData = new Asset(path);
-                    assets.Add(path, assetData);
-                }
+            if (!assets.TryGetValue(path, out var assetData))
+            {
+                assetData = new Asset(path);
+                assets.Add(path, assetData);
+            }
 
-                await LoadDependency(assetData.bundle);
-                if (!bundles.TryGetValue(assetData.bundle, out var assetBundle))
+            await LoadDependency(assetData.bundle);
+            if (!bundles.TryGetValue(assetData.bundle, out var assetBundle))
+            {
+                assetBundle = await LoadAssetBundleTask(assetData.bundle);
+                if (assetBundle == null)
                 {
-                    assetBundle = await LoadAssetBundleTask(assetData.bundle);
-                    if (assetBundle == null)
-                    {
-                        return null;
-                    }
-                }
-
-                if (typeof(T).IsSubclassOf(typeof(Component)))
-                {
-                    var obj = assetBundle.LoadAssetAsync<GameObject>(assetData.asset);
-                    return ((GameObject)Instantiate(obj.asset)).GetComponent<T>();
-                }
-                else
-                {
-                    var obj = assetBundle.LoadAssetAsync<T>(assetData.asset);
-                    return obj.asset is GameObject ? (T)Instantiate(obj.asset) : (T)obj.asset;
+                    return null;
                 }
             }
 
-            /// <summary>
-            /// 根据路径加载
-            /// </summary>
-            /// <param name="path"></param>
-            /// <param name="action"></param>
-            /// <typeparam name="T"></typeparam>
-            /// <returns></returns>
-            public async void LoadAsync<T>(string path, Action<T> action = null) where T : Object
-            {
-                if (!Runtime) return;
+            var obj = assetBundle.LoadAssetAsync<T>(assetData.asset);
+            return obj.asset is GameObject ? (T)Instantiate(obj.asset) : (T)obj.asset;
+        }
+
+        /// <summary>
+        /// 根据路径加载
+        /// </summary>
+        /// <param name="path"></param>
+        /// <returns></returns>
+        internal async Task<AsyncOperation> LoadSceneAsync(string path)
+        {
+            if (!GlobalManager.Runtime) return null;
 #if UNITY_EDITOR
-                if (!BuildSetting.Instance.isRemote)
-                {
-                    BuildSetting.Instance.LoadAsync(path, action);
-                    return;
-                }
+            if (!GlobalSetting.Instance.RemoteLoad)
+            {
+                return UnitySceneManager.LoadSceneAsync(path.Split('/')[1], LoadSceneMode.Single);
+            }
 #endif
-                if (!assets.TryGetValue(path, out var assetData))
-                {
-                    assetData = new Asset(path);
-                    assets.Add(path, assetData);
-                }
-
-                await LoadDependency(assetData.bundle);
-                if (!bundles.TryGetValue(assetData.bundle, out var assetBundle))
-                {
-                    assetBundle = await LoadAssetBundleTask(assetData.bundle);
-                    if (assetBundle == null)
-                    {
-                        return;
-                    }
-                }
-
-                if (typeof(T).IsSubclassOf(typeof(Component)))
-                {
-                    var obj = assetBundle.LoadAssetAsync<GameObject>(assetData.asset);
-                    var asset = ((GameObject)Instantiate(obj.asset)).GetComponent<T>();
-                    action?.Invoke(asset);
-                }
-                else
-                {
-                    var obj = assetBundle.LoadAssetAsync<T>(assetData.asset);
-                    var asset = obj.asset is GameObject ? (T)Instantiate(obj.asset) : (T)obj.asset;
-                    action?.Invoke(asset);
-                }
-            }
-
-            /// <summary>
-            /// 根据路径加载
-            /// </summary>
-            /// <param name="path"></param>
-            /// <returns></returns>
-            internal async Task<AsyncOperation> LoadSceneAsync(string path)
+            if (!assets.TryGetValue(path, out var assetData))
             {
-                if (!Runtime) return null;
-#if UNITY_EDITOR
-                if (!BuildSetting.Instance.isRemote)
-                {
-                    return UnitySceneManager.LoadSceneAsync(path.Split('/')[1], LoadSceneMode.Single);
-                }
-#endif
-                if (!assets.TryGetValue(path, out var assetData))
-                {
-                    assetData = new Asset(path);
-                    assets.Add(path, assetData);
-                }
-
-                await LoadDependency(assetData.bundle);
-                if (!bundles.TryGetValue(assetData.bundle, out var assetBundle))
-                {
-                    assetBundle = await LoadAssetBundleTask(assetData.bundle);
-                    if (assetBundle == null)
-                    {
-                        return null;
-                    }
-                }
-
-                return UnitySceneManager.LoadSceneAsync(assetData.asset, LoadSceneMode.Single);
+                assetData = new Asset(path);
+                assets.Add(path, assetData);
             }
 
-            /// <summary>
-            /// 卸载AB包的方法
-            /// </summary>
-            /// <param name="labelName"></param>
-            public void Unload(string labelName)
+            await LoadDependency(assetData.bundle);
+            if (!bundles.TryGetValue(assetData.bundle, out var assetBundle))
             {
-                if (bundles.TryGetValue(labelName, out var assetBundle))
+                assetBundle = await LoadAssetBundleTask(assetData.bundle);
+                if (assetBundle == null)
                 {
-                    assetBundle.Unload(false);
-                    foreach (var asset in assets.Values.Where(asset => asset.bundle == labelName))
-                    {
-                        assets.Remove($"{asset.bundle}/{asset.asset}");
-                    }
-
-                    bundles.Remove(labelName);
+                    return null;
                 }
             }
 
-            /// <summary>
-            /// 清空AB包的方法
-            /// </summary>
-            internal void OnDestroy()
+            return UnitySceneManager.LoadSceneAsync(assetData.asset, LoadSceneMode.Single);
+        }
+
+        /// <summary>
+        /// 卸载AB包的方法
+        /// </summary>
+        /// <param name="labelName"></param>
+        public void Unload(string labelName)
+        {
+            if (bundles.TryGetValue(labelName, out var assetBundle))
             {
-                AssetBundle.UnloadAllAssetBundles(true);
-                tasks.Clear();
-                assets.Clear();
-                bundles.Clear();
-                manifest = null;
-                mainAsset = null;
+                assetBundle.Unload(false);
+                foreach (var asset in assets.Values.Where(asset => asset.bundle == labelName))
+                {
+                    assets.Remove($"{asset.bundle}/{asset.asset}");
+                }
+
+                bundles.Remove(labelName);
             }
+        }
+
+        /// <summary>
+        /// 清空AB包的方法
+        /// </summary>
+        internal void OnDestroy()
+        {
+            AssetBundle.UnloadAllAssetBundles(true);
+            awaits.Clear();
+            assets.Clear();
+            bundles.Clear();
+            manifest = null;
+            mainAsset = null;
         }
     }
 }

@@ -9,6 +9,7 @@
 // *********************************************************************************
 
 using System;
+using JFramework.Core;
 using JFramework.Interface;
 using Sirenix.OdinInspector;
 using UnityEngine;
@@ -22,7 +23,7 @@ using JFramework.Editor;
 namespace JFramework
 {
     [AddComponentMenu(""), DefaultExecutionOrder(-10)]
-    public sealed partial class GlobalManager : MonoBehaviour, IInject
+    public sealed partial class GlobalManager : MonoBehaviour, IEntity
     {
         /// <summary>
         /// 是否在运行模式
@@ -118,15 +119,16 @@ namespace JFramework
         private static void RuntimeInitializeOnLoad()
         {
             Entity = ScriptableObject.CreateInstance<EntityManager>();
+            Entity.name = nameof(EntityManager);
         }
     }
 
     public sealed partial class GlobalManager
     {
 #if UNITY_EDITOR
-        public static bool isRemote => BuildSetting.Instance.isRemote;
+        public static bool isRemote => GlobalSetting.Instance.RemoteLoad;
         public static void Add(int id, string name, object item) => EditorSetting.Add(id, name, item);
-        [ShowInInspector] public static Dictionary<Type, IPool> streams => StreamPool.streams;
+        [ShowInInspector, LabelText("缓存池")] private static Dictionary<Type, IPool> streams => StreamPool.streams;
 #endif
         [ShowInInspector, LabelText("实体")] internal static EntityManager Entity;
 
@@ -144,20 +146,20 @@ namespace JFramework
 
         [ShowInInspector, LabelText("音效"), Inject]
         public static AudioManager Audio;
-
-        [ShowInInspector, LabelText("场景"), Inject]
-        public static SceneManager Scene;
+        
+        [ShowInInspector, LabelText("资源管理"), Inject]
+        public static AssetManager Asset;
 
         [ShowInInspector, LabelText("计时器"), Inject]
         public static TimerManager Time;
 
         [ShowInInspector, LabelText("事件中心"), Inject]
         public static EventManager Event;
+        
+        [ShowInInspector, LabelText("场景"), Inject]
+        public static SceneManager Scene;
 
-        [ShowInInspector, LabelText("资源管理"), Inject]
-        public static AssetManager Asset;
-
-        [ShowInInspector, LabelText("资源请求"), Inject]
-        public static AssetRequest Request;
+        [ShowInInspector, LabelText("更新请求"), Inject]
+        public static RequestManager Request;
     }
 }

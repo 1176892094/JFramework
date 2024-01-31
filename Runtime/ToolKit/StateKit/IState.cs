@@ -8,8 +8,6 @@
 // # Description: This is an automatically generated comment.
 // *********************************************************************************
 
-using UnityEngine;
-
 namespace JFramework.Interface
 {
     /// <summary>
@@ -18,15 +16,10 @@ namespace JFramework.Interface
     public interface IState : IEnter, IUpdate, IExit
     {
         /// <summary>
-        /// 状态是否活跃
-        /// </summary>
-        bool isActive { get; }
-
-        /// <summary>
         /// 状态的初始化方法
         /// </summary>
         /// <param name="owner"></param>
         /// <param name="machine">状态机</param>
-        void OnAwake(GameObject owner, IStateMachine machine);
+        void OnAwake(IEntity owner, IStateMachine machine);
     }
 }

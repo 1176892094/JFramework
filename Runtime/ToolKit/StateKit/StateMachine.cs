@@ -22,7 +22,7 @@ namespace JFramework
     /// 状态机类
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    public abstract class StateMachine<T> : Controller, IStateMachine where T : IEntity
+    public abstract class StateMachine<T> : Controller<T>, IStateMachine where T : IEntity
     {
         /// <summary>
         /// 存储状态的字典
@@ -46,7 +46,7 @@ namespace JFramework
         /// <returns></returns>
         public bool IsActive<TState>() where TState : IState
         {
-            return states.TryGetValue(typeof(TState), out var state) && state.isActive;
+            return states != null && state.GetType() == typeof(T);
         }
 
         /// <summary>

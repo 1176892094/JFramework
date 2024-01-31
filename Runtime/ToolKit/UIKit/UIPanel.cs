@@ -17,7 +17,7 @@ namespace JFramework
     /// <summary>
     /// UI面板的抽象类
     /// </summary>
-    public abstract class UIPanel : MonoBehaviour, IPanel, IInject
+    public abstract class UIPanel : MonoBehaviour, IPanel, IEntity
     {
         /// <summary>
         /// UI层级
