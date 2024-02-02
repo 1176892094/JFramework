@@ -43,19 +43,19 @@ namespace JFramework
         /// <summary>
         /// 实体控制器获取
         /// </summary>
-        /// <param name="gameObject"></param>
-        public static T GetControl<T>(this GameObject gameObject) where T : ScriptableObject, IController
+        /// <param name="entity"></param>
+        public static T GetControl<T>(this IEntity entity) where T : ScriptableObject, IController
         {
-            return (T)GlobalManager.Entity.Register(gameObject, typeof(T));
+            return (T)GlobalManager.Entity.Register(entity, typeof(T));
         }
 
         /// <summary>
         /// 实体卸载控制器
         /// </summary>
-        /// <param name="gameObject"></param>
-        public static void UnRegister(this GameObject gameObject)
+        /// <param name="entity"></param>
+        public static void UnRegister(this IEntity entity)
         {
-            GlobalManager.Entity.UnRegister(gameObject);
+            GlobalManager.Entity.UnRegister(entity);
         }
     }
 }

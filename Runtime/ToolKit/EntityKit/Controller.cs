@@ -8,7 +8,6 @@
 // # Description: This is an automatically generated comment.
 // *********************************************************************************
 
-using System;
 using JFramework.Interface;
 using UnityEngine;
 
@@ -27,11 +26,11 @@ namespace JFramework
         /// <summary>
         /// 所有者的游戏对象
         /// </summary>
-        public T owner => instance ??= GlobalManager.Entity.instance.GetComponent<T>();
-        
+        public T owner => instance ??= (T)GlobalManager.Entity.instance;
+
         /// <summary>
         /// 注册实体单位
         /// </summary>
-        void IController.Awake() => instance ??= GlobalManager.Entity.instance.GetComponent<T>();
+        void IController.Awake() => instance ??= (T)GlobalManager.Entity.instance;
     }
 }

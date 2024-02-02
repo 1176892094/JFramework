@@ -38,6 +38,6 @@ namespace JFramework
         /// <summary>
         /// 实体销毁 (销毁控制器)
         /// </summary>
-        protected virtual void OnDestroy() => gameObject.UnRegister();
+        protected virtual void OnDestroy() => this.UnRegister();
     }
 }

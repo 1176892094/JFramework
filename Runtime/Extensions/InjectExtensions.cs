@@ -35,7 +35,7 @@ namespace JFramework
 
                 if (typeof(IController).IsAssignableFrom(field.FieldType))
                 {
-                    var obj = GlobalManager.Entity.Register(inject.gameObject, field.FieldType);
+                    var obj = GlobalManager.Entity.Register(inject, field.FieldType);
                     field.SetValue(inject, obj);
                 }
                 else if (typeof(Component).IsAssignableFrom(field.FieldType))

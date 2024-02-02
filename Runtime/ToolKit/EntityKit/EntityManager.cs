@@ -28,51 +28,51 @@ namespace JFramework.Core
         /// 控制器存储字典
         /// </summary>
         [ShowInInspector, LabelText("实体列表")]
-        private readonly Dictionary<GameObject, Controllers> components = new Dictionary<GameObject, Controllers>();
+        private readonly Dictionary<IEntity, Controllers> components = new Dictionary<IEntity, Controllers>();
 
         /// <summary>
         /// 临时实体存储栈
         /// </summary>
-        private readonly Stack<GameObject> stacks = new Stack<GameObject>();
+        private readonly Stack<IEntity> stacks = new Stack<IEntity>();
 
         /// <summary>
         /// 临时实体值
         /// </summary>
-        public GameObject instance => stacks.Pop();
+        public IEntity instance => stacks.Pop();
 
         /// <summary>
         /// 为实体注册控制器
         /// </summary>
-        /// <param name="gameObject"></param>
+        /// <param name="entity"></param>
         /// <param name="type"></param>
         /// <returns></returns>
-        public IController Register(GameObject gameObject, Type type)
+        public IController Register(IEntity entity, Type type)
         {
-            if (!components.TryGetValue(gameObject, out var controls))
+            if (!components.TryGetValue(entity, out var controls))
             {
                 controls = new Controllers();
-                components.Add(gameObject, controls);
+                components.Add(entity, controls);
             }
 
             if (!controls.TryGetValue(type, out var control))
             {
-                stacks.Push(gameObject);
+                stacks.Push(entity);
                 control = (IController)CreateInstance(type);
                 ((ScriptableObject)control).name = type.Name;
                 controls.Add(type, control);
                 control.Awake();
             }
 
-            return components[gameObject][type];
+            return components[entity][type];
         }
 
         /// <summary>
         /// 取消注册控制器
         /// </summary>
-        /// <param name="gameObject"></param>
-        public void UnRegister(GameObject gameObject)
+        /// <param name="entity"></param>
+        public void UnRegister(IEntity entity)
         {
-            if (components.TryGetValue(gameObject, out var controls))
+            if (components.TryGetValue(entity, out var controls))
             {
                 foreach (var control in controls.Values)
                 {
@@ -80,7 +80,7 @@ namespace JFramework.Core
                 }
 
                 controls.Clear();
-                components.Remove(gameObject);
+                components.Remove(entity);
             }
         }
 
@@ -90,9 +90,9 @@ namespace JFramework.Core
         private void OnDestroy()
         {
             var copies = components.Keys.ToList();
-            foreach (var gameObject in copies)
+            foreach (var entity in copies)
             {
-                UnRegister(gameObject);
+                UnRegister(entity);
             }
 
             components.Clear();
