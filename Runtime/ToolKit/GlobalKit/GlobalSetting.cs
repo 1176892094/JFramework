@@ -260,20 +260,14 @@ namespace JFramework
         {
             if (objects.TryGetValue(path, out var obj))
             {
-                if (obj is GameObject)
-                {
-                    return (T)Object.Instantiate(obj);
-                }
-                else if (obj is Component)
-                {
-                    return ((GameObject)Object.Instantiate(obj)).GetComponent<T>();
-                }
-                else if (obj is Texture2D texture)
+                if (obj is Texture2D texture)
                 {
                     obj = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), Vector2.one * 0.5f);
+                    return (T)obj;
                 }
 
-                return (T)obj;
+                var asset = obj is GameObject ? Object.Instantiate((T)obj) : (T)obj;
+                return asset;
             }
 
             return null;
