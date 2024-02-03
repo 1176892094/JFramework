@@ -28,14 +28,14 @@ using JFramework.Editor;
 namespace JFramework.Core
 {
     using AssetTask = Task<AssetBundle>;
-    
+
     public sealed class AssetManager : Controller<GlobalManager>
     {
         /// <summary>
         /// 存储AB包的名称和资源
         /// </summary>
         [ShowInInspector] private readonly Dictionary<string, Asset> assets = new Dictionary<string, Asset>();
-        
+
         /// <summary>
         /// 异步加载AB包的任务
         /// </summary>
@@ -45,7 +45,7 @@ namespace JFramework.Core
         /// 存储AB包的字典
         /// </summary>
         [ShowInInspector] private readonly Dictionary<string, AssetBundle> bundles = new Dictionary<string, AssetBundle>();
-        
+
         /// <summary>
         /// 主包
         /// </summary>
@@ -177,7 +177,16 @@ namespace JFramework.Core
             }
 
             var obj = assetBundle.LoadAssetAsync<T>(assetData.asset);
-            return obj.asset is GameObject ? (T)Instantiate(obj.asset) : (T)obj.asset;
+            if (obj.asset is GameObject)
+            {
+                return (T)Instantiate(obj.asset);
+            }
+            else if (obj.asset is Component)
+            {
+                return ((GameObject)Instantiate(obj.asset)).GetComponent<T>();
+            }
+
+            return (T)obj.asset;
         }
 
         /// <summary>
