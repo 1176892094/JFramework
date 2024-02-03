@@ -18,7 +18,7 @@ namespace JFramework.Core
     /// <summary>
     /// 事件管理器
     /// </summary>
-    public sealed class EventManager : Controller<GlobalManager>
+    public sealed class EventManager : Component<GlobalManager>
     {
         /// <summary>
         /// 事件观察字典

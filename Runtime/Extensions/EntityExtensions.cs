@@ -23,10 +23,8 @@ namespace JFramework
         /// </summary>
         public static void Listen(this IUpdate entity)
         {
-            if (GlobalManager.Runtime)
-            {
-                GlobalManager.OnUpdate += entity.OnUpdate;
-            }
+            if (!GlobalManager.Runtime) return;
+            GlobalManager.OnUpdate += entity.OnUpdate;
         }
 
         /// <summary>
@@ -34,28 +32,26 @@ namespace JFramework
         /// </summary>
         public static void Remove(this IUpdate entity)
         {
-            if (GlobalManager.Runtime)
-            {
-                GlobalManager.OnUpdate -= entity.OnUpdate;
-            }
+            if (!GlobalManager.Runtime) return;
+            GlobalManager.OnUpdate -= entity.OnUpdate;
         }
 
         /// <summary>
         /// 实体控制器获取
         /// </summary>
         /// <param name="entity"></param>
-        public static T GetControl<T>(this IEntity entity) where T : ScriptableObject, IController
+        public static T FindComponent<T>(this IEntity entity) where T : ScriptableObject, IComponent
         {
-            return (T)GlobalManager.Entity.Register(entity, typeof(T));
+            return (T)GlobalManager.Entity.FindComponent(entity, typeof(T));
         }
 
         /// <summary>
         /// 实体卸载控制器
         /// </summary>
         /// <param name="entity"></param>
-        public static void UnRegister(this IEntity entity)
+        public static void Destroy(this IEntity entity)
         {
-            GlobalManager.Entity.UnRegister(entity);
+            GlobalManager.Entity.Destroy(entity);
         }
     }
 }

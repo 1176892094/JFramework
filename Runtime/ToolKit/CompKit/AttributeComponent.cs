@@ -30,7 +30,7 @@ namespace JFramework
     /// </summary>
     /// <typeparam name="TEntity">控制器的实体单位</typeparam>
     /// <typeparam name="TAttribute">持有属性枚举</typeparam>
-    public abstract class AttributeController<TEntity, TAttribute> : Controller<TEntity> where TAttribute : Enum where TEntity : IEntity
+    public abstract class AttributeComponent<TEntity, TAttribute> : Component<TEntity> where TAttribute : Enum where TEntity : IEntity
     {
         /// <summary>
         /// 存储 实体所持有的属性

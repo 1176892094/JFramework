@@ -18,7 +18,7 @@ namespace JFramework.Core
     /// <summary>
     /// 场景管理器
     /// </summary>
-    public class SceneManager : Controller<GlobalManager>
+    public class SceneManager : Component<GlobalManager>
     {
         /// <summary>
         /// 异步加载场景的进度条

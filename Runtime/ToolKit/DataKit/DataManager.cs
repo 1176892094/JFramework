@@ -23,7 +23,7 @@ namespace JFramework.Core
     /// <summary>
     /// 数据管理器
     /// </summary>
-    public sealed class DataManager : Controller<GlobalManager>
+    public sealed class DataManager : Component<GlobalManager>
     {
         /// <summary>
         /// 整数键

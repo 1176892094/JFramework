@@ -8,8 +8,8 @@
 // # Description: This is an automatically generated comment.
 // *********************************************************************************
 
+using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
@@ -20,7 +20,7 @@ namespace JFramework.Core
     /// <summary>
     /// 音效管理器
     /// </summary>
-    public sealed class AudioManager : Controller<GlobalManager>
+    public sealed class AudioManager : Component<GlobalManager>
     {
         /// <summary>
         /// 完成音效列表
@@ -81,15 +81,16 @@ namespace JFramework.Core
         /// 播放背景音乐
         /// </summary>
         /// <param name="name">背景音乐的路径</param>
-        public async Task<AudioSource> PlayMusic(string name)
+        /// <param name="action"></param>
+        public async void PlayMusic(string name, Action<AudioSource> action = null)
         {
-            if (!GlobalManager.Runtime || !isActive) return null;
+            if (!GlobalManager.Runtime || !isActive) return;
             var clip = await GlobalManager.Asset.Load<AudioClip>(GlobalSetting.GetAudioPath(name));
             audioSource.volume = musicVolume;
             audioSource.clip = clip;
             audioSource.loop = true;
             audioSource.Play();
-            return audioSource;
+            action?.Invoke(audioSource);
         }
 
         /// <summary>
@@ -124,9 +125,10 @@ namespace JFramework.Core
         /// 播放一次音效
         /// </summary>
         /// <param name="name">传入音效路径</param>
-        public async Task<AudioSource> PlayOnce(string name)
+        /// <param name="action"></param>
+        public async void PlayOnce(string name, Action<AudioSource> action = null)
         {
-            if (!GlobalManager.Runtime || !isActive) return null;
+            if (!GlobalManager.Runtime || !isActive) return;
             if (!stacks.TryPop(out var audio))
             {
                 audio = poolManager.gameObject.AddComponent<AudioSource>();
@@ -138,16 +140,17 @@ namespace JFramework.Core
             audio.clip = clip;
             audio.Play();
             GlobalManager.Time.Pop(clip.length).Invoke(() => StopAudio(audio));
-            return audio;
+            action?.Invoke(audio);
         }
 
         /// <summary>
         /// 播放循环音效
         /// </summary>
         /// <param name="name">传入音效路径</param>
-        public async Task<AudioSource> PlayLoop(string name)
+        /// <param name="action"></param>
+        public async void PlayLoop(string name, Action<AudioSource> action = null)
         {
-            if (!GlobalManager.Runtime || !isActive) return null;
+            if (!GlobalManager.Runtime || !isActive) return;
             if (!stacks.TryPop(out var audio))
             {
                 audio = poolManager.gameObject.AddComponent<AudioSource>();
@@ -159,7 +162,7 @@ namespace JFramework.Core
             audio.clip = clip;
             audio.loop = true;
             audio.Play();
-            return audio;
+            action?.Invoke(audio);
         }
 
         /// <summary>

@@ -22,7 +22,7 @@ namespace JFramework
     /// 状态机类
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    public abstract class StateMachine<T> : Controller<T>, IStateMachine where T : IEntity
+    public abstract class StateMachine<T> : Component<T>, IStateMachine where T : IEntity
     {
         /// <summary>
         /// 存储状态的字典

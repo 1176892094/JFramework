@@ -25,7 +25,7 @@ namespace JFramework.Core
     /// <summary>
     /// Json管理器
     /// </summary>
-    public sealed class JsonManager : Controller<GlobalManager>
+    public sealed class JsonManager : Component<GlobalManager>
     {
         /// <summary>
         /// 存储加密密钥的字典

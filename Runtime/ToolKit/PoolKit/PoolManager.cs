@@ -8,6 +8,7 @@
 // # Description: This is an automatically generated comment.
 // *********************************************************************************
 
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using JFramework.Interface;
@@ -19,7 +20,7 @@ namespace JFramework.Core
     /// <summary>
     /// 对象池管理器
     /// </summary>
-    public sealed class PoolManager : Controller<GlobalManager>
+    public sealed class PoolManager : Component<GlobalManager>
     {
         /// <summary>
         /// 对象池组
@@ -66,6 +67,32 @@ namespace JFramework.Core
             DontDestroyOnLoad(o);
             o.name = path;
             return o;
+        }
+
+        /// <summary>
+        /// 对象池管理器异步获取对象
+        /// </summary>
+        /// <param name="path">弹出对象的路径</param>
+        /// <param name="action"></param>
+        public async void Pop(string path, Action<GameObject> action)
+        {
+            if (!GlobalManager.Runtime) return;
+            if (pools.TryGetValue(path, out var pool) && pool.Count > 0)
+            {
+                var obj = pool.Pop();
+                if (obj != null)
+                {
+                    obj.SetActive(true);
+                    obj.transform.SetParent(null);
+                    action?.Invoke(obj);
+                    return;
+                }
+            }
+
+            var o = await GlobalManager.Asset.Load<GameObject>(path);
+            DontDestroyOnLoad(o);
+            o.name = path;
+            action?.Invoke(o);
         }
 
         /// <summary>

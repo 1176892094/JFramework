@@ -11,6 +11,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using JFramework.Interface;
 using Sirenix.OdinInspector;
 using UnityEngine;
@@ -22,7 +23,7 @@ namespace JFramework.Core
     /// <summary>
     /// UI界面管理器
     /// </summary>
-    public sealed class UIManager : Controller<GlobalManager>
+    public sealed class UIManager : Component<GlobalManager>
     {
         /// <summary>
         /// 存储所有UI的字典
@@ -33,7 +34,7 @@ namespace JFramework.Core
         /// UI层级字典
         /// </summary>
         [ShowInInspector] private readonly Dictionary<UILayer, Transform> layers = new Dictionary<UILayer, Transform>();
-        
+
         /// <summary>
         /// UI画布
         /// </summary>
@@ -57,7 +58,7 @@ namespace JFramework.Core
         /// UI管理器显示UI面板 (无委托值)
         /// </summary>
         /// <typeparam name="TPanel">可以使用所有继承IPanel的对象</typeparam>
-        public void ShowPanel<TPanel>() where TPanel : Component, IPanel
+        public async void ShowPanel<TPanel>() where TPanel : Component, IPanel
         {
             if (!GlobalManager.Runtime) return;
             if (panels.TryGetValue(typeof(TPanel), out var panel))
@@ -66,14 +67,14 @@ namespace JFramework.Core
                 return;
             }
 
-            LoadPanel<TPanel>(null);
+            await LoadPanel<TPanel>();
         }
 
         /// <summary>
         /// UI管理器显示UI面板 (无委托值)
         /// </summary>
         /// <typeparam name="TPanel">可以使用所有继承IPanel的对象</typeparam>
-        public void ShowPanel<TPanel>(Action action) where TPanel : Component, IPanel
+        public async void ShowPanel<TPanel>(Action action) where TPanel : Component, IPanel
         {
             if (!GlobalManager.Runtime) return;
             if (panels.TryGetValue(typeof(TPanel), out var panel))
@@ -83,14 +84,15 @@ namespace JFramework.Core
                 return;
             }
 
-            LoadPanel<TPanel>(panel => action?.Invoke());
+            await LoadPanel<TPanel>();
+            action?.Invoke();
         }
 
         /// <summary>
         /// UI管理器显示UI面板 (有委托值)
         /// </summary>
         /// <typeparam name="TPanel">可以使用所有继承IPanel的对象</typeparam>
-        public void ShowPanel<TPanel>(Action<TPanel> action) where TPanel : Component, IPanel
+        public async void ShowPanel<TPanel>(Action<TPanel> action) where TPanel : Component, IPanel
         {
             if (!GlobalManager.Runtime) return;
             if (panels.TryGetValue(typeof(TPanel), out var panel))
@@ -100,19 +102,20 @@ namespace JFramework.Core
                 return;
             }
 
-            LoadPanel(action);
+            panel = await LoadPanel<TPanel>();
+            action?.Invoke((TPanel)panel);
         }
 
         /// <summary>
         /// UI管理器加载面板
         /// </summary>
         /// <typeparam name="TPanel">可以使用所有继承IPanel的对象</typeparam>
-        private async void LoadPanel<TPanel>(Action<TPanel> action) where TPanel : Component, IPanel
+        private async Task<TPanel> LoadPanel<TPanel>() where TPanel : Component, IPanel
         {
             if (panels.ContainsKey(typeof(TPanel)))
             {
                 Debug.LogWarning($"加载  {typeof(TPanel).Name.Red()} 失败，面板已经加载!");
-                return;
+                return null;
             }
 
             var obj = await GlobalManager.Asset.Load<GameObject>(GlobalSetting.GetUIPath(typeof(TPanel).Name));
@@ -124,7 +127,7 @@ namespace JFramework.Core
             panel.transform.SetParent(GetLayer(panel.layer), false);
             panels.Add(typeof(TPanel), panel);
             panel.Show();
-            action?.Invoke(panel);
+            return panel;
         }
 
         /// <summary>

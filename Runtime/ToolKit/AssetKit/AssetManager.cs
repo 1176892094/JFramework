@@ -28,14 +28,14 @@ using JFramework.Editor;
 namespace JFramework.Core
 {
     using AssetTask = Task<AssetBundle>;
-    
-    public sealed class AssetManager : Controller<GlobalManager>
+
+    public sealed class AssetManager : Component<GlobalManager>
     {
         /// <summary>
         /// 存储AB包的名称和资源
         /// </summary>
         [ShowInInspector] private readonly Dictionary<string, Asset> assets = new Dictionary<string, Asset>();
-        
+
         /// <summary>
         /// 异步加载AB包的任务
         /// </summary>
@@ -45,7 +45,7 @@ namespace JFramework.Core
         /// 存储AB包的字典
         /// </summary>
         [ShowInInspector] private readonly Dictionary<string, AssetBundle> bundles = new Dictionary<string, AssetBundle>();
-        
+
         /// <summary>
         /// 主包
         /// </summary>
@@ -176,8 +176,64 @@ namespace JFramework.Core
                 }
             }
 
-            var obj = assetBundle.LoadAssetAsync<T>(assetData.asset);
-            return obj.asset is GameObject ? (T)Instantiate(obj.asset) : (T)obj.asset;
+            if (typeof(T).IsSubclassOf(typeof(Component)))
+            {
+                var obj = assetBundle.LoadAssetAsync<GameObject>(assetData.asset);
+                return ((GameObject)Object.Instantiate(obj.asset)).GetComponent<T>();
+            }
+            else
+            {
+                var obj = assetBundle.LoadAssetAsync<T>(assetData.asset);
+                return obj.asset is GameObject ? (T)Instantiate(obj.asset) : (T)obj.asset;
+            }
+        }
+
+        /// <summary>
+        /// 根据路径加载
+        /// </summary>
+        /// <param name="path"></param>
+        /// <param name="action"></param>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
+        public async void Load<T>(string path, Action<T> action = null) where T : Object
+        {
+            if (!GlobalManager.Runtime) return;
+#if UNITY_EDITOR
+            if (!GlobalSetting.Instance.RemoteLoad)
+            {
+                var asset = GlobalSetting.Instance.Load<T>(path);
+                action?.Invoke(asset);
+                return;
+            }
+#endif
+            if (!assets.TryGetValue(path, out var assetData))
+            {
+                assetData = new Asset(path);
+                assets.Add(path, assetData);
+            }
+
+            await LoadDependency(assetData.bundle);
+            if (!bundles.TryGetValue(assetData.bundle, out var assetBundle))
+            {
+                assetBundle = await LoadAssetBundleTask(assetData.bundle);
+                if (assetBundle == null)
+                {
+                    return;
+                }
+            }
+            
+            if (typeof(T).IsSubclassOf(typeof(Component)))
+            {
+                var obj = assetBundle.LoadAssetAsync<GameObject>(assetData.asset);
+                var asset = ((GameObject)Object.Instantiate(obj.asset)).GetComponent<T>();
+                action?.Invoke(asset);
+            }
+            else
+            {
+                var obj = assetBundle.LoadAssetAsync<T>(assetData.asset);
+                var asset = obj.asset is GameObject ? (T)Instantiate(obj.asset) : (T)obj.asset;
+                action?.Invoke(asset);
+            }
         }
 
         /// <summary>

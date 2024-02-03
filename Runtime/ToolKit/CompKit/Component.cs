@@ -16,7 +16,7 @@ namespace JFramework
     /// <summary>
     /// 控制器
     /// </summary>
-    public abstract class Controller<T> : ScriptableObject, IController where T : IEntity
+    public abstract class Component<T> : ScriptableObject, IComponent where T : IEntity
     {
         /// <summary>
         /// 所有者
@@ -31,6 +31,6 @@ namespace JFramework
         /// <summary>
         /// 注册实体单位
         /// </summary>
-        void IController.Awake() => instance ??= (T)GlobalManager.Entity.instance;
+        void IComponent.Awake() => instance ??= (T)GlobalManager.Entity.instance;
     }
 }

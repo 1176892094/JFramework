@@ -17,7 +17,7 @@ using UnityEngine;
 
 namespace JFramework.Core
 {
-    using Controllers = Dictionary<Type, IController>;
+    using Components = Dictionary<Type, IComponent>;
 
     /// <summary>
     /// 控制器管理器
@@ -27,8 +27,8 @@ namespace JFramework.Core
         /// <summary>
         /// 控制器存储字典
         /// </summary>
-        [ShowInInspector, LabelText("实体列表")]
-        private readonly Dictionary<IEntity, Controllers> components = new Dictionary<IEntity, Controllers>();
+        [ShowInInspector]
+        private readonly Dictionary<IEntity, Components> entities = new Dictionary<IEntity, Components>();
 
         /// <summary>
         /// 临时实体存储栈
@@ -46,41 +46,41 @@ namespace JFramework.Core
         /// <param name="entity"></param>
         /// <param name="type"></param>
         /// <returns></returns>
-        public IController Register(IEntity entity, Type type)
+        public IComponent FindComponent(IEntity entity, Type type)
         {
-            if (!components.TryGetValue(entity, out var controls))
+            if (!entities.TryGetValue(entity, out var components))
             {
-                controls = new Controllers();
-                components.Add(entity, controls);
+                components = new Components();
+                entities.Add(entity, components);
             }
 
-            if (!controls.TryGetValue(type, out var control))
+            if (!components.TryGetValue(type, out var component))
             {
                 stacks.Push(entity);
-                control = (IController)CreateInstance(type);
-                ((ScriptableObject)control).name = type.Name;
-                controls.Add(type, control);
-                control.Awake();
+                component = (IComponent)CreateInstance(type);
+                ((ScriptableObject)component).name = type.Name;
+                components.Add(type, component);
+                component.Awake();
             }
 
-            return components[entity][type];
+            return entities[entity][type];
         }
 
         /// <summary>
         /// 取消注册控制器
         /// </summary>
         /// <param name="entity"></param>
-        public void UnRegister(IEntity entity)
+        public void Destroy(IEntity entity)
         {
-            if (components.TryGetValue(entity, out var controls))
+            if (entities.TryGetValue(entity, out var components))
             {
-                foreach (var control in controls.Values)
+                foreach (var component in components.Values)
                 {
-                    Destroy((ScriptableObject)control);
+                    Destroy((ScriptableObject)component);
                 }
 
-                controls.Clear();
-                components.Remove(entity);
+                components.Clear();
+                entities.Remove(entity);
             }
         }
 
@@ -89,13 +89,13 @@ namespace JFramework.Core
         /// </summary>
         private void OnDestroy()
         {
-            var copies = components.Keys.ToList();
+            var copies = entities.Keys.ToList();
             foreach (var entity in copies)
             {
-                UnRegister(entity);
+                Destroy(entity);
             }
 
-            components.Clear();
+            entities.Clear();
         }
     }
 }

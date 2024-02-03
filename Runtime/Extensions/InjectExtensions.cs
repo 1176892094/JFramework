@@ -33,10 +33,10 @@ namespace JFramework
                 var attribute = field.GetCustomAttribute<InjectAttribute>(true);
                 if (attribute == null) continue;
 
-                if (typeof(IController).IsAssignableFrom(field.FieldType))
+                if (typeof(IComponent).IsAssignableFrom(field.FieldType))
                 {
-                    var obj = GlobalManager.Entity.Register(inject, field.FieldType);
-                    field.SetValue(inject, obj);
+                    var component = GlobalManager.Entity.FindComponent(inject, field.FieldType);
+                    field.SetValue(inject, component);
                 }
                 else if (typeof(Component).IsAssignableFrom(field.FieldType))
                 {

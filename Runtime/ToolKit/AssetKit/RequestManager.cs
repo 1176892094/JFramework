@@ -23,7 +23,7 @@ namespace JFramework.Core
     /// <summary>
     /// AB包更新相关
     /// </summary>
-    public class RequestManager : Controller<GlobalManager>
+    public class RequestManager : Component<GlobalManager>
     {
         /// <summary>
         /// 本地数据列表
