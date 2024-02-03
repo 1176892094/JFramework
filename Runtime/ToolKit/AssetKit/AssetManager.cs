@@ -151,7 +151,7 @@ namespace JFramework.Core
         /// <param name="path"></param>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
-        public async Task<T> Load<T>(string path) where T : Object
+        public async Task<T> LoadAsync<T>(string path) where T : Object
         {
             if (!GlobalManager.Runtime) return null;
 #if UNITY_EDITOR
@@ -195,7 +195,7 @@ namespace JFramework.Core
         /// <param name="action"></param>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
-        public async void Load<T>(string path, Action<T> action = null) where T : Object
+        public async void LoadAsync<T>(string path, Action<T> action = null) where T : Object
         {
             if (!GlobalManager.Runtime) return;
 #if UNITY_EDITOR

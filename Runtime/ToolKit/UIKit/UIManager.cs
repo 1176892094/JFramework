@@ -118,7 +118,7 @@ namespace JFramework.Core
                 return null;
             }
 
-            var obj = await GlobalManager.Asset.Load<GameObject>(GlobalSetting.GetUIPath(typeof(TPanel).Name));
+            var obj = await GlobalManager.Asset.LoadAsync<GameObject>(GlobalSetting.GetUIPath(typeof(TPanel).Name));
             if (!obj.TryGetComponent<TPanel>(out var panel))
             {
                 panel = obj.AddComponent<TPanel>();

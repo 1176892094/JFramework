@@ -32,6 +32,17 @@ namespace JFramework
         /// 加密数据的向量
         /// </summary>
         public byte[] iv;
+        
+        /// <summary>
+        /// 构造密钥
+        /// </summary>
+        /// <param name="name">名称</param>
+        public JsonData(string name)
+        {
+            this.name = name;
+            iv = Array.Empty<byte>();
+            key = Array.Empty<byte>();
+        }
 
         /// <summary>
         /// 构造密钥

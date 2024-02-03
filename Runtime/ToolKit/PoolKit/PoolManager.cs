@@ -63,7 +63,7 @@ namespace JFramework.Core
                 }
             }
 
-            var o = await GlobalManager.Asset.Load<GameObject>(path);
+            var o = await GlobalManager.Asset.LoadAsync<GameObject>(path);
             DontDestroyOnLoad(o);
             o.name = path;
             return o;
@@ -89,7 +89,7 @@ namespace JFramework.Core
                 }
             }
 
-            var o = await GlobalManager.Asset.Load<GameObject>(path);
+            var o = await GlobalManager.Asset.LoadAsync<GameObject>(path);
             DontDestroyOnLoad(o);
             o.name = path;
             action?.Invoke(o);

@@ -103,7 +103,7 @@ namespace JFramework.Core
 
             if (!secrets.ContainsKey(name))
             {
-                secrets[name] = new JsonData();
+                secrets[name] = new JsonData(name);
                 Save(new JsonSetting(secrets.Values.ToList()), nameof(JsonManager));
                 return new T();
             }
@@ -115,7 +115,7 @@ namespace JFramework.Core
             }
             catch (Exception)
             {
-                secrets[name] = new JsonData();
+                secrets[name] = new JsonData(name);
                 Save(new JsonSetting(secrets.Values.ToList()), nameof(JsonManager));
                 return new T();
             }
@@ -146,7 +146,7 @@ namespace JFramework.Core
                 obj.name = obj.GetType().Name;
             }
 
-            File.WriteAllBytes(FilePath(obj.name), Encrypt(JsonUtility.ToJson(obj), name));
+            File.WriteAllBytes(FilePath(obj.name), Encrypt(JsonUtility.ToJson(obj), obj.name));
         }
 
         /// <summary>
@@ -175,7 +175,7 @@ namespace JFramework.Core
             }
             catch (Exception)
             {
-                secrets[obj.name] = new JsonData();
+                secrets[obj.name] = new JsonData(obj.name);
                 Save(new JsonSetting(secrets.Values.ToList()), nameof(JsonManager));
             }
         }
@@ -200,7 +200,7 @@ namespace JFramework.Core
 
             if (!secrets.ContainsKey(obj.name))
             {
-                secrets[name] = new JsonData();
+                secrets[obj.name] = new JsonData(obj.name);
                 Save(new JsonSetting(secrets.Values.ToList()), nameof(JsonManager));
                 return;
             }
@@ -213,7 +213,7 @@ namespace JFramework.Core
             }
             catch (Exception)
             {
-                secrets[obj.name] = new JsonData();
+                secrets[obj.name] = new JsonData(obj.name);
                 Save(new JsonSetting(secrets.Values.ToList()), nameof(JsonManager));
             }
         }
@@ -259,7 +259,7 @@ namespace JFramework.Core
             catch (Exception e)
             {
                 Debug.LogWarning($"存档 {name.Red()} 丢失!\n{e}");
-                secrets[name] = new JsonData();
+                secrets[name] = new JsonData(name);
                 return null;
             }
             finally
@@ -290,7 +290,7 @@ namespace JFramework.Core
             catch (Exception e)
             {
                 Debug.LogWarning($"存档 {name.Red()} 丢失!\n{e}");
-                secrets[name] = new JsonData();
+                secrets[name] = new JsonData(name);
                 Save(new JsonSetting(secrets.Values.ToList()), nameof(JsonManager));
                 return null;
             }
