@@ -1,10 +1,10 @@
 // *********************************************************************************
-// # Project: JFramework
+// # Project: Test
 // # Unity: 2022.3.5f1c1
 // # Author: Charlotte
 // # Version: 1.0.0
-// # History: 2023-12-21  21:03
-// # Copyright: 2023, Charlotte
+// # History: 2024-02-04  22:59
+// # Copyright: 2024, Charlotte
 // # Description: This is an automatically generated comment.
 // *********************************************************************************
 
@@ -15,19 +15,12 @@ using UnityEngine.UI;
 
 namespace JFramework
 {
-    /// <summary>
-    /// 注入接口的拓展
-    /// </summary>
     public static partial class Extensions
     {
-        /// <summary>
-        /// 对自身进行依赖注入
-        /// </summary>
-        /// <param name="inject">对注入接口的拓展</param>
         public static void Inject(this IEntity inject)
         {
             var type = inject.GetType();
-            var fields = type.GetFields(Reflection.Instance | BindingFlags.Static);
+            var fields = type.GetFields(Reflection.Instance);
             foreach (var field in fields)
             {
                 var attribute = field.GetCustomAttribute<InjectAttribute>(true);
@@ -44,46 +37,35 @@ namespace JFramework
                     if (string.IsNullOrEmpty(fieldName))
                     {
                         var component = inject.transform.GetComponent(field.FieldType);
-                        if (component != null)
-                        {
-                            field.SetValue(inject, component);
-                        }
+                        if (component == null) continue;
+                        field.SetValue(inject, component);
                     }
                     else
                     {
-                        var target = inject.transform.GetChild(fieldName);
-                        if (target != null)
-                        {
-                            var component = target.GetComponent(field.FieldType);
-                            if (component != null)
-                            {
-                                field.SetValue(inject, component);
-                            }
+                        var child = inject.transform.GetChild(fieldName);
+                        if (child == null) continue;
 
-                            var method = type.GetMethod(fieldName, Reflection.Instance);
-                            if (method != null)
-                            {
-                                if (component is Button button)
-                                {
-                                    inject.SetButton(fieldName, button);
-                                }
-                                else if (component is Toggle toggle)
-                                {
-                                    inject.SetToggle(fieldName, toggle);
-                                }
-                            }
+                        var component = child.GetComponent(field.FieldType);
+                        if (component == null) continue;
+
+                        field.SetValue(inject, component);
+                        var method = type.GetMethod(fieldName, Reflection.Instance);
+                        if (method == null) continue;
+
+                        switch (component)
+                        {
+                            case Button button:
+                                inject.SetButton(fieldName, button);
+                                break;
+                            case Toggle toggle:
+                                inject.SetToggle(fieldName, toggle);
+                                break;
                         }
                     }
                 }
             }
         }
 
-        /// <summary>
-        /// 注册按钮
-        /// </summary>
-        /// <param name="inject"></param>
-        /// <param name="name"></param>
-        /// <param name="button"></param>
         private static void SetButton(this IEntity inject, string name, Button button)
         {
             if (inject.transform.TryGetComponent(out IPanel panel))
@@ -100,12 +82,6 @@ namespace JFramework
             }
         }
 
-        /// <summary>
-        /// 注册开关
-        /// </summary>
-        /// <param name="inject"></param>
-        /// <param name="name"></param>
-        /// <param name="toggle"></param>
         private static void SetToggle(this IEntity inject, string name, Toggle toggle)
         {
             if (inject.transform.TryGetComponent(out IPanel panel))
@@ -122,12 +98,6 @@ namespace JFramework
             }
         }
 
-        /// <summary>
-        /// 迭代查找子物体
-        /// </summary>
-        /// <param name="parent"></param>
-        /// <param name="name"></param>
-        /// <returns></returns>
         private static Transform GetChild(this Transform parent, string name)
         {
             for (int i = 0; i < parent.childCount; i++)

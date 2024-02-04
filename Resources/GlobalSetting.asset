@@ -1,0 +1,24 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 0}
+  m_Name: GlobalSetting
+  m_EditorClassIdentifier: JFramework:JFramework:GlobalSetting
+  platform: 5
+  assetInfo: AssetBundleInfo
+  buildPath: AssetBundles
+  assetPath: Assets/Template
+  editorPath: Assets/Editor/Resources
+  remotePath: http://192.168.0.3:8000/AssetBundles
+  remoteLoad: 0
+  remoteBuild: 0
+  sceneAssets:
+  - Assets/Template/Scenes/AwakeScene.unity

@@ -1,10 +1,10 @@
 // *********************************************************************************
-// # Project: JFramework
+// # Project: Test
 // # Unity: 2022.3.5f1c1
 // # Author: Charlotte
 // # Version: 1.0.0
-// # History: 2023-10-26  12:47
-// # Copyright: 2023, Charlotte
+// # History: 2024-02-04  22:46
+// # Copyright: 2024, Charlotte
 // # Description: This is an automatically generated comment.
 // *********************************************************************************
 
@@ -14,22 +14,10 @@ using JFramework;
 using UnityEditor;
 using UnityEngine;
 
-// ReSharper disable All
-
-/// <summary>
-/// 编辑器单例
-/// </summary>
-/// <typeparam name="T">所属的单例对象</typeparam>
 public abstract class EditorSingleton<T> : ScriptableObject where T : EditorSingleton<T>
 {
-    /// <summary>
-    /// 单例自身
-    /// </summary>
     private static T instance;
 
-    /// <summary>
-    /// 安全的单例调用
-    /// </summary>
     public static T Instance
     {
         get
