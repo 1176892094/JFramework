@@ -16,7 +16,7 @@ namespace JFramework
 {
     public static class StreamPool
     {
-        private static readonly Dictionary<Type, IPool> streams = new Dictionary<Type, IPool>();
+        internal static readonly Dictionary<Type, IPool> streams = new Dictionary<Type, IPool>();
 
         public static T Pop<T>()
         {

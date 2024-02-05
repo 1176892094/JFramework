@@ -9,8 +9,10 @@
 // *********************************************************************************
 
 using System;
+using System.Collections.Generic;
 using JFramework.Core;
 using JFramework.Interface;
+using Sirenix.OdinInspector;
 using UnityEngine;
 
 namespace JFramework
@@ -84,6 +86,8 @@ namespace JFramework
     public sealed partial class GlobalManager
     {
         public static bool isRemote => SettingManager.Instance.remoteLoad;
+        
+        [ShowInInspector] private Dictionary<Type, IPool> stream => StreamPool.streams;
 
         [SerializeField] private EntityManager entity;
         internal static EntityManager Entity => Instance.entity;
