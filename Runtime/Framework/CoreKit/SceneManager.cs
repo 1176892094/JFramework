@@ -48,7 +48,7 @@ namespace JFramework.Core
             try
             {
                 if (!GlobalManager.Instance) return;
-                var operation = await GlobalManager.Asset.LoadSceneAsync(GlobalSetting.GetScenePath(name));
+                var operation = await GlobalManager.Asset.LoadSceneAsync(SettingManager.GetScenePath(name));
                 await operation;
             }
             catch (Exception e)
@@ -62,7 +62,7 @@ namespace JFramework.Core
             try
             {
                 if (!GlobalManager.Instance) return;
-                var operation = await GlobalManager.Asset.LoadSceneAsync(GlobalSetting.GetScenePath(name));
+                var operation = await GlobalManager.Asset.LoadSceneAsync(SettingManager.GetScenePath(name));
                 action?.Invoke(operation);
             }
             catch (Exception e)

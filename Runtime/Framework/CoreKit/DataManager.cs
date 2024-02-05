@@ -45,7 +45,7 @@ namespace JFramework.Core
             {
                 try
                 {
-                    var obj = await GlobalManager.Asset.Load<ScriptableObject>(GlobalSetting.GetTablePath(type.Name));
+                    var obj = await GlobalManager.Asset.Load<ScriptableObject>(SettingManager.GetTablePath(type.Name));
                     var table = (IDataTable)obj;
                     if (type.FullName == null) return;
                     var data = assembly.GetType(type.FullName[..^5]);

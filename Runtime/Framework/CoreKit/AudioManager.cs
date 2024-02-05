@@ -43,7 +43,7 @@ namespace JFramework.Core
         public async void PlayMusic(string name, Action<AudioSource> action = null)
         {
             if (!GlobalManager.Instance || !isActive) return;
-            var clip = await GlobalManager.Asset.Load<AudioClip>(GlobalSetting.GetAudioPath(name));
+            var clip = await GlobalManager.Asset.Load<AudioClip>(SettingManager.GetAudioPath(name));
             audioSource.volume = musicVolume;
             audioSource.clip = clip;
             audioSource.loop = true;
@@ -59,7 +59,7 @@ namespace JFramework.Core
                 audio = poolManager.gameObject.AddComponent<AudioSource>();
             }
 
-            var clip = await GlobalManager.Asset.Load<AudioClip>(GlobalSetting.GetAudioPath(name));
+            var clip = await GlobalManager.Asset.Load<AudioClip>(SettingManager.GetAudioPath(name));
             playList.Add(audio);
             audio.volume = audioVolume;
             audio.clip = clip;
@@ -76,7 +76,7 @@ namespace JFramework.Core
                 audio = poolManager.gameObject.AddComponent<AudioSource>();
             }
 
-            var clip = await GlobalManager.Asset.Load<AudioClip>(GlobalSetting.GetAudioPath(name));
+            var clip = await GlobalManager.Asset.Load<AudioClip>(SettingManager.GetAudioPath(name));
             playList.Add(audio);
             audio.volume = audioVolume;
             audio.clip = clip;

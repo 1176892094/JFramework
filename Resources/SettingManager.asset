@@ -9,9 +9,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 0}
-  m_Name: GlobalSetting
-  m_EditorClassIdentifier: JFramework:JFramework:GlobalSetting
+  m_Script: {fileID: 11500000, guid: 44ad09f1d6a94a539d03bf46ca54214f, type: 3}
+  m_Name: SettingManager
+  m_EditorClassIdentifier: 
   platform: 5
   assetInfo: AssetBundleInfo
   buildPath: AssetBundles
@@ -20,5 +20,4 @@ MonoBehaviour:
   remotePath: http://192.168.0.3:8000/AssetBundles
   remoteLoad: 0
   remoteBuild: 0
-  sceneAssets:
-  - Assets/Template/Scenes/AwakeScene.unity
+  sceneAssets: []

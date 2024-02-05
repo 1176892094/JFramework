@@ -26,19 +26,19 @@ namespace JFramework
     {
         private static void UpdateSceneSetting()
         {
-            if (!GlobalSetting.Instance) return;
+            if (!SettingManager.Instance) return;
             var sceneAssets = EditorBuildSettings.scenes.Select(scene => scene.path).ToList();
-            foreach (var scenePath in GlobalSetting.Instance.sceneAssets)
+            foreach (var scenePath in SettingManager.Instance.sceneAssets)
             {
                 if (sceneAssets.Contains(scenePath))
                 {
-                    if (!GlobalSetting.Instance.remoteLoad) continue;
+                    if (!SettingManager.Instance.remoteLoad) continue;
                     var scenes = EditorBuildSettings.scenes.Where(scene => scene.path != scenePath);
                     EditorBuildSettings.scenes = scenes.ToArray();
                 }
                 else
                 {
-                    if (GlobalSetting.Instance.remoteLoad) continue;
+                    if (SettingManager.Instance.remoteLoad) continue;
                     var scenes = EditorBuildSettings.scenes.ToList();
                     scenes.Add(new EditorBuildSettingsScene(scenePath, true));
                     EditorBuildSettings.scenes = scenes.ToArray();
@@ -84,8 +84,8 @@ namespace JFramework
                 }
             }
 
-            GlobalSetting.Instance.sceneAssets.Clear();
-            var folderPaths = AssetDatabase.GetSubFolders(GlobalSetting.Instance.assetPath);
+            SettingManager.Instance.sceneAssets.Clear();
+            var folderPaths = AssetDatabase.GetSubFolders(SettingManager.Instance.assetPath);
             foreach (var folderPath in folderPaths)
             {
                 if (string.IsNullOrEmpty(folderPath)) continue;
@@ -108,11 +108,11 @@ namespace JFramework
                     var asset = AssetDatabase.LoadAssetAtPath<Object>(path);
                     if (asset is SceneAsset)
                     {
-                        GlobalSetting.Instance.sceneAssets.Add(path);
+                        SettingManager.Instance.sceneAssets.Add(path);
                     }
 
                     if (asset == null) continue;
-                    GlobalSetting.Instance.objects[$"{folder}/{asset.name}"] = asset;
+                    SettingManager.Instance.objects[$"{folder}/{asset.name}"] = asset;
                 }
             }
 
@@ -125,12 +125,12 @@ namespace JFramework
         {
             UpdateAsset();
             UpdateSceneSetting();
-            var directory = Directory.CreateDirectory(GlobalSetting.platformPath);
-            BuildPipeline.BuildAssetBundles(GlobalSetting.platformPath, BuildAssetBundleOptions.ChunkBasedCompression, (BuildTarget)GlobalSetting.Instance.platform);
+            var directory = Directory.CreateDirectory(SettingManager.platformPath);
+            BuildPipeline.BuildAssetBundles(SettingManager.platformPath, BuildAssetBundleOptions.ChunkBasedCompression, (BuildTarget)SettingManager.Instance.platform);
             var infoList = directory.GetFiles().Where(info => info.Extension == "").ToList();
             var fileList = infoList.Select(info => new Bundle(GetProviderInfo(info.FullName), info.Name, info.Length.ToString())).ToList();
             var contents = JsonUtility.ToJson(new Variables<Bundle>(fileList), true);
-            File.WriteAllText(GlobalSetting.assetBundleInfo, contents);
+            File.WriteAllText(SettingManager.assetBundleInfo, contents);
             Debug.Log("构建 AssetBundles 成功!".Green());
             AssetDatabase.Refresh();
         }

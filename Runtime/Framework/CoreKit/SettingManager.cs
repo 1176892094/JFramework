@@ -17,11 +17,11 @@ using Object = UnityEngine.Object;
 
 namespace JFramework
 {
-    [CreateAssetMenu(fileName = nameof(GlobalSetting), menuName = "ScriptableObject/" + nameof(GlobalSetting))]
-    internal partial class GlobalSetting : ScriptableObject
+    [CreateAssetMenu(fileName = nameof(SettingManager), menuName = "ScriptableObject/" + nameof(SettingManager))]
+    internal partial class SettingManager : ScriptableObject
     {
-        private static GlobalSetting instance;
-        public static GlobalSetting Instance => instance ??= Resources.Load<GlobalSetting>(nameof(GlobalSetting));
+        private static SettingManager instance;
+        public static SettingManager Instance => instance ??= Resources.Load<SettingManager>(nameof(SettingManager));
 
         public AssetPlatform platform = AssetPlatform.StandaloneWindows;
 

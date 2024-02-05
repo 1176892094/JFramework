@@ -37,7 +37,7 @@ namespace JFramework.Core
         {
             if (mainAsset == null)
             {
-                mainAsset = await LoadAssetTask(GlobalSetting.Instance.platform.ToString());
+                mainAsset = await LoadAssetTask(SettingManager.Instance.platform.ToString());
                 manifest = mainAsset.LoadAsset<AssetBundleManifest>(nameof(AssetBundleManifest));
             }
 
@@ -73,7 +73,7 @@ namespace JFramework.Core
 
         private async Task<AssetBundle> LoadAssetBundle(string bundle)
         {
-            var path = GlobalSetting.GetPersistentPath(bundle);
+            var path = SettingManager.GetPersistentPath(bundle);
             if (File.Exists(path))
             {
                 var request = await AssetBundle.LoadFromFileAsync(path);
@@ -82,7 +82,7 @@ namespace JFramework.Core
                 return assetBundle;
             }
 
-            path = GlobalSetting.GetStreamingPath(bundle);
+            path = SettingManager.GetStreamingPath(bundle);
 #if UNITY_ANDROID && !UNITY_EDITOR
             using (var request = UnityWebRequestAssetBundle.GetAssetBundle(path))
             {
@@ -112,9 +112,9 @@ namespace JFramework.Core
         {
             if (!GlobalManager.Instance) return null;
 #if UNITY_EDITOR
-            if (!GlobalSetting.Instance.remoteLoad)
+            if (!SettingManager.Instance.remoteLoad)
             {
-                return GlobalSetting.Instance.Load<T>(path);
+                return SettingManager.Instance.Load<T>(path);
             }
 #endif
             if (!assets.TryGetValue(path, out var assetData))
@@ -149,9 +149,9 @@ namespace JFramework.Core
         {
             if (!GlobalManager.Instance) return;
 #if UNITY_EDITOR
-            if (!GlobalSetting.Instance.remoteLoad)
+            if (!SettingManager.Instance.remoteLoad)
             {
-                var asset = GlobalSetting.Instance.Load<T>(path);
+                var asset = SettingManager.Instance.Load<T>(path);
                 action?.Invoke(asset);
                 return;
             }
@@ -190,7 +190,7 @@ namespace JFramework.Core
         {
             if (!GlobalManager.Instance) return null;
 #if UNITY_EDITOR
-            if (!GlobalSetting.Instance.remoteLoad)
+            if (!SettingManager.Instance.remoteLoad)
             {
                 return UnitySceneManager.LoadSceneAsync(path.Split('/')[1], LoadSceneMode.Single);
             }

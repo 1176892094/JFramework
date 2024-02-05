@@ -83,7 +83,7 @@ namespace JFramework
 
     public sealed partial class GlobalManager
     {
-        public static bool isRemote => GlobalSetting.Instance.remoteLoad;
+        public static bool isRemote => SettingManager.Instance.remoteLoad;
 
         [SerializeField] private EntityManager entity;
         internal static EntityManager Entity => Instance.entity;
