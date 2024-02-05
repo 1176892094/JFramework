@@ -24,6 +24,7 @@ namespace JFramework.Core
 
         public void Register<T>(T entity) where T : IEntity
         {
+            if (!GlobalManager.Instance) return;
             if (!objects.ContainsKey(typeof(T)))
             {
                 objects.Add(typeof(T), entity);
@@ -32,11 +33,13 @@ namespace JFramework.Core
 
         public T Get<T>() where T : IEntity
         {
+            if (!GlobalManager.Instance) return default;
             return objects.TryGetValue(typeof(T), out var entity) ? (T)entity : default;
         }
 
         public void UnRegister<T>() where T : IEntity
         {
+            if (!GlobalManager.Instance) return;
             if (!objects.ContainsKey(typeof(T)))
             {
                 objects.Remove(typeof(T));
