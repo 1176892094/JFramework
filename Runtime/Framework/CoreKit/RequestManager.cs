@@ -20,7 +20,7 @@ using Debug = UnityEngine.Debug;
 
 namespace JFramework.Core
 {
-    public class RequestManager : Component<GlobalManager>
+    public sealed class RequestManager : Component<GlobalManager>
     {
         public event Action<int> OnLoadStart;
         public event Action<string, float> OnLoadUpdate;

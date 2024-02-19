@@ -15,7 +15,7 @@ using Sirenix.OdinInspector;
 
 namespace JFramework.Core
 {
-    public class EventManager : Component<GlobalManager>
+    public sealed class EventManager : Component<GlobalManager>
     {
         [ShowInInspector] private readonly Dictionary<Type, IEvent> observers = new Dictionary<Type, IEvent>();
 

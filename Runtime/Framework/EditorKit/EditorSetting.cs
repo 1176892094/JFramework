@@ -75,6 +75,7 @@ namespace JFramework
         [MenuItem("Tools/JFramework/Update Assets", priority = 2)]
         private static void UpdateAsset()
         {
+            UpdateSceneSetting();
             var bundleNames = AssetDatabase.GetAllAssetBundleNames();
             foreach (var bundleName in bundleNames)
             {
@@ -124,7 +125,6 @@ namespace JFramework
         private static void BuildAsset()
         {
             UpdateAsset();
-            UpdateSceneSetting();
             var directory = Directory.CreateDirectory(SettingManager.platformPath);
             BuildPipeline.BuildAssetBundles(SettingManager.platformPath, BuildAssetBundleOptions.ChunkBasedCompression, (BuildTarget)SettingManager.Instance.platform);
             var infoList = directory.GetFiles().Where(info => info.Extension == "").ToList();
