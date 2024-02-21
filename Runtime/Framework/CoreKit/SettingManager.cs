@@ -20,10 +20,12 @@ using UnityEditor;
 
 namespace JFramework
 {
-    internal partial class SettingManager : ScriptableObject
+    internal class SettingManager : ScriptableObject
     {
         private static SettingManager instance;
         public static SettingManager Instance => instance ??= Resources.Load<SettingManager>(nameof(SettingManager));
+
+        private static readonly string assetSavePath = $"Packages/com.jinyijie.core/Resources/{nameof(SettingManager)}.asset";
 
         public AssetPlatform platform = AssetPlatform.StandaloneWindows;
 
@@ -45,8 +47,6 @@ namespace JFramework
 
         private static string remoteInfoName => Instance.assetInfo + "_TMP.json";
 
-        private static string assetSavePath = $"Packages/com.jinyijie.core/Resources/{nameof(SettingManager)}.asset";
-
         public static string clientInfoPath => GetPersistentPath(clientInfoName);
 
         public static string remoteInfoPath => GetPersistentPath(remoteInfoName);
@@ -67,14 +67,14 @@ namespace JFramework
 
         public static string GetRemoteFilePath(string fileName) => Path.Combine(Instance.remotePath, GetPlatform(fileName));
 
-        public static string GetPlatform(string fileName) => Path.Combine(Instance.platform.ToString(), fileName);
+        private static string GetPlatform(string fileName) => Path.Combine(Instance.platform.ToString(), fileName);
 
 #if UNITY_EDITOR
         [Folder] public List<string> sceneAssets = new List<string>();
 
         public Dictionary<string, Object> objects = new Dictionary<string, Object>();
 
-        public static string remoteBuildPath => Instance.remoteBuild ? Instance.buildPath : Application.streamingAssetsPath;
+        private static string remoteBuildPath => Instance.remoteBuild ? Instance.buildPath : Application.streamingAssetsPath;
 
         public static string platformPath => Path.Combine(remoteBuildPath, Instance.platform.ToString());
 
@@ -87,13 +87,15 @@ namespace JFramework
             {
                 if (typeof(T).IsSubclassOf(typeof(Component)))
                 {
-                    return ((GameObject)Object.Instantiate(obj)).GetComponent<T>();
+                    return ((GameObject)Instantiate(obj)).GetComponent<T>();
                 }
-                else if (obj is GameObject)
+
+                if (obj is GameObject)
                 {
-                    return (T)Object.Instantiate(obj);
+                    return (T)Instantiate(obj);
                 }
-                else if (obj is Texture2D texture)
+
+                if (obj is Texture2D texture)
                 {
                     obj = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), Vector2.one * 0.5f);
                 }
@@ -104,15 +106,16 @@ namespace JFramework
             return null;
         }
 
-        public static SettingManager GetOrAddSettings()
+        private static SettingManager GetOrAddSettings()
         {
             var settings = Resources.Load<SettingManager>(nameof(SettingManager));
             if (settings == null)
             {
-                settings = ScriptableObject.CreateInstance<SettingManager>();
-                if (!Directory.Exists(Path.GetDirectoryName(assetSavePath)))
+                settings = CreateInstance<SettingManager>();
+                var directory = Path.GetDirectoryName(assetSavePath);
+                if (!Directory.Exists(directory) && !string.IsNullOrEmpty(directory))
                 {
-                    Directory.CreateDirectory(Path.GetDirectoryName(assetSavePath));
+                    Directory.CreateDirectory(directory);
                 }
 
                 AssetDatabase.CreateAsset(settings, assetSavePath);
@@ -122,7 +125,7 @@ namespace JFramework
             return settings;
         }
 
-        public static SerializedObject GetSerializedSettings()
+        private static SerializedObject GetSerializedSettings()
         {
             return new SerializedObject(GetOrAddSettings());
         }
@@ -132,7 +135,7 @@ namespace JFramework
         {
             var provider = new SettingsProvider("Project/JFramework", SettingsScope.Project)
             {
-                guiHandler = (searchContext) =>
+                guiHandler = _ =>
                 {
                     var settings = GetSerializedSettings();
                     EditorGUILayout.PropertyField(settings.FindProperty("platform"));

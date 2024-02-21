@@ -83,11 +83,7 @@ namespace JFramework.Core
             {
                 var data = table.GetData(i);
                 var key = (T)field.GetValue(data);
-                if (!dataList.ContainsKey(key))
-                {
-                    dataList.Add(key, data);
-                }
-                else
+                if (!dataList.TryAdd(key, data))
                 {
                     Debug.LogWarning($"{table.GetType().Name.Orange()} 键值重复。 键值：{key.ToString().Red()}");
                 }

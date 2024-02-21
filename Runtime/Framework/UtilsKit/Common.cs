@@ -227,8 +227,7 @@ namespace JFramework
 
             for (int index = minIndex; index <= maxIndex; ++index)
             {
-                if (grids.ContainsKey(index)) continue;
-                grids.Add(index, default);
+                if (!grids.TryAdd(index, default)) continue;
                 var obj = await GlobalManager.Pool.Pop(path);
                 obj.transform.SetParent(content);
                 obj.transform.localScale = Vector3.one;

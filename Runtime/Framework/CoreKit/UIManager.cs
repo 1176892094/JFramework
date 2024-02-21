@@ -111,9 +111,9 @@ namespace JFramework.Core
 
         public TPanel GetPanel<TPanel>() where TPanel : IPanel => (TPanel)GetPanel(typeof(TPanel));
 
-        public IPanel GetPanel(Type key) => panels.TryGetValue(key, out var panel) ? panel : null;
+        public IPanel GetPanel(Type key) => panels.GetValueOrDefault(key);
 
-        public Transform GetLayer(UILayer type) => panels != null ? layers[type] : null;
+        public Transform GetLayer(UILayer type) => layers.GetValueOrDefault(type);
 
         public bool IsActive<TPanel>() where TPanel : IPanel
         {
