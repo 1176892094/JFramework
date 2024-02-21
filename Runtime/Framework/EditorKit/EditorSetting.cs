@@ -99,10 +99,11 @@ namespace JFramework
                     var importer = AssetImporter.GetAtPath(path);
                     if (importer == null) continue;
 
-                    if (importer.assetBundleName != folder.ToLower())
+                    var label = folder.ToLower();
+                    if (importer.assetBundleName != label)
                     {
                         Debug.Log($"增加 AssetBundles 资源: {path.Green()}");
-                        importer.assetBundleName = folder;
+                        importer.assetBundleName = label;
                         importer.SaveAndReimport();
                     }
 
@@ -113,7 +114,7 @@ namespace JFramework
                     }
 
                     if (asset == null) continue;
-                    SettingManager.Instance.objects[$"{folder}/{asset.name}"] = asset;
+                    SettingManager.Instance.objects[$"{label}/{asset.name}"] = asset;
                 }
             }
 
