@@ -82,6 +82,7 @@ namespace JFramework
 
         public T Load<T>(string path) where T : Object
         {
+            path = char.ToUpper(path[0]) + path.Substring(1);
             if (objects.TryGetValue(path, out var obj))
             {
                 if (typeof(T).IsSubclassOf(typeof(Component)))
