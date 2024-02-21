@@ -12,12 +12,14 @@ using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
 using Object = UnityEngine.Object;
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 
 // ReSharper disable All
 
 namespace JFramework
 {
-    [CreateAssetMenu(fileName = nameof(SettingManager), menuName = "ScriptableObject/" + nameof(SettingManager))]
     internal partial class SettingManager : ScriptableObject
     {
         private static SettingManager instance;
@@ -42,6 +44,8 @@ namespace JFramework
         public static string clientInfoName => Instance.assetInfo + ".json";
 
         private static string remoteInfoName => Instance.assetInfo + "_TMP.json";
+
+        private static string assetSavePath = $"Packages/com.jinyijie.core/Resources/{nameof(SettingManager)}.asset";
 
         public static string clientInfoPath => GetPersistentPath(clientInfoName);
 
@@ -97,6 +101,55 @@ namespace JFramework
             }
 
             return null;
+        }
+
+        public static SettingManager GetOrAddSettings()
+        {
+            var settings = Resources.Load<SettingManager>(nameof(SettingManager));
+            if (settings == null)
+            {
+                settings = ScriptableObject.CreateInstance<SettingManager>();
+                if (!Directory.Exists(Path.GetDirectoryName(assetSavePath)))
+                {
+                    Directory.CreateDirectory(Path.GetDirectoryName(assetSavePath));
+                }
+
+                AssetDatabase.CreateAsset(settings, assetSavePath);
+                AssetDatabase.SaveAssets();
+            }
+
+            return settings;
+        }
+
+        public static SerializedObject GetSerializedSettings()
+        {
+            return new SerializedObject(GetOrAddSettings());
+        }
+
+        [SettingsProvider]
+        public static SettingsProvider CreateEditorLearnSettingsProvider()
+        {
+            var provider = new SettingsProvider("Project/JFramework", SettingsScope.Project)
+            {
+                guiHandler = (searchContext) =>
+                {
+                    var settings = GetSerializedSettings();
+                    EditorGUILayout.PropertyField(settings.FindProperty("platform"));
+                    EditorGUILayout.PropertyField(settings.FindProperty("assetInfo"));
+                    EditorGUILayout.PropertyField(settings.FindProperty("buildPath"));
+                    EditorGUILayout.PropertyField(settings.FindProperty("assetPath"));
+                    EditorGUILayout.PropertyField(settings.FindProperty("editorPath"));
+                    EditorGUILayout.PropertyField(settings.FindProperty("remotePath"));
+                    EditorGUILayout.PropertyField(settings.FindProperty("remoteLoad"));
+                    EditorGUILayout.PropertyField(settings.FindProperty("remoteBuild"));
+                    EditorGUILayout.PropertyField(settings.FindProperty("sceneAssets"));
+                    settings.ApplyModifiedPropertiesWithoutUndo();
+                },
+
+                keywords = new HashSet<string>(new[] { "JFramework" })
+            };
+
+            return provider;
         }
 #endif
     }
