@@ -12,6 +12,7 @@ using System;
 using System.Collections.Generic;
 using JFramework.Interface;
 using Sirenix.OdinInspector;
+using UnityEngine;
 
 namespace JFramework
 {
@@ -80,19 +81,7 @@ namespace JFramework
 
         public override int GetHashCode() => HashCode.Combine(size, code, name);
     }
-
-    [Serializable]
-    internal struct Event<T> : IEvent where T : struct, IEvent
-    {
-        private event Action<T> OnExecute;
-
-        public void Listen(IEvent<T> obj) => OnExecute += obj.Execute;
-
-        public void Remove(IEvent<T> obj) => OnExecute -= obj.Execute;
-
-        public void Invoke(T message) => OnExecute?.Invoke(message);
-    }
-
+    
     [Serializable]
     internal struct Pool<T> : IPool<T>
     {

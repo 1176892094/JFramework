@@ -35,7 +35,6 @@ namespace JFramework
         public Variables(List<T> value) => this.value = value;
     }
 
-
     [Serializable]
     public sealed class Timer
     {
@@ -144,16 +143,17 @@ namespace JFramework
     }
 
     [Serializable]
-    public class UIScroll<TItem, TGrid> where TGrid : IGrid<TItem>, IUpdate where TItem : new()
+    public class UIScroll<TItem, TGrid> where TGrid : IGrid<TItem> where TItem : new()
     {
         private readonly Dictionary<int, TGrid> grids = new Dictionary<int, TGrid>();
         private RectTransform content;
         private List<TItem> items;
         private int oldMinIndex = -1;
         private int oldMaxIndex = -1;
-        private Rect rect;
         private int row;
         private int column;
+        private float width;
+        private float height;
         private string path;
 
         public void SetContent(RectTransform content, string path)
@@ -162,11 +162,12 @@ namespace JFramework
             this.content = content;
         }
 
-        public void InitGrids(Rect rect, int row, int column)
+        public void InitGrids(int width, int height, int row, int column)
         {
-            this.rect = rect;
+            this.width = width;
+            this.height = height;
             this.column = column;
-            this.row = (int)(row * (rect.height + rect.y));
+            this.row = row * height;
         }
 
         public void Refresh(List<TItem> items)
@@ -182,16 +183,16 @@ namespace JFramework
 
             this.items = items;
             content.anchoredPosition = Vector2.zero;
-            content.sizeDelta = new Vector2(0, Mathf.CeilToInt((float)items.Count / column) * (rect.height + rect.y) + 1);
+            content.sizeDelta = new Vector2(0, Mathf.CeilToInt((float)items.Count / column) * height + 1);
         }
 
         public async void OnUpdate()
         {
             if (items == null) return;
-            var height = rect.height + rect.y;
+            var fixHeight = height;
             var position = content.anchoredPosition;
-            var minIndex = Math.Max(0, (int)(position.y / height) * column);
-            var maxIndex = Math.Min((int)((position.y + row) / height) * column + column - 1, items.Count - 1);
+            var minIndex = Math.Max(0, (int)(position.y / fixHeight) * column);
+            var maxIndex = Math.Min((int)((position.y + row) / fixHeight) * column + column - 1, items.Count - 1);
 
             if (minIndex != oldMinIndex || maxIndex != oldMaxIndex)
             {
@@ -231,8 +232,8 @@ namespace JFramework
                 var obj = await GlobalManager.Pool.Pop(path);
                 obj.transform.SetParent(content);
                 obj.transform.localScale = Vector3.one;
-                var posX = index % column * (rect.width + rect.x);
-                var posY = -(index / column) * height - rect.height / 2;
+                var posX = index % column * width + width / 2;
+                var posY = -(index / column) * fixHeight - height / 2;
                 obj.transform.localPosition = new Vector3(posX, posY, 0);
                 if (obj.TryGetComponent(out TGrid grid))
                 {

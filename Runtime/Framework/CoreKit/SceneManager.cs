@@ -40,7 +40,7 @@ namespace JFramework.Core
         public void UnRegister<T>() where T : IEntity
         {
             if (!GlobalManager.Instance) return;
-            if (!objects.ContainsKey(typeof(T)))
+            if (objects.ContainsKey(typeof(T)))
             {
                 objects.Remove(typeof(T));
             }

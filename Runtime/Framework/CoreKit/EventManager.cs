@@ -12,6 +12,7 @@ using System;
 using System.Collections.Generic;
 using JFramework.Interface;
 using Sirenix.OdinInspector;
+using UnityEngine;
 
 namespace JFramework.Core
 {
@@ -48,6 +49,17 @@ namespace JFramework.Core
         private void OnDestroy()
         {
             observers.Clear();
+        }
+        
+        private sealed class Event<T> : IEvent where T : struct, IEvent
+        {
+            private event Action<T> OnExecute;
+
+            public void Listen(IEvent<T> obj) => OnExecute += obj.Execute;
+
+            public void Remove(IEvent<T> obj) => OnExecute -= obj.Execute;
+
+            public void Invoke(T message) => OnExecute?.Invoke(message);
         }
     }
 }
