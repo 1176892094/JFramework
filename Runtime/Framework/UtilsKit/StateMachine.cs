@@ -83,12 +83,7 @@ namespace JFramework
 
         protected virtual void OnDestroy()
         {
-            var copies = states.Values.ToList();
-            foreach (var state in copies)
-            {
-                StreamPool.Push(state, state.GetType());
-            }
-
+            state = null;
             states.Clear();
         }
     }
