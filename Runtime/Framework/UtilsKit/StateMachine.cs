@@ -22,10 +22,6 @@ namespace JFramework
         public T owner { get; private set; }
         public IStateMachine machine { get; private set; }
 
-        protected virtual void OnAwake()
-        {
-        }
-
         protected abstract void OnEnter();
 
         protected abstract void OnUpdate();
@@ -42,7 +38,6 @@ namespace JFramework
         {
             this.owner = (T)owner;
             this.machine = machine;
-            OnAwake();
         }
     }
 
@@ -83,7 +78,12 @@ namespace JFramework
 
         protected virtual void OnDestroy()
         {
-            state = null;
+            var copies = states.Values.ToList();
+            foreach (var state in copies)
+            {
+                StreamPool.Push(state, state.GetType());
+            }
+
             states.Clear();
         }
     }
