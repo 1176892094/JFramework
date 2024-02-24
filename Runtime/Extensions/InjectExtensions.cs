@@ -35,11 +35,14 @@ namespace JFramework
                     var name = attribute.name;
                     if (string.IsNullOrEmpty(name))
                     {
-                        var component = inject.transform.GetComponent(field.FieldType);
-                        if (component != null)
+                        if (!typeof(Transform).IsAssignableFrom(field.FieldType))
                         {
-                            field.SetValue(inject, component);
-                            continue;
+                            var component = inject.transform.GetComponent(field.FieldType);
+                            if (component != null)
+                            {
+                                field.SetValue(inject, component);
+                                continue;
+                            }
                         }
 
                         name = char.ToUpper(field.Name[0]) + field.Name.Substring(1);
