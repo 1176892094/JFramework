@@ -25,13 +25,15 @@ namespace JFramework.Core
 {
     using AssetTask = Task<AssetBundle>;
 
-    public sealed class AssetManager : Component<GlobalManager>
+    public sealed class AssetManager : ScriptableObject
     {
         private AssetBundle mainAsset;
         private AssetBundleManifest manifest;
-        [ShowInInspector] private readonly Dictionary<string, Asset> assets = new Dictionary<string, Asset>();
-        [ShowInInspector] private readonly Dictionary<string, AssetTask> awaits = new Dictionary<string, AssetTask>();
-        [ShowInInspector] private readonly Dictionary<string, AssetBundle> bundles = new Dictionary<string, AssetBundle>();
+        [ShowInInspector, LabelText("加载资源")] private readonly Dictionary<string, Asset> assets = new Dictionary<string, Asset>();
+        [ShowInInspector, LabelText("等待列表")] private readonly Dictionary<string, AssetTask> awaits = new Dictionary<string, AssetTask>();
+
+        [ShowInInspector, LabelText("依赖列表")]
+        private readonly Dictionary<string, AssetBundle> bundles = new Dictionary<string, AssetBundle>();
 
         private async Task LoadDependency(string bundle)
         {
@@ -214,21 +216,21 @@ namespace JFramework.Core
             return UnitySceneManager.LoadSceneAsync(assetData.asset, LoadSceneMode.Single);
         }
 
-        public void Unload(string labelName)
+        public void Unload(string bundle)
         {
-            if (bundles.TryGetValue(labelName, out var assetBundle))
+            if (bundles.TryGetValue(bundle, out var assetBundle))
             {
                 assetBundle.Unload(false);
-                foreach (var asset in assets.Values.Where(asset => asset.bundle == labelName))
+                foreach (var asset in assets.Values.Where(asset => asset.bundle == bundle))
                 {
                     assets.Remove($"{asset.bundle}/{asset.asset}");
                 }
 
-                bundles.Remove(labelName);
+                bundles.Remove(bundle);
             }
         }
 
-        private void OnDestroy()
+        internal void OnDestroy()
         {
             AssetBundle.UnloadAllAssetBundles(true);
             awaits.Clear();

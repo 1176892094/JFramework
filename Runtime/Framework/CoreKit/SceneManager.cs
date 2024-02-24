@@ -18,9 +18,9 @@ using UnitySceneManager = UnityEngine.SceneManagement.SceneManager;
 
 namespace JFramework.Core
 {
-    public sealed class SceneManager : Component<GlobalManager>
+    public sealed class SceneManager : ScriptableObject
     {
-        [ShowInInspector] private readonly Dictionary<Type, IEntity> objects = new Dictionary<Type, IEntity>();
+        [ShowInInspector, LabelText("场景对象")] private readonly Dictionary<Type, IEntity> objects = new Dictionary<Type, IEntity>();
 
         public void Register<T>(T entity) where T : IEntity
         {
@@ -77,6 +77,11 @@ namespace JFramework.Core
         public override string ToString()
         {
             return UnitySceneManager.GetActiveScene().name;
+        }
+
+        internal void OnDestroy()
+        {
+            objects.Clear();
         }
     }
 }

@@ -19,9 +19,11 @@ namespace JFramework.Core
 {
     using Components = Dictionary<Type, IComponent>;
 
+    [CreateAssetMenu(fileName = nameof(EntityManager), menuName = "ScriptableObject/" + nameof(EntityManager))]
     internal sealed class EntityManager : ScriptableObject
     {
-        [ShowInInspector] private readonly Dictionary<IEntity, Components> entities = new Dictionary<IEntity, Components>();
+        [ShowInInspector, LabelText("实体组件")]
+        private readonly Dictionary<IEntity, Components> entities = new Dictionary<IEntity, Components>();
 
         private readonly Stack<IEntity> stacks = new Stack<IEntity>();
 
@@ -61,7 +63,7 @@ namespace JFramework.Core
             }
         }
 
-        private void OnDestroy()
+        internal void OnDestroy()
         {
             var copies = entities.Keys.ToList();
             foreach (var entity in copies)

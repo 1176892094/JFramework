@@ -21,15 +21,16 @@ using Object = UnityEngine.Object;
 
 namespace JFramework.Core
 {
-    public sealed class UIManager : Component<GlobalManager>
+    public sealed class UIManager : ScriptableObject
     {
-        public Canvas canvas { get; private set; }
-        [ShowInInspector] private readonly Dictionary<Type, IPanel> panels = new Dictionary<Type, IPanel>();
-        [ShowInInspector] private readonly Dictionary<UILayer, Transform> layers = new Dictionary<UILayer, Transform>();
+        [LabelText("界面画布")] public Canvas canvas;
+        [ShowInInspector, LabelText("用户界面")] private readonly Dictionary<Type, IPanel> panels = new Dictionary<Type, IPanel>();
+        [ShowInInspector, LabelText("界面层级")] private readonly Dictionary<UILayer, Transform> layers = new Dictionary<UILayer, Transform>();
 
-        private void Awake()
+        internal void Awake()
         {
-            canvas = owner.transform.Find("UICanvas").GetComponent<Canvas>();
+            if (!GlobalManager.Instance) return;
+            canvas = GlobalManager.Instance.transform.Find("UICanvas").GetComponent<Canvas>();
             layers[UILayer.Bottom] = canvas.transform.Find("Layer1");
             layers[UILayer.Normal] = canvas.transform.Find("Layer2");
             layers[UILayer.Middle] = canvas.transform.Find("Layer3");
@@ -145,7 +146,7 @@ namespace JFramework.Core
             }
         }
 
-        private void OnDestroy()
+        internal void OnDestroy()
         {
             canvas = null;
             panels.Clear();

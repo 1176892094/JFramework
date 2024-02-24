@@ -30,7 +30,7 @@ namespace JFramework
 
         IData IDataTable.GetData(int index) => GetData(index);
     }
-    
+
     [Serializable]
     public abstract class Entity : MonoBehaviour, IEntity
     {
@@ -64,7 +64,7 @@ namespace JFramework
     [Serializable]
     public abstract class Component<T> : ScriptableObject, IComponent where T : IEntity
     {
-        private T instance;
+        [SerializeField] private T instance;
 
         public T owner => instance ??= (T)GlobalManager.Entity.instance;
 

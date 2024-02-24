@@ -20,14 +20,14 @@ using Debug = UnityEngine.Debug;
 
 namespace JFramework.Core
 {
-    public sealed class RequestManager : Component<GlobalManager>
+    public sealed class RequestManager : ScriptableObject
     {
         public event Action<int> OnLoadStart;
         public event Action<string, float> OnLoadUpdate;
         public event Action OnLoadComplete;
         private readonly List<string> updateAssets = new List<string>();
-        [ShowInInspector] private Dictionary<string, Bundle> localAssets = new Dictionary<string, Bundle>();
-        [ShowInInspector] private Dictionary<string, Bundle> remoteAssets = new Dictionary<string, Bundle>();
+        [ShowInInspector, LabelText("本地资源")] private Dictionary<string, Bundle> localAssets = new Dictionary<string, Bundle>();
+        [ShowInInspector, LabelText("远端资源")] private Dictionary<string, Bundle> remoteAssets = new Dictionary<string, Bundle>();
 
         public async Task<bool> UpdateAssetBundles()
         {
@@ -182,7 +182,7 @@ namespace JFramework.Core
             return updateAssets.Count == 0;
         }
 
-        private void OnDestroy()
+        internal void OnDestroy()
         {
             OnLoadStart = null;
             OnLoadUpdate = null;

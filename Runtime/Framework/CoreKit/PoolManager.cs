@@ -17,13 +17,19 @@ using UnityEngine;
 
 namespace JFramework.Core
 {
-    public sealed class PoolManager : Component<GlobalManager>
+    public sealed class PoolManager : ScriptableObject
     {
         private Transform poolManager;
-        [ShowInInspector] private readonly Dictionary<string, GameObject> parents = new Dictionary<string, GameObject>();
-        [ShowInInspector] private readonly Dictionary<string, IPool<GameObject>> pools = new Dictionary<string, IPool<GameObject>>();
+        [ShowInInspector, LabelText("对象池组")] private readonly Dictionary<string, GameObject> parents = new Dictionary<string, GameObject>();
 
-        private void Awake() => poolManager = owner.transform.Find("PoolManager");
+        [ShowInInspector, LabelText("对象列表")]
+        private readonly Dictionary<string, IPool<GameObject>> pools = new Dictionary<string, IPool<GameObject>>();
+
+        internal void Awake()
+        {
+            if (!GlobalManager.Instance) return;
+            poolManager = GlobalManager.Instance.transform.Find("PoolManager");
+        }
 
         public async Task<GameObject> Pop(string path)
         {
@@ -89,7 +95,7 @@ namespace JFramework.Core
             }
         }
 
-        private void OnDestroy()
+        internal void OnDestroy()
         {
             foreach (var pool in pools.Values)
             {

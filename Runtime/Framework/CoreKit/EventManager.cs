@@ -16,9 +16,9 @@ using UnityEngine;
 
 namespace JFramework.Core
 {
-    public sealed class EventManager : Component<GlobalManager>
+    public sealed class EventManager : ScriptableObject
     {
-        [ShowInInspector] private readonly Dictionary<Type, IEvent> observers = new Dictionary<Type, IEvent>();
+        [ShowInInspector, LabelText("注册列表")] private readonly Dictionary<Type, IEvent> observers = new Dictionary<Type, IEvent>();
 
         public void Listen<T>(IEvent<T> obj) where T : struct, IEvent
         {
@@ -46,11 +46,11 @@ namespace JFramework.Core
             }
         }
 
-        private void OnDestroy()
+        internal void OnDestroy()
         {
             observers.Clear();
         }
-        
+
         private sealed class Event<T> : IEvent where T : struct, IEvent
         {
             private event Action<T> OnExecute;

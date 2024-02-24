@@ -10,17 +10,22 @@
 
 using System.Collections.Generic;
 using Sirenix.OdinInspector;
+using UnityEngine;
 
 namespace JFramework.Core
 {
-    public sealed class TimerManager : Component<GlobalManager>
+    public sealed class TimerManager : ScriptableObject
     {
         private LinkedListNode<Timer> next;
         private LinkedListNode<Timer> first;
-        [ShowInInspector] private readonly Queue<Timer> stopList = new Queue<Timer>();
-        [ShowInInspector] private readonly LinkedList<Timer> playList = new LinkedList<Timer>();
+        [ShowInInspector, LabelText("结束列表")] private readonly Queue<Timer> stopList = new Queue<Timer>();
+        [ShowInInspector, LabelText("运行列表")] private readonly LinkedList<Timer> playList = new LinkedList<Timer>();
 
-        private void Awake() => GlobalManager.OnUpdate += Update;
+        internal void Awake()
+        {
+            if (!GlobalManager.Instance) return;
+            GlobalManager.OnUpdate += Update;
+        }
 
         private void Update()
         {
@@ -57,7 +62,7 @@ namespace JFramework.Core
             }
         }
 
-        private void OnDestroy()
+        internal void OnDestroy()
         {
             next = null;
             first = null;

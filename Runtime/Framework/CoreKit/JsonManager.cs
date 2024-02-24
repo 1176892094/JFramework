@@ -15,14 +15,18 @@ using System.Linq;
 using System.Security.Cryptography;
 using Sirenix.OdinInspector;
 using UnityEngine;
+using Object = UnityEngine.Object;
 
 namespace JFramework.Core
 {
-    public sealed class JsonManager : Component<GlobalManager>
+    public sealed class JsonManager : ScriptableObject
     {
-        [ShowInInspector] private Dictionary<string, Json> secrets = new Dictionary<string, Json>();
+        [ShowInInspector, LabelText("加密密钥")] private Dictionary<string, Json> secrets = new Dictionary<string, Json>();
 
-        private void Awake() => secrets = Load<List<Json>>(nameof(JsonManager)).ToDictionary(json => json.name);
+        internal void Awake()
+        {
+            secrets = Load<List<Json>>(nameof(JsonManager)).ToDictionary(json => json.name);
+        }
 
         public void Save<T>(T obj, string name) where T : new()
         {
@@ -146,7 +150,7 @@ namespace JFramework.Core
             return filePath;
         }
 
-        private static string FilePath(ScriptableObject obj)
+        private string FilePath(Object obj)
         {
             if (string.IsNullOrEmpty(obj.name))
             {
@@ -210,6 +214,11 @@ namespace JFramework.Core
                 Save(secrets.Values.ToList(), nameof(JsonManager));
                 return null;
             }
+        }
+
+        internal void OnDestroy()
+        {
+            secrets.Clear();
         }
     }
 }

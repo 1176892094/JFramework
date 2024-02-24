@@ -20,15 +20,15 @@ using Debug = UnityEngine.Debug;
 
 namespace JFramework.Core
 {
-    public sealed class DataManager : Component<GlobalManager>
+    public sealed class DataManager : ScriptableObject
     {
-        [ShowInInspector]
+        [ShowInInspector, LabelText("整数数据")]
         private readonly Dictionary<Type, Dictionary<int, IData>> intData = new Dictionary<Type, Dictionary<int, IData>>();
 
-        [ShowInInspector]
+        [ShowInInspector, LabelText("枚举数据")]
         private readonly Dictionary<Type, Dictionary<Enum, IData>> enumData = new Dictionary<Type, Dictionary<Enum, IData>>();
 
-        [ShowInInspector]
+        [ShowInInspector, LabelText("字符数据")]
         private readonly Dictionary<Type, Dictionary<string, IData>> stringData = new Dictionary<Type, Dictionary<string, IData>>();
 
         public async Task LoadDataTable()
@@ -158,7 +158,7 @@ namespace JFramework.Core
             return default;
         }
 
-        private void OnDestroy()
+        internal void OnDestroy()
         {
             intData.Clear();
             enumData.Clear();

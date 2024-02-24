@@ -19,8 +19,7 @@ namespace JFramework
     {
         public static void Inject(this IEntity inject)
         {
-            var type = inject.GetType();
-            var fields = type.GetFields(Reflection.Instance);
+            var fields = inject.GetType().GetFields(Reflection.Instance);
             foreach (var field in fields)
             {
                 var attribute = field.GetCustomAttribute<InjectAttribute>(true);
@@ -33,37 +32,66 @@ namespace JFramework
                 }
                 else if (typeof(Component).IsAssignableFrom(field.FieldType))
                 {
-                    var fieldName = attribute.name;
-                    if (string.IsNullOrEmpty(fieldName))
+                    var name = attribute.name;
+                    if (string.IsNullOrEmpty(name))
                     {
                         var component = inject.transform.GetComponent(field.FieldType);
-                        if (component == null) continue;
-                        field.SetValue(inject, component);
-                    }
-                    else
-                    {
-                        var child = inject.transform.GetChild(fieldName);
-                        if (child == null) continue;
-
-                        var component = child.GetComponent(field.FieldType);
-                        if (component == null) continue;
-
-                        field.SetValue(inject, component);
-                        var method = type.GetMethod(fieldName, Reflection.Instance);
-                        if (method == null) continue;
-
-                        switch (component)
+                        if (component != null)
                         {
-                            case Button button:
-                                inject.SetButton(fieldName, button);
-                                break;
-                            case Toggle toggle:
-                                inject.SetToggle(fieldName, toggle);
-                                break;
+                            field.SetValue(inject, component);
+                            continue;
                         }
+
+                        name = char.ToUpper(field.Name[0]) + field.Name.Substring(1);
                     }
+                    
+                    inject.SetValue(field, name);
                 }
             }
+        }
+
+        private static void SetValue(this IEntity inject, FieldInfo field, string name)
+        {
+            var child = inject.transform.GetChild(name);
+            if (child == null) return;
+
+            var component = child.GetComponent(field.FieldType);
+            if (component == null) return;
+
+            field.SetValue(inject, component);
+
+            var method = inject.GetType().GetMethod(name, Reflection.Instance);
+            if (method == null) return;
+
+            switch (component)
+            {
+                case Button button:
+                    inject.SetButton(name, button);
+                    break;
+                case Toggle toggle:
+                    inject.SetToggle(name, toggle);
+                    break;
+            }
+        }
+
+        private static Transform GetChild(this Transform parent, string name)
+        {
+            for (int i = 0; i < parent.childCount; i++)
+            {
+                var child = parent.GetChild(i);
+                if (child.name == name)
+                {
+                    return child;
+                }
+
+                var result = child.GetChild(name);
+                if (result != null)
+                {
+                    return result;
+                }
+            }
+
+            return null;
         }
 
         private static void SetButton(this IEntity inject, string name, Button button)
@@ -96,26 +124,6 @@ namespace JFramework
             {
                 toggle.onValueChanged.AddListener(value => inject.transform.SendMessage(name, value));
             }
-        }
-
-        private static Transform GetChild(this Transform parent, string name)
-        {
-            for (int i = 0; i < parent.childCount; i++)
-            {
-                var child = parent.GetChild(i);
-                if (child.name == name)
-                {
-                    return child;
-                }
-
-                var result = child.GetChild(name);
-                if (result != null)
-                {
-                    return result;
-                }
-            }
-
-            return null;
         }
     }
 }

@@ -13,26 +13,30 @@ using System.Collections.Generic;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
-// ReSharper disable All
-
 namespace JFramework.Core
 {
-    public sealed class AudioManager : Component<GlobalManager>
+    public sealed class AudioManager : ScriptableObject
     {
         private Transform poolManager;
         private AudioSource audioSource;
-        [SerializeField] private bool isActive;
-        [SerializeField, Range(0, 1f)] private float musicVolume = 0.5f;
-        [SerializeField, Range(0, 1f)] private float audioVolume = 0.5f;
-        [ShowInInspector] private readonly Stack<AudioSource> stopList = new Stack<AudioSource>();
-        [ShowInInspector] private readonly HashSet<AudioSource> playList = new HashSet<AudioSource>();
+        [SerializeField, LabelText("是否启用")] private bool isActive;
 
-        private void Awake()
+        [SerializeField, LabelText("背景音乐"), Range(0, 1f)]
+        private float musicVolume = 0.5f;
+
+        [SerializeField, LabelText("游戏音效"), Range(0, 1f)]
+        private float audioVolume = 0.5f;
+
+        [ShowInInspector, LabelText("完成列表")] private readonly Stack<AudioSource> stopList = new Stack<AudioSource>();
+        [ShowInInspector, LabelText("播放列表")] private readonly HashSet<AudioSource> playList = new HashSet<AudioSource>();
+
+        internal void Awake()
         {
-            isActive = true;
+            if (!GlobalManager.Instance) return;
             GlobalManager.Json.Load(this);
-            poolManager = owner.transform.Find("PoolManager");
+            poolManager = GlobalManager.Instance.transform.Find("PoolManager");
             audioSource = poolManager.GetComponent<AudioSource>();
+            isActive = true;
         }
 
         public void SetActive(bool isActive)
