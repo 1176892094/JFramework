@@ -420,12 +420,11 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3743219265611728300}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: -1228691765, guid: 80016c062767f431993611a834fe369d, type: 3}
+  m_Script: {fileID: -1228691765, guid: 58e3d0696a7fb4422b16c70d35ef4905, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  debugEnabled: 1
 --- !u!1 &4845887262955193946
 GameObject:
   m_ObjectHideFlags: 0
@@ -766,7 +765,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8a2c92b9215f41a08ab77819075fbd9a, type: 3}
   m_Name: TimerManager
   m_EditorClassIdentifier: 
-  instance: {fileID: 3842979958256889866}
 --- !u!114 &-6756527298918873295
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -779,7 +777,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cfcb75e8e2764f14bed5d888c107d1c4, type: 3}
   m_Name: AssetManager
   m_EditorClassIdentifier: 
-  instance: {fileID: 3842979958256889866}
 --- !u!114 &-5239657031375956828
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -792,7 +789,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 99f0a44ec3f2491991e7f8c9b48abb1f, type: 3}
   m_Name: DataManager
   m_EditorClassIdentifier: 
-  instance: {fileID: 3842979958256889866}
 --- !u!114 &-3881959553603161170
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -805,7 +801,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 19039f8917ef43ea9a0c76d8b5b263cb, type: 3}
   m_Name: PoolManager
   m_EditorClassIdentifier: 
-  instance: {fileID: 3842979958256889866}
 --- !u!114 &-3101250698184500407
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -830,7 +825,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 72754264326e46beba9c7f367719818f, type: 3}
   m_Name: JsonManager
   m_EditorClassIdentifier: 
-  instance: {fileID: 3842979958256889866}
 --- !u!114 &1750141933736754553
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -843,7 +837,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3c11a44528ce4dc480a7a36085699372, type: 3}
   m_Name: RequestManager
   m_EditorClassIdentifier: 
-  instance: {fileID: 3842979958256889866}
 --- !u!114 &1773467658423528453
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -856,7 +849,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 02c612a9ace3444d8d5e47a388be9fb9, type: 3}
   m_Name: AudioManager
   m_EditorClassIdentifier: 
-  instance: {fileID: 3842979958256889866}
   isActive: 0
   musicVolume: 0.5
   audioVolume: 0.5
@@ -872,7 +864,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 39a85998a84f4149a8f11f2fc11d6e73, type: 3}
   m_Name: SceneManager
   m_EditorClassIdentifier: 
-  instance: {fileID: 3842979958256889866}
 --- !u!114 &7262992234334799549
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -885,7 +876,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9dff0d57dd1645e7b93e89fd9239c81b, type: 3}
   m_Name: UIManager
   m_EditorClassIdentifier: 
-  instance: {fileID: 3842979958256889866}
+  canvas: {fileID: 0}
 --- !u!114 &7514134452619435346
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -898,4 +889,3 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0ae744309ba04c8587e4123b5cc704c9, type: 3}
   m_Name: EventManager
   m_EditorClassIdentifier: 
-  instance: {fileID: 3842979958256889866}
