@@ -11,7 +11,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using JFramework.Interface;
 using Sirenix.OdinInspector;
 using UnityEngine;
@@ -38,52 +37,50 @@ namespace JFramework.Core
             layers[UILayer.Ignore] = canvas.transform.Find("Layer5");
         }
 
-        public async void ShowPanel<TPanel>() where TPanel : UIPanel
+        public void ShowPanel<TPanel>() where TPanel : UIPanel
         {
-            if (!GlobalManager.Instance) return;
             if (panels.TryGetValue(typeof(TPanel), out var panel))
             {
                 panel.Show();
-                return;
             }
-
-            await LoadPanel<TPanel>();
+            else
+            {
+                LoadPanel<TPanel>();
+            }
         }
 
-        public async void ShowPanel<TPanel>(Action action) where TPanel : UIPanel
+        public void ShowPanel<TPanel>(Action action) where TPanel : UIPanel
         {
-            if (!GlobalManager.Instance) return;
             if (panels.TryGetValue(typeof(TPanel), out var panel))
             {
                 panel.Show();
                 action?.Invoke();
-                return;
             }
-
-            await LoadPanel<TPanel>();
-            action?.Invoke();
+            else
+            {
+                LoadPanel<TPanel>(panel => action());
+            }
         }
 
-        public async void ShowPanel<TPanel>(Action<TPanel> action) where TPanel : UIPanel
+        public void ShowPanel<TPanel>(Action<TPanel> action) where TPanel : UIPanel
         {
-            if (!GlobalManager.Instance) return;
             if (panels.TryGetValue(typeof(TPanel), out var panel))
             {
                 panel.Show();
                 action?.Invoke((TPanel)panel);
-                return;
             }
-
-            panel = await LoadPanel<TPanel>();
-            action?.Invoke((TPanel)panel);
+            else
+            {
+                LoadPanel<TPanel>(action);
+            }
         }
 
-        private async Task<TPanel> LoadPanel<TPanel>() where TPanel : UIPanel
+        private async void LoadPanel<TPanel>(Action<TPanel> action = null) where TPanel : UIPanel
         {
             if (panels.ContainsKey(typeof(TPanel)))
             {
                 Debug.LogWarning($"加载  {typeof(TPanel).Name.Red()} 失败，面板已经加载!");
-                return default;
+                return;
             }
 
             var obj = await GlobalManager.Asset.Load<GameObject>(SettingManager.GetUIPath(typeof(TPanel).Name));
@@ -95,12 +92,11 @@ namespace JFramework.Core
             panel.transform.SetParent(GetLayer(panel.layer), false);
             panels.Add(typeof(TPanel), panel);
             panel.Show();
-            return panel;
+            action?.Invoke(panel);
         }
 
         public void HidePanel<TPanel>() where TPanel : IPanel
         {
-            if (!GlobalManager.Instance) return;
             if (panels.TryGetValue(typeof(TPanel), out var panel))
             {
                 if (IsActive<TPanel>())
@@ -121,27 +117,34 @@ namespace JFramework.Core
             return panels.TryGetValue(typeof(TPanel), out var panel) && panel.gameObject.activeInHierarchy;
         }
 
-        public static void Register<T>(T panel) where T : IPanel
+        public void Register<T>(T panel) where T : IPanel
         {
-            GlobalManager.UI.panels.Add(typeof(T), panel);
+            if (!panels.ContainsKey(typeof(T)))
+            {
+                panels.Add(typeof(T), panel);
+            }
         }
 
-        public static void UnRegister<T>(T panel) where T : IPanel
+        public void UnRegister<T>(T panel) where T : IPanel
         {
-            Object.Destroy(panel.gameObject);
-            GlobalManager.UI.panels.Remove(typeof(T));
+            if (panels.Remove(typeof(T)))
+            {
+                Object.Destroy(panel.gameObject);
+            }
         }
 
         public void Clear()
         {
-            if (!GlobalManager.Instance) return;
-            var copies = panels.Keys.Where(type => panels.ContainsKey(type)).ToList();
+            var copies = panels.Keys.ToList();
             foreach (var type in copies)
             {
-                if (panels[type].state != UIState.DontDestroy)
+                if (panels.TryGetValue(type, out var panel))
                 {
-                    Destroy(panels[type].gameObject);
-                    panels.Remove(type);
+                    if (panel.state != UIState.DontDestroy)
+                    {
+                        Destroy(panel.gameObject);
+                        panels.Remove(type);
+                    }
                 }
             }
         }

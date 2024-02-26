@@ -110,36 +110,36 @@ namespace JFramework
         [ShowInInspector] private Dictionary<Type, IPool> stream => StreamPool.streams;
 
         [SerializeField] private EntityManager entity;
-        internal static EntityManager Entity => Instance.entity;
+        internal static EntityManager Entity => Instance != null ? Instance.entity : null;
 
         [SerializeField] private UIManager panel;
-        public static UIManager UI => Instance.panel;
+        public static UIManager UI => Instance != null ? Instance.panel : null;
 
         [SerializeField] private JsonManager json;
-        public static JsonManager Json => Instance.json;
+        public static JsonManager Json => Instance != null ? Instance.json : null;
 
         [SerializeField] private PoolManager pool;
-        public static PoolManager Pool => Instance.pool;
+        public static PoolManager Pool => Instance != null ? Instance.pool : null;
 
         [SerializeField] private DataManager data;
-        public static DataManager Data => Instance.data;
+        public static DataManager Data => Instance != null ? Instance.data : null;
 
         [SerializeField] private AssetManager asset;
-        public static AssetManager Asset => Instance.asset;
+        public static AssetManager Asset => Instance != null ? Instance.asset : null;
 
         [SerializeField] private SceneManager scene;
-        public static SceneManager Scene => Instance.scene;
+        public static SceneManager Scene => Instance != null ? Instance.scene : null;
 
         [SerializeField] private TimerManager timer;
-        public static TimerManager Time => Instance.timer;
+        public static TimerManager Time => Instance != null ? Instance.timer : null;
 
         [SerializeField] private AudioManager sound;
-        public static AudioManager Audio => Instance.sound;
+        public static AudioManager Audio => Instance != null ? Instance.sound : null;
 
         [SerializeField] private EventManager @event;
-        public static EventManager Event => Instance.@event;
+        public static EventManager Event => Instance != null ? Instance.@event : null;
 
         [SerializeField] private RequestManager request;
-        public static RequestManager Request => Instance.request;
+        public static RequestManager Request => Instance != null ? Instance.request : null;
     }
 }

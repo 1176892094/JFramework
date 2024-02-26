@@ -21,16 +21,9 @@ namespace JFramework
 
     public enum UIState : byte
     {
-        Default = 0,
+        Common = 0,
         Freeze = 1,
         DontDestroy = 2
-    }
-
-    internal enum TimerState : byte
-    {
-        Run = 0,
-        Stop = 1,
-        Complete = 2
     }
 
     internal enum AssetPlatform : byte

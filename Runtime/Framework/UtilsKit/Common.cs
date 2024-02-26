@@ -38,34 +38,17 @@ namespace JFramework
     [Serializable]
     public sealed class Timer
     {
-        public int count;
-        private bool unscaled;
-        private float duration;
-        private float waitTime;
-        private TimerState state;
-        private event Action OnComplete;
+        private bool running;
+        private bool unscale;
+        [SerializeField] private int count;
+        [SerializeField] private float interval;
+        [SerializeField] private float duration;
+        private event Action OnUpdate;
+        private float seconds => unscale ? Time.unscaledTime : Time.time;
 
-        public Timer Invoke(Action OnComplete)
+        public Timer Invoke(Action OnUpdate)
         {
-            this.OnComplete = OnComplete;
-            return this;
-        }
-
-        public Timer Invoke(Action<Timer> OnComplete)
-        {
-            this.OnComplete = () => OnComplete(this);
-            return this;
-        }
-
-        public Timer Play()
-        {
-            state = TimerState.Run;
-            return this;
-        }
-
-        public Timer Stop()
-        {
-            state = TimerState.Stop;
+            this.OnUpdate = OnUpdate;
             return this;
         }
 
@@ -77,68 +60,63 @@ namespace JFramework
 
         public Timer Unscale()
         {
-            unscaled = true;
-            waitTime = Time.unscaledTime + duration;
+            unscale = true;
+            duration = seconds + interval;
             return this;
         }
 
-        public Timer Set(float duration)
+        public Timer Set(float interval)
         {
-            this.duration = duration;
-            waitTime = unscaled ? Time.unscaledTime : Time.time;
-            waitTime += duration;
+            this.interval = interval;
+            duration = seconds + interval;
             return this;
         }
 
         public Timer Add(float duration)
         {
-            waitTime += duration;
+            this.duration += duration;
             return this;
         }
 
-        internal void Start(float duration)
+        internal Timer Pop(float interval)
         {
             count = 1;
-            unscaled = false;
-            state = TimerState.Run;
-            this.duration = duration;
-            waitTime = Time.time + duration;
+            running = true;
+            unscale = false;
+            this.interval = interval;
+            duration = seconds + interval;
+            return this;
         }
 
         internal void Update()
         {
-            if (state != TimerState.Run)
+            if (!running || seconds <= duration)
             {
                 return;
             }
 
-            var current = unscaled ? Time.unscaledTime : Time.time;
-            if (current <= waitTime)
-            {
-                return;
-            }
-
-            waitTime = current + duration;
+            duration = seconds + interval;
             try
             {
                 count--;
-                OnComplete?.Invoke();
+                OnUpdate?.Invoke();
                 if (count == 0)
                 {
                     GlobalManager.Time.Push(this);
                 }
             }
-            catch (Exception)
+            catch (Exception e)
             {
                 GlobalManager.Time.Push(this);
+                Debug.LogWarning("计时器无法执行方法：\n" + e);
             }
         }
 
-        internal void Close()
+        internal void Push()
         {
-            unscaled = false;
-            OnComplete = null;
-            state = TimerState.Complete;
+            running = false;
+            unscale = false;
+            OnUpdate = null;
         }
     }
 

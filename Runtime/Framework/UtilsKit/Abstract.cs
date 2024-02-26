@@ -44,7 +44,7 @@ namespace JFramework
     {
         public UILayer layer { get; protected set; } = UILayer.Normal;
 
-        public UIState state { get; protected set; } = UIState.Default;
+        public UIState state { get; protected set; } = UIState.Common;
 
         protected virtual void Awake() => this.Inject();
 

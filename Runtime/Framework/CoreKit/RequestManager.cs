@@ -31,7 +31,6 @@ namespace JFramework.Core
 
         public async Task<bool> UpdateAssetBundles()
         {
-            if (!GlobalManager.Instance) return false;
             if (await GetRemoteData())
             {
                 Debug.Log("解析远端对比文件完成");

@@ -20,7 +20,7 @@ namespace JFramework
 
         public static T Pop<T>()
         {
-            if (streams.TryGetValue(typeof(T), out var stream) && stream.Count > 0)
+            if (streams.TryGetValue(typeof(T), out var stream) && stream.count > 0)
             {
                 return ((IPool<T>)stream).Pop();
             }
@@ -30,7 +30,7 @@ namespace JFramework
 
         public static T Pop<T>(Type type)
         {
-            if (streams.TryGetValue(type, out var stream) && stream.Count > 0)
+            if (streams.TryGetValue(type, out var stream) && stream.count > 0)
             {
                 return ((IPool<T>)stream).Pop();
             }

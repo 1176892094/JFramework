@@ -62,7 +62,7 @@ namespace JFramework.Interface
 
     public interface IPool : IDisposable
     {
-        int Count { get; }
+        int count { get; }
     }
 
     public interface IPool<T> : IPool

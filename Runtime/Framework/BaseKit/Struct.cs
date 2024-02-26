@@ -11,7 +11,7 @@
 using System;
 using System.Collections.Generic;
 using JFramework.Interface;
-using Sirenix.OdinInspector;
+using UnityEngine;
 
 namespace JFramework
 {
@@ -80,30 +80,26 @@ namespace JFramework
 
         public override int GetHashCode() => HashCode.Combine(size, code, name);
     }
-    
+
     [Serializable]
     internal struct Pool<T> : IPool<T>
     {
-        [ShowInInspector] private Stack<T> pool;
+        [SerializeField] private List<T> pool;
 
-        public int Count => pool.Count;
+        public int count => pool.Count;
 
-        public Pool(T obj)
-        {
-            pool = new Stack<T>();
-            pool.Push(obj);
-        }
+        public Pool(T obj) => pool = new List<T> { obj };
 
         public T Pop()
         {
-            return pool.TryPop(out var obj) ? obj : Activator.CreateInstance<T>();
+            return count > 0 ? pool[0] : Activator.CreateInstance<T>();
         }
 
         public bool Push(T obj)
         {
             if (!pool.Contains(obj))
             {
-                pool.Push(obj);
+                pool.Add(obj);
                 return true;
             }
 

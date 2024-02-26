@@ -33,8 +33,7 @@ namespace JFramework.Core
 
         public async Task<GameObject> Pop(string path)
         {
-            if (!GlobalManager.Instance) return default;
-            if (pools.TryGetValue(path, out var pool) && pool.Count > 0)
+            if (pools.TryGetValue(path, out var pool) && pool.count > 0)
             {
                 var obj = pool.Pop();
                 if (obj != null)
@@ -53,8 +52,7 @@ namespace JFramework.Core
 
         public async void Pop(string path, Action<GameObject> action)
         {
-            if (!GlobalManager.Instance) return;
-            if (pools.TryGetValue(path, out var pool) && pool.Count > 0)
+            if (pools.TryGetValue(path, out var pool) && pool.count > 0)
             {
                 var obj = pool.Pop();
                 if (obj != null)
@@ -74,7 +72,6 @@ namespace JFramework.Core
 
         public void Push(GameObject obj)
         {
-            if (!GlobalManager.Instance) return;
             if (obj == null) return;
             if (!parents.TryGetValue(obj.name, out var parent))
             {

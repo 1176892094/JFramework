@@ -16,9 +16,7 @@ namespace JFramework.Core
 {
     public sealed class TimerManager : ScriptableObject
     {
-        [ShowInInspector, LabelText("运行计时器")] private readonly LinkedList<Timer> timers = new LinkedList<Timer>();
-        private LinkedListNode<Timer> next;
-        private LinkedListNode<Timer> first;
+        [SerializeField, LabelText("运行计时器")] private List<Timer> timers = new List<Timer>();
 
         internal void OnEnable()
         {
@@ -28,39 +26,28 @@ namespace JFramework.Core
 
         private void OnUpdate()
         {
-            if (timers.Count <= 0) return;
-            first = timers.First;
-            while (first != null)
+            for (int i = timers.Count - 1; i >= 0; i--)
             {
-                next = first.Next;
-                first.Value?.Update();
-                first = next;
+                timers[i]?.Update();
             }
         }
 
         public Timer Pop(float time)
         {
-            if (!GlobalManager.Instance) return null;
             var timer = StreamPool.Pop<Timer>();
-            timer.Start(time);
-            timers.AddLast(timer);
-            return timer;
+            timers.Add(timer);
+            return timer.Pop(time);
         }
 
         public void Push(Timer timer)
-        {
-            if (!GlobalManager.Instance) return;
-            if (timers.Remove(timer))
-            {
-                timer.Close();
-                StreamPool.Push(timer);
-            }
+        { ;
+            if (!timers.Remove(timer)) return;
+            StreamPool.Push(timer);
+            timer.Push();
         }
 
         internal void OnDisable()
         {
-            next = null;
-            first = null;
             timers.Clear();
         }
     }

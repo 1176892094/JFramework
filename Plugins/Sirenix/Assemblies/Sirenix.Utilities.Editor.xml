@@ -1781,23 +1781,23 @@
         </member>
         <member name="M:Sirenix.Utilities.Editor.GUIHelper.PushFadeGroupDuration(System.Single)">
             <summary>
-            Pushes the value to the fade group duration stack. Remeber to pop with <see cref="M:Sirenix.Utilities.Editor.GUIHelper.PopFadeGroupDuration"/>.
+            Pushes the value to the fade group interval stack. Remeber to pop with <see cref="M:Sirenix.Utilities.Editor.GUIHelper.PopFadeGroupDuration"/>.
             </summary>
         </member>
         <member name="M:Sirenix.Utilities.Editor.GUIHelper.PopFadeGroupDuration">
             <summary>
-            Pops fade group duration value pushed by <see cref="M:Sirenix.Utilities.Editor.GUIHelper.PushFadeGroupDuration(System.Single)"/>.
+            Pops fade group interval value pushed by <see cref="M:Sirenix.Utilities.Editor.GUIHelper.PushFadeGroupDuration(System.Single)"/>.
             </summary>
         </member>
         <member name="M:Sirenix.Utilities.Editor.GUIHelper.PushTabPageSlideAnimationDuration(System.Single)">
             <summary>
-            Pushes the value to the tab page slide animation duration stack. Remember to pop with <see cref="M:Sirenix.Utilities.Editor.GUIHelper.PopTabPageSlideAnimationDuration"/>.
+            Pushes the value to the tab page slide animation interval stack. Remember to pop with <see cref="M:Sirenix.Utilities.Editor.GUIHelper.PopTabPageSlideAnimationDuration"/>.
             </summary>
-            <param name="duration"></param>
+            <param name="interval"></param>
         </member>
         <member name="M:Sirenix.Utilities.Editor.GUIHelper.PopTabPageSlideAnimationDuration">
             <summary>
-            Pops tab page slide animation duration value pushed by <see cref="M:Sirenix.Utilities.Editor.GUIHelper.PushTabPageSlideAnimationDuration(System.Single)"/>.
+            Pops tab page slide animation interval value pushed by <see cref="M:Sirenix.Utilities.Editor.GUIHelper.PushTabPageSlideAnimationDuration(System.Single)"/>.
             </summary>
         </member>
         <member name="M:Sirenix.Utilities.Editor.GUIHelper.ClearRepaintRequest">
@@ -5375,17 +5375,17 @@
         </member>
         <member name="P:Sirenix.Utilities.Editor.SirenixEditorGUI.DefaultFadeGroupDuration">
             <summary>
-            Default fade group animation duration.
+            Default fade group animation interval.
             </summary>
         </member>
         <member name="P:Sirenix.Utilities.Editor.SirenixEditorGUI.TabPageSlideAnimationDuration">
             <summary>
-            Tab page slide animation duration.
+            Tab page slide animation interval.
             </summary>
         </member>
         <member name="P:Sirenix.Utilities.Editor.SirenixEditorGUI.ShakingAnimationDuration">
             <summary>
-            Shaking animation duration.
+            Shaking animation interval.
             </summary>
         </member>
         <member name="P:Sirenix.Utilities.Editor.SirenixEditorGUI.ExpandFoldoutByDefault">
@@ -6090,7 +6090,7 @@
             </summary>
             <param name="key">The key for the fade group.</param>
             <param name="isVisible">Current state of the fade group.</param>
-            <param name="duration">The duration of fade in and out.</param>
+            <param name="interval">The interval of fade in and out.</param>
         </member>
         <member name="M:Sirenix.Utilities.Editor.SirenixEditorGUI.BeginFadeGroup(System.Object,System.Boolean,System.Single@,System.Single)">
             <summary>
@@ -6099,7 +6099,7 @@
             <param name="key">The key for the fade group.</param>
             <param name="isVisible">Current state of the fade group.</param>
             <param name="t">A value between 0 and 1 indicating how expanded the fade group is.</param>
-            <param name="duration">The duration of fade in and out.</param>
+            <param name="interval">The interval of fade in and out.</param>
         </member>
         <member name="M:Sirenix.Utilities.Editor.SirenixEditorGUI.BeginFadeGroup(System.Object,System.Object,System.Boolean,System.Single)">
             <summary>
@@ -6108,7 +6108,7 @@
             <param name="primaryKey">The primary key for the fade group.</param>
             <param name="secondaryKey">The secondly key for the fade group.</param>
             <param name="isVisible">Current state of the fade group.</param>
-            <param name="duration">The duration of fade in and out.</param>
+            <param name="interval">The interval of fade in and out.</param>
         </member>
         <member name="M:Sirenix.Utilities.Editor.SirenixEditorGUI.BeginFadeGroup(System.Object,System.String,System.Boolean,System.Single)">
             <summary>
@@ -6117,7 +6117,7 @@
             <param name="key">The key for the fade group.</param>
             <param name="name">The name of the fade group.</param>
             <param name="isVisible">Current state of the fade group.</param>
-            <param name="duration">The duration of fade in and out.</param>
+            <param name="interval">The interval of fade in and out.</param>
         </member>
         <member name="M:Sirenix.Utilities.Editor.SirenixEditorGUI.BeginFadeGroup(System.Single)">
             <summary>

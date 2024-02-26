@@ -10,7 +10,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using JFramework.Interface;
 using Sirenix.OdinInspector;
 
@@ -22,7 +21,7 @@ namespace JFramework
     public abstract class State<T> : IState where T : IEntity
     {
         public T owner { get; private set; }
-        
+
         public IStateMachine machine { get; private set; }
 
         protected abstract void OnEnter();
@@ -30,7 +29,7 @@ namespace JFramework
         protected abstract void OnUpdate();
 
         protected abstract void OnExit();
-        
+
         void IState.OnAwake(IEntity owner, IStateMachine machine)
         {
             this.owner = (T)owner;
@@ -63,8 +62,7 @@ namespace JFramework
             state.OnAwake(owner, this);
             states[typeof(T2)] = state;
         }
-
-
+        
         public void AddState<T2, T3>() where T2 : IState where T3 : IState, new()
         {
             var state = StreamPool.Pop<IState>(typeof(T3));
@@ -81,8 +79,7 @@ namespace JFramework
 
         protected virtual void OnDestroy()
         {
-            var copies = states.Values.ToList();
-            foreach (var state in copies)
+            foreach (var state in states.Values)
             {
                 StreamPool.Push(state, state.GetType());
             }

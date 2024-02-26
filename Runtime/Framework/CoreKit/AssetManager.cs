@@ -113,7 +113,6 @@ namespace JFramework.Core
 
         public async Task<T> Load<T>(string path) where T : Object
         {
-            if (!GlobalManager.Instance) return null;
 #if UNITY_EDITOR
             if (!SettingManager.Instance.remoteLoad)
             {
@@ -150,7 +149,6 @@ namespace JFramework.Core
 
         public async void LoadAsync<T>(string path, Action<T> action = null) where T : Object
         {
-            if (!GlobalManager.Instance) return;
 #if UNITY_EDITOR
             if (!SettingManager.Instance.remoteLoad)
             {
@@ -191,7 +189,6 @@ namespace JFramework.Core
 
         internal async Task<AsyncOperation> LoadSceneAsync(string path)
         {
-            if (!GlobalManager.Instance) return null;
 #if UNITY_EDITOR
             if (!SettingManager.Instance.remoteLoad)
             {

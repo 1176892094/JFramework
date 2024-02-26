@@ -296,7 +296,7 @@
         </member>
         <member name="P:Sirenix.OdinInspector.Editor.GeneralDrawerConfig.ShakingAnimationDuration">
             <summary>
-            Specify the shaking duration for most shaking animations throughout the inspector.
+            Specify the shaking interval for most shaking animations throughout the inspector.
             </summary>
         </member>
         <member name="P:Sirenix.OdinInspector.Editor.GeneralDrawerConfig.TabPageSlideAnimationDuration">

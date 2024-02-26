@@ -151,32 +151,8 @@ namespace JFramework
                         name = char.ToUpper(field.Name[0]) + field.Name.Substring(1);
                     }
 
-                    inject.SetValue(field, name);
+                    inject.SetComponent(field, name);
                 }
-            }
-        }
-
-        private static void SetValue(this IEntity inject, FieldInfo field, string name)
-        {
-            var child = inject.transform.GetChild(name);
-            if (child == null) return;
-
-            var component = child.GetComponent(field.FieldType);
-            if (component == null) return;
-
-            field.SetValue(inject, component);
-
-            var method = inject.GetType().GetMethod(name, Reflection.Instance);
-            if (method == null) return;
-
-            switch (component)
-            {
-                case Button button:
-                    inject.SetButton(name, button);
-                    break;
-                case Toggle toggle:
-                    inject.SetToggle(name, toggle);
-                    break;
             }
         }
 
@@ -198,6 +174,30 @@ namespace JFramework
             }
 
             return null;
+        }
+        
+        private static void SetComponent(this IEntity inject, FieldInfo field, string name)
+        {
+            var child = inject.transform.GetChild(name);
+            if (child == null) return;
+
+            var component = child.GetComponent(field.FieldType);
+            if (component == null) return;
+
+            field.SetValue(inject, component);
+
+            var method = inject.GetType().GetMethod(name, Reflection.Instance);
+            if (method == null) return;
+
+            switch (component)
+            {
+                case Button button:
+                    inject.SetButton(name, button);
+                    break;
+                case Toggle toggle:
+                    inject.SetToggle(name, toggle);
+                    break;
+            }
         }
 
         private static void SetButton(this IEntity inject, string name, Button button)
