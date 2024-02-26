@@ -35,11 +35,11 @@ namespace JFramework
 
         private void OnEnable()
         {
-            json.Awake();
-            pool.Awake();
-            sound.Awake();
-            timer.Awake();
-            panel.Awake();
+            json.OnEnable();
+            pool.OnEnable();
+            sound.OnEnable();
+            timer.OnEnable();
+            panel.OnEnable();
         }
 
         private void Start()
@@ -68,17 +68,17 @@ namespace JFramework
 
         private void OnDisable()
         {
-            data.OnDestroy();
-            json.OnDestroy();
-            pool.OnDestroy();
-            asset.OnDestroy();
-            sound.OnDestroy();
-            scene.OnDestroy();
-            timer.OnDestroy();
-            panel.OnDestroy();
-            entity.OnDestroy();
-            @event.OnDestroy();
-            request.OnDestroy();
+            data.OnDisable();
+            json.OnDisable();
+            pool.OnDisable();
+            asset.OnDisable();
+            sound.OnDisable();
+            scene.OnDisable();
+            timer.OnDisable();
+            panel.OnDisable();
+            entity.OnDisable();
+            @event.OnDisable();
+            request.OnDisable();
         }
 
         private void OnApplicationQuit()
@@ -141,43 +141,5 @@ namespace JFramework
 
         [SerializeField] private RequestManager request;
         public static RequestManager Request => Instance.request;
-
-        // [Button]
-        // public void Button()
-        // {
-        //     entity = ScriptableObject.CreateInstance<EntityManager>();
-        //     entity.name = "EntityManager";
-        //     AssetDatabase.AddObjectToAsset(entity, gameObject);
-        //     panel = ScriptableObject.CreateInstance<UIManager>();
-        //     panel.name = "UIManager";
-        //     AssetDatabase.AddObjectToAsset(panel, gameObject);
-        //     sound = ScriptableObject.CreateInstance<AudioManager>();
-        //     sound.name = "AudioManager";
-        //     AssetDatabase.AddObjectToAsset(sound, gameObject);
-        //     json = ScriptableObject.CreateInstance<JsonManager>();
-        //     json.name = "JsonManager";
-        //     AssetDatabase.AddObjectToAsset(json, gameObject);
-        //     pool = ScriptableObject.CreateInstance<PoolManager>();
-        //     pool.name = "PoolManager";
-        //     AssetDatabase.AddObjectToAsset(pool, gameObject);
-        //     @event = ScriptableObject.CreateInstance<EventManager>();
-        //     @event.name = "EventManager";
-        //     AssetDatabase.AddObjectToAsset(@event, gameObject);
-        //     data = ScriptableObject.CreateInstance<DataManager>();
-        //     data.name = "DataManager";
-        //     AssetDatabase.AddObjectToAsset(data, gameObject);
-        //     asset = ScriptableObject.CreateInstance<AssetManager>();
-        //     asset.name = "AssetManager";
-        //     AssetDatabase.AddObjectToAsset(asset, gameObject);
-        //     timer = ScriptableObject.CreateInstance<TimerManager>();
-        //     timer.name = "TimerManager";
-        //     AssetDatabase.AddObjectToAsset(timer, gameObject);
-        //     scene = ScriptableObject.CreateInstance<SceneManager>();
-        //     scene.name = "SceneManager";
-        //     AssetDatabase.AddObjectToAsset(scene, gameObject);
-        //     request = ScriptableObject.CreateInstance<RequestManager>();
-        //     request.name = "RequestManager";
-        //     AssetDatabase.AddObjectToAsset(request, gameObject);
-        // }
     }
 }

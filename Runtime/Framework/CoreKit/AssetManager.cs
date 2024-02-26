@@ -7,6 +7,7 @@
 // # Copyright: 2024, Charlotte
 // # Description: This is an automatically generated comment.
 // *********************************************************************************
+// ReSharper disable All
 
 using System;
 using System.Collections.Generic;
@@ -230,7 +231,7 @@ namespace JFramework.Core
             }
         }
 
-        internal void OnDestroy()
+        internal void OnDisable()
         {
             AssetBundle.UnloadAllAssetBundles(true);
             awaits.Clear();

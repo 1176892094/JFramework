@@ -16,21 +16,20 @@ namespace JFramework.Core
 {
     public sealed class TimerManager : ScriptableObject
     {
+        [ShowInInspector, LabelText("运行计时器")] private readonly LinkedList<Timer> timers = new LinkedList<Timer>();
         private LinkedListNode<Timer> next;
         private LinkedListNode<Timer> first;
-        [ShowInInspector, LabelText("结束列表")] private readonly Queue<Timer> stopList = new Queue<Timer>();
-        [ShowInInspector, LabelText("运行列表")] private readonly LinkedList<Timer> playList = new LinkedList<Timer>();
 
-        internal void Awake()
+        internal void OnEnable()
         {
             if (!GlobalManager.Instance) return;
-            GlobalManager.OnUpdate += Update;
+            GlobalManager.OnUpdate += OnUpdate;
         }
 
-        private void Update()
+        private void OnUpdate()
         {
-            if (playList.Count <= 0) return;
-            first = playList.First;
+            if (timers.Count <= 0) return;
+            first = timers.First;
             while (first != null)
             {
                 next = first.Next;
@@ -42,32 +41,27 @@ namespace JFramework.Core
         public Timer Pop(float time)
         {
             if (!GlobalManager.Instance) return null;
-            if (!stopList.TryDequeue(out var timer))
-            {
-                timer = new Timer();
-            }
-
+            var timer = StreamPool.Pop<Timer>();
             timer.Start(time);
-            playList.AddLast(timer);
+            timers.AddLast(timer);
             return timer;
         }
 
         public void Push(Timer timer)
         {
             if (!GlobalManager.Instance) return;
-            if (playList.Remove(timer))
+            if (timers.Remove(timer))
             {
                 timer.Close();
-                stopList.Enqueue(timer);
+                StreamPool.Push(timer);
             }
         }
 
-        internal void OnDestroy()
+        internal void OnDisable()
         {
             next = null;
             first = null;
-            playList.Clear();
-            stopList.Clear();
+            timers.Clear();
         }
     }
 }

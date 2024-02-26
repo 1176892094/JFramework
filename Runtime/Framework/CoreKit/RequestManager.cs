@@ -182,7 +182,7 @@ namespace JFramework.Core
             return updateAssets.Count == 0;
         }
 
-        internal void OnDestroy()
+        internal void OnDisable()
         {
             OnLoadStart = null;
             OnLoadUpdate = null;

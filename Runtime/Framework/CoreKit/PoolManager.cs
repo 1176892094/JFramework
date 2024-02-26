@@ -25,7 +25,7 @@ namespace JFramework.Core
         [ShowInInspector, LabelText("对象列表")]
         private readonly Dictionary<string, IPool<GameObject>> pools = new Dictionary<string, IPool<GameObject>>();
 
-        internal void Awake()
+        internal void OnEnable()
         {
             if (!GlobalManager.Instance) return;
             poolManager = GlobalManager.Instance.transform.Find("PoolManager");
@@ -95,7 +95,7 @@ namespace JFramework.Core
             }
         }
 
-        internal void OnDestroy()
+        internal void OnDisable()
         {
             foreach (var pool in pools.Values)
             {

@@ -30,7 +30,7 @@ namespace JFramework.Core
         [ShowInInspector, LabelText("完成列表")] private readonly Stack<AudioSource> stopList = new Stack<AudioSource>();
         [ShowInInspector, LabelText("播放列表")] private readonly HashSet<AudioSource> playList = new HashSet<AudioSource>();
 
-        internal void Awake()
+        internal void OnEnable()
         {
             if (!GlobalManager.Instance) return;
             GlobalManager.Json.Load(this);
@@ -133,7 +133,7 @@ namespace JFramework.Core
             }
         }
 
-        internal void OnDestroy()
+        internal void OnDisable()
         {
             playList.Clear();
             stopList.Clear();

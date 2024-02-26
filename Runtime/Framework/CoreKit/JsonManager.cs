@@ -23,7 +23,7 @@ namespace JFramework.Core
     {
         [ShowInInspector, LabelText("加密密钥")] private Dictionary<string, Json> secrets = new Dictionary<string, Json>();
 
-        internal void Awake()
+        internal void OnEnable()
         {
             secrets = Load<List<Json>>(nameof(JsonManager)).ToDictionary(json => json.name);
         }
@@ -216,7 +216,7 @@ namespace JFramework.Core
             }
         }
 
-        internal void OnDestroy()
+        internal void OnDisable()
         {
             secrets.Clear();
         }

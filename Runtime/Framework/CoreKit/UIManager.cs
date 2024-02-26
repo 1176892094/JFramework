@@ -27,7 +27,7 @@ namespace JFramework.Core
         [ShowInInspector, LabelText("用户界面")] private readonly Dictionary<Type, IPanel> panels = new Dictionary<Type, IPanel>();
         [ShowInInspector, LabelText("界面层级")] private readonly Dictionary<UILayer, Transform> layers = new Dictionary<UILayer, Transform>();
 
-        internal void Awake()
+        internal void OnEnable()
         {
             if (!GlobalManager.Instance) return;
             canvas = GlobalManager.Instance.transform.Find("UICanvas").GetComponent<Canvas>();
@@ -146,7 +146,7 @@ namespace JFramework.Core
             }
         }
 
-        internal void OnDestroy()
+        internal void OnDisable()
         {
             canvas = null;
             panels.Clear();

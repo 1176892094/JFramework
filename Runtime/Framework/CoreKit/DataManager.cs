@@ -158,7 +158,7 @@ namespace JFramework.Core
             return default;
         }
 
-        internal void OnDestroy()
+        internal void OnDisable()
         {
             intData.Clear();
             enumData.Clear();

@@ -14,12 +14,15 @@ using System.Linq;
 using JFramework.Interface;
 using Sirenix.OdinInspector;
 
+// ReSharper disable All
+
 namespace JFramework
 {
     [Serializable]
     public abstract class State<T> : IState where T : IEntity
     {
         public T owner { get; private set; }
+        
         public IStateMachine machine { get; private set; }
 
         protected abstract void OnEnter();
@@ -27,18 +30,18 @@ namespace JFramework
         protected abstract void OnUpdate();
 
         protected abstract void OnExit();
-
-        void IEnter.OnEnter() => OnEnter();
-
-        void IUpdate.OnUpdate() => OnUpdate();
-
-        void IExit.OnExit() => OnExit();
-
+        
         void IState.OnAwake(IEntity owner, IStateMachine machine)
         {
             this.owner = (T)owner;
             this.machine = machine;
         }
+
+        void IState.OnEnter() => OnEnter();
+
+        void IState.OnUpdate() => OnUpdate();
+
+        void IState.OnExit() => OnExit();
     }
 
     [Serializable]
@@ -51,7 +54,7 @@ namespace JFramework
 
         public bool IsActive<T2>() where T2 : IState
         {
-            return states != null && state.GetType() == typeof(T2);
+            return state?.GetType() == typeof(T2);
         }
 
         public void AddState<T2>() where T2 : IState, new()

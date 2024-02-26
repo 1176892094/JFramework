@@ -36,10 +36,6 @@ namespace JFramework
     {
         protected virtual void Awake() => this.Inject();
 
-        protected virtual void OnEnable() => GetComponent<IUpdate>()?.Listen();
-
-        protected virtual void OnDisable() => GetComponent<IUpdate>()?.Remove();
-
         protected virtual void OnDestroy() => this.Destroy();
     }
 
@@ -51,10 +47,6 @@ namespace JFramework
         public UIState state { get; protected set; } = UIState.Default;
 
         protected virtual void Awake() => this.Inject();
-
-        protected virtual void OnEnable() => GetComponent<IUpdate>()?.Listen();
-
-        protected virtual void OnDisable() => GetComponent<IUpdate>()?.Remove();
 
         public virtual void Show() => gameObject.SetActive(true);
 
@@ -68,7 +60,7 @@ namespace JFramework
 
         public T owner => instance ??= (T)GlobalManager.Entity.instance;
 
-        void IComponent.Awake() => instance ??= (T)GlobalManager.Entity.instance;
+        void IComponent.OnAwake() => instance ??= (T)GlobalManager.Entity.instance;
     }
 
     [Serializable]

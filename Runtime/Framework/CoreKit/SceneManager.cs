@@ -79,7 +79,7 @@ namespace JFramework.Core
             return UnitySceneManager.GetActiveScene().name;
         }
 
-        internal void OnDestroy()
+        internal void OnDisable()
         {
             objects.Clear();
         }

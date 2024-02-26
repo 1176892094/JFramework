@@ -43,7 +43,7 @@ namespace JFramework.Core
                 component = (IComponent)CreateInstance(type);
                 ((ScriptableObject)component).name = type.Name;
                 components.Add(type, component);
-                component.Awake();
+                component.OnAwake();
             }
 
             return entities[entity][type];
@@ -63,7 +63,7 @@ namespace JFramework.Core
             }
         }
 
-        internal void OnDestroy()
+        internal void OnDisable()
         {
             var copies = entities.Keys.ToList();
             foreach (var entity in copies)
