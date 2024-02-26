@@ -20,16 +20,15 @@ using Debug = UnityEngine.Debug;
 
 namespace JFramework.Core
 {
+    using IntData = Dictionary<int, IData>;
+    using EnumData = Dictionary<Enum, IData>;
+    using StringData = Dictionary<string, IData>;
+
     public sealed class DataManager : ScriptableObject
     {
-        [ShowInInspector, LabelText("整数数据")]
-        private readonly Dictionary<Type, Dictionary<int, IData>> intData = new Dictionary<Type, Dictionary<int, IData>>();
-
-        [ShowInInspector, LabelText("枚举数据")]
-        private readonly Dictionary<Type, Dictionary<Enum, IData>> enumData = new Dictionary<Type, Dictionary<Enum, IData>>();
-
-        [ShowInInspector, LabelText("字符数据")]
-        private readonly Dictionary<Type, Dictionary<string, IData>> stringData = new Dictionary<Type, Dictionary<string, IData>>();
+        [ShowInInspector, LabelText("整数数据")] private Dictionary<Type, IntData> intData = new();
+        [ShowInInspector, LabelText("枚举数据")] private Dictionary<Type, EnumData> enumData = new();
+        [ShowInInspector, LabelText("字符数据")] private Dictionary<Type, StringData> stringData = new();
 
         public async Task LoadDataTable()
         {

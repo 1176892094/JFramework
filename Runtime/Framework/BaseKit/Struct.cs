@@ -88,11 +88,18 @@ namespace JFramework
 
         public int count => pool.Count;
 
-        public Pool(T obj) => pool = new List<T> { obj };
+        public Pool(T obj) => pool = new List<T>() { obj };
 
         public T Pop()
         {
-            return count > 0 ? pool[0] : Activator.CreateInstance<T>();
+            if (count > 0)
+            {
+                var obj = pool[0];
+                pool.Remove(obj);
+                return obj;
+            }
+
+            return Activator.CreateInstance<T>();
         }
 
         public bool Push(T obj)

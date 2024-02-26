@@ -21,7 +21,7 @@ namespace JFramework.Core
 {
     public sealed class JsonManager : ScriptableObject
     {
-        [ShowInInspector, LabelText("加密密钥")] private Dictionary<string, Json> secrets = new Dictionary<string, Json>();
+        [ShowInInspector, LabelText("加密密钥")] private Dictionary<string, Json> secrets = new();
 
         internal void OnEnable()
         {
@@ -139,7 +139,7 @@ namespace JFramework.Core
             }
         }
 
-        private static string FilePath(string name)
+        private string FilePath(string name)
         {
             var filePath = Path.Combine(Application.streamingAssetsPath, $"{name}.json");
             if (!File.Exists(filePath))
@@ -214,11 +214,6 @@ namespace JFramework.Core
                 Save(secrets.Values.ToList(), nameof(JsonManager));
                 return null;
             }
-        }
-
-        internal void OnDisable()
-        {
-            secrets.Clear();
         }
     }
 }

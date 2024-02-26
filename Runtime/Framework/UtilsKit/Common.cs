@@ -18,7 +18,7 @@ namespace JFramework
     [Serializable]
     public sealed class Variable<T> : IVariable where T : new()
     {
-        public T value;
+        [SerializeField] public T value;
 
         public Variable() => value = new T();
 
@@ -28,7 +28,7 @@ namespace JFramework
     [Serializable]
     public sealed class Variables<T> : IVariable where T : struct
     {
-        public List<T> value;
+        [SerializeField] public List<T> value;
 
         public Variables() => value = new List<T>();
 

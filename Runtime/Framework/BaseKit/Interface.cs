@@ -26,7 +26,7 @@ namespace JFramework.Interface
 
     public interface IComponent
     {
-        void OnAwake();
+        void OnAwake(IEntity owner);
     }
 
     public interface IState

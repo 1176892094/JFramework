@@ -22,14 +22,14 @@ namespace JFramework.Core
 {
     public sealed class RequestManager : ScriptableObject
     {
+        [ShowInInspector, LabelText("本地资源")] private Dictionary<string, Bundle> localAssets = new();
+        [ShowInInspector, LabelText("远端资源")] private Dictionary<string, Bundle> remoteAssets = new();
+        private readonly List<string> updateAssets = new();
         public event Action<int> OnLoadStart;
+        public event Action<bool> OnLoadComplete;
         public event Action<string, float> OnLoadUpdate;
-        public event Action OnLoadComplete;
-        private readonly List<string> updateAssets = new List<string>();
-        [ShowInInspector, LabelText("本地资源")] private Dictionary<string, Bundle> localAssets = new Dictionary<string, Bundle>();
-        [ShowInInspector, LabelText("远端资源")] private Dictionary<string, Bundle> remoteAssets = new Dictionary<string, Bundle>();
 
-        public async Task<bool> UpdateAssetBundles()
+        public async void UpdateAssetBundles()
         {
             if (await GetRemoteData())
             {
@@ -72,13 +72,13 @@ namespace JFramework.Core
                 if (await GetAssetBundles())
                 {
                     await File.WriteAllTextAsync(SettingManager.clientInfoPath, remoteInfo);
-                    OnLoadComplete?.Invoke();
-                    return true;
+                    OnLoadComplete?.Invoke(true);
+                    return;
                 }
             }
 
             Debug.Log("更新失败。");
-            return false;
+            OnLoadComplete?.Invoke(false);
         }
 
         private static async Task<bool> GetRemoteData()

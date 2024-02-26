@@ -69,7 +69,6 @@ namespace JFramework
         private void OnDisable()
         {
             data.OnDisable();
-            json.OnDisable();
             pool.OnDisable();
             asset.OnDisable();
             sound.OnDisable();

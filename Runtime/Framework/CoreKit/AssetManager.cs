@@ -28,13 +28,11 @@ namespace JFramework.Core
 
     public sealed class AssetManager : ScriptableObject
     {
+        [ShowInInspector, LabelText("加载资源")] private Dictionary<string, Asset> assets = new();
+        [ShowInInspector, LabelText("等待列表")] private Dictionary<string, AssetTask> awaits = new();
+        [ShowInInspector, LabelText("依赖列表")] private Dictionary<string, AssetBundle> bundles = new();
         private AssetBundle mainAsset;
         private AssetBundleManifest manifest;
-        [ShowInInspector, LabelText("加载资源")] private readonly Dictionary<string, Asset> assets = new Dictionary<string, Asset>();
-        [ShowInInspector, LabelText("等待列表")] private readonly Dictionary<string, AssetTask> awaits = new Dictionary<string, AssetTask>();
-
-        [ShowInInspector, LabelText("依赖列表")]
-        private readonly Dictionary<string, AssetBundle> bundles = new Dictionary<string, AssetBundle>();
 
         private async Task LoadDependency(string bundle)
         {

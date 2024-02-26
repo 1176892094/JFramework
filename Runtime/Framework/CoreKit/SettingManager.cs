@@ -16,8 +16,6 @@ using Object = UnityEngine.Object;
 using UnityEditor;
 #endif
 
-// ReSharper disable All
-
 namespace JFramework
 {
     internal class SettingManager : ScriptableObject
@@ -38,7 +36,7 @@ namespace JFramework
         public string editorPath = "Assets/Editor/Resources";
 
         public string remotePath = "http://192.168.0.3:8000/AssetBundles";
-
+        
         public bool remoteLoad;
 
         public bool remoteBuild;
@@ -144,9 +142,26 @@ namespace JFramework
                     EditorGUILayout.PropertyField(settings.FindProperty("assetPath"));
                     EditorGUILayout.PropertyField(settings.FindProperty("editorPath"));
                     EditorGUILayout.PropertyField(settings.FindProperty("remotePath"));
-                    EditorGUILayout.PropertyField(settings.FindProperty("remoteLoad"));
-                    EditorGUILayout.PropertyField(settings.FindProperty("remoteBuild"));
-                    EditorGUILayout.PropertyField(settings.FindProperty("sceneAssets"));
+
+                    var field = settings.FindProperty("remoteLoad");
+                    EditorGUI.BeginDisabledGroup(true);
+                    EditorGUILayout.PropertyField(field);
+                    EditorGUI.EndDisabledGroup();
+                    if (GUILayout.Button("切换资源加载方式"))
+                    {
+                        field.boolValue = !field.boolValue;
+                        EditorSetting.UpdateSceneSetting(field.boolValue);
+                    }
+
+                    field = settings.FindProperty("remoteBuild");
+                    EditorGUI.BeginDisabledGroup(true);
+                    EditorGUILayout.PropertyField(field);
+                    EditorGUI.EndDisabledGroup();
+                    if (GUILayout.Button("切换资源构建目录"))
+                    {
+                        field.boolValue = !field.boolValue;
+                    }
+                    
                     settings.ApplyModifiedPropertiesWithoutUndo();
                 },
 

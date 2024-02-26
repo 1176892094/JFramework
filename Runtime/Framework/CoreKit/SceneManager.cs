@@ -20,30 +20,24 @@ namespace JFramework.Core
 {
     public sealed class SceneManager : ScriptableObject
     {
-        [ShowInInspector, LabelText("场景对象")] private readonly Dictionary<Type, IEntity> objects = new Dictionary<Type, IEntity>();
+        [ShowInInspector, LabelText("场景对象")] private Dictionary<Type, IEntity> objects = new();
 
         public void Register<T>(T entity) where T : IEntity
         {
-            if (!objects.ContainsKey(typeof(T)))
-            {
-                objects.Add(typeof(T), entity);
-            }
+            objects.TryAdd(typeof(T), entity);
         }
 
         public T Get<T>() where T : IEntity
         {
-            return objects.TryGetValue(typeof(T), out var entity) ? (T)entity : default;
+            return (T)objects.GetValueOrDefault(typeof(T));
         }
 
         public void UnRegister<T>() where T : IEntity
         {
-            if (objects.ContainsKey(typeof(T)))
-            {
-                objects.Remove(typeof(T));
-            }
+            objects.Remove(typeof(T));
         }
 
-        public async Task LoadScene(string name)
+        public async Task Load(string name)
         {
             try
             {
@@ -56,7 +50,7 @@ namespace JFramework.Core
             }
         }
 
-        public async void LoadSceneAsync(string name, Action<AsyncOperation> action = null)
+        public async void LoadAsync(string name, Action<AsyncOperation> action = null)
         {
             try
             {

@@ -24,7 +24,7 @@ namespace JFramework
 {
     internal partial class EditorSetting
     {
-        private static void UpdateSceneSetting()
+        public static void UpdateSceneSetting(bool remoteLoad)
         {
             if (!SettingManager.Instance) return;
             var sceneAssets = EditorBuildSettings.scenes.Select(scene => scene.path).ToList();
@@ -32,13 +32,13 @@ namespace JFramework
             {
                 if (sceneAssets.Contains(scenePath))
                 {
-                    if (!SettingManager.Instance.remoteLoad) continue;
+                    if (!remoteLoad) continue;
                     var scenes = EditorBuildSettings.scenes.Where(scene => scene.path != scenePath);
                     EditorBuildSettings.scenes = scenes.ToArray();
                 }
                 else
                 {
-                    if (SettingManager.Instance.remoteLoad) continue;
+                    if (remoteLoad) continue;
                     var scenes = EditorBuildSettings.scenes.ToList();
                     scenes.Add(new EditorBuildSettingsScene(scenePath, true));
                     EditorBuildSettings.scenes = scenes.ToArray();
@@ -63,9 +63,6 @@ namespace JFramework
             return result;
         }
 
-        [InitializeOnLoadMethod]
-        private static void InitializeOnLoad() => UpdateSceneSetting();
-
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
         private static void RuntimeInitializeOnLoad() => UpdateAsset();
     }
@@ -75,7 +72,6 @@ namespace JFramework
         [MenuItem("Tools/JFramework/Update Assets", priority = 2)]
         private static void UpdateAsset()
         {
-            UpdateSceneSetting();
             var bundleNames = AssetDatabase.GetAllAssetBundleNames();
             foreach (var bundleName in bundleNames)
             {

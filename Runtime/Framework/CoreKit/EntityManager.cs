@@ -19,15 +19,10 @@ namespace JFramework.Core
 {
     using Components = Dictionary<Type, IComponent>;
 
-    [CreateAssetMenu(fileName = nameof(EntityManager), menuName = "ScriptableObject/" + nameof(EntityManager))]
     internal sealed class EntityManager : ScriptableObject
     {
-        [ShowInInspector, LabelText("实体组件")]
-        private readonly Dictionary<IEntity, Components> entities = new Dictionary<IEntity, Components>();
-
-        private readonly Stack<IEntity> stacks = new Stack<IEntity>();
-
-        public IEntity instance => stacks.Pop();
+        [ShowInInspector, LabelText("实体组件")] private Dictionary<IEntity, Components> entities = new();
+        public IEntity instance;
 
         public IComponent FindComponent(IEntity entity, Type type)
         {
@@ -39,11 +34,11 @@ namespace JFramework.Core
 
             if (!components.TryGetValue(type, out var component))
             {
-                stacks.Push(entity);
+                instance = entity;
                 component = (IComponent)CreateInstance(type);
                 ((ScriptableObject)component).name = type.Name;
                 components.Add(type, component);
-                component.OnAwake();
+                component.OnAwake(instance);
             }
 
             return entities[entity][type];

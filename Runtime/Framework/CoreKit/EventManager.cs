@@ -18,31 +18,31 @@ namespace JFramework.Core
 {
     public sealed class EventManager : ScriptableObject
     {
-        [ShowInInspector, LabelText("注册列表")] private readonly Dictionary<Type, IEvent> observers = new Dictionary<Type, IEvent>();
+        [ShowInInspector, LabelText("事件列表")] private Dictionary<Type, IEvent> observers = new();
 
         public void Listen<T>(IEvent<T> obj) where T : struct, IEvent
         {
-            if (!observers.ContainsKey(typeof(T)))
+            if (!observers.TryGetValue(typeof(T), out var observer))
             {
-                observers.Add(typeof(T), new Event<T>());
+                observers.Add(typeof(T), observer = new Event<T>());
             }
 
-            ((Event<T>)observers[typeof(T)]).Listen(obj);
+            ((Event<T>)observer).OnExecute += obj.Execute;
         }
 
         public void Remove<T>(IEvent<T> obj) where T : struct, IEvent
         {
-            if (observers.ContainsKey(typeof(T)))
+            if (observers.TryGetValue(typeof(T), out var observer))
             {
-                ((Event<T>)observers[typeof(T)]).Remove(obj);
+                ((Event<T>)observer).OnExecute -= obj.Execute;
             }
         }
 
         public void Invoke<T>(T obj = default) where T : struct, IEvent
         {
-            if (observers.ContainsKey(typeof(T)))
+            if (observers.TryGetValue(typeof(T), out var observer))
             {
-                ((Event<T>)observers[typeof(T)]).Invoke(obj);
+                ((Event<T>)observer).OnExecute?.Invoke(obj);
             }
         }
 
@@ -51,15 +51,9 @@ namespace JFramework.Core
             observers.Clear();
         }
 
-        private sealed class Event<T> : IEvent where T : struct, IEvent
+        private class Event<T> : IEvent where T : struct, IEvent
         {
-            private event Action<T> OnExecute;
-
-            public void Listen(IEvent<T> obj) => OnExecute += obj.Execute;
-
-            public void Remove(IEvent<T> obj) => OnExecute -= obj.Execute;
-
-            public void Invoke(T message) => OnExecute?.Invoke(message);
+            public Action<T> OnExecute;
         }
     }
 }

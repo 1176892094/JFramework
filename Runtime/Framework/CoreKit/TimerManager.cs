@@ -16,7 +16,7 @@ namespace JFramework.Core
 {
     public sealed class TimerManager : ScriptableObject
     {
-        [SerializeField, LabelText("运行计时器")] private List<Timer> timers = new List<Timer>();
+        [SerializeField, LabelText("运行计时器")] private List<Timer> timers = new();
 
         internal void OnEnable()
         {
@@ -32,15 +32,15 @@ namespace JFramework.Core
             }
         }
 
-        public Timer Pop(float time)
+        public Timer Pop(float interval)
         {
             var timer = StreamPool.Pop<Timer>();
             timers.Add(timer);
-            return timer.Pop(time);
+            return timer.Pop(interval);
         }
 
         public void Push(Timer timer)
-        { ;
+        {
             if (!timers.Remove(timer)) return;
             StreamPool.Push(timer);
             timer.Push();

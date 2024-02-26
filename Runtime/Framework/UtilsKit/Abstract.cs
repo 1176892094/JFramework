@@ -60,7 +60,7 @@ namespace JFramework
 
         public T owner => instance ??= (T)GlobalManager.Entity.instance;
 
-        void IComponent.OnAwake() => instance ??= (T)GlobalManager.Entity.instance;
+        void IComponent.OnAwake(IEntity instance) => this.instance ??= (T)instance;
     }
 
     [Serializable]

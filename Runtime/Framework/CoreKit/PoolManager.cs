@@ -19,11 +19,9 @@ namespace JFramework.Core
 {
     public sealed class PoolManager : ScriptableObject
     {
+        [ShowInInspector, LabelText("对象池组")] private Dictionary<string, GameObject> parents = new();
+        [ShowInInspector, LabelText("对象列表")] private Dictionary<string, IPool<GameObject>> pools = new();
         private Transform poolManager;
-        [ShowInInspector, LabelText("对象池组")] private readonly Dictionary<string, GameObject> parents = new Dictionary<string, GameObject>();
-
-        [ShowInInspector, LabelText("对象列表")]
-        private readonly Dictionary<string, IPool<GameObject>> pools = new Dictionary<string, IPool<GameObject>>();
 
         internal void OnEnable()
         {
@@ -101,6 +99,7 @@ namespace JFramework.Core
 
             pools.Clear();
             parents.Clear();
+            poolManager = null;
         }
     }
 }

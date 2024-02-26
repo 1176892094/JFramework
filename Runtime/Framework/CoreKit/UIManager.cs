@@ -22,9 +22,9 @@ namespace JFramework.Core
 {
     public sealed class UIManager : ScriptableObject
     {
-        [LabelText("界面画布")] public Canvas canvas;
-        [ShowInInspector, LabelText("用户界面")] private readonly Dictionary<Type, IPanel> panels = new Dictionary<Type, IPanel>();
-        [ShowInInspector, LabelText("界面层级")] private readonly Dictionary<UILayer, Transform> layers = new Dictionary<UILayer, Transform>();
+        [ShowInInspector, LabelText("界面画布")] public Canvas canvas;
+        [ShowInInspector, LabelText("用户界面")] private Dictionary<Type, IPanel> panels = new();
+        [ShowInInspector, LabelText("界面层级")] private Dictionary<UILayer, Transform> layers = new();
 
         internal void OnEnable()
         {
@@ -37,7 +37,7 @@ namespace JFramework.Core
             layers[UILayer.Ignore] = canvas.transform.Find("Layer5");
         }
 
-        public void ShowPanel<TPanel>() where TPanel : UIPanel
+        public void Show<TPanel>() where TPanel : UIPanel
         {
             if (panels.TryGetValue(typeof(TPanel), out var panel))
             {
@@ -45,11 +45,11 @@ namespace JFramework.Core
             }
             else
             {
-                LoadPanel<TPanel>();
+                Load<TPanel>();
             }
         }
 
-        public void ShowPanel<TPanel>(Action action) where TPanel : UIPanel
+        public void Show<TPanel>(Action action) where TPanel : UIPanel
         {
             if (panels.TryGetValue(typeof(TPanel), out var panel))
             {
@@ -58,11 +58,11 @@ namespace JFramework.Core
             }
             else
             {
-                LoadPanel<TPanel>(panel => action());
+                Load<TPanel>(panel => action());
             }
         }
 
-        public void ShowPanel<TPanel>(Action<TPanel> action) where TPanel : UIPanel
+        public void Show<TPanel>(Action<TPanel> action) where TPanel : UIPanel
         {
             if (panels.TryGetValue(typeof(TPanel), out var panel))
             {
@@ -71,11 +71,11 @@ namespace JFramework.Core
             }
             else
             {
-                LoadPanel<TPanel>(action);
+                Load<TPanel>(action);
             }
         }
 
-        private async void LoadPanel<TPanel>(Action<TPanel> action = null) where TPanel : UIPanel
+        private async void Load<TPanel>(Action<TPanel> action = null) where TPanel : UIPanel
         {
             if (panels.ContainsKey(typeof(TPanel)))
             {
@@ -89,13 +89,13 @@ namespace JFramework.Core
                 panel = obj.AddComponent<TPanel>();
             }
 
-            panel.transform.SetParent(GetLayer(panel.layer), false);
+            panel.transform.SetParent(layers[panel.layer], false);
             panels.Add(typeof(TPanel), panel);
             panel.Show();
             action?.Invoke(panel);
         }
 
-        public void HidePanel<TPanel>() where TPanel : IPanel
+        public void Hide<TPanel>() where TPanel : IPanel
         {
             if (panels.TryGetValue(typeof(TPanel), out var panel))
             {
@@ -106,11 +106,11 @@ namespace JFramework.Core
             }
         }
 
-        public TPanel GetPanel<TPanel>() where TPanel : IPanel => (TPanel)GetPanel(typeof(TPanel));
+        public TPanel Get<TPanel>() where TPanel : IPanel => (TPanel)panels.GetValueOrDefault(typeof(TPanel));
 
-        public IPanel GetPanel(Type key) => panels.GetValueOrDefault(key);
+        public IPanel Get(Type key) => panels.GetValueOrDefault(key);
 
-        public Transform GetLayer(UILayer type) => layers.GetValueOrDefault(type);
+        public Transform Get(UILayer type) => layers.GetValueOrDefault(type);
 
         public bool IsActive<TPanel>() where TPanel : IPanel
         {
