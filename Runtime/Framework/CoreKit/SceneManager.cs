@@ -21,6 +21,7 @@ namespace JFramework.Core
     public sealed class SceneManager : ScriptableObject
     {
         [ShowInInspector, LabelText("场景对象")] private Dictionary<Type, IEntity> objects = new();
+        [ShowInInspector] public bool isLoading { get; private set; }
 
         public void Register<T>(T entity) where T : IEntity
         {
@@ -41,8 +42,10 @@ namespace JFramework.Core
         {
             try
             {
+                isLoading = true;
                 var operation = await GlobalManager.Asset.LoadSceneAsync(SettingManager.GetScenePath(name));
                 await operation;
+                isLoading = false;
             }
             catch (Exception e)
             {
@@ -54,8 +57,10 @@ namespace JFramework.Core
         {
             try
             {
+                isLoading = true;
                 var operation = await GlobalManager.Asset.LoadSceneAsync(SettingManager.GetScenePath(name));
                 action?.Invoke(operation);
+                isLoading = false;
             }
             catch (Exception e)
             {
@@ -71,6 +76,7 @@ namespace JFramework.Core
         internal void OnDisable()
         {
             objects.Clear();
+            isLoading = false;
         }
     }
 }
