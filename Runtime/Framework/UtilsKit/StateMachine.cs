@@ -72,9 +72,12 @@ namespace JFramework
 
         public void ChangeState<T2>() where T2 : IState
         {
-            state?.OnExit();
-            state = states[typeof(T2)];
-            state?.OnEnter();
+            if (!GlobalManager.Scene.isLoading)
+            {
+                state?.OnExit();
+                state = states[typeof(T2)];
+                state?.OnEnter();
+            }
         }
 
         protected virtual void OnDestroy()
