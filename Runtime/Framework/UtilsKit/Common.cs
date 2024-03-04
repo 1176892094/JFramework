@@ -10,6 +10,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using JFramework.Interface;
 using UnityEngine;
 
@@ -162,6 +163,22 @@ namespace JFramework
             this.items = items;
             content.anchoredPosition = Vector2.zero;
             content.sizeDelta = new Vector2(0, Mathf.CeilToInt((float)items.Count / column) * height + 1);
+        }
+
+        public void Clear()
+        {
+            foreach (var i in grids.Keys)
+            {
+                if (grids.TryGetValue(i, out var grid))
+                {
+                    if (grid != null)
+                    {
+                        GlobalManager.Pool.Push(grid.gameObject);
+                    }
+                }
+            }
+
+            grids.Clear();
         }
 
         public async void OnUpdate()
