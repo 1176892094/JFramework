@@ -151,22 +151,6 @@ namespace JFramework
 
         public void Refresh(List<TItem> items)
         {
-            foreach (var (index, grid) in grids)
-            {
-                grid.Dispose();
-                if (index < items.Count && items[index] != null)
-                {
-                    grid.SetItem(items[index]);
-                }
-            }
-
-            this.items = items;
-            content.anchoredPosition = Vector2.zero;
-            content.sizeDelta = new Vector2(0, Mathf.CeilToInt((float)items.Count / column) * height + 1);
-        }
-
-        public void Clear()
-        {
             foreach (var i in grids.Keys)
             {
                 if (grids.TryGetValue(i, out var grid))
@@ -179,6 +163,9 @@ namespace JFramework
             }
 
             grids.Clear();
+            this.items = items;
+            content.anchoredPosition = Vector2.zero;
+            content.sizeDelta = new Vector2(0, Mathf.CeilToInt((float)items.Count / column) * height + 1);
         }
 
         public async void OnUpdate()
