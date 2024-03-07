@@ -10,7 +10,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using JFramework.Interface;
 using UnityEngine;
 
@@ -50,6 +49,12 @@ namespace JFramework
         public Timer Invoke(Action OnUpdate)
         {
             this.OnUpdate = OnUpdate;
+            return this;
+        }
+        
+        public Timer Invoke(Action<Timer> OnUpdate)
+        {
+            this.OnUpdate = () => OnUpdate(this);
             return this;
         }
 
