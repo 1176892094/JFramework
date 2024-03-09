@@ -111,77 +111,92 @@ namespace JFramework.Core
 
         public async Task<T> Load<T>(string path) where T : Object
         {
+            try
+            {
 #if UNITY_EDITOR
-            if (!SettingManager.Instance.remoteLoad)
-            {
-                return SettingManager.Instance.Load<T>(path);
-            }
-#endif
-            if (!assets.TryGetValue(path, out var assetData))
-            {
-                assetData = new Asset(path);
-                assets.Add(path, assetData);
-            }
-
-            await LoadDependency(assetData.bundle);
-            if (!bundles.TryGetValue(assetData.bundle, out var assetBundle))
-            {
-                assetBundle = await LoadAssetTask(assetData.bundle);
-                if (assetBundle == null)
+                if (!SettingManager.Instance.remoteLoad)
                 {
-                    return null;
+                    return SettingManager.Instance.Load<T>(path);
+                }
+#endif
+                if (!assets.TryGetValue(path, out var assetData))
+                {
+                    assetData = new Asset(path);
+                    assets.Add(path, assetData);
+                }
+
+                await LoadDependency(assetData.bundle);
+                if (!bundles.TryGetValue(assetData.bundle, out var assetBundle))
+                {
+                    assetBundle = await LoadAssetTask(assetData.bundle);
+                    if (assetBundle == null)
+                    {
+                        return null;
+                    }
+                }
+
+                if (typeof(T).IsSubclassOf(typeof(Component)))
+                {
+                    var obj = assetBundle.LoadAssetAsync<GameObject>(assetData.asset);
+                    return ((GameObject)Instantiate(obj.asset)).GetComponent<T>();
+                }
+                else
+                {
+                    var obj = assetBundle.LoadAssetAsync<T>(assetData.asset);
+                    return obj.asset is GameObject ? (T)Instantiate(obj.asset) : (T)obj.asset;
                 }
             }
-
-            if (typeof(T).IsSubclassOf(typeof(Component)))
+            catch (Exception e)
             {
-                var obj = assetBundle.LoadAssetAsync<GameObject>(assetData.asset);
-                return ((GameObject)Instantiate(obj.asset)).GetComponent<T>();
-            }
-            else
-            {
-                var obj = assetBundle.LoadAssetAsync<T>(assetData.asset);
-                return obj.asset is GameObject ? (T)Instantiate(obj.asset) : (T)obj.asset;
+                Debug.LogWarning(e);
+                return null;
             }
         }
 
         public async void LoadAsync<T>(string path, Action<T> action = null) where T : Object
         {
+            try
+            {
 #if UNITY_EDITOR
-            if (!SettingManager.Instance.remoteLoad)
-            {
-                var asset = SettingManager.Instance.Load<T>(path);
-                action?.Invoke(asset);
-                return;
-            }
-#endif
-            if (!assets.TryGetValue(path, out var assetData))
-            {
-                assetData = new Asset(path);
-                assets.Add(path, assetData);
-            }
-
-            await LoadDependency(assetData.bundle);
-            if (!bundles.TryGetValue(assetData.bundle, out var assetBundle))
-            {
-                assetBundle = await LoadAssetTask(assetData.bundle);
-                if (assetBundle == null)
+                if (!SettingManager.Instance.remoteLoad)
                 {
+                    var asset = SettingManager.Instance.Load<T>(path);
+                    action?.Invoke(asset);
                     return;
                 }
-            }
+#endif
+                if (!assets.TryGetValue(path, out var assetData))
+                {
+                    assetData = new Asset(path);
+                    assets.Add(path, assetData);
+                }
 
-            if (typeof(T).IsSubclassOf(typeof(Component)))
-            {
-                var obj = assetBundle.LoadAssetAsync<GameObject>(assetData.asset);
-                var asset = ((GameObject)Instantiate(obj.asset)).GetComponent<T>();
-                action?.Invoke(asset);
+                await LoadDependency(assetData.bundle);
+                if (!bundles.TryGetValue(assetData.bundle, out var assetBundle))
+                {
+                    assetBundle = await LoadAssetTask(assetData.bundle);
+                    if (assetBundle == null)
+                    {
+                        return;
+                    }
+                }
+
+                if (typeof(T).IsSubclassOf(typeof(Component)))
+                {
+                    var obj = assetBundle.LoadAssetAsync<GameObject>(assetData.asset);
+                    var asset = ((GameObject)Instantiate(obj.asset)).GetComponent<T>();
+                    action?.Invoke(asset);
+                }
+                else
+                {
+                    var obj = assetBundle.LoadAssetAsync<T>(assetData.asset);
+                    var asset = obj.asset is GameObject ? (T)Instantiate(obj.asset) : (T)obj.asset;
+                    action?.Invoke(asset);
+                }
             }
-            else
+            catch (Exception e)
             {
-                var obj = assetBundle.LoadAssetAsync<T>(assetData.asset);
-                var asset = obj.asset is GameObject ? (T)Instantiate(obj.asset) : (T)obj.asset;
-                action?.Invoke(asset);
+                Debug.LogWarning(e);
             }
         }
 
