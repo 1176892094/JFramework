@@ -17,10 +17,10 @@ namespace JFramework.Core
 {
     public sealed class AudioManager : ScriptableObject
     {
-        [SerializeField, LabelText("完成列表")] private List<AudioSource> stops = new();
-        [SerializeField, LabelText("播放列表")] private List<AudioSource> plays = new();
-        [SerializeField, Range(0, 1f)] private float audioVolume = 0.5f;
-        [SerializeField, Range(0, 1f)] private float soundVolume = 0.5f;
+        [ShowInInspector, LabelText("完成列表")] private List<AudioSource> stops = new();
+        [ShowInInspector, LabelText("播放列表")] private List<AudioSource> plays = new();
+        [SerializeField, Range(0, 1f)] public float audioVolume = 0.5f;
+        [SerializeField, Range(0, 1f)] public float soundVolume = 0.5f;
         private GameObject poolManager;
         private AudioSource audioSource;
 
