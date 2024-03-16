@@ -80,6 +80,11 @@ namespace JFramework
             return (T)GlobalManager.Entity.FindComponent(entity, typeof(T));
         }
 
+        public static IComponent FindComponent(this IEntity entity, Type type)
+        {
+            return GlobalManager.Entity.FindComponent(entity, type);
+        }
+
         public static void Destroy(this IEntity entity)
         {
             if (!GlobalManager.Instance) return;
@@ -175,7 +180,7 @@ namespace JFramework
 
             return null;
         }
-        
+
         private static void SetComponent(this IEntity inject, FieldInfo field, string name)
         {
             var child = inject.transform.GetChild(name);
