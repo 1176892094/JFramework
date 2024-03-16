@@ -66,26 +66,18 @@ namespace JFramework
     [Serializable]
     public abstract class AttributeComponent<T1, T2> : Component<T1> where T1 : IEntity where T2 : Enum
     {
-        private readonly Dictionary<T2, IVariable> attributes = new Dictionary<T2, IVariable>();
+        private readonly Dictionary<T2, float> attributes = new Dictionary<T2, float>();
 
-        public T Get<T>(T2 key) where T : struct
+        public float Get(T2 key)
         {
-            if (!attributes.ContainsKey(key))
-            {
-                attributes.Add(key, new Variable<T>());
-            }
-
-            return ((Variable<T>)attributes[key]).value;
+            attributes.TryAdd(key, 0);
+            return attributes[key];
         }
 
-        public void Set<T>(T2 key, T value) where T : struct
+        public void Set(T2 key, float value)
         {
-            if (!attributes.ContainsKey(key))
-            {
-                attributes.Add(key, new Variable<T>());
-            }
-
-            ((Variable<T>)attributes[key]).value = value;
+            attributes.TryAdd(key, 0);
+            attributes[key]= value;
         }
 
         protected virtual void OnDestroy()
