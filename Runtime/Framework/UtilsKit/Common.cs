@@ -43,18 +43,31 @@ namespace JFramework
         [SerializeField] private int count;
         [SerializeField] private float interval;
         [SerializeField] private float duration;
-        private event Action OnUpdate;
+        private event Action callback;
+        private event Func<bool> condition;
         private float seconds => unscale ? Time.unscaledTime : Time.time;
 
-        public Timer Invoke(Action OnUpdate)
+        public Timer Invoke(Action callback)
         {
-            this.OnUpdate = OnUpdate;
+            this.callback = callback;
             return this;
         }
-        
-        public Timer Invoke(Action<Timer> OnUpdate)
+
+        public Timer Invoke(Action<Timer> callback)
         {
-            this.OnUpdate = () => OnUpdate(this);
+            this.callback = () => callback(this);
+            return this;
+        }
+
+        public Timer When(Func<bool> condition)
+        {
+            this.condition = condition;
+            return this;
+        }
+
+        public Timer When(Func<Timer, bool> condition)
+        {
+            this.condition = () => condition(this);
             return this;
         }
 
@@ -104,11 +117,25 @@ namespace JFramework
             duration = seconds + interval;
             try
             {
-                count--;
-                OnUpdate?.Invoke();
-                if (count == 0)
+                if (condition != null)
                 {
-                    GlobalManager.Time.Push(this);
+                    if (condition())
+                    {
+                        callback?.Invoke();
+                    }
+                    else
+                    {
+                        GlobalManager.Time.Push(this);
+                    }
+                }
+                else
+                {
+                    count--;
+                    callback?.Invoke();
+                    if (count == 0)
+                    {
+                        GlobalManager.Time.Push(this);
+                    }
                 }
             }
             catch (Exception e)
@@ -122,7 +149,8 @@ namespace JFramework
         {
             running = false;
             unscale = false;
-            OnUpdate = null;
+            callback = null;
+            condition = null;
         }
     }
 
