@@ -1,10 +1,10 @@
 // *********************************************************************************
 // # Project: JFramework
 // # Unity: 2022.3.5f1c1
-// # Author: Charlotte
+// # Author: jinyijie
 // # Version: 1.0.0
-// # History: 2023-10-23  23:19
-// # Copyright: 2023, Charlotte
+// # History: 2024-4-4  18:2
+// # Copyright: 2024, jinyijie
 // # Description: This is an automatically generated comment.
 // *********************************************************************************
 
@@ -19,36 +19,26 @@ namespace JFramework
 {
     public static partial class Extensions
     {
-        // public static void Input(this string reason, out Secret<int> result)
-        // {
-        //     result = int.Parse(reason);
-        // }
-        //
-        // public static void Input(this string reason, out Secret<long> result)
-        // {
-        //     result = long.Parse(reason);
-        // }
-        //
-        // public static void Input(this string reason, out Secret<bool> result)
-        // {
-        //     result = bool.Parse(reason);
-        // }
-        //
-        // public static void Input(this string reason, out Secret<float> result)
-        // {
-        //     result = float.Parse(reason);
-        // }
-        //
-        // public static void Input(this string reason, out Secret<double> result)
-        // {
-        //     result = double.Parse(reason);
-        // }
-        //
-        // public static void Input(this string reason, out Secret<string> result)
-        // {
-        //     result = reason ?? string.Empty;
-        // }
-        
+        public static void Input(this string reason, out SecretInt result)
+        {
+            result = int.Parse(reason);
+        }
+
+        public static void Input(this string reason, out SecretBool result)
+        {
+            result = bool.Parse(reason);
+        }
+
+        public static void Input(this string reason, out SecretFloat result)
+        {
+            result = float.Parse(reason);
+        }
+
+        public static void Input(this string reason, out SecretString result)
+        {
+            result = reason ?? string.Empty;
+        }
+
         public static void Input(this string reason, out string result)
         {
             result = reason ?? string.Empty;
@@ -128,6 +118,42 @@ namespace JFramework
 
     public static partial class Extensions
     {
+        public static void Input(this string reason, out SecretInt[] result)
+        {
+            var content = reason.Content(out result);
+            for (int i = 0; i < content.Length; ++i)
+            {
+                content[i].Input(out result[i]);
+            }
+        }
+
+        public static void Input(this string reason, out SecretBool[] result)
+        {
+            var content = reason.Content(out result);
+            for (int i = 0; i < content.Length; ++i)
+            {
+                content[i].Input(out result[i]);
+            }
+        }
+
+        public static void Input(this string reason, out SecretFloat[] result)
+        {
+            var content = reason.Content(out result);
+            for (int i = 0; i < content.Length; ++i)
+            {
+                content[i].Input(out result[i]);
+            }
+        }
+
+        public static void Input(this string reason, out SecretString[] result)
+        {
+            var content = reason.Content(out result);
+            for (int i = 0; i < content.Length; ++i)
+            {
+                content[i].Input(out result[i]);
+            }
+        }
+        
         public static void Input(this string reason, out string[] result)
         {
             var content = reason.Content(out result);
