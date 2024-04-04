@@ -1,0 +1,16 @@
+{
+    "name": "JFramework.Anti",
+    "rootNamespace": "",
+    "references": [
+        "GUID:d8ce6126430ed467f929d29db18099c7"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

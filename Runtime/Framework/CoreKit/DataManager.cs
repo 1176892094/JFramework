@@ -32,7 +32,7 @@ namespace JFramework.Core
 
         public async Task LoadDataTable()
         {
-            var assembly = Reflection.GetAssembly("HotUpdate");
+            var assembly = Reflection.GetAssembly("HotUpdate.Data");
             if (assembly == null)
             {
                 assembly = Reflection.GetAssembly("Assembly-CSharp");
