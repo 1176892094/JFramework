@@ -10,9 +10,6 @@
 
 using System;
 using System.Text;
-#if UNITY_EDITOR
-using UnityEditor;
-#endif
 using UnityEngine;
 
 namespace JFramework
@@ -60,7 +57,6 @@ namespace JFramework
             return target;
         }
 
-#if UNITY_EDITOR
         public static bool Input(this string reason, out string result)
         {
             result = reason ?? string.Empty;
@@ -105,11 +101,13 @@ namespace JFramework
             return true;
         }
 
+#if UNITY_EDITOR
         public static bool Input(this string reason, out Sprite result)
         {
-            result = AssetDatabase.LoadAssetAtPath<Sprite>(reason);
+            result = UnityEditor.AssetDatabase.LoadAssetAtPath<Sprite>(reason);
             return true;
         }
+#endif
 
         public static bool Input<T>(this string reason, out T result) where T : struct
         {
@@ -207,6 +205,7 @@ namespace JFramework
             return true;
         }
 
+#if UNITY_EDITOR
         public static bool Input(this string reason, out Sprite[] result)
         {
             var content = reason.Content(out result);
@@ -217,6 +216,7 @@ namespace JFramework
 
             return true;
         }
+#endif
 
         public static bool Input<T>(this string reason, out T[] result) where T : struct
         {
@@ -246,6 +246,5 @@ namespace JFramework
 
             return new string[0];
         }
-#endif
     }
 }
