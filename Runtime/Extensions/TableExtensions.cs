@@ -8,10 +8,11 @@
 // # Description: This is an automatically generated comment.
 // *********************************************************************************
 
-#if UNITY_EDITOR
 using System;
 using System.Text;
+#if UNITY_EDITOR
 using UnityEditor;
+#endif
 using UnityEngine;
 
 namespace JFramework
@@ -59,6 +60,7 @@ namespace JFramework
             return target;
         }
 
+#if UNITY_EDITOR
         public static bool Input(this string reason, out string result)
         {
             result = reason ?? string.Empty;
@@ -244,6 +246,6 @@ namespace JFramework
 
             return new string[0];
         }
+#endif
     }
 }
-#endif
