@@ -9,6 +9,7 @@
 // *********************************************************************************
 
 using System;
+using UnityEngine;
 using Random = System.Random;
 
 namespace JFramework
@@ -20,30 +21,14 @@ namespace JFramework
 
         public static int Random(int min, int max)
         {
-            return random.Next(min, max);
+            return random.Next(0, max < 0 ? 1024 : max);
         }
 
         public static void AntiCheat()
         {
-            OnAntiCheat?.Invoke();
-        }
-
-        public static bool IsEquals(byte[] origin, byte[] target)
-        {
-            if (origin == null || target == null || origin.Length != target.Length)
-            {
-                return false;
-            }
-
-            for (int i = 0; i < origin.Length; i++)
-            {
-                if (origin[i] != target[i])
-                {
-                    return false;
-                }
-            }
-
-            return true;
+            Debug.LogWarning("检查到作弊！");
+            // OnAntiCheat?.Invoke();
+            // Application.Quit();
         }
     }
 }

@@ -48,24 +48,24 @@ namespace JFramework.Core
                     var table = (IDataTable)obj;
                     if (type.FullName == null) return;
                     var data = assembly.GetType(type.FullName[..^5]);
-                    var field = Reflection.GetField<KeyAttribute>(data);
-                    if (field == null)
+                    var property = Reflection.GetProperty<KeyAttribute>(data);
+                    if (property == null)
                     {
                         Debug.LogWarning($"{data.Name.Red()} 缺少主键。");
                         return;
                     }
 
-                    if (field.FieldType.IsEnum)
+                    if (property.PropertyType.IsEnum)
                     {
-                        enumData.Add(data, Add<Enum>(field, table));
+                        enumData.Add(data, Add<Enum>(property, table));
                     }
-                    else if (field.FieldType == typeof(int))
+                    else if (property.PropertyType == typeof(int))
                     {
-                        intData.Add(data, Add<int>(field, table));
+                        intData.Add(data, Add<int>(property, table));
                     }
-                    else if (field.FieldType == typeof(string))
+                    else if (property.PropertyType == typeof(string))
                     {
-                        stringData.Add(data, Add<string>(field, table));
+                        stringData.Add(data, Add<string>(property, table));
                     }
                 }
                 catch (Exception e)
@@ -75,13 +75,13 @@ namespace JFramework.Core
             }
         }
 
-        private static Dictionary<T, IData> Add<T>(FieldInfo field, IDataTable table)
+        private static Dictionary<T, IData> Add<T>(PropertyInfo property, IDataTable table)
         {
             var dataList = new Dictionary<T, IData>();
             for (int i = 0; i < table.Count; i++)
             {
                 var data = table.GetData(i);
-                var key = (T)field.GetValue(data);
+                var key = (T)property.GetValue(data);
                 if (!dataList.TryAdd(key, data))
                 {
                     Debug.LogWarning($"{table.GetType().Name.Orange()} 键值重复。 键值：{key.ToString().Red()}");

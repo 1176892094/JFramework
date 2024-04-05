@@ -10,7 +10,9 @@
 
 using System;
 using JFramework.Interface;
+using Sirenix.OdinInspector;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 
 namespace JFramework
@@ -18,74 +20,55 @@ namespace JFramework
     [Serializable]
     public struct SecretFloat : IVariable
     {
-        public byte offset;
-        public byte[] origin;
-        public byte[] buffer;
-
-        private bool Empty => origin == null || origin.Length == 0;
-
-        private float Value
+        public float origin;
+        public float buffer;
+        public int offset;
+        
+        public float Value
         {
             get
             {
-                var target = new byte[buffer.Length];
-                Buffer.BlockCopy(buffer, 0, target, 0, target.Length);
-                for (var i = 0; i < target.Length; i++)
+                if (offset == 0)
                 {
-                    target[i] = (byte)(target[i] - offset);
+                    this = new SecretFloat(0);
                 }
 
-                if (!Secret.IsEquals(origin, target))
+                var target = buffer - offset;
+                if (Math.Abs(origin - target) > 0.01f)
                 {
                     Secret.AntiCheat();
-                    return default;
                 }
 
-                return BitConverter.ToSingle(target);
+                return target;
             }
             set
             {
-                origin = BitConverter.GetBytes(value);
-                buffer = new byte[origin.Length];
-                offset = (byte)Secret.Random(0, byte.MaxValue);
-                Buffer.BlockCopy(origin, 0, buffer, 0, origin.Length);
-                for (var i = 0; i < buffer.Length; i++)
+                origin = value;
+                unchecked
                 {
-                    buffer[i] = (byte)(buffer[i] + offset);
+                    offset = Random.Range(1, short.MaxValue - (int)value);
+                    buffer = value + offset;
+                    Debug.LogWarning(value + " " + buffer + "  " + offset);
                 }
             }
         }
 
         public SecretFloat(float value)
         {
-            origin = BitConverter.GetBytes(value);
-            buffer = new byte[origin.Length];
-            offset = (byte)Secret.Random(0, byte.MaxValue);
-            Buffer.BlockCopy(origin, 0, buffer, 0, origin.Length);
-            for (var i = 0; i < buffer.Length; i++)
-            {
-                buffer[i] = (byte)(buffer[i] + offset);
-            }
+            origin = 0;
+            offset = 0;
+            buffer = 0;
+            Value = value;
         }
 
         public static implicit operator float(SecretFloat secret)
         {
-            if (secret.Empty)
-            {
-                secret = new SecretFloat(default);
-            }
-
             return secret.Value;
         }
 
         public static implicit operator SecretFloat(float value)
         {
             return new SecretFloat(value);
-        }
-
-        public static implicit operator string(SecretFloat secret)
-        {
-            return secret.Value.ToString("F");
         }
 
         public override string ToString()

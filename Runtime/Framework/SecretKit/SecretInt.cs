@@ -10,69 +10,57 @@
 
 using System;
 using JFramework.Interface;
+using Sirenix.OdinInspector;
+using UnityEngine;
+using Random = UnityEngine.Random;
 
 namespace JFramework
 {
     [Serializable]
     public struct SecretInt : IVariable
     {
-        public byte offset;
-        public byte[] origin;
-        public byte[] buffer;
+        public int origin;
+        public int buffer;
+        public int offset;
 
-        private bool Empty => origin == null || origin.Length == 0;
-
-        private int Value
+        public int Value
         {
             get
             {
-                var target = new byte[buffer.Length];
-                Buffer.BlockCopy(buffer, 0, target, 0, target.Length);
-                for (var i = 0; i < target.Length; i++)
+                if (offset == 0)
                 {
-                    target[i] = (byte)(target[i] - offset);
+                    this = new SecretInt(0);
                 }
 
-                if (!Secret.IsEquals(origin, target))
+                var target = buffer - offset;
+                if (!origin.Equals(target))
                 {
                     Secret.AntiCheat();
-                    return default;
                 }
 
-                return BitConverter.ToInt32(target);
+                return target;
             }
             set
             {
-                origin = BitConverter.GetBytes(value);
-                buffer = new byte[origin.Length];
-                offset = (byte)Secret.Random(0, byte.MaxValue);
-                Buffer.BlockCopy(origin, 0, buffer, 0, origin.Length);
-                for (var i = 0; i < buffer.Length; i++)
+                origin = value;
+                unchecked
                 {
-                    buffer[i] = (byte)(buffer[i] + offset);
+                    offset = Random.Range(1, int.MaxValue - value);
+                    buffer = value + offset;
                 }
             }
         }
 
         public SecretInt(int value)
         {
-            origin = BitConverter.GetBytes(value);
-            buffer = new byte[origin.Length];
-            offset = (byte)Secret.Random(0, byte.MaxValue);
-            Buffer.BlockCopy(origin, 0, buffer, 0, origin.Length);
-            for (var i = 0; i < buffer.Length; i++)
-            {
-                buffer[i] = (byte)(buffer[i] + offset);
-            }
+            origin = 0;
+            offset = 0;
+            buffer = 0;
+            Value = value;
         }
 
         public static implicit operator int(SecretInt secret)
         {
-            if (secret.Empty)
-            {
-                secret = new SecretInt(default);
-            }
-
             return secret.Value;
         }
 
@@ -81,9 +69,14 @@ namespace JFramework
             return new SecretInt(value);
         }
 
-        public static implicit operator string(SecretInt secret)
+        public static implicit operator bool(SecretInt secret)
         {
-            return secret.Value.ToString();
+            return secret.Value != 0;
+        }
+
+        public static implicit operator SecretInt(bool secret)
+        {
+            return new SecretInt(1);
         }
 
         public override string ToString()

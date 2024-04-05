@@ -31,10 +31,10 @@ namespace JFramework
             return Array.FindAll(types, type => typeof(T).IsAssignableFrom(type));
         }
 
-        public static FieldInfo GetField<T>(Type type) where T : Attribute
+        public static PropertyInfo GetProperty<T>(Type type) where T : Attribute
         {
-            var fields = type.GetFields(Instance);
-            return fields.FirstOrDefault(field => field.GetCustomAttributes(typeof(T), false).Length > 0);
+            var properties = type.GetProperties(Instance);
+            return properties.FirstOrDefault(field => field.GetCustomAttributes(typeof(T), false).Length > 0);
         }
     }
 }

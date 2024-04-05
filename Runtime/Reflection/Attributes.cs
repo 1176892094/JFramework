@@ -13,7 +13,7 @@ using UnityEngine;
 
 namespace JFramework
 {
-    [AttributeUsage(AttributeTargets.Field)]
+    [AttributeUsage(AttributeTargets.Property)]
     public class KeyAttribute : Attribute
     {
     }

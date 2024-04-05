@@ -9,8 +9,10 @@
 // *********************************************************************************
 
 using System;
-using System.Text;
 using JFramework.Interface;
+using Sirenix.OdinInspector;
+using UnityEngine;
+using Random = UnityEngine.Random;
 
 
 namespace JFramework
@@ -18,63 +20,47 @@ namespace JFramework
     [Serializable]
     public struct SecretString : IVariable
     {
-        public byte offset;
-        public byte[] origin;
-        public byte[] buffer;
-
-        private bool Empty => origin == null || origin.Length == 0;
-
-        private string Value
+        public string origin;
+        public string buffer;
+        public int offset;
+        
+        public string Value
         {
             get
             {
-                var target = new byte[buffer.Length];
-                Buffer.BlockCopy(buffer, 0, target, 0, target.Length);
-                for (var i = 0; i < target.Length; i++)
+                if (origin.IsEmpty())
                 {
-                    target[i] = (byte)(target[i] - offset);
+                    return "";
                 }
-
-                if (!Secret.IsEquals(origin, target))
+                var target = buffer.Remove(offset, 1);
+                if (!origin.Equals(target))
                 {
                     Secret.AntiCheat();
-                    return default;
                 }
 
-                return Encoding.UTF8.GetString(target);
+                return target;
             }
             set
             {
-                origin = Encoding.UTF8.GetBytes(value);
-                buffer = new byte[origin.Length];
-                offset = (byte)Secret.Random(0, byte.MaxValue);
-                Buffer.BlockCopy(origin, 0, buffer, 0, origin.Length);
-                for (var i = 0; i < buffer.Length; i++)
+                origin = value;
+                unchecked
                 {
-                    buffer[i] = (byte)(buffer[i] + offset);
+                    offset = Random.Range(0, value.Length);
+                    buffer = value.Insert(offset, "A");
                 }
             }
         }
 
         public SecretString(string value)
         {
-            origin = Encoding.UTF8.GetBytes(value);
-            buffer = new byte[origin.Length];
-            offset = (byte)Secret.Random(0, byte.MaxValue);
-            Buffer.BlockCopy(origin, 0, buffer, 0, origin.Length);
-            for (var i = 0; i < buffer.Length; i++)
-            {
-                buffer[i] = (byte)(buffer[i] + offset);
-            }
+            origin = "";
+            offset = 0;
+            buffer = "";
+            Value = value;
         }
 
         public static implicit operator string(SecretString secret)
         {
-            if (secret.Empty)
-            {
-                secret = new SecretString("");
-            }
-
             return secret.Value;
         }
 
