@@ -10,7 +10,6 @@
 
 using System;
 using JFramework.Interface;
-using UnityEngine;
 using Random = UnityEngine.Random;
 
 
@@ -47,7 +46,6 @@ namespace JFramework
                 {
                     offset = Random.Range(1, short.MaxValue - (int)value);
                     buffer = value + offset;
-                    Debug.LogWarning(value + " " + buffer + "  " + offset);
                 }
             }
         }

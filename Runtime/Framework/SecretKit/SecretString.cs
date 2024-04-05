@@ -21,15 +21,16 @@ namespace JFramework
         public string origin;
         public string buffer;
         public int offset;
-        
+
         public string Value
         {
             get
             {
                 if (origin.IsEmpty())
                 {
-                    return "";
+                    this = new SecretString("");
                 }
+
                 var target = buffer.Remove(offset, 4);
                 if (!origin.Equals(target))
                 {
