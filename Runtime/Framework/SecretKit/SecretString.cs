@@ -10,8 +10,6 @@
 
 using System;
 using JFramework.Interface;
-using Sirenix.OdinInspector;
-using UnityEngine;
 using Random = UnityEngine.Random;
 
 
@@ -32,7 +30,7 @@ namespace JFramework
                 {
                     return "";
                 }
-                var target = buffer.Remove(offset, 1);
+                var target = buffer.Remove(offset, 4);
                 if (!origin.Equals(target))
                 {
                     Secret.AntiCheat();
@@ -46,7 +44,7 @@ namespace JFramework
                 unchecked
                 {
                     offset = Random.Range(0, value.Length);
-                    buffer = value.Insert(offset, "A");
+                    buffer = value.Insert(offset, "作弊检测");
                 }
             }
         }
@@ -54,8 +52,8 @@ namespace JFramework
         public SecretString(string value)
         {
             origin = "";
-            offset = 0;
             buffer = "";
+            offset = 0;
             Value = value;
         }
 

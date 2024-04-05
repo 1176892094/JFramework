@@ -10,8 +10,6 @@
 
 using System;
 using JFramework.Interface;
-using Sirenix.OdinInspector;
-using UnityEngine;
 using Random = UnityEngine.Random;
 
 namespace JFramework
@@ -54,8 +52,8 @@ namespace JFramework
         public SecretInt(int value)
         {
             origin = 0;
-            offset = 0;
             buffer = 0;
+            offset = 0;
             Value = value;
         }
 

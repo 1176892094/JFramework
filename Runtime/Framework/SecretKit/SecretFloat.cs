@@ -10,7 +10,6 @@
 
 using System;
 using JFramework.Interface;
-using Sirenix.OdinInspector;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
@@ -34,7 +33,7 @@ namespace JFramework
                 }
 
                 var target = buffer - offset;
-                if (Math.Abs(origin - target) > 0.01f)
+                if (Math.Abs(origin - target) > 0.1f)
                 {
                     Secret.AntiCheat();
                 }
@@ -56,8 +55,8 @@ namespace JFramework
         public SecretFloat(float value)
         {
             origin = 0;
-            offset = 0;
             buffer = 0;
+            offset = 0;
             Value = value;
         }
 
