@@ -15,7 +15,7 @@ namespace JFramework
 {
     public static class Secret
     {
-        private static event Action OnAntiCheat;
+        public static event Action OnAntiCheat;
 
         public static void AntiCheat()
         {
