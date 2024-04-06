@@ -74,7 +74,7 @@ namespace JFramework
 
         public static implicit operator SecretInt(bool secret)
         {
-            return new SecretInt(1);
+            return new SecretInt(secret ? 1 : 0);
         }
 
         public override string ToString()
