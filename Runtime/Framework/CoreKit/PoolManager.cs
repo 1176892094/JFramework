@@ -12,25 +12,25 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using JFramework.Interface;
-using Sirenix.OdinInspector;
 using UnityEngine;
+using Object = UnityEngine.Object;
 
 namespace JFramework.Core
 {
-    public sealed class PoolManager : ScriptableObject
+    public static class PoolManager
     {
-        [ShowInInspector, LabelText("对象池组")] private Dictionary<string, GameObject> parents = new();
-        [ShowInInspector, LabelText("对象列表")] private Dictionary<string, IPool<GameObject>> pools = new();
-        private Transform poolManager;
+        private static readonly Dictionary<string, GameObject> parents = new();
+        internal static readonly Dictionary<string, IPool<GameObject>> pools = new();
+        private static Transform poolManager;
 
-        internal void OnEnable()
+        internal static void Register()
         {
-            if (!GlobalManager.Instance) return;
             poolManager = GlobalManager.Instance.transform.Find("PoolManager");
         }
 
-        public async Task<GameObject> Pop(string path)
+        public static async Task<GameObject> Pop(string path)
         {
+            if (!GlobalManager.Instance) return null;
             if (pools.TryGetValue(path, out var pool) && pool.count > 0)
             {
                 var obj = pool.Pop();
@@ -42,14 +42,15 @@ namespace JFramework.Core
                 }
             }
 
-            var o = await GlobalManager.Asset.Load<GameObject>(path);
-            DontDestroyOnLoad(o);
+            var o = await AssetManager.Load<GameObject>(path);
+            Object.DontDestroyOnLoad(o);
             o.name = path;
             return o;
         }
 
-        public async void Pop(string path, Action<GameObject> action)
+        public static async void Pop(string path, Action<GameObject> action)
         {
+            if (!GlobalManager.Instance) return;
             if (pools.TryGetValue(path, out var pool) && pool.count > 0)
             {
                 var obj = pool.Pop();
@@ -62,14 +63,15 @@ namespace JFramework.Core
                 }
             }
 
-            var o = await GlobalManager.Asset.Load<GameObject>(path);
-            DontDestroyOnLoad(o);
+            var o = await AssetManager.Load<GameObject>(path);
+            Object.DontDestroyOnLoad(o);
             o.name = path;
             action?.Invoke(o);
         }
 
-        public void Push(GameObject obj)
+        public static void Push(GameObject obj)
         {
+            if (!GlobalManager.Instance) return;
             if (obj == null) return;
             if (!parents.TryGetValue(obj.name, out var parent))
             {
@@ -90,7 +92,7 @@ namespace JFramework.Core
             }
         }
 
-        internal void OnDisable()
+        internal static void UnRegister()
         {
             foreach (var pool in pools.Values)
             {

@@ -13,133 +13,80 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
-using Sirenix.OdinInspector;
 using UnityEngine;
-using Object = UnityEngine.Object;
 
 namespace JFramework.Core
 {
-    public sealed class JsonManager : ScriptableObject
+    public static class JsonManager
     {
-        [ShowInInspector, LabelText("加密密钥")] private Dictionary<string, Json> secrets = new();
+        private static Dictionary<string, Json> secrets = new();
 
-        internal void OnEnable()
+        internal static void Register()
         {
-            secrets = Load<List<Json>>(nameof(JsonManager)).ToDictionary(json => json.name);
+            var copies = new List<Json>();
+            Load(copies, nameof(JsonManager));
+            secrets = copies.ToDictionary(json => json.name);
         }
 
-        public void Save<T>(T obj, string name) where T : new()
+        public static T Reader<T>(string json)
         {
+            return JsonUtility.FromJson<JsonMapper<T>>(json).value;
+        }
+
+        public static string Writer<T>(T obj, bool isPretty = false)
+        {
+            return JsonUtility.ToJson(new JsonMapper<T>(obj), isPretty);
+        }
+
+        public static void Save<T>(T obj, string name)
+        {
+            if (!GlobalManager.Instance) return;
             var filePath = FilePath(name);
-            var saveJson = JsonUtility.ToJson(new Variable<T>(obj));
+            object jsonData = obj is ScriptableObject ? obj : new JsonMapper<T>(obj);
+            var saveJson = JsonUtility.ToJson(jsonData);
             File.WriteAllText(filePath, saveJson);
         }
 
-        public T Load<T>(string name) where T : new()
+        public static void Load<T>(T obj, string name)
         {
+            if (!GlobalManager.Instance) return;
             var filePath = FilePath(name);
             if (!File.Exists(filePath))
             {
-                Save(new T(), name);
-            }
-
-            var saveJson = File.ReadAllText(filePath);
-            var jsonData = JsonUtility.FromJson<Variable<T>>(saveJson).value;
-            return !string.IsNullOrEmpty(saveJson) ? jsonData : new T();
-        }
-
-        public void Encrypt<T>(T obj, string name) where T : new()
-        {
-            var filePath = FilePath(name);
-            var saveJson = Encrypt(JsonUtility.ToJson(new Variable<T>(obj)), name);
-            File.WriteAllBytes(filePath, saveJson);
-        }
-
-        public T Decrypt<T>(string name) where T : new()
-        {
-            var filePath = FilePath(name);
-            if (!File.Exists(filePath))
-            {
-                Encrypt(new T(), name);
-            }
-
-            if (!secrets.ContainsKey(name))
-            {
-                secrets[name] = new Json(name);
-                Save(secrets.Values.ToList(), nameof(JsonManager));
-                return new T();
-            }
-
-            try
-            {
-                var saveJson = Decrypt(File.ReadAllBytes(filePath), name);
-                var jsonData = JsonUtility.FromJson<Variable<T>>(saveJson).value;
-                return !string.IsNullOrEmpty(saveJson) ? jsonData : new T();
-            }
-            catch (Exception)
-            {
-                secrets[name] = new Json(name);
-                Save(secrets.Values.ToList(), nameof(JsonManager));
-                return new T();
-            }
-        }
-
-        public void Save(ScriptableObject obj)
-        {
-            var filePath = FilePath(obj);
-            var saveJson = JsonUtility.ToJson(obj);
-            File.WriteAllText(filePath, saveJson);
-        }
-
-        public void Load(ScriptableObject obj)
-        {
-            var filePath = FilePath(obj);
-            if (!File.Exists(filePath))
-            {
-                Save(obj);
+                Save(obj, name);
             }
 
             var saveJson = File.ReadAllText(filePath);
             if (string.IsNullOrEmpty(saveJson)) return;
-            JsonUtility.FromJsonOverwrite(saveJson, obj);
+            object jsonData = obj is ScriptableObject ? obj : new JsonMapper<T>(obj);
+            JsonUtility.FromJsonOverwrite(saveJson, jsonData);
         }
 
-        public void Encrypt(ScriptableObject obj)
+        public static void Encrypt<T>(T obj, string name)
         {
-            var filePath = FilePath(obj);
-            var saveJson = Encrypt(JsonUtility.ToJson(obj), obj.name);
+            if (!GlobalManager.Instance) return;
+            var filePath = FilePath(name);
+            object jsonData = obj is ScriptableObject ? obj : new JsonMapper<T>(obj);
+            var saveJson = Encrypt(JsonUtility.ToJson(jsonData), name);
             File.WriteAllBytes(filePath, saveJson);
         }
 
-        public void Decrypt(ScriptableObject obj)
+        public static void Decrypt<T>(T obj, string name)
         {
-            var filePath = FilePath(obj);
+            if (!GlobalManager.Instance) return;
+            var filePath = FilePath(name);
             if (!File.Exists(filePath))
             {
-                Encrypt(obj);
+                Encrypt(obj, name);
             }
 
-            if (!secrets.ContainsKey(obj.name))
-            {
-                secrets[obj.name] = new Json(obj.name);
-                Save(secrets.Values.ToList(), nameof(JsonManager));
-                return;
-            }
-
-            try
-            {
-                var saveJson = Decrypt(File.ReadAllBytes(filePath), obj.name);
-                if (string.IsNullOrEmpty(saveJson)) return;
-                JsonUtility.FromJsonOverwrite(saveJson, obj);
-            }
-            catch (Exception)
-            {
-                secrets[obj.name] = new Json(obj.name);
-                Save(secrets.Values.ToList(), nameof(JsonManager));
-            }
+            var saveJson = Decrypt(File.ReadAllBytes(filePath), name);
+            if (string.IsNullOrEmpty(saveJson)) return;
+            object jsonData = obj is ScriptableObject ? obj : new JsonMapper<T>(obj);
+            JsonUtility.FromJsonOverwrite(saveJson, jsonData);
         }
 
-        private string FilePath(string name)
+        private static string FilePath(string name)
         {
             var filePath = Path.Combine(Application.streamingAssetsPath, $"{name}.json");
             if (!File.Exists(filePath))
@@ -150,23 +97,7 @@ namespace JFramework.Core
             return filePath;
         }
 
-        private string FilePath(Object obj)
-        {
-            if (string.IsNullOrEmpty(obj.name))
-            {
-                obj.name = obj.GetType().Name;
-            }
-
-            var filePath = Path.Combine(Application.streamingAssetsPath, $"{obj.name}.json");
-            if (!File.Exists(filePath))
-            {
-                filePath = Path.Combine(Application.persistentDataPath, $"{obj.name}.json");
-            }
-
-            return filePath;
-        }
-
-        private byte[] Encrypt(string json, string name)
+        private static byte[] Encrypt(string json, string name)
         {
             try
             {
@@ -194,7 +125,7 @@ namespace JFramework.Core
             }
         }
 
-        private string Decrypt(byte[] json, string name)
+        private static string Decrypt(byte[] json, string name)
         {
             try
             {
@@ -213,6 +144,17 @@ namespace JFramework.Core
                 Debug.LogWarning($"存档 {name.Red()} 丢失!\n{e}");
                 Save(secrets.Values.ToList(), nameof(JsonManager));
                 return null;
+            }
+        }
+
+        [Serializable]
+        private class JsonMapper<T>
+        {
+            public T value;
+
+            public JsonMapper(T value)
+            {
+                this.value = value;
             }
         }
     }

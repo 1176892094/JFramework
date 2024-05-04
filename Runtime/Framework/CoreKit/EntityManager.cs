@@ -12,30 +12,29 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using JFramework.Interface;
-using Sirenix.OdinInspector;
 using UnityEngine;
+using Object = UnityEngine.Object;
 
 namespace JFramework.Core
 {
-    using Components = Dictionary<Type, IComponent>;
-
-    internal sealed class EntityManager : ScriptableObject
+    internal static class EntityManager
     {
-        [ShowInInspector, LabelText("实体组件")] private Dictionary<IEntity, Components> entities = new();
-        public IEntity instance;
+        public static readonly Dictionary<IEntity, Dictionary<Type, IComponent>> entities = new();
+        public static IEntity instance;
 
-        public IComponent FindComponent(IEntity entity, Type type)
+        public static IComponent FindComponent(IEntity entity, Type type)
         {
+            if (!GlobalManager.Instance) return null;
             if (!entities.TryGetValue(entity, out var components))
             {
-                components = new Components();
+                components = new Dictionary<Type, IComponent>();
                 entities.Add(entity, components);
             }
 
             if (!components.TryGetValue(type, out var component))
             {
                 instance = entity;
-                component = (IComponent)CreateInstance(type);
+                component = (IComponent)ScriptableObject.CreateInstance(type);
                 ((ScriptableObject)component).name = type.Name;
                 components.Add(type, component);
                 component.OnAwake(instance);
@@ -44,13 +43,14 @@ namespace JFramework.Core
             return entities[entity][type];
         }
 
-        public void Destroy(IEntity entity)
+        public static void Destroy(IEntity entity)
         {
+            if (!GlobalManager.Instance) return;
             if (entities.TryGetValue(entity, out var components))
             {
                 foreach (var component in components.Values)
                 {
-                    Destroy((ScriptableObject)component);
+                    Object.Destroy((ScriptableObject)component);
                 }
 
                 components.Clear();
@@ -58,8 +58,9 @@ namespace JFramework.Core
             }
         }
 
-        internal void OnDisable()
+        public static void UnRegister()
         {
+            if (!GlobalManager.Instance) return;
             var copies = entities.Keys.ToList();
             foreach (var entity in copies)
             {
@@ -67,6 +68,7 @@ namespace JFramework.Core
             }
 
             entities.Clear();
+            instance = null;
         }
     }
 }

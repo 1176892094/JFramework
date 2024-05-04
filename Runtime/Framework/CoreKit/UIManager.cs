@@ -12,7 +12,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using JFramework.Interface;
-using Sirenix.OdinInspector;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
@@ -20,15 +19,14 @@ using Object = UnityEngine.Object;
 
 namespace JFramework.Core
 {
-    public sealed class UIManager : ScriptableObject
+    public static class UIManager
     {
-        [ShowInInspector, LabelText("界面画布")] public Canvas canvas;
-        [ShowInInspector, LabelText("用户界面")] private Dictionary<Type, IPanel> panels = new();
-        [ShowInInspector, LabelText("界面层级")] private Dictionary<UILayer, Transform> layers = new();
+        public static Canvas canvas;
+        private static readonly Dictionary<UILayer, Transform> layers = new();
+        internal static readonly Dictionary<Type, IPanel> panels = new();
 
-        internal void OnEnable()
+        internal static void Register()
         {
-            if (!GlobalManager.Instance) return;
             canvas = GlobalManager.Instance.transform.Find("UICanvas").GetComponent<Canvas>();
             layers[UILayer.Bottom] = canvas.transform.Find("Layer1");
             layers[UILayer.Normal] = canvas.transform.Find("Layer2");
@@ -37,8 +35,9 @@ namespace JFramework.Core
             layers[UILayer.Ignore] = canvas.transform.Find("Layer5");
         }
 
-        public void Show<TPanel>() where TPanel : UIPanel
+        public static void Show<TPanel>() where TPanel : UIPanel
         {
+            if (!GlobalManager.Instance) return;
             if (panels.TryGetValue(typeof(TPanel), out var panel))
             {
                 panel.Show();
@@ -49,8 +48,9 @@ namespace JFramework.Core
             }
         }
 
-        public void Show<TPanel>(Action action) where TPanel : UIPanel
+        public static void Show<TPanel>(Action action) where TPanel : UIPanel
         {
+            if (!GlobalManager.Instance) return;
             if (panels.TryGetValue(typeof(TPanel), out var panel))
             {
                 panel.Show();
@@ -62,8 +62,9 @@ namespace JFramework.Core
             }
         }
 
-        public void Show<TPanel>(Action<TPanel> action) where TPanel : UIPanel
+        public static void Show<TPanel>(Action<TPanel> action) where TPanel : UIPanel
         {
+            if (!GlobalManager.Instance) return;
             if (panels.TryGetValue(typeof(TPanel), out var panel))
             {
                 panel.Show();
@@ -75,7 +76,7 @@ namespace JFramework.Core
             }
         }
 
-        private async void Load<TPanel>(Action<TPanel> action = null) where TPanel : UIPanel
+        private static async void Load<TPanel>(Action<TPanel> action = null) where TPanel : UIPanel
         {
             if (panels.ContainsKey(typeof(TPanel)))
             {
@@ -83,7 +84,7 @@ namespace JFramework.Core
                 return;
             }
 
-            var obj = await GlobalManager.Asset.Load<GameObject>(SettingManager.GetUIPath(typeof(TPanel).Name));
+            var obj = await AssetManager.Load<GameObject>(SettingManager.GetUIPath(typeof(TPanel).Name));
             if (!obj.TryGetComponent<TPanel>(out var panel))
             {
                 panel = obj.AddComponent<TPanel>();
@@ -95,8 +96,9 @@ namespace JFramework.Core
             action?.Invoke(panel);
         }
 
-        public void Hide<TPanel>() where TPanel : IPanel
+        public static void Hide<TPanel>() where TPanel : IPanel
         {
+            if (!GlobalManager.Instance) return;
             if (panels.TryGetValue(typeof(TPanel), out var panel))
             {
                 if (IsActive<TPanel>())
@@ -106,18 +108,18 @@ namespace JFramework.Core
             }
         }
 
-        public TPanel Get<TPanel>() where TPanel : IPanel => (TPanel)panels.GetValueOrDefault(typeof(TPanel));
+        public static TPanel Get<TPanel>() where TPanel : IPanel => (TPanel)panels.GetValueOrDefault(typeof(TPanel));
 
-        public IPanel Get(Type key) => panels.GetValueOrDefault(key);
+        public static IPanel Get(Type key) => panels.GetValueOrDefault(key);
 
-        public Transform Get(UILayer type) => layers.GetValueOrDefault(type);
+        public static Transform Get(UILayer type) => layers.GetValueOrDefault(type);
 
-        public bool IsActive<TPanel>() where TPanel : IPanel
+        public static bool IsActive<TPanel>() where TPanel : IPanel
         {
             return panels.TryGetValue(typeof(TPanel), out var panel) && panel.gameObject.activeInHierarchy;
         }
 
-        public void Register<T>(T panel) where T : IPanel
+        public static void Register<T>(T panel) where T : IPanel
         {
             if (!panels.ContainsKey(typeof(T)))
             {
@@ -125,7 +127,7 @@ namespace JFramework.Core
             }
         }
 
-        public void UnRegister<T>(T panel) where T : IPanel
+        public static void UnRegister<T>(T panel) where T : IPanel
         {
             if (panels.Remove(typeof(T)))
             {
@@ -133,7 +135,7 @@ namespace JFramework.Core
             }
         }
 
-        public void Clear()
+        public static void Clear()
         {
             var copies = panels.Keys.ToList();
             foreach (var type in copies)
@@ -142,14 +144,14 @@ namespace JFramework.Core
                 {
                     if (panel.state != UIState.DontDestroy)
                     {
-                        Destroy(panel.gameObject);
+                        Object.Destroy(panel.gameObject);
                         panels.Remove(type);
                     }
                 }
             }
         }
 
-        internal void OnDisable()
+        internal static void UnRegister()
         {
             canvas = null;
             panels.Clear();

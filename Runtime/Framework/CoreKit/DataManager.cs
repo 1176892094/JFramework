@@ -14,23 +14,18 @@ using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using JFramework.Interface;
-using Sirenix.OdinInspector;
 using UnityEngine;
 using Debug = UnityEngine.Debug;
 
 namespace JFramework.Core
 {
-    using IntData = Dictionary<int, IData>;
-    using EnumData = Dictionary<Enum, IData>;
-    using StringData = Dictionary<string, IData>;
-
-    public sealed class DataManager : ScriptableObject
+    public static class DataManager
     {
-        [ShowInInspector, LabelText("整数数据")] private Dictionary<Type, IntData> intData = new();
-        [ShowInInspector, LabelText("枚举数据")] private Dictionary<Type, EnumData> enumData = new();
-        [ShowInInspector, LabelText("字符数据")] private Dictionary<Type, StringData> stringData = new();
+        internal static readonly Dictionary<Type, Dictionary<int, IData>> intData = new();
+        internal static readonly Dictionary<Type, Dictionary<Enum, IData>> enumData = new();
+        internal static readonly Dictionary<Type, Dictionary<string, IData>> stringData = new();
 
-        public async Task LoadDataTable()
+        public static async Task LoadDataTable()
         {
             var assembly = Reflection.GetAssembly("HotUpdate.Data");
             if (assembly == null)
@@ -44,7 +39,7 @@ namespace JFramework.Core
             {
                 try
                 {
-                    var obj = await GlobalManager.Asset.Load<ScriptableObject>(SettingManager.GetTablePath(type.Name));
+                    var obj = await AssetManager.Load<ScriptableObject>(SettingManager.GetTablePath(type.Name));
                     var table = (IDataTable)obj;
                     if (type.FullName == null) return;
                     var data = assembly.GetType(type.FullName[..^5]);
@@ -91,8 +86,9 @@ namespace JFramework.Core
             return dataList;
         }
 
-        public T Get<T>(int key) where T : IData
+        public static T Get<T>(int key) where T : IData
         {
+            if (!GlobalManager.Instance) return default;
             if (!intData.TryGetValue(typeof(T), out var dataList))
             {
                 return default;
@@ -106,8 +102,9 @@ namespace JFramework.Core
             return (T)data;
         }
 
-        public T Get<T>(Enum key) where T : IData
+        public static T Get<T>(Enum key) where T : IData
         {
+            if (!GlobalManager.Instance) return default;
             if (!enumData.TryGetValue(typeof(T), out var dataList))
             {
                 return default;
@@ -121,8 +118,9 @@ namespace JFramework.Core
             return (T)data;
         }
 
-        public T Get<T>(string key) where T : IData
+        public static T Get<T>(string key) where T : IData
         {
+            if (!GlobalManager.Instance) return default;
             if (!stringData.TryGetValue(typeof(T), out var dataList))
             {
                 return default;
@@ -136,8 +134,9 @@ namespace JFramework.Core
             return (T)data;
         }
 
-        public T[] GetTable<T>() where T : IData
+        public static T[] GetTable<T>() where T : IData
         {
+            if (!GlobalManager.Instance) return default;
             if (intData.TryGetValue(typeof(T), out var intList))
             {
                 return intList?.Values.Cast<T>().ToArray();
@@ -157,7 +156,7 @@ namespace JFramework.Core
             return default;
         }
 
-        internal void OnDisable()
+        internal static void UnRegister()
         {
             intData.Clear();
             enumData.Clear();

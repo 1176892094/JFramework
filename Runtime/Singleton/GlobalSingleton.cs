@@ -8,6 +8,7 @@
 // # Description: This is an automatically generated comment.
 // *********************************************************************************
 
+using JFramework.Core;
 using UnityEngine;
 
 namespace JFramework
@@ -27,7 +28,7 @@ namespace JFramework
                 {
                     lock (locked)
                     {
-                        instance ??= FindObjectOfType<T>();
+                        instance ??= FindFirstObjectByType<T>();
                         instance ??= new GameObject(typeof(T).Name).AddComponent<T>();
                         instance.Register();
                     }

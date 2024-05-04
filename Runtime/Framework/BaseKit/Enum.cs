@@ -26,7 +26,7 @@ namespace JFramework
         DontDestroy = 2
     }
 
-    internal enum AssetPlatform : byte
+    public enum AssetPlatform : byte
     {
         StandaloneOSX = 2,
         StandaloneWindows = 5,

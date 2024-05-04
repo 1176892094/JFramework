@@ -11,17 +11,16 @@
 using System;
 using System.Collections.Generic;
 using JFramework.Interface;
-using Sirenix.OdinInspector;
-using UnityEngine;
 
 namespace JFramework.Core
 {
-    public sealed class EventManager : ScriptableObject
+    public static class EventManager
     {
-        [ShowInInspector, LabelText("事件列表")] private Dictionary<Type, IEvent> observers = new();
+        internal static readonly Dictionary<Type, IEvent> observers = new();
 
-        public void Listen<T>(IEvent<T> obj) where T : struct, IEvent
+        public static void Listen<T>(IEvent<T> obj) where T : struct, IEvent
         {
+            if (!GlobalManager.Instance) return;
             if (!observers.TryGetValue(typeof(T), out var observer))
             {
                 observers.Add(typeof(T), observer = new Event<T>());
@@ -30,23 +29,25 @@ namespace JFramework.Core
             ((Event<T>)observer).OnExecute += obj.Execute;
         }
 
-        public void Remove<T>(IEvent<T> obj) where T : struct, IEvent
+        public static void Remove<T>(IEvent<T> obj) where T : struct, IEvent
         {
+            if (!GlobalManager.Instance) return;
             if (observers.TryGetValue(typeof(T), out var observer))
             {
                 ((Event<T>)observer).OnExecute -= obj.Execute;
             }
         }
 
-        public void Invoke<T>(T obj = default) where T : struct, IEvent
+        public static void Invoke<T>(T obj = default) where T : struct, IEvent
         {
+            if (!GlobalManager.Instance) return;
             if (observers.TryGetValue(typeof(T), out var observer))
             {
                 ((Event<T>)observer).OnExecute?.Invoke(obj);
             }
         }
 
-        internal void OnDisable()
+        internal static void UnRegister()
         {
             observers.Clear();
         }

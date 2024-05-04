@@ -11,6 +11,7 @@
 using System;
 using System.Collections.Generic;
 using System.Reflection;
+using JFramework.Core;
 using JFramework.Interface;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -23,18 +24,17 @@ namespace JFramework
     {
         public static T FindComponent<T>(this IEntity entity) where T : ScriptableObject, IComponent
         {
-            return (T)GlobalManager.Entity.FindComponent(entity, typeof(T));
+            return (T)EntityManager.FindComponent(entity, typeof(T));
         }
 
         public static IComponent FindComponent(this IEntity entity, Type type)
         {
-            return GlobalManager.Entity.FindComponent(entity, type);
+            return EntityManager.FindComponent(entity, type);
         }
 
         public static void Destroy(this IEntity entity)
         {
-            if (!GlobalManager.Instance) return;
-            GlobalManager.Entity.Destroy(entity);
+            EntityManager.Destroy(entity);
         }
 
         public static void Refresh<TGird, TItem>(this TGird[] grids, List<TItem> items) where TGird : IGrid<TItem>
@@ -78,10 +78,10 @@ namespace JFramework
             {
                 var attribute = field.GetCustomAttribute<InjectAttribute>(true);
                 if (attribute == null) continue;
-
+                
                 if (typeof(IComponent).IsAssignableFrom(field.FieldType))
                 {
-                    var component = GlobalManager.Entity.FindComponent(inject, field.FieldType);
+                    var component = EntityManager.FindComponent(inject, field.FieldType);
                     field.SetValue(inject, component);
                 }
                 else if (typeof(Component).IsAssignableFrom(field.FieldType))
@@ -157,8 +157,10 @@ namespace JFramework
             {
                 button.onClick.AddListener(() =>
                 {
-                    if (panel.state == UIState.Freeze) return;
-                    inject.transform.SendMessage(name);
+                    if (panel.state != UIState.Freeze)
+                    {
+                        inject.transform.SendMessage(name);
+                    }
                 });
             }
             else
@@ -173,8 +175,10 @@ namespace JFramework
             {
                 toggle.onValueChanged.AddListener(value =>
                 {
-                    if (panel.state == UIState.Freeze) return;
-                    inject.transform.SendMessage(name, value);
+                    if (panel.state != UIState.Freeze)
+                    {
+                        inject.transform.SendMessage(name, value);
+                    }
                 });
             }
             else

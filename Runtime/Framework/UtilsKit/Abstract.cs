@@ -10,6 +10,7 @@
 
 using System;
 using System.Collections.Generic;
+using JFramework.Core;
 using JFramework.Interface;
 using UnityEngine;
 
@@ -19,12 +20,14 @@ namespace JFramework
     public abstract class DataTable<T> : ScriptableObject, IDataTable where T : IData
     {
         [SerializeField] private List<T> dataList = new List<T>();
-
+        
+        public int Count => dataList.Count;
+        
         public void AddData(T data) => dataList.Add(data);
 
         public T GetData(int index) => dataList[index];
 
-        int IDataTable.Count => dataList.Count;
+        public void Clear() => dataList.Clear();
 
         void IDataTable.AddData(IData data) => AddData((T)data);
 
@@ -58,7 +61,7 @@ namespace JFramework
     {
         [SerializeField] private T instance;
 
-        public T owner => instance ??= (T)GlobalManager.Entity.instance;
+        public T owner => instance ??= (T)EntityManager.instance;
 
         void IComponent.OnAwake(IEntity instance) => this.instance ??= (T)instance;
     }
@@ -77,7 +80,7 @@ namespace JFramework
         public void Set(T2 key, float value)
         {
             attributes.TryAdd(key, 0);
-            attributes[key]= value;
+            attributes[key] = value;
         }
 
         protected virtual void OnDestroy()

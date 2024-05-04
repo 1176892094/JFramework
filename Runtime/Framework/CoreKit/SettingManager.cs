@@ -32,14 +32,22 @@ namespace JFramework
         public string buildPath = "AssetBundles";
 
         public string assetPath = "Assets/Template";
+        
+        public string dataPath = "Assets/Template/DataTable";
+        
+        public string scriptPath = "Assets/Scripts/DataTable";
 
         public string editorPath = "Assets/Editor/Resources";
 
         public string remotePath = "http://192.168.0.3:8000/AssetBundles";
-        
+
         public bool remoteLoad;
 
         public bool remoteBuild;
+
+        public bool assetLoadKey;
+
+        public string excelPathKey;
 
         public static string clientInfoName => Instance.assetInfo + ".json";
 
@@ -68,9 +76,10 @@ namespace JFramework
         private static string GetPlatform(string fileName) => Path.Combine(Instance.platform.ToString(), fileName);
 
 #if UNITY_EDITOR
+        [Folder] public string[] sceneEditor = new string[3];
         [Folder] public List<string> sceneAssets = new List<string>();
 
-        public Dictionary<string, Object> objects = new Dictionary<string, Object>();
+        public readonly Dictionary<string, Object> objects = new Dictionary<string, Object>();
 
         private static string remoteBuildPath => Instance.remoteBuild ? Instance.buildPath : Application.streamingAssetsPath;
 
@@ -161,7 +170,7 @@ namespace JFramework
                     {
                         field.boolValue = !field.boolValue;
                     }
-                    
+
                     settings.ApplyModifiedPropertiesWithoutUndo();
                 },
 

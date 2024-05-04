@@ -10,6 +10,7 @@
 
 using System;
 using System.Collections.Generic;
+using JFramework.Core;
 using JFramework.Interface;
 using Sirenix.OdinInspector;
 
@@ -62,7 +63,7 @@ namespace JFramework
             state.OnAwake(owner, this);
             states[typeof(T2)] = state;
         }
-        
+
         public void AddState<T2, T3>() where T2 : IState where T3 : IState, new()
         {
             var state = StreamPool.Pop<IState>(typeof(T3));
@@ -72,14 +73,11 @@ namespace JFramework
 
         public void ChangeState<T2>() where T2 : IState
         {
-            if (!GlobalManager.Scene.isLoading)
+            if (!SceneManager.isLoading)
             {
-                if (owner.gameObject.activeInHierarchy)
-                {
-                    state?.OnExit();
-                    state = states[typeof(T2)];
-                    state?.OnEnter();
-                }
+                state?.OnExit();
+                state = states[typeof(T2)];
+                state?.OnEnter();
             }
         }
 

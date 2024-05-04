@@ -10,83 +10,90 @@
 
 using System;
 using System.Collections.Generic;
-using Sirenix.OdinInspector;
 using UnityEngine;
 
 namespace JFramework.Core
 {
-    public sealed class AudioManager : ScriptableObject
+    [Serializable]
+    public class AudioSetting
     {
-        [ShowInInspector, LabelText("完成列表")] private List<AudioSource> stops = new();
-        [ShowInInspector, LabelText("播放列表")] private List<AudioSource> plays = new();
-        [SerializeField, Range(0, 1f)] public float audioVolume = 0.5f;
-        [SerializeField, Range(0, 1f)] public float soundVolume = 0.5f;
-        private GameObject poolManager;
-        private AudioSource audioSource;
+        public float audioVolume = 0.5f;
+        public float soundVolume = 0.5f;
+    }
 
-        internal void OnEnable()
+    public static class AudioManager
+    {
+        internal static readonly List<AudioSource> stops = new();
+        internal static readonly List<AudioSource> plays = new();
+        internal static readonly AudioSetting audioSetting = new AudioSetting();
+        private static GameObject poolManager;
+        private static AudioSource audioSource;
+
+        internal static void Register()
         {
-            if (!GlobalManager.Instance) return;
             poolManager = GlobalManager.Instance.transform.Find("PoolManager").gameObject;
             audioSource = poolManager.GetComponent<AudioSource>();
-            GlobalManager.Json.Load(this);
+            JsonManager.Load(audioSetting, nameof(AudioManager));
         }
 
-        public async void PlayAudio(string name, Action<AudioSource> action = null)
+        public static async void PlayAudio(string name, Action<AudioSource> action = null)
         {
-            var clip = await GlobalManager.Asset.Load<AudioClip>(SettingManager.GetAudioPath(name));
-            audioSource.volume = audioVolume;
+            if (!GlobalManager.Instance) return;
+            var clip = await AssetManager.Load<AudioClip>(SettingManager.GetAudioPath(name));
+            audioSource.volume = audioSetting.audioVolume;
             audioSource.clip = clip;
             audioSource.loop = true;
             audioSource.Play();
             action?.Invoke(audioSource);
         }
 
-        public async void PlayOnce(string name, Action<AudioSource> action = null)
+        public static async void PlayOnce(string name, Action<AudioSource> action = null)
         {
-            var clip = await GlobalManager.Asset.Load<AudioClip>(SettingManager.GetAudioPath(name));
+            if (!GlobalManager.Instance) return;
+            var clip = await AssetManager.Load<AudioClip>(SettingManager.GetAudioPath(name));
             var sound = stops.Count > 0 ? stops[0] : poolManager.AddComponent<AudioSource>();
             stops.Remove(sound);
             plays.Add(sound);
-            sound.volume = soundVolume;
+            sound.volume = audioSetting.soundVolume;
             sound.clip = clip;
-            GlobalManager.Time.Pop(clip.length).Invoke(() => StopSound(sound));
+            TimerManager.Pop(clip.length).Invoke(() => StopSound(sound));
             sound.Play();
             action?.Invoke(sound);
         }
 
-        public async void PlayLoop(string name, Action<AudioSource> action = null)
+        public static async void PlayLoop(string name, Action<AudioSource> action = null)
         {
-            var clip = await GlobalManager.Asset.Load<AudioClip>(SettingManager.GetAudioPath(name));
+            if (!GlobalManager.Instance) return;
+            var clip = await AssetManager.Load<AudioClip>(SettingManager.GetAudioPath(name));
             var sound = stops.Count > 0 ? stops[0] : poolManager.AddComponent<AudioSource>();
             stops.Remove(sound);
             plays.Add(sound);
-            sound.volume = soundVolume;
+            sound.volume = audioSetting.soundVolume;
             sound.clip = clip;
             sound.loop = true;
             sound.Play();
             action?.Invoke(sound);
         }
 
-        public void SetAudio(float audioVolume)
+        public static void SetAudio(float audioVolume)
         {
-            this.audioVolume = audioVolume;
+            audioSetting.audioVolume = audioVolume;
             audioSource.volume = audioVolume;
-            GlobalManager.Json.Save(this);
+            JsonManager.Save(audioSetting, nameof(AudioManager));
         }
 
-        public void SetSound(float soundVolume)
+        public static void SetSound(float soundVolume)
         {
-            this.soundVolume = soundVolume;
+            audioSetting.soundVolume = soundVolume;
             foreach (var sound in plays)
             {
                 sound.volume = soundVolume;
             }
 
-            GlobalManager.Json.Save(this);
+            JsonManager.Save(audioSetting, nameof(AudioManager));
         }
 
-        public void StopAudio(bool pause = true)
+        public static void StopAudio(bool pause = true)
         {
             if (pause)
             {
@@ -98,7 +105,7 @@ namespace JFramework.Core
             }
         }
 
-        public void StopSound(AudioSource sound)
+        public static void StopSound(AudioSource sound)
         {
             if (plays.Contains(sound))
             {
@@ -108,7 +115,7 @@ namespace JFramework.Core
             }
         }
 
-        internal void OnDisable()
+        internal static void UnRegister()
         {
             plays.Clear();
             stops.Clear();

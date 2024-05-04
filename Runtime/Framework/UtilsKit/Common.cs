@@ -10,147 +10,204 @@
 
 using System;
 using System.Collections.Generic;
+using System.Text;
+using JFramework.Core;
 using JFramework.Interface;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 namespace JFramework
 {
     [Serializable]
-    public sealed class Variable<T> : IVariable where T : new()
+    public struct SecretInt
     {
-        [SerializeField] public T value;
+        public int origin;
+        public int buffer;
+        public int offset;
 
-        public Variable() => value = new T();
+        public int Value
+        {
+            get
+            {
+                if (offset == 0)
+                {
+                    this = new SecretInt(0);
+                }
 
-        public Variable(T value) => this.value = value;
+                var target = buffer - offset;
+                if (!origin.Equals(target))
+                {
+                    GlobalManager.Cheat();
+                }
+
+                return target;
+            }
+            set
+            {
+                origin = value;
+                unchecked
+                {
+                    offset = Random.Range(1, int.MaxValue - value);
+                    buffer = value + offset;
+                }
+            }
+        }
+
+        public SecretInt(int value)
+        {
+            origin = 0;
+            buffer = 0;
+            offset = 0;
+            Value = value;
+        }
+
+        public static implicit operator int(SecretInt secret)
+        {
+            return secret.Value;
+        }
+
+        public static implicit operator SecretInt(int value)
+        {
+            return new SecretInt(value);
+        }
+
+        public static implicit operator bool(SecretInt secret)
+        {
+            return secret.Value != 0;
+        }
+
+        public static implicit operator SecretInt(bool secret)
+        {
+            return new SecretInt(secret ? 1 : 0);
+        }
+
+        public override string ToString()
+        {
+            return Value.ToString();
+        }
     }
 
     [Serializable]
-    public sealed class Variables<T> : IVariable where T : struct
+    public struct SecretFloat
     {
-        [SerializeField] public List<T> value;
+        public float origin;
+        public float buffer;
+        public int offset;
 
-        public Variables() => value = new List<T>();
+        public float Value
+        {
+            get
+            {
+                if (offset == 0)
+                {
+                    this = new SecretFloat(0);
+                }
 
-        public Variables(List<T> value) => this.value = value;
+                var target = buffer - offset;
+                if (Math.Abs(origin - target) > 0.1f)
+                {
+                    GlobalManager.Cheat();
+                }
+
+                return target;
+            }
+            set
+            {
+                origin = value;
+                unchecked
+                {
+                    offset = Random.Range(1, short.MaxValue - (int)value);
+                    buffer = value + offset;
+                }
+            }
+        }
+
+        public SecretFloat(float value)
+        {
+            origin = 0;
+            buffer = 0;
+            offset = 0;
+            Value = value;
+        }
+
+        public static implicit operator float(SecretFloat secret)
+        {
+            return secret.Value;
+        }
+
+        public static implicit operator SecretFloat(float value)
+        {
+            return new SecretFloat(value);
+        }
+
+        public override string ToString()
+        {
+            return Value.ToString("F");
+        }
     }
 
     [Serializable]
-    public sealed class Timer
+    public struct SecretString
     {
-        private bool running;
-        private bool unscale;
-        [SerializeField] private int count;
-        [SerializeField] private float interval;
-        [SerializeField] private float duration;
-        private event Action callback;
-        private event Func<bool> condition;
-        private float seconds => unscale ? Time.unscaledTime : Time.time;
+        public string origin;
+        public byte[] buffer;
+        public int offset;
 
-        public Timer Invoke(Action callback)
+        public string Value
         {
-            this.callback = callback;
-            return this;
-        }
-
-        public Timer Invoke(Action<Timer> callback)
-        {
-            this.callback = () => callback(this);
-            return this;
-        }
-
-        public Timer When(Func<bool> condition)
-        {
-            this.condition = condition;
-            return this;
-        }
-
-        public Timer When(Func<Timer, bool> condition)
-        {
-            this.condition = () => condition(this);
-            return this;
-        }
-
-        public Timer Loops(int count = 0)
-        {
-            this.count = count;
-            return this;
-        }
-
-        public Timer Unscale()
-        {
-            unscale = true;
-            duration = seconds + interval;
-            return this;
-        }
-
-        public Timer Set(float interval)
-        {
-            this.interval = interval;
-            duration = seconds + interval;
-            return this;
-        }
-
-        public Timer Add(float duration)
-        {
-            this.duration += duration;
-            return this;
-        }
-
-        internal Timer Pop(float interval)
-        {
-            count = 1;
-            running = true;
-            unscale = false;
-            this.interval = interval;
-            duration = seconds + interval;
-            return this;
-        }
-
-        internal void Update()
-        {
-            if (!running || seconds <= duration)
+            get
             {
-                return;
-            }
-
-            duration = seconds + interval;
-            try
-            {
-                if (condition != null)
+                if (origin.IsEmpty())
                 {
-                    if (condition())
-                    {
-                        callback?.Invoke();
-                    }
-                    else
-                    {
-                        GlobalManager.Time.Push(this);
-                    }
+                    this = new SecretString("");
                 }
-                else
+
+                var target = new byte[buffer.Length];
+                for (int i = 0; i < buffer.Length; i++)
                 {
-                    count--;
-                    callback?.Invoke();
-                    if (count == 0)
-                    {
-                        GlobalManager.Time.Push(this);
-                    }
+                    target[i] = (byte)(buffer[i] - offset);
+                }
+
+                if (!origin.Equals(Encoding.UTF8.GetString(target)))
+                {
+                    GlobalManager.Cheat();
+                }
+
+                return origin;
+            }
+            set
+            {
+                origin = value;
+                offset = Random.Range(0, byte.MaxValue);
+                buffer = Encoding.UTF8.GetBytes(origin);
+                for (int i = 0; i < buffer.Length; i++)
+                {
+                    buffer[i] = (byte)(buffer[i] + offset);
                 }
             }
-            catch (Exception e)
-            {
-                GlobalManager.Time.Push(this);
-                Debug.LogWarning("计时器无法执行方法：\n" + e);
-            }
         }
 
-        internal void Push()
+        public SecretString(string value)
         {
-            running = false;
-            unscale = false;
-            callback = null;
-            condition = null;
+            origin = "";
+            buffer = null;
+            offset = 0;
+            Value = value;
+        }
+
+        public static implicit operator string(SecretString secret)
+        {
+            return secret.Value;
+        }
+
+        public static implicit operator SecretString(string value)
+        {
+            return new SecretString(value);
+        }
+
+        public override string ToString()
+        {
+            return Value;
         }
     }
 
@@ -190,7 +247,7 @@ namespace JFramework
                 {
                     if (grid != null)
                     {
-                        GlobalManager.Pool.Push(grid.gameObject);
+                        PoolManager.Push(grid.gameObject);
                     }
                 }
             }
@@ -217,7 +274,7 @@ namespace JFramework
                     {
                         if (grid != null)
                         {
-                            GlobalManager.Pool.Push(grid.gameObject);
+                            PoolManager.Push(grid.gameObject);
                         }
 
                         grids.Remove(i);
@@ -230,7 +287,7 @@ namespace JFramework
                     {
                         if (grid != null)
                         {
-                            GlobalManager.Pool.Push(grid.gameObject);
+                            PoolManager.Push(grid.gameObject);
                         }
 
                         grids.Remove(i);
@@ -244,7 +301,7 @@ namespace JFramework
             for (int index = minIndex; index <= maxIndex; ++index)
             {
                 if (!grids.TryAdd(index, default)) continue;
-                var obj = await GlobalManager.Pool.Pop(path);
+                var obj = await PoolManager.Pop(path);
                 obj.transform.SetParent(content);
                 obj.transform.localScale = Vector3.one;
                 var posX = index % column * width + width / 2;
@@ -261,7 +318,7 @@ namespace JFramework
                 }
                 else
                 {
-                    GlobalManager.Pool.Push(obj);
+                    PoolManager.Push(obj);
                 }
             }
         }

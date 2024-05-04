@@ -9,224 +9,204 @@
 // *********************************************************************************
 
 using System;
-using System.Text;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace JFramework
 {
     public static partial class Extensions
     {
-        private const byte DATA_OFFSET = 1 << 7;
-
-        public static void Serialize(this string reason, out byte[] offset, out byte[] result)
+        private static readonly Dictionary<Type, Delegate> parse = new Dictionary<Type, Delegate>()
         {
-            offset = default;
-            result = default;
-            if (!string.IsNullOrEmpty(reason))
+            { typeof(string), new Func<string, string>(InputString) },
+            { typeof(Vector2), new Func<string, Vector2>(InputVector2) },
+            { typeof(Vector3), new Func<string, Vector3>(InputVector3) },
+            { typeof(Vector2Int), new Func<string, Vector2Int>(InputVector2Int) },
+            { typeof(Vector3Int), new Func<string, Vector3Int>(InputVector3Int) },
+        };
+
+        private static readonly Dictionary<Type, Delegate> parseArray = new Dictionary<Type, Delegate>()
+        {
+            { typeof(string[]), new Func<string, string[]>(InputStringArray) },
+            { typeof(Vector2[]), new Func<string, Vector2[]>(InputVector2Array) },
+            { typeof(Vector3[]), new Func<string, Vector3[]>(InputVector3Array) },
+            { typeof(Vector2Int[]), new Func<string, Vector2Int[]>(InputVector2IntArray) },
+            { typeof(Vector3Int[]), new Func<string, Vector3Int[]>(InputVector3IntArray) },
+        };
+
+        public static T Parse<T>(this SecretString reason)
+        {
+            if (parse.TryGetValue(typeof(T), out var func))
             {
-                result = Encoding.UTF8.GetBytes(reason);
-                offset = new byte[result.Length];
-                Buffer.BlockCopy(result, 0, offset, 0, result.Length);
-                for (int i = 0; i < offset.Length; i++)
-                {
-                    offset[i] += DATA_OFFSET;
-                }
+                return (T)func.DynamicInvoke(reason.Value);
             }
+
+            return reason.Value.InputGeneric<T>();
         }
 
-        public static string Deserialize(this byte[] reason, byte[] result)
+        public static T[] Array<T>(this SecretString reason)
         {
-            if (reason == null || result == null || reason.Length != result.Length)
+            if (parseArray.TryGetValue(typeof(T[]), out var func))
             {
-                return "";
+                return (T[])func.DynamicInvoke(reason.Value);
             }
 
-            var offset = new byte[result.Length];
-            Buffer.BlockCopy(result, 0, offset, 0, result.Length);
-            for (int i = 0; i < offset.Length; i++)
-            {
-                offset[i] -= DATA_OFFSET;
-            }
-
-            var target = Encoding.UTF8.GetString(offset);
-            if (target != Encoding.UTF8.GetString(reason))
-            {
-                Secret.AntiCheat();
-            }
-
-            return target;
+            return reason.Value.InputGenericArray<T>();
         }
 
-        public static bool Input(this string reason, out string result)
+        public static void Input(this string reason, out SecretString result)
         {
             result = reason ?? string.Empty;
-            return true;
-        }
-
-        public static bool Input(this string reason, out Vector2 result)
-        {
-            var points = reason.Split(',');
-            points[0].Input(out float x);
-            points[1].Input(out float y);
-            result = new Vector2(x, y);
-            return true;
-        }
-
-        public static bool Input(this string reason, out Vector3 result)
-        {
-            var points = reason.Split(',');
-            points[0].Input(out float x);
-            points[1].Input(out float y);
-            points[2].Input(out float z);
-            result = new Vector3(x, y, z);
-            return true;
-        }
-
-        public static bool Input(this string reason, out Vector2Int result)
-        {
-            var points = reason.Split(',');
-            points[0].Input(out int x);
-            points[1].Input(out int y);
-            result = new Vector2Int(x, y);
-            return true;
-        }
-
-        public static bool Input(this string reason, out Vector3Int result)
-        {
-            var points = reason.Split(',');
-            points[0].Input(out int x);
-            points[1].Input(out int y);
-            points[2].Input(out int z);
-            result = new Vector3Int(x, y, z);
-            return true;
         }
 
 #if UNITY_EDITOR
-        public static bool Input(this string reason, out Sprite result)
+        public static void Input(this string reason, out Sprite result)
         {
             result = UnityEditor.AssetDatabase.LoadAssetAtPath<Sprite>(reason);
-            return true;
+        }
+
+        public static void Input(this string reason, out Sprite[] result)
+        {
+            var content = reason.Content(out result);
+            for (int i = 0; i < content.Length; ++i)
+            {
+                content[i].Input(out result[i]);
+            }
         }
 #endif
 
-        public static bool Input<T>(this string reason, out T result) where T : struct
+        public static string InputString(this string reason)
         {
-            result = default;
+            return reason ?? string.Empty;
+        }
+
+        public static Vector2 InputVector2(this string reason)
+        {
+            var points = reason.Split(',');
+            var x = float.Parse(points[0]);
+            var y = float.Parse(points[1]);
+            return new Vector2(x, y);
+        }
+
+        public static Vector3 InputVector3(this string reason)
+        {
+            var points = reason.Split(',');
+            var x = float.Parse(points[0]);
+            var y = float.Parse(points[1]);
+            var z = float.Parse(points[2]);
+            return new Vector3(x, y, z);
+        }
+
+        public static Vector2Int InputVector2Int(this string reason)
+        {
+            var points = reason.Split(',');
+            var x = int.Parse(points[0]);
+            var y = int.Parse(points[1]);
+            return new Vector2Int(x, y);
+        }
+
+        public static Vector3Int InputVector3Int(this string reason)
+        {
+            var points = reason.Split(',');
+            var x = int.Parse(points[0]);
+            var y = int.Parse(points[1]);
+            var z = int.Parse(points[2]);
+            return new Vector3Int(x, y, z);
+        }
+
+        public static T InputGeneric<T>(this string reason)
+        {
             if (!string.IsNullOrEmpty(reason))
             {
-                if (typeof(T).IsEnum)
+                var type = typeof(T);
+                if (type.IsEnum)
                 {
-                    result = Enum.Parse<T>(reason);
-                    return true;
+                    return (T)Enum.Parse(type, reason);
                 }
 
-                if (typeof(T).IsPrimitive)
+                if (type.IsPrimitive)
                 {
-                    result = (T)Convert.ChangeType(reason, typeof(T));
-                    return true;
+                    return (T)Convert.ChangeType(reason, type);
                 }
 
-                object obj = new T();
-                var fields = typeof(T).GetFields(Reflection.Instance);
+                var obj = Activator.CreateInstance(type);
+                var fields = type.GetFields(Reflection.Instance);
                 var members = reason.Split(',');
-                for (int i = 0; i < fields.Length; i += 2)
+                for (int i = 0; i < fields.Length; i++)
                 {
-                    var target = Encoding.UTF8.GetBytes(members[i / 2]);
-                    var offset = new byte[target.Length];
-                    Buffer.BlockCopy(target, 0, offset, 0, target.Length);
-                    for (int j = 0; j < offset.Length; j++)
-                    {
-                        offset[j] += DATA_OFFSET;
-                    }
-
-                    fields[i].SetValue(obj, target);
-                    fields[i + 1].SetValue(obj, offset);
+                    fields[i].SetValue(obj, new SecretString(members[i]));
                 }
 
-                result = (T)obj;
-                return true;
+                return (T)obj;
             }
 
-            return false;
+            return default;
         }
 
-        public static bool Input(this string reason, out string[] result)
+        public static string[] InputStringArray(this string reason)
         {
-            var content = reason.Content(out result);
+            var content = reason.Content(out string[] result);
             for (int i = 0; i < content.Length; ++i)
             {
-                content[i].Input(out result[i]);
+                result[i] = content[i].InputString();
             }
 
-            return true;
+            return result;
         }
 
-        public static bool Input(this string reason, out Vector2[] result)
+        public static Vector2[] InputVector2Array(this string reason)
         {
-            var content = reason.Content(out result);
+            var content = reason.Content(out Vector2[] result);
             for (int i = 0; i < content.Length; ++i)
             {
-                content[i].Input(out result[i]);
+                result[i] = content[i].InputVector2();
             }
 
-            return true;
+            return result;
         }
 
-        public static bool Input(this string reason, out Vector3[] result)
+        public static Vector3[] InputVector3Array(this string reason)
         {
-            var content = reason.Content(out result);
+            var content = reason.Content(out Vector3[] result);
             for (int i = 0; i < content.Length; ++i)
             {
-                content[i].Input(out result[i]);
+                result[i] = content[i].InputVector3();
             }
 
-            return true;
+            return result;
         }
 
-        public static bool Input(this string reason, out Vector2Int[] result)
+        public static Vector2Int[] InputVector2IntArray(this string reason)
         {
-            var content = reason.Content(out result);
+            var content = reason.Content(out Vector2Int[] result);
             for (int i = 0; i < content.Length; ++i)
             {
-                content[i].Input(out result[i]);
+                result[i] = content[i].InputVector2Int();
             }
 
-            return true;
+            return result;
         }
 
-        public static bool Input(this string reason, out Vector3Int[] result)
+        public static Vector3Int[] InputVector3IntArray(this string reason)
         {
-            var content = reason.Content(out result);
+            var content = reason.Content(out Vector3Int[] result);
             for (int i = 0; i < content.Length; ++i)
             {
-                content[i].Input(out result[i]);
+                result[i] = content[i].InputVector3Int();
             }
 
-            return true;
+            return result;
         }
-
-#if UNITY_EDITOR
-        public static bool Input(this string reason, out Sprite[] result)
+        
+        public static T[] InputGenericArray<T>(this string reason)
         {
-            var content = reason.Content(out result);
+            var content = reason.Content(out T[] result);
             for (int i = 0; i < content.Length; ++i)
             {
-                content[i].Input(out result[i]);
+                result[i] = content[i].InputGeneric<T>();
             }
 
-            return true;
-        }
-#endif
-
-        public static bool Input<T>(this string reason, out T[] result) where T : struct
-        {
-            var content = reason.Content(out result);
-            for (int i = 0; i < content.Length; ++i)
-            {
-                content[i].Input(out result[i]);
-            }
-
-            return true;
+            return result;
         }
 
         private static string[] Content<T>(this string reason, out T[] result)

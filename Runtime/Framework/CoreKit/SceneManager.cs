@@ -12,38 +12,40 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using JFramework.Interface;
-using Sirenix.OdinInspector;
 using UnityEngine;
-using UnitySceneManager = UnityEngine.SceneManagement.SceneManager;
 
 namespace JFramework.Core
 {
-    public sealed class SceneManager : ScriptableObject
+    public static class SceneManager
     {
-        [ShowInInspector, LabelText("场景对象")] private Dictionary<Type, IEntity> objects = new();
-        [ShowInInspector] public bool isLoading { get; private set; }
+        internal static readonly Dictionary<Type, IEntity> objects = new();
+        public static bool isLoading { get; private set; }
 
-        public void Register<T>(T entity) where T : IEntity
+        public static void Register<T>(T entity) where T : IEntity
         {
+            if (!GlobalManager.Instance) return;
             objects.TryAdd(typeof(T), entity);
         }
 
-        public T Get<T>() where T : IEntity
+        public static T Get<T>() where T : IEntity
         {
+            if (!GlobalManager.Instance) return default;
             return (T)objects.GetValueOrDefault(typeof(T));
         }
 
-        public void UnRegister<T>() where T : IEntity
+        public static void UnRegister<T>() where T : IEntity
         {
+            if (!GlobalManager.Instance) return;
             objects.Remove(typeof(T));
         }
 
-        public async Task Load(string name)
+        public static async Task Load(string name)
         {
+            if (!GlobalManager.Instance) return;
             try
             {
                 isLoading = true;
-                var operation = await GlobalManager.Asset.LoadSceneAsync(SettingManager.GetScenePath(name));
+                var operation = await AssetManager.LoadSceneAsync(SettingManager.GetScenePath(name));
                 await operation;
                 isLoading = false;
             }
@@ -53,12 +55,13 @@ namespace JFramework.Core
             }
         }
 
-        public async void LoadAsync(string name, Action<AsyncOperation> action = null)
+        public static async void LoadAsync(string name, Action<AsyncOperation> action = null)
         {
+            if (!GlobalManager.Instance) return;
             try
             {
                 isLoading = true;
-                var operation = await GlobalManager.Asset.LoadSceneAsync(SettingManager.GetScenePath(name));
+                var operation = await AssetManager.LoadSceneAsync(SettingManager.GetScenePath(name));
                 action?.Invoke(operation);
                 isLoading = false;
             }
@@ -68,12 +71,7 @@ namespace JFramework.Core
             }
         }
 
-        public override string ToString()
-        {
-            return UnitySceneManager.GetActiveScene().name;
-        }
-
-        internal void OnDisable()
+        internal static void UnRegister()
         {
             objects.Clear();
             isLoading = false;

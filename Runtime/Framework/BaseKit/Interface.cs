@@ -13,10 +13,6 @@ using UnityEngine;
 
 namespace JFramework.Interface
 {
-    public interface IVariable
-    {
-    }
-
     public interface IEntity
     {
         Transform transform { get; }
@@ -83,6 +79,8 @@ namespace JFramework.Interface
         void AddData(IData data);
 
         IData GetData(int index);
+
+        void Clear();
     }
 
     public interface IPanel : IEntity

@@ -15,6 +15,7 @@ using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
+using JFramework.Core;
 using Debug = UnityEngine.Debug;
 using UnityEditor;
 using UnityEngine;
@@ -45,7 +46,7 @@ namespace JFramework
                 }
             }
         }
-        
+
         private static string GetProviderInfo(string filePath)
         {
             using var file = new FileStream(filePath, FileMode.Open);
@@ -112,8 +113,7 @@ namespace JFramework
                     SettingManager.Instance.objects[$"{folder}/{asset.name}"] = asset;
                 }
             }
-
-            Debug.Log("更新 AssetBundles 完成。".Green());
+            
             AssetDatabase.Refresh();
         }
 
@@ -125,7 +125,7 @@ namespace JFramework
             BuildPipeline.BuildAssetBundles(SettingManager.platformPath, BuildAssetBundleOptions.ChunkBasedCompression, (BuildTarget)SettingManager.Instance.platform);
             var infoList = directory.GetFiles().Where(info => info.Extension == "").ToList();
             var fileList = infoList.Select(info => new Bundle(GetProviderInfo(info.FullName), info.Name, info.Length.ToString())).ToList();
-            var contents = JsonUtility.ToJson(new Variables<Bundle>(fileList), true);
+            var contents = JsonManager.Writer(fileList, true);
             File.WriteAllText(SettingManager.assetBundleInfo, contents);
             Debug.Log("构建 AssetBundles 成功!".Green());
             AssetDatabase.Refresh();

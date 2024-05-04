@@ -24,17 +24,15 @@ using UnitySceneManager = UnityEngine.SceneManagement.SceneManager;
 
 namespace JFramework.Core
 {
-    using AssetTask = Task<AssetBundle>;
-
-    public sealed class AssetManager : ScriptableObject
+    public static class AssetManager
     {
-        [ShowInInspector, LabelText("加载资源")] private Dictionary<string, Asset> assets = new();
-        [ShowInInspector, LabelText("等待列表")] private Dictionary<string, AssetTask> awaits = new();
-        [ShowInInspector, LabelText("依赖列表")] private Dictionary<string, AssetBundle> bundles = new();
-        private AssetBundle mainAsset;
-        private AssetBundleManifest manifest;
+        private static readonly Dictionary<string, Asset> assets = new();
+        private static readonly Dictionary<string, AssetBundle> bundles = new();
+        private static readonly Dictionary<string, Task<AssetBundle>> assetTasks = new();
+        private static AssetBundle mainAsset;
+        private static AssetBundleManifest manifest;
 
-        private async Task LoadDependency(string bundle)
+        private static async Task LoadDependency(string bundle)
         {
             if (mainAsset == null)
             {
@@ -52,15 +50,15 @@ namespace JFramework.Core
             }
         }
 
-        private async Task<AssetBundle> LoadAssetTask(string bundle)
+        private static async Task<AssetBundle> LoadAssetTask(string bundle)
         {
-            if (awaits.TryGetValue(bundle, out var task))
+            if (assetTasks.TryGetValue(bundle, out var task))
             {
                 return await task;
             }
 
             var newTask = LoadAssetBundle(bundle);
-            awaits[bundle] = newTask;
+            assetTasks[bundle] = newTask;
 
             try
             {
@@ -68,11 +66,11 @@ namespace JFramework.Core
             }
             finally
             {
-                awaits.Remove(bundle);
+                assetTasks.Remove(bundle);
             }
         }
 
-        private async Task<AssetBundle> LoadAssetBundle(string bundle)
+        private static async Task<AssetBundle> LoadAssetBundle(string bundle)
         {
             var path = SettingManager.GetPersistentPath(bundle);
             if (File.Exists(path))
@@ -109,10 +107,11 @@ namespace JFramework.Core
             return null;
         }
 
-        public async Task<T> Load<T>(string path) where T : Object
+        public static async Task<T> Load<T>(string path) where T : Object
         {
             try
             {
+                if (!GlobalManager.Instance) return null;
 #if UNITY_EDITOR
                 if (!SettingManager.Instance.remoteLoad)
                 {
@@ -138,12 +137,12 @@ namespace JFramework.Core
                 if (typeof(T).IsSubclassOf(typeof(Component)))
                 {
                     var obj = assetBundle.LoadAssetAsync<GameObject>(assetData.asset);
-                    return ((GameObject)Instantiate(obj.asset)).GetComponent<T>();
+                    return ((GameObject)Object.Instantiate(obj.asset)).GetComponent<T>();
                 }
                 else
                 {
                     var obj = assetBundle.LoadAssetAsync<T>(assetData.asset);
-                    return obj.asset is GameObject ? (T)Instantiate(obj.asset) : (T)obj.asset;
+                    return obj.asset is GameObject ? (T)Object.Instantiate(obj.asset) : (T)obj.asset;
                 }
             }
             catch (Exception e)
@@ -153,10 +152,11 @@ namespace JFramework.Core
             }
         }
 
-        public async void LoadAsync<T>(string path, Action<T> action = null) where T : Object
+        public static async void LoadAsync<T>(string path, Action<T> action = null) where T : Object
         {
             try
             {
+                if (!GlobalManager.Instance) return;
 #if UNITY_EDITOR
                 if (!SettingManager.Instance.remoteLoad)
                 {
@@ -184,13 +184,13 @@ namespace JFramework.Core
                 if (typeof(T).IsSubclassOf(typeof(Component)))
                 {
                     var obj = assetBundle.LoadAssetAsync<GameObject>(assetData.asset);
-                    var asset = ((GameObject)Instantiate(obj.asset)).GetComponent<T>();
+                    var asset = ((GameObject)Object.Instantiate(obj.asset)).GetComponent<T>();
                     action?.Invoke(asset);
                 }
                 else
                 {
                     var obj = assetBundle.LoadAssetAsync<T>(assetData.asset);
-                    var asset = obj.asset is GameObject ? (T)Instantiate(obj.asset) : (T)obj.asset;
+                    var asset = obj.asset is GameObject ? (T)Object.Instantiate(obj.asset) : (T)obj.asset;
                     action?.Invoke(asset);
                 }
             }
@@ -200,8 +200,9 @@ namespace JFramework.Core
             }
         }
 
-        internal async Task<AsyncOperation> LoadSceneAsync(string path)
+        internal static async Task<AsyncOperation> LoadSceneAsync(string path)
         {
+            if (!GlobalManager.Instance) return null;
 #if UNITY_EDITOR
             if (!SettingManager.Instance.remoteLoad)
             {
@@ -227,24 +228,10 @@ namespace JFramework.Core
             return UnitySceneManager.LoadSceneAsync(assetData.asset, LoadSceneMode.Single);
         }
 
-        public void Unload(string bundle)
-        {
-            if (bundles.TryGetValue(bundle, out var assetBundle))
-            {
-                assetBundle.Unload(false);
-                foreach (var asset in assets.Values.Where(asset => asset.bundle == bundle))
-                {
-                    assets.Remove($"{asset.bundle}/{asset.asset}");
-                }
-
-                bundles.Remove(bundle);
-            }
-        }
-
-        internal void OnDisable()
+        internal static void UnRegister()
         {
             AssetBundle.UnloadAllAssetBundles(true);
-            awaits.Clear();
+            assetTasks.Clear();
             assets.Clear();
             bundles.Clear();
             manifest = null;

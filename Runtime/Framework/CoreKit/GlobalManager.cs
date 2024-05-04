@@ -10,12 +10,11 @@
 
 using System;
 using System.Collections.Generic;
-using JFramework.Core;
 using JFramework.Interface;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
-namespace JFramework
+namespace JFramework.Core
 {
     [AddComponentMenu(""), DefaultExecutionOrder(-10)]
     public sealed partial class GlobalManager : MonoBehaviour, IEntity
@@ -28,6 +27,8 @@ namespace JFramework
 
         public static event Action OnQuit;
 
+        public static event Action OnCheat;
+
         private void Awake()
         {
             Instance = this;
@@ -35,11 +36,11 @@ namespace JFramework
 
         private void OnEnable()
         {
-            json.OnEnable();
-            pool.OnEnable();
-            sound.OnEnable();
-            timer.OnEnable();
-            panel.OnEnable();
+            UIManager.Register();
+            JsonManager.Register();
+            PoolManager.Register();
+            AudioManager.Register();
+            TimerManager.Register();
         }
 
         private void Start()
@@ -68,16 +69,16 @@ namespace JFramework
 
         private void OnDisable()
         {
-            data.OnDisable();
-            pool.OnDisable();
-            asset.OnDisable();
-            sound.OnDisable();
-            scene.OnDisable();
-            timer.OnDisable();
-            panel.OnDisable();
-            entity.OnDisable();
-            @event.OnDisable();
-            request.OnDisable();
+            UIManager.UnRegister();
+            DataManager.UnRegister();
+            PoolManager.UnRegister();
+            AssetManager.UnRegister();
+            AudioManager.UnRegister();
+            SceneManager.UnRegister();
+            TimerManager.UnRegister();
+            EventManager.UnRegister();
+            EntityManager.UnRegister();
+            RequestManager.UnRegister();
         }
 
         private void OnApplicationQuit()
@@ -98,47 +99,34 @@ namespace JFramework
             OnQuit = null;
             OnStart = null;
             OnUpdate = null;
+            OnCheat = null;
             GC.Collect();
+        }
+
+        public static void Cheat()
+        {
+            Debug.LogWarning("检查到作弊！");
+            OnCheat?.Invoke();
         }
     }
 
     public sealed partial class GlobalManager
     {
         public static bool isRemote => SettingManager.Instance.remoteLoad;
-
-        [ShowInInspector] private Dictionary<Type, IPool> stream => StreamPool.streams;
-
-        [SerializeField] private EntityManager entity;
-        internal static EntityManager Entity => Instance != null ? Instance.entity : null;
-
-        [SerializeField] private UIManager panel;
-        public static UIManager UI => Instance != null ? Instance.panel : null;
-
-        [SerializeField] private JsonManager json;
-        public static JsonManager Json => Instance != null ? Instance.json : null;
-
-        [SerializeField] private PoolManager pool;
-        public static PoolManager Pool => Instance != null ? Instance.pool : null;
-
-        [SerializeField] private DataManager data;
-        public static DataManager Data => Instance != null ? Instance.data : null;
-
-        [SerializeField] private AssetManager asset;
-        public static AssetManager Asset => Instance != null ? Instance.asset : null;
-
-        [SerializeField] private SceneManager scene;
-        public static SceneManager Scene => Instance != null ? Instance.scene : null;
-
-        [SerializeField] private TimerManager timer;
-        public static TimerManager Time => Instance != null ? Instance.timer : null;
-
-        [SerializeField] private AudioManager sound;
-        public static AudioManager Audio => Instance != null ? Instance.sound : null;
-
-        [SerializeField] private EventManager @event;
-        public static EventManager Event => Instance != null ? Instance.@event : null;
-
-        [SerializeField] private RequestManager request;
-        public static RequestManager Request => Instance != null ? Instance.request : null;
+        public static AssetPlatform platform => SettingManager.Instance.platform;
+        [ShowInInspector] private static Dictionary<Type, IPool> streams => StreamPool.streams;
+        [ShowInInspector] private static Dictionary<IEntity, Dictionary<Type, IComponent>> entities => EntityManager.entities;
+        [ShowInInspector] private static Dictionary<Type, IPanel> panels => UIManager.panels;
+        [ShowInInspector] private static Dictionary<Type, IEvent> events => EventManager.observers;
+        [ShowInInspector] private static Dictionary<Type, IEntity> scenes => SceneManager.objects;
+        [ShowInInspector] private static Dictionary<string, IPool<GameObject>> objects => PoolManager.pools;
+        [ShowInInspector] private static Dictionary<Type, Dictionary<int, IData>> intData => DataManager.intData;
+        [ShowInInspector] private static Dictionary<Type, Dictionary<Enum, IData>> enumData => DataManager.enumData;
+        [ShowInInspector] private static Dictionary<Type, Dictionary<string, IData>> stringData => DataManager.stringData;
+        [ShowInInspector] private static List<Timer> timerPlay => TimerManager.timers;
+        [ShowInInspector] private static List<AudioSource> audioStop => AudioManager.stops;
+        [ShowInInspector] private static List<AudioSource> audioPlay => AudioManager.plays;
+        [ShowInInspector, Range(0, 1)] private static float audioVolume => AudioManager.audioSetting.soundVolume;
+        [ShowInInspector, Range(0, 1)] private static float soundVolume => AudioManager.audioSetting.soundVolume;
     }
 }

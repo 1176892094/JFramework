@@ -13,36 +13,35 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using Sirenix.OdinInspector;
-using UnityEngine;
 using UnityEngine.Networking;
 using Debug = UnityEngine.Debug;
 
 namespace JFramework.Core
 {
-    public sealed class RequestManager : ScriptableObject
+    public static class RequestManager
     {
-        [ShowInInspector, LabelText("本地资源")] private Dictionary<string, Bundle> localAssets = new();
-        [ShowInInspector, LabelText("远端资源")] private Dictionary<string, Bundle> remoteAssets = new();
-        private readonly List<string> updateAssets = new();
-        public event Action<int> OnLoadStart;
-        public event Action<bool> OnLoadComplete;
-        public event Action<string, float> OnLoadUpdate;
+        private static Dictionary<string, Bundle> localAssets = new();
+        private static Dictionary<string, Bundle> remoteAssets = new();
+        private static readonly List<string> updateAssets = new();
+        public static event Action<int> OnLoadStart;
+        public static event Action<bool> OnLoadComplete;
+        public static event Action<string, float> OnLoadUpdate;
 
-        public async void UpdateAssetBundles()
+        public static async void UpdateAssetBundles()
         {
+            if (!GlobalManager.Instance) return;
             if (await GetRemoteData())
             {
                 Debug.Log("解析远端对比文件完成");
                 var remoteInfo = await File.ReadAllTextAsync(SettingManager.remoteInfoPath);
-                var jsonData = JsonUtility.FromJson<Variables<Bundle>>(remoteInfo);
-                remoteAssets = jsonData.value.ToDictionary(data => data.name);
+                var jsonData = JsonManager.Reader<List<Bundle>>(remoteInfo);
+                remoteAssets = jsonData.ToDictionary(bundle => bundle.name);
 
                 var clientInfo = await GetLocalData();
                 if (clientInfo != null)
                 {
-                    jsonData = JsonUtility.FromJson<Variables<Bundle>>(clientInfo);
-                    localAssets = jsonData.value.ToDictionary(data => data.name);
+                    jsonData = JsonManager.Reader<List<Bundle>>(clientInfo);
+                    localAssets = jsonData.ToDictionary(bundle => bundle.name);
                 }
 
                 Debug.Log("解析本地对比文件完成");
@@ -141,7 +140,7 @@ namespace JFramework.Core
             return null;
         }
 
-        private async Task<bool> GetAssetBundles()
+        private static async Task<bool> GetAssetBundles()
         {
             var reloads = 5;
             var copyList = updateAssets.ToList();
@@ -181,7 +180,7 @@ namespace JFramework.Core
             return updateAssets.Count == 0;
         }
 
-        internal void OnDisable()
+        internal static void UnRegister()
         {
             OnLoadStart = null;
             OnLoadUpdate = null;

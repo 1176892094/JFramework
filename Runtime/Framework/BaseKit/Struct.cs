@@ -11,7 +11,6 @@
 using System;
 using System.Collections.Generic;
 using JFramework.Interface;
-using UnityEngine;
 
 namespace JFramework
 {
@@ -84,7 +83,7 @@ namespace JFramework
     [Serializable]
     internal struct Pool<T> : IPool<T>
     {
-        [SerializeField] private List<T> pool;
+        public List<T> pool;
 
         public int count => pool.Count;
 

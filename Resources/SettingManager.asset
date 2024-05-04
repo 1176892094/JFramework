@@ -17,8 +17,8 @@ MonoBehaviour:
   buildPath: AssetBundles
   assetPath: Assets/Template
   editorPath: Assets/Editor/Resources
-  remotePath: http://192.168.0.5:8000/Files/Unity/Forest/AssetBundles
-  remoteLoad: 1
+  remotePath: http://192.168.0.4:8000/Files/Unity/Forest/AssetBundles
+  remoteLoad: 0
   remoteBuild: 1
   sceneAssets:
   - Assets/Template/Scenes/AwakeScene.unity
