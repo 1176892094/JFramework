@@ -15,6 +15,7 @@ using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
+using JFramework;
 using JFramework.Core;
 using Debug = UnityEngine.Debug;
 using UnityEditor;

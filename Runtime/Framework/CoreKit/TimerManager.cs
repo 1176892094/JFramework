@@ -10,6 +10,7 @@
 
 using System;
 using System.Collections.Generic;
+using JFramework.Core;
 using UnityEngine;
 
 namespace JFramework.Core
@@ -52,7 +53,10 @@ namespace JFramework.Core
             timers.Clear();
         }
     }
+}
 
+namespace JFramework
+{
     [Serializable]
     public sealed class Timer
     {

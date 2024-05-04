@@ -14,18 +14,11 @@ using UnityEngine;
 
 namespace JFramework.Core
 {
-    [Serializable]
-    public class AudioSetting
-    {
-        public float audioVolume = 0.5f;
-        public float soundVolume = 0.5f;
-    }
-
     public static class AudioManager
     {
         internal static readonly List<AudioSource> stops = new();
         internal static readonly List<AudioSource> plays = new();
-        internal static readonly AudioSetting audioSetting = new AudioSetting();
+        public static readonly AudioSetting audioSetting = new AudioSetting();
         private static GameObject poolManager;
         private static AudioSource audioSource;
 
@@ -121,6 +114,13 @@ namespace JFramework.Core
             stops.Clear();
             poolManager = null;
             audioSource = null;
+        }
+        
+        [Serializable]
+        public class AudioSetting
+        {
+            public float audioVolume = 0.5f;
+            public float soundVolume = 0.5f;
         }
     }
 }

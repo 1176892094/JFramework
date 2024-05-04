@@ -13,6 +13,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using JFramework.Interface;
 using UnityEngine;
+using UnitySceneManager = UnityEngine.SceneManagement.SceneManager;
 
 namespace JFramework.Core
 {
@@ -20,6 +21,8 @@ namespace JFramework.Core
     {
         internal static readonly Dictionary<Type, IEntity> objects = new();
         public static bool isLoading { get; private set; }
+
+        public static string sceneName => UnitySceneManager.GetActiveScene().name;
 
         public static void Register<T>(T entity) where T : IEntity
         {

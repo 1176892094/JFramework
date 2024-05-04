@@ -11,6 +11,7 @@
 using System;
 using System.Collections.Generic;
 using System.Reflection;
+using JFramework;
 using JFramework.Core;
 using JFramework.Interface;
 using UnityEngine;

@@ -16,6 +16,26 @@ using UnityEngine;
 
 namespace JFramework.Core
 {
+    public sealed partial class GlobalManager
+    {
+        public static bool isRemote => SettingManager.Instance.remoteLoad;
+        public static AssetPlatform platform => SettingManager.Instance.platform;
+        [ShowInInspector] private static Dictionary<Type, IPool> streams => StreamPool.streams;
+        [ShowInInspector] private static Dictionary<IEntity, Dictionary<Type, IComponent>> entities => EntityManager.entities;
+        [ShowInInspector] private static Dictionary<Type, IPanel> panels => UIManager.panels;
+        [ShowInInspector] private static Dictionary<Type, IEvent> events => EventManager.observers;
+        [ShowInInspector] private static Dictionary<Type, IEntity> scenes => SceneManager.objects;
+        [ShowInInspector] private static Dictionary<string, IPool<GameObject>> objects => PoolManager.pools;
+        [ShowInInspector] private static Dictionary<Type, Dictionary<int, IData>> intData => DataManager.intData;
+        [ShowInInspector] private static Dictionary<Type, Dictionary<Enum, IData>> enumData => DataManager.enumData;
+        [ShowInInspector] private static Dictionary<Type, Dictionary<string, IData>> stringData => DataManager.stringData;
+        [ShowInInspector] private static List<Timer> timerPlay => TimerManager.timers;
+        [ShowInInspector] private static List<AudioSource> audioStop => AudioManager.stops;
+        [ShowInInspector] private static List<AudioSource> audioPlay => AudioManager.plays;
+        [ShowInInspector] private static float audioVolume => AudioManager.audioSetting.soundVolume;
+        [ShowInInspector] private static float soundVolume => AudioManager.audioSetting.soundVolume;
+    }
+
     [AddComponentMenu(""), DefaultExecutionOrder(-10)]
     public sealed partial class GlobalManager : MonoBehaviour, IEntity
     {
@@ -108,25 +128,5 @@ namespace JFramework.Core
             Debug.LogWarning("检查到作弊！");
             OnCheat?.Invoke();
         }
-    }
-
-    public sealed partial class GlobalManager
-    {
-        public static bool isRemote => SettingManager.Instance.remoteLoad;
-        public static AssetPlatform platform => SettingManager.Instance.platform;
-        [ShowInInspector] private static Dictionary<Type, IPool> streams => StreamPool.streams;
-        [ShowInInspector] private static Dictionary<IEntity, Dictionary<Type, IComponent>> entities => EntityManager.entities;
-        [ShowInInspector] private static Dictionary<Type, IPanel> panels => UIManager.panels;
-        [ShowInInspector] private static Dictionary<Type, IEvent> events => EventManager.observers;
-        [ShowInInspector] private static Dictionary<Type, IEntity> scenes => SceneManager.objects;
-        [ShowInInspector] private static Dictionary<string, IPool<GameObject>> objects => PoolManager.pools;
-        [ShowInInspector] private static Dictionary<Type, Dictionary<int, IData>> intData => DataManager.intData;
-        [ShowInInspector] private static Dictionary<Type, Dictionary<Enum, IData>> enumData => DataManager.enumData;
-        [ShowInInspector] private static Dictionary<Type, Dictionary<string, IData>> stringData => DataManager.stringData;
-        [ShowInInspector] private static List<Timer> timerPlay => TimerManager.timers;
-        [ShowInInspector] private static List<AudioSource> audioStop => AudioManager.stops;
-        [ShowInInspector] private static List<AudioSource> audioPlay => AudioManager.plays;
-        [ShowInInspector, Range(0, 1)] private static float audioVolume => AudioManager.audioSetting.soundVolume;
-        [ShowInInspector, Range(0, 1)] private static float soundVolume => AudioManager.audioSetting.soundVolume;
     }
 }
