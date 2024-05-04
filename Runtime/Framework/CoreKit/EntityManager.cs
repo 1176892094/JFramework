@@ -60,7 +60,6 @@ namespace JFramework.Core
 
         public static void UnRegister()
         {
-            if (!GlobalManager.Instance) return;
             var copies = entities.Keys.ToList();
             foreach (var entity in copies)
             {
