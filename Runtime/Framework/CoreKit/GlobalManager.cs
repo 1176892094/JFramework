@@ -10,6 +10,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using JFramework.Interface;
 using Sirenix.OdinInspector;
 using UnityEngine;
@@ -30,8 +31,8 @@ namespace JFramework.Core
         [ShowInInspector] private static Dictionary<Type, Dictionary<Enum, IData>> enumData => DataManager.enumData;
         [ShowInInspector] private static Dictionary<Type, Dictionary<string, IData>> stringData => DataManager.stringData;
         [ShowInInspector] private static List<Timer> timerPlay => TimerManager.timers;
-        [ShowInInspector] private static List<AudioSource> audioStop => AudioManager.stops;
-        [ShowInInspector] private static List<AudioSource> audioPlay => AudioManager.plays;
+        [ShowInInspector] private static List<AudioClip> audioStop => AudioManager.stops.Select(source => source.clip).ToList();
+        [ShowInInspector] private static List<AudioClip> audioPlay => AudioManager.plays.Select(source => source.clip).ToList();
         [ShowInInspector] private static float audioVolume => AudioManager.audioValue;
         [ShowInInspector] private static float soundVolume => AudioManager.soundValue;
     }

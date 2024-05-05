@@ -18,9 +18,20 @@ namespace JFramework.Core
     {
         internal static readonly List<AudioSource> stops = new();
         internal static readonly List<AudioSource> plays = new();
-        public static readonly AudioSetting audioSetting = new AudioSetting();
+        private static readonly AudioSetting audioSetting = new AudioSetting();
         private static GameObject poolManager;
         private static AudioSource audioSource;
+        public static float audioValue
+        {
+            get => audioSetting.audioVolume;
+            set => audioSetting.audioVolume = value;
+        }
+        
+        public static float soundValue
+        {
+            get => audioSetting.soundVolume;
+            set => audioSetting.soundVolume = value;
+        }
 
         internal static void Register()
         {
@@ -33,7 +44,7 @@ namespace JFramework.Core
         {
             if (!GlobalManager.Instance) return;
             var clip = await AssetManager.Load<AudioClip>(SettingManager.GetAudioPath(name));
-            audioSource.volume = audioSetting.audioVolume;
+            audioSource.volume = audioValue;
             audioSource.clip = clip;
             audioSource.loop = true;
             audioSource.Play();
@@ -47,7 +58,7 @@ namespace JFramework.Core
             var sound = stops.Count > 0 ? stops[0] : poolManager.AddComponent<AudioSource>();
             stops.Remove(sound);
             plays.Add(sound);
-            sound.volume = audioSetting.soundVolume;
+            sound.volume = soundValue;
             sound.clip = clip;
             TimerManager.Pop(clip.length).Invoke(() => StopSound(sound));
             sound.Play();
@@ -61,7 +72,7 @@ namespace JFramework.Core
             var sound = stops.Count > 0 ? stops[0] : poolManager.AddComponent<AudioSource>();
             stops.Remove(sound);
             plays.Add(sound);
-            sound.volume = audioSetting.soundVolume;
+            sound.volume = soundValue;
             sound.clip = clip;
             sound.loop = true;
             sound.Play();
