@@ -16,10 +16,18 @@ MonoBehaviour:
   assetInfo: AssetBundleInfo
   buildPath: AssetBundles
   assetPath: Assets/Template
+  dataPath: Assets/Template/DataTable
+  scriptPath: Assets/Scripts/DataTable
   editorPath: Assets/Editor/Resources
   remotePath: http://192.168.0.4:8000/Files/Unity/Forest/AssetBundles
   remoteLoad: 0
   remoteBuild: 1
+  assetLoadKey: 0
+  excelPathKey: /Users/jinyijie/Files/Unity/Forest/DataTable
+  sceneEditor:
+  - 
+  - 
+  - 
   sceneAssets:
   - Assets/Template/Scenes/AwakeScene.unity
   - Assets/Template/Scenes/BossScene1.unity
