@@ -32,8 +32,8 @@ namespace JFramework.Core
         [ShowInInspector] private static List<Timer> timerPlay => TimerManager.timers;
         [ShowInInspector] private static List<AudioSource> audioStop => AudioManager.stops;
         [ShowInInspector] private static List<AudioSource> audioPlay => AudioManager.plays;
-        [ShowInInspector] private static float audioVolume => AudioManager.audioSetting.audioVolume;
-        [ShowInInspector] private static float soundVolume => AudioManager.audioSetting.soundVolume;
+        [ShowInInspector] private static float audioVolume => AudioManager.audioValue;
+        [ShowInInspector] private static float soundVolume => AudioManager.soundValue;
     }
 
     [AddComponentMenu(""), DefaultExecutionOrder(-10)]
