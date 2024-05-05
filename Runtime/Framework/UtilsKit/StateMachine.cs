@@ -75,9 +75,12 @@ namespace JFramework
         {
             if (!SceneManager.isLoading)
             {
-                state?.OnExit();
-                state = states[typeof(T2)];
-                state?.OnEnter();
+                if (owner.gameObject.activeInHierarchy)
+                {
+                    state?.OnExit();
+                    state = states[typeof(T2)];
+                    state?.OnEnter();
+                }
             }
         }
 
