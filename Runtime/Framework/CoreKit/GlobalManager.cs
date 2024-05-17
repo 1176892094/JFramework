@@ -35,6 +35,9 @@ namespace JFramework.Core
         [ShowInInspector] private static List<AudioClip> audioPlay => AudioManager.plays.Select(source => source.clip).ToList();
         [ShowInInspector] private static float audioVolume => AudioManager.audioValue;
         [ShowInInspector] private static float soundVolume => AudioManager.soundValue;
+#if UNITY_EDITOR
+        public static void EditorWindow(string path, object editor) => EditorSetting.editors[path] = editor;
+#endif
     }
 
     [AddComponentMenu(""), DefaultExecutionOrder(-10)]

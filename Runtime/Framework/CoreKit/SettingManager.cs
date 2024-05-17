@@ -12,9 +12,6 @@ using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
 using Object = UnityEngine.Object;
-#if UNITY_EDITOR
-using UnityEditor;
-#endif
 
 namespace JFramework
 {
@@ -22,9 +19,7 @@ namespace JFramework
     {
         private static SettingManager instance;
         public static SettingManager Instance => instance ??= Resources.Load<SettingManager>(nameof(SettingManager));
-
-        private static readonly string assetSavePath = $"Packages/com.jinyijie.core/Resources/{nameof(SettingManager)}.asset";
-
+        
         public AssetPlatform platform = AssetPlatform.StandaloneWindows;
 
         public string assetInfo = "AssetBundleInfo";
@@ -32,9 +27,9 @@ namespace JFramework
         public string buildPath = "AssetBundles";
 
         public string assetPath = "Assets/Template";
-        
+
         public string dataPath = "Assets/Template/DataTable";
-        
+
         public string scriptPath = "Assets/Scripts/DataTable";
 
         public string editorPath = "Assets/Editor/Resources";
@@ -45,9 +40,9 @@ namespace JFramework
 
         public bool remoteBuild;
 
-        public bool assetLoadKey;
+        [HideInInspector] public bool assetLoadKey;
 
-        public string excelPathKey;
+        [HideInInspector] public string excelPathKey;
 
         public static string clientInfoName => Instance.assetInfo + ".json";
 
@@ -76,8 +71,8 @@ namespace JFramework
         private static string GetPlatform(string fileName) => Path.Combine(Instance.platform.ToString(), fileName);
 
 #if UNITY_EDITOR
-        [Folder] public string[] sceneEditor = new string[3];
-        [Folder] public List<string> sceneAssets = new List<string>();
+        [HideInInspector] public string[] sceneEditor = new string[3];
+        [HideInInspector] public List<string> sceneAssets = new List<string>();
 
         public readonly Dictionary<string, Object> objects = new Dictionary<string, Object>();
 
@@ -111,73 +106,6 @@ namespace JFramework
             }
 
             return null;
-        }
-
-        private static SettingManager GetOrAddSettings()
-        {
-            var settings = Resources.Load<SettingManager>(nameof(SettingManager));
-            if (settings == null)
-            {
-                settings = CreateInstance<SettingManager>();
-                var directory = Path.GetDirectoryName(assetSavePath);
-                if (!Directory.Exists(directory) && !string.IsNullOrEmpty(directory))
-                {
-                    Directory.CreateDirectory(directory);
-                }
-
-                AssetDatabase.CreateAsset(settings, assetSavePath);
-                AssetDatabase.SaveAssets();
-            }
-
-            return settings;
-        }
-
-        private static SerializedObject GetSerializedSettings()
-        {
-            return new SerializedObject(GetOrAddSettings());
-        }
-
-        [SettingsProvider]
-        public static SettingsProvider CreateEditorLearnSettingsProvider()
-        {
-            var provider = new SettingsProvider("Project/JFramework", SettingsScope.Project)
-            {
-                guiHandler = _ =>
-                {
-                    var settings = GetSerializedSettings();
-                    EditorGUILayout.PropertyField(settings.FindProperty("platform"));
-                    EditorGUILayout.PropertyField(settings.FindProperty("assetInfo"));
-                    EditorGUILayout.PropertyField(settings.FindProperty("buildPath"));
-                    EditorGUILayout.PropertyField(settings.FindProperty("assetPath"));
-                    EditorGUILayout.PropertyField(settings.FindProperty("editorPath"));
-                    EditorGUILayout.PropertyField(settings.FindProperty("remotePath"));
-
-                    var field = settings.FindProperty("remoteLoad");
-                    EditorGUI.BeginDisabledGroup(true);
-                    EditorGUILayout.PropertyField(field);
-                    EditorGUI.EndDisabledGroup();
-                    if (GUILayout.Button("切换资源加载方式"))
-                    {
-                        field.boolValue = !field.boolValue;
-                        EditorSetting.UpdateSceneSetting(field.boolValue);
-                    }
-
-                    field = settings.FindProperty("remoteBuild");
-                    EditorGUI.BeginDisabledGroup(true);
-                    EditorGUILayout.PropertyField(field);
-                    EditorGUI.EndDisabledGroup();
-                    if (GUILayout.Button("切换资源构建目录"))
-                    {
-                        field.boolValue = !field.boolValue;
-                    }
-
-                    settings.ApplyModifiedPropertiesWithoutUndo();
-                },
-
-                keywords = new HashSet<string>(new[] { "JFramework" })
-            };
-
-            return provider;
         }
 #endif
     }

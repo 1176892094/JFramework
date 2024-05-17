@@ -10,13 +10,16 @@
 
 #if UNITY_EDITOR
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
-using JFramework;
 using JFramework.Core;
+using Sirenix.OdinInspector.Editor;
+using Sirenix.Utilities;
+using Sirenix.Utilities.Editor;
 using Debug = UnityEngine.Debug;
 using UnityEditor;
 using UnityEngine;
@@ -24,8 +27,46 @@ using Object = UnityEngine.Object;
 
 namespace JFramework
 {
-    internal partial class EditorSetting
+    internal partial class EditorSetting : OdinMenuEditorWindow
     {
+        public static readonly SortedDictionary<string, object> editors = new SortedDictionary<string, object>();
+
+        [MenuItem("Tools/JFramework/Editor Window _F1", priority = 1)]
+        protected static void ShowEditorWindow()
+        {
+            var window = GetWindow<EditorSetting>();
+            window.position = GUIHelper.GetEditorWindowRect().AlignCenter(800, 600);
+        }
+
+        protected override OdinMenuTree BuildMenuTree()
+        {
+            var tree = new OdinMenuTree
+            {
+                { "主页", SettingManager.Instance, EditorIcons.House },
+            };
+
+            var icon = 0;
+            foreach (var editor in editors)
+            {
+                switch (icon)
+                {
+                    case 0:
+                        tree.Add(editor.Key, editor.Value, EditorIcons.SettingsCog);
+                        break;
+                    case 1:
+                        tree.Add(editor.Key, editor.Value, EditorIcons.Bell);
+                        break;
+                    default:
+                        tree.Add(editor.Key, editor.Value, EditorIcons.Folder);
+                        break;
+                }
+
+                icon++;
+            }
+
+            return tree;
+        }
+
         public static void UpdateSceneSetting(bool remoteLoad)
         {
             if (!SettingManager.Instance) return;
@@ -69,7 +110,7 @@ namespace JFramework
         private static void RuntimeInitializeOnLoad() => UpdateAsset();
     }
 
-    internal static partial class EditorSetting
+    internal partial class EditorSetting
     {
         [MenuItem("Tools/JFramework/Update Assets", priority = 2)]
         private static void UpdateAsset()
@@ -114,7 +155,7 @@ namespace JFramework
                     SettingManager.Instance.objects[$"{folder}/{asset.name}"] = asset;
                 }
             }
-            
+
             AssetDatabase.Refresh();
         }
 
@@ -123,7 +164,8 @@ namespace JFramework
         {
             UpdateAsset();
             var directory = Directory.CreateDirectory(SettingManager.platformPath);
-            BuildPipeline.BuildAssetBundles(SettingManager.platformPath, BuildAssetBundleOptions.ChunkBasedCompression, (BuildTarget)SettingManager.Instance.platform);
+            BuildPipeline.BuildAssetBundles(SettingManager.platformPath, BuildAssetBundleOptions.ChunkBasedCompression,
+                (BuildTarget)SettingManager.Instance.platform);
             var infoList = directory.GetFiles().Where(info => info.Extension == "").ToList();
             var fileList = infoList.Select(info => new Bundle(GetProviderInfo(info.FullName), info.Name, info.Length.ToString())).ToList();
             var contents = JsonManager.Writer(fileList, true);
