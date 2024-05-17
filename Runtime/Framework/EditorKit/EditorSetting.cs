@@ -67,28 +67,6 @@ namespace JFramework
             return tree;
         }
 
-        public static void UpdateSceneSetting(bool remoteLoad)
-        {
-            if (!SettingManager.Instance) return;
-            var sceneAssets = EditorBuildSettings.scenes.Select(scene => scene.path).ToList();
-            foreach (var scenePath in SettingManager.Instance.sceneAssets)
-            {
-                if (sceneAssets.Contains(scenePath))
-                {
-                    if (!remoteLoad) continue;
-                    var scenes = EditorBuildSettings.scenes.Where(scene => scene.path != scenePath);
-                    EditorBuildSettings.scenes = scenes.ToArray();
-                }
-                else
-                {
-                    if (remoteLoad) continue;
-                    var scenes = EditorBuildSettings.scenes.ToList();
-                    scenes.Add(new EditorBuildSettingsScene(scenePath, true));
-                    EditorBuildSettings.scenes = scenes.ToArray();
-                }
-            }
-        }
-
         private static string GetProviderInfo(string filePath)
         {
             using var file = new FileStream(filePath, FileMode.Open);

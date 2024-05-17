@@ -10,8 +10,14 @@
 
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
+using Sirenix.OdinInspector;
 using UnityEngine;
 using Object = UnityEngine.Object;
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
+
 
 namespace JFramework
 {
@@ -19,7 +25,7 @@ namespace JFramework
     {
         private static SettingManager instance;
         public static SettingManager Instance => instance ??= Resources.Load<SettingManager>(nameof(SettingManager));
-        
+
         public AssetPlatform platform = AssetPlatform.StandaloneWindows;
 
         public string assetInfo = "AssetBundleInfo";
@@ -36,6 +42,7 @@ namespace JFramework
 
         public string remotePath = "http://192.168.0.3:8000/AssetBundles";
 
+        [OnValueChanged("UpdateSceneSetting")]
         public bool remoteLoad;
 
         public bool remoteBuild;
@@ -106,6 +113,27 @@ namespace JFramework
             }
 
             return null;
+        }
+
+        public void UpdateSceneSetting()
+        {
+            var assets = EditorBuildSettings.scenes.Select(scene => scene.path).ToList();
+            foreach (var scenePath in sceneAssets)
+            {
+                if (assets.Contains(scenePath))
+                {
+                    if (!remoteLoad) continue;
+                    var scenes = EditorBuildSettings.scenes.Where(scene => scene.path != scenePath);
+                    EditorBuildSettings.scenes = scenes.ToArray();
+                }
+                else
+                {
+                    if (remoteLoad) continue;
+                    var scenes = EditorBuildSettings.scenes.ToList();
+                    scenes.Add(new EditorBuildSettingsScene(scenePath, true));
+                    EditorBuildSettings.scenes = scenes.ToArray();
+                }
+            }
         }
 #endif
     }
