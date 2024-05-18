@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 44ad09f1d6a94a539d03bf46ca54214f, type: 3}
   m_Name: SettingManager
   m_EditorClassIdentifier: 
-  platform: 2
+  platform: 13
   assetInfo: AssetBundleInfo
   buildPath: AssetBundles
   assetPath: Assets/Template
@@ -25,9 +25,9 @@ MonoBehaviour:
   assetLoadKey: 0
   excelPathKey: /Users/jinyijie/Files/Unity/Forest/DataTable
   sceneEditor:
+  - Assets/Template/Scenes/AwakeScene.unity
   - Assets/Template/Scenes/BossScene2.unity
   - Assets/Template/Scenes/BossScene4.unity
-  - Assets/Template/Scenes/LevelScene5.unity
   sceneAssets:
   - Assets/Template/Scenes/AwakeScene.unity
   - Assets/Template/Scenes/BossScene1.unity
