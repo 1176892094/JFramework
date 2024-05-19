@@ -8,6 +8,7 @@
 // # Description: This is an automatically generated comment.
 // *********************************************************************************
 
+#if UNITY_EDITOR
 using UnityEditor;
 using UnityEngine;
 
@@ -26,7 +27,7 @@ namespace JFramework
             EditorGUI.EndProperty();
         }
     }
-    
+
     [CustomPropertyDrawer(typeof(SecretFloat))]
     public class SecretFloatDrawer : PropertyDrawer
     {
@@ -40,7 +41,7 @@ namespace JFramework
             EditorGUI.EndProperty();
         }
     }
-    
+
     [CustomPropertyDrawer(typeof(SecretString))]
     public class SecretStringDrawer : PropertyDrawer
     {
@@ -55,3 +56,4 @@ namespace JFramework
         }
     }
 }
+#endif
