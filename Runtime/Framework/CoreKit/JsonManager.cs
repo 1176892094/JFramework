@@ -14,6 +14,7 @@ using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
 using UnityEngine;
+using Object = UnityEngine.Object;
 
 namespace JFramework.Core
 {
@@ -28,28 +29,16 @@ namespace JFramework.Core
             secrets = copies.ToDictionary(json => json.name);
         }
 
-        public static T Reader<T>(string json)
-        {
-            return JsonUtility.FromJson<JsonMapper<T>>(json).value;
-        }
-
-        public static string Writer<T>(T obj, bool isPretty = false)
-        {
-            return JsonUtility.ToJson(new JsonMapper<T>(obj), isPretty);
-        }
-
         public static void Save<T>(T obj, string name)
         {
-            if (!GlobalManager.Instance) return;
             var filePath = FilePath(name);
-            object jsonData = obj is ScriptableObject ? obj : new JsonMapper<T>(obj);
+            object jsonData = obj is Object ? obj : new JsonMapper<T>(obj);
             var saveJson = JsonUtility.ToJson(jsonData);
             File.WriteAllText(filePath, saveJson);
         }
 
         public static void Load<T>(T obj, string name)
         {
-            if (!GlobalManager.Instance) return;
             var filePath = FilePath(name);
             if (!File.Exists(filePath))
             {
@@ -58,7 +47,7 @@ namespace JFramework.Core
 
             var saveJson = File.ReadAllText(filePath);
             if (string.IsNullOrEmpty(saveJson)) return;
-            object jsonData = obj is ScriptableObject ? obj : new JsonMapper<T>(obj);
+            object jsonData = obj is Object ? obj : new JsonMapper<T>(obj);
             JsonUtility.FromJsonOverwrite(saveJson, jsonData);
         }
 
@@ -66,7 +55,7 @@ namespace JFramework.Core
         {
             if (!GlobalManager.Instance) return;
             var filePath = FilePath(name);
-            object jsonData = obj is ScriptableObject ? obj : new JsonMapper<T>(obj);
+            object jsonData = obj is Object ? obj : new JsonMapper<T>(obj);
             var saveJson = Encrypt(JsonUtility.ToJson(jsonData), name);
             File.WriteAllBytes(filePath, saveJson);
         }
@@ -82,7 +71,7 @@ namespace JFramework.Core
 
             var saveJson = Decrypt(File.ReadAllBytes(filePath), name);
             if (string.IsNullOrEmpty(saveJson)) return;
-            object jsonData = obj is ScriptableObject ? obj : new JsonMapper<T>(obj);
+            object jsonData = obj is Object ? obj : new JsonMapper<T>(obj);
             JsonUtility.FromJsonOverwrite(saveJson, jsonData);
         }
 
@@ -145,6 +134,16 @@ namespace JFramework.Core
                 Save(secrets.Values.ToList(), nameof(JsonManager));
                 return null;
             }
+        }
+
+        public static T Reader<T>(string json)
+        {
+            return JsonUtility.FromJson<JsonMapper<T>>(json).value;
+        }
+
+        public static string Writer<T>(T obj, bool isPretty = false)
+        {
+            return JsonUtility.ToJson(new JsonMapper<T>(obj), isPretty);
         }
 
         [Serializable]
