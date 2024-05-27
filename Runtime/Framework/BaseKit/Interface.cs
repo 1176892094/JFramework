@@ -42,7 +42,7 @@ namespace JFramework.Interface
 
         void AddState<T>() where T : IState, new();
 
-        void AddState<T1, T2>() where T1 : IState where T2 : IState, new();
+        void AddState<T>(Type type) where T : IState;
 
         void ChangeState<T>() where T : IState;
     }

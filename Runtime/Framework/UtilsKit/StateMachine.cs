@@ -64,9 +64,9 @@ namespace JFramework
             states[typeof(T2)] = state;
         }
 
-        public void AddState<T2, T3>() where T2 : IState where T3 : IState, new()
+        public void AddState<T2>(Type type) where T2 : IState
         {
-            var state = StreamPool.Pop<IState>(typeof(T3));
+            var state = StreamPool.Pop<IState>(type);
             state.OnAwake(owner, this);
             states[typeof(T2)] = state;
         }
