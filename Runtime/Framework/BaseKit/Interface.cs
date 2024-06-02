@@ -27,7 +27,7 @@ namespace JFramework.Interface
 
     public interface IState
     {
-        void OnAwake(IEntity owner, IStateMachine machine);
+        void OnAwake(IEntity owner);
 
         void OnEnter();
 

@@ -23,19 +23,13 @@ namespace JFramework
     {
         public T owner { get; private set; }
 
-        public IStateMachine machine { get; private set; }
-
         protected abstract void OnEnter();
 
         protected abstract void OnUpdate();
 
         protected abstract void OnExit();
 
-        void IState.OnAwake(IEntity owner, IStateMachine machine)
-        {
-            this.owner = (T)owner;
-            this.machine = machine;
-        }
+        void IState.OnAwake(IEntity owner) => this.owner = (T)owner;
 
         void IState.OnEnter() => OnEnter();
 
@@ -60,14 +54,14 @@ namespace JFramework
         public void AddState<T2>() where T2 : IState, new()
         {
             var state = StreamPool.Pop<IState>(typeof(T2));
-            state.OnAwake(owner, this);
+            state.OnAwake(owner);
             states[typeof(T2)] = state;
         }
 
         public void AddState<T2>(Type type) where T2 : IState
         {
             var state = StreamPool.Pop<IState>(type);
-            state.OnAwake(owner, this);
+            state.OnAwake(owner);
             states[typeof(T2)] = state;
         }
 
