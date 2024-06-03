@@ -180,7 +180,7 @@ namespace JFramework.Core
             }
         }
 
-        internal static async Task<AsyncOperation> LoadSceneAsync(string path)
+        internal static async Task<string> LoadScene(string path)
         {
             try
             {
@@ -188,7 +188,7 @@ namespace JFramework.Core
 #if UNITY_EDITOR
                 if (!SettingManager.Instance.remoteLoad)
                 {
-                    return UnitySceneManager.LoadSceneAsync(path.Split('/')[1], LoadSceneMode.Single);
+                    return path.Split('/')[1];
                 }
 #endif
                 var assetData = await LoadAssetData(path);
@@ -196,7 +196,7 @@ namespace JFramework.Core
                 var scenePaths = assetBundle.GetAllScenePaths();
                 if (scenePaths.Any(scenePath => assetData.asset == scenePath))
                 {
-                    return UnitySceneManager.LoadSceneAsync(assetData.asset, LoadSceneMode.Single);
+                    return assetData.asset;
                 }
             }
             catch (Exception e)
