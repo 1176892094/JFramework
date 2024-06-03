@@ -20,9 +20,9 @@ namespace JFramework.Core
 {
     public static class RequestManager
     {
-        private static Dictionary<string, Bundle> localAssets = new();
-        private static Dictionary<string, Bundle> remoteAssets = new();
-        private static readonly List<string> updateAssets = new();
+        private static readonly List<string> updateBundles = new();
+        private static Dictionary<string, Bundle> clientBundles = new();
+        private static Dictionary<string, Bundle> remoteBundles = new();
         public static event Action<List<long>> OnLoadStart;
         public static event Action<string, float> OnLoadUpdate;
         public static event Action<bool> OnLoadComplete;
@@ -30,57 +30,58 @@ namespace JFramework.Core
         public static async void UpdateAssetBundles()
         {
             if (!GlobalManager.Instance) return;
-            if (await GetRemoteData())
+            if (!await GetRemoteBundle())
             {
-                Debug.Log("解析远端对比文件完成");
-                var remoteInfo = await File.ReadAllTextAsync(SettingManager.remoteInfoPath);
-                var jsonData = JsonManager.Reader<List<Bundle>>(remoteInfo);
-                remoteAssets = jsonData.ToDictionary(bundle => bundle.name);
+                Debug.Log("更新失败。");
+                OnLoadComplete?.Invoke(false);
+                return;
+            }
 
-                var clientInfo = await GetLocalData();
-                if (clientInfo != null)
-                {
-                    jsonData = JsonManager.Reader<List<Bundle>>(clientInfo);
-                    localAssets = jsonData.ToDictionary(bundle => bundle.name);
-                }
+            var remote = await File.ReadAllTextAsync(SettingManager.remoteInfoPath);
+            var bundles = JsonManager.Reader<List<Bundle>>(remote);
+            remoteBundles = bundles.ToDictionary(bundle => bundle.name);
 
-                Debug.Log("解析本地对比文件完成");
-                foreach (var fileName in remoteAssets.Keys)
+            var client = await GetClientBundle();
+            if (client != null)
+            {
+                bundles = JsonManager.Reader<List<Bundle>>(client);
+                clientBundles = bundles.ToDictionary(bundle => bundle.name);
+            }
+
+            foreach (var key in remoteBundles.Keys)
+            {
+                if (clientBundles.TryGetValue(key, out var bundle))
                 {
-                    if (!localAssets.ContainsKey(fileName))
+                    if (bundle != remoteBundles[key])
                     {
-                        updateAssets.Add(fileName);
+                        updateBundles.Add(key);
                     }
-                    else
-                    {
-                        if (localAssets[fileName] != remoteAssets[fileName])
-                        {
-                            updateAssets.Add(fileName);
-                        }
 
-                        localAssets.Remove(fileName);
-                    }
+                    clientBundles.Remove(key);
                 }
-
-                Debug.Log("删除弃用的资源文件");
-                foreach (var path in localAssets.Keys.Select(SettingManager.GetPersistentPath).Where(File.Exists))
+                else
                 {
-                    File.Delete(path);
-                }
-
-                if (await GetAssetBundles())
-                {
-                    await File.WriteAllTextAsync(SettingManager.clientInfoPath, remoteInfo);
-                    OnLoadComplete?.Invoke(true);
-                    return;
+                    updateBundles.Add(key);
                 }
             }
 
-            Debug.Log("更新失败。");
-            OnLoadComplete?.Invoke(false);
+            foreach (var key in clientBundles.Keys)
+            {
+                var path = SettingManager.GetPersistentPath(key);
+                if (File.Exists(path))
+                {
+                    File.Delete(path);
+                }
+            }
+
+            if (await GetAssetBundles())
+            {
+                await File.WriteAllTextAsync(SettingManager.clientInfoPath, remote);
+                OnLoadComplete?.Invoke(true);
+            }
         }
 
-        private static async Task<bool> GetRemoteData()
+        private static async Task<bool> GetRemoteBundle()
         {
             var reloads = 5;
             var success = false;
@@ -117,7 +118,7 @@ namespace JFramework.Core
             return success;
         }
 
-        private static async Task<string> GetLocalData()
+        private static async Task<string> GetClientBundle()
         {
             if (File.Exists(SettingManager.clientInfoPath))
             {
@@ -144,8 +145,8 @@ namespace JFramework.Core
         {
             var reloads = 5;
             var startLoad = false;
-            var nameList = updateAssets.ToList();
-            while (updateAssets.Count > 0 && reloads-- > 0)
+            var nameList = updateBundles.ToList();
+            while (updateBundles.Count > 0 && reloads-- > 0)
             {
                 var sizeList = new List<long>();
                 foreach (var fileName in nameList)
@@ -193,14 +194,14 @@ namespace JFramework.Core
                         await File.WriteAllBytesAsync(SettingManager.GetPersistentPath(fileName), contents);
                     }
 
-                    if (updateAssets.Contains(fileName))
+                    if (updateBundles.Contains(fileName))
                     {
-                        updateAssets.Remove(fileName);
+                        updateBundles.Remove(fileName);
                     }
                 }
             }
 
-            return updateAssets.Count == 0;
+            return updateBundles.Count == 0;
         }
 
         internal static void UnRegister()
@@ -208,9 +209,9 @@ namespace JFramework.Core
             OnLoadStart = null;
             OnLoadUpdate = null;
             OnLoadComplete = null;
-            localAssets.Clear();
-            remoteAssets.Clear();
-            updateAssets.Clear();
+            clientBundles.Clear();
+            remoteBundles.Clear();
+            updateBundles.Clear();
         }
     }
 }
