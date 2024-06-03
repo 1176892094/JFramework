@@ -36,17 +36,6 @@ namespace JFramework.Interface
         void OnExit();
     }
 
-    public interface IStateMachine
-    {
-        bool IsActive<T>() where T : IState;
-
-        void AddState<T>() where T : IState, new();
-
-        void AddState<T>(Type type) where T : IState;
-
-        void ChangeState<T>() where T : IState;
-    }
-
     public interface IEvent
     {
     }

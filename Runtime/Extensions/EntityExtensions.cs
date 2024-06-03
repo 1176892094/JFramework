@@ -47,12 +47,12 @@ namespace JFramework
                     }
 
                     var name = char.ToUpper(field.Name[0]) + field.Name.Substring(1);
-                    inject.AddComponent(field, name);
+                    inject.SetValue(field, name);
                 }
             }
         }
 
-        private static void AddComponent(this IEntity inject, FieldInfo field, string name)
+        private static void SetValue(this IEntity inject, FieldInfo field, string name)
         {
             var child = inject.transform.GetChild(name);
             if (child == null) return;

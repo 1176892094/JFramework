@@ -23,9 +23,9 @@ namespace JFramework.Core
         private static Dictionary<string, Bundle> localAssets = new();
         private static Dictionary<string, Bundle> remoteAssets = new();
         private static readonly List<string> updateAssets = new();
-        public static event Action<int> OnLoadStart;
-        public static event Action<bool> OnLoadComplete;
+        public static event Action<List<long>> OnLoadStart;
         public static event Action<string, float> OnLoadUpdate;
+        public static event Action<bool> OnLoadComplete;
 
         public static async void UpdateAssetBundles()
         {
@@ -143,11 +143,34 @@ namespace JFramework.Core
         private static async Task<bool> GetAssetBundles()
         {
             var reloads = 5;
-            var copyList = updateAssets.ToList();
-            OnLoadStart?.Invoke(updateAssets.Count);
+            var startLoad = false;
+            var nameList = updateAssets.ToList();
             while (updateAssets.Count > 0 && reloads-- > 0)
             {
-                foreach (var fileName in copyList)
+                var sizeList = new List<long>();
+                foreach (var fileName in nameList)
+                {
+                    var fileUri = SettingManager.GetRemoteFilePath(fileName);
+                    using (var request = UnityWebRequest.Head(fileUri))
+                    {
+                        await request.SendWebRequest();
+                        if (request.result != UnityWebRequest.Result.Success)
+                        {
+                            Debug.Log($"获取 {fileName} 文件失败\n");
+                            continue;
+                        }
+
+                        sizeList.Add(long.Parse(request.GetResponseHeader("Content-Length")));
+                    }
+                }
+
+                if (!startLoad)
+                {
+                    startLoad = true;
+                    OnLoadStart?.Invoke(sizeList);
+                }
+
+                foreach (var fileName in nameList)
                 {
                     var fileUri = SettingManager.GetRemoteFilePath(fileName);
                     using (var request = UnityWebRequest.Get(fileUri))

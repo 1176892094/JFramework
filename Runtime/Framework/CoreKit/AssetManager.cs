@@ -15,20 +15,107 @@ using System.Linq;
 using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.Networking;
-using UnityEngine.SceneManagement;
 using Debug = UnityEngine.Debug;
 using Object = UnityEngine.Object;
-using UnitySceneManager = UnityEngine.SceneManagement.SceneManager;
 
 namespace JFramework.Core
 {
     public static class AssetManager
     {
+        private static AssetBundle mainAsset;
+        private static AssetBundleManifest manifest;
         private static readonly Dictionary<string, Asset> assets = new();
         private static readonly Dictionary<string, AssetBundle> bundles = new();
         private static readonly Dictionary<string, Task<AssetBundle>> requests = new();
-        private static AssetBundle mainAsset;
-        private static AssetBundleManifest manifest;
+
+        public static async Task<T> Load<T>(string path) where T : Object
+        {
+            try
+            {
+                if (!GlobalManager.Instance) return null;
+#if UNITY_EDITOR
+                if (!SettingManager.Instance.remoteLoad)
+                {
+                    return SettingManager.Instance.Load<T>(path);
+                }
+#endif
+                var assetData = await LoadAssetData(path);
+                var assetBundle = await LoadAssetBundle(assetData.bundle);
+                if (typeof(T).IsSubclassOf(typeof(Component)))
+                {
+                    var obj = assetBundle.LoadAssetAsync<GameObject>(assetData.asset);
+                    return ((GameObject)Object.Instantiate(obj.asset)).GetComponent<T>();
+                }
+                else
+                {
+                    var obj = assetBundle.LoadAssetAsync<T>(assetData.asset);
+                    return obj.asset is GameObject ? (T)Object.Instantiate(obj.asset) : (T)obj.asset;
+                }
+            }
+            catch (Exception e)
+            {
+                Debug.LogWarning(e);
+                return null;
+            }
+        }
+
+        public static async void Load<T>(string path, Action<T> action) where T : Object
+        {
+            try
+            {
+                if (!GlobalManager.Instance) return;
+#if UNITY_EDITOR
+                if (!SettingManager.Instance.remoteLoad)
+                {
+                    action.Invoke(SettingManager.Instance.Load<T>(path));
+                    return;
+                }
+#endif
+                var assetData = await LoadAssetData(path);
+                var assetBundle = await LoadAssetBundle(assetData.bundle);
+                if (typeof(T).IsSubclassOf(typeof(Component)))
+                {
+                    var obj = assetBundle.LoadAssetAsync<GameObject>(assetData.asset);
+                    action.Invoke(((GameObject)Object.Instantiate(obj.asset)).GetComponent<T>());
+                }
+                else
+                {
+                    var obj = assetBundle.LoadAssetAsync<T>(assetData.asset);
+                    action.Invoke(obj.asset is GameObject ? (T)Object.Instantiate(obj.asset) : (T)obj.asset);
+                }
+            }
+            catch (Exception e)
+            {
+                Debug.LogWarning(e);
+            }
+        }
+
+        internal static async Task<string> LoadScene(string path)
+        {
+            try
+            {
+                if (!GlobalManager.Instance) return null;
+#if UNITY_EDITOR
+                if (!SettingManager.Instance.remoteLoad)
+                {
+                    return path.Split('/')[1];
+                }
+#endif
+                var assetData = await LoadAssetData(path);
+                var assetBundle = await LoadAssetBundle(assetData.bundle);
+                var scenePaths = assetBundle.GetAllScenePaths();
+                if (scenePaths.Any(scenePath => Path.GetFileNameWithoutExtension(scenePath) == assetData.asset))
+                {
+                    return assetData.asset;
+                }
+            }
+            catch (Exception e)
+            {
+                Debug.LogWarning(e);
+            }
+
+            return null;
+        }
 
         private static async Task<Asset> LoadAssetData(string path)
         {
@@ -108,102 +195,8 @@ namespace JFramework.Core
                 bundles.Add(bundle, assetBundle);
                 return assetBundle;
             }
-
 #endif
             Debug.LogWarning($"加载 {bundle} 资源包失败");
-            return null;
-        }
-
-        public static async Task<T> Load<T>(string path) where T : Object
-        {
-            try
-            {
-                if (!GlobalManager.Instance) return null;
-#if UNITY_EDITOR
-                if (!SettingManager.Instance.remoteLoad)
-                {
-                    return SettingManager.Instance.Load<T>(path);
-                }
-#endif
-
-                var assetData = await LoadAssetData(path);
-                var assetBundle = await LoadAssetBundle(assetData.bundle);
-                if (typeof(T).IsSubclassOf(typeof(Component)))
-                {
-                    var obj = assetBundle.LoadAssetAsync<GameObject>(assetData.asset);
-                    return ((GameObject)Object.Instantiate(obj.asset)).GetComponent<T>();
-                }
-                else
-                {
-                    var obj = assetBundle.LoadAssetAsync<T>(assetData.asset);
-                    return obj.asset is GameObject ? (T)Object.Instantiate(obj.asset) : (T)obj.asset;
-                }
-            }
-            catch (Exception e)
-            {
-                Debug.LogWarning(e);
-                return null;
-            }
-        }
-
-        public static async void Load<T>(string path, Action<T> action) where T : Object
-        {
-            try
-            {
-                if (!GlobalManager.Instance) return;
-#if UNITY_EDITOR
-                if (!SettingManager.Instance.remoteLoad)
-                {
-                    var asset = SettingManager.Instance.Load<T>(path);
-                    action?.Invoke(asset);
-                    return;
-                }
-#endif
-                var assetData = await LoadAssetData(path);
-                var assetBundle = await LoadAssetBundle(assetData.bundle);
-                if (typeof(T).IsSubclassOf(typeof(Component)))
-                {
-                    var obj = assetBundle.LoadAssetAsync<GameObject>(assetData.asset);
-                    var asset = ((GameObject)Object.Instantiate(obj.asset)).GetComponent<T>();
-                    action?.Invoke(asset);
-                }
-                else
-                {
-                    var obj = assetBundle.LoadAssetAsync<T>(assetData.asset);
-                    var asset = obj.asset is GameObject ? (T)Object.Instantiate(obj.asset) : (T)obj.asset;
-                    action?.Invoke(asset);
-                }
-            }
-            catch (Exception e)
-            {
-                Debug.LogWarning(e);
-            }
-        }
-
-        internal static async Task<string> LoadScene(string path)
-        {
-            try
-            {
-                if (!GlobalManager.Instance) return null;
-#if UNITY_EDITOR
-                if (!SettingManager.Instance.remoteLoad)
-                {
-                    return path.Split('/')[1];
-                }
-#endif
-                var assetData = await LoadAssetData(path);
-                var assetBundle = await LoadAssetBundle(assetData.bundle);
-                var scenePaths = assetBundle.GetAllScenePaths();
-                if (scenePaths.Any(scenePath => assetData.asset == scenePath))
-                {
-                    return assetData.asset;
-                }
-            }
-            catch (Exception e)
-            {
-                Debug.LogWarning(e);
-            }
-
             return null;
         }
 

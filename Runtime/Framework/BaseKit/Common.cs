@@ -111,7 +111,7 @@ namespace JFramework
     }
 
     [Serializable]
-    public abstract class StateMachine<T1> : Component<T1>, IStateMachine where T1 : IEntity
+    public abstract class StateMachine<T1> : Component<T1> where T1 : IEntity
     {
         [ShowInInspector] private readonly Dictionary<Type, IState> states = new Dictionary<Type, IState>();
         [ShowInInspector] private IState state;

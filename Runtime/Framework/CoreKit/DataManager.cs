@@ -15,7 +15,6 @@ using System.Reflection;
 using System.Threading.Tasks;
 using JFramework.Interface;
 using UnityEngine;
-using Debug = UnityEngine.Debug;
 
 namespace JFramework.Core
 {
