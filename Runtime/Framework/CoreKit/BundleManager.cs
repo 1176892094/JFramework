@@ -18,7 +18,7 @@ using Debug = UnityEngine.Debug;
 
 namespace JFramework.Core
 {
-    public static class RequestManager
+    public static class BundleManager
     {
         private static readonly List<string> updateBundles = new();
         private static Dictionary<string, Bundle> clientBundles = new();

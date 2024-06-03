@@ -14,7 +14,7 @@ using UnityEngine;
 
 namespace JFramework.Core
 {
-    public static class AudioManager
+    public static class SoundManager
     {
         internal static readonly List<AudioSource> stops = new();
         internal static readonly List<AudioSource> plays = new();
@@ -37,7 +37,7 @@ namespace JFramework.Core
         {
             poolManager = GlobalManager.Instance.transform.Find("PoolManager").gameObject;
             audioSource = poolManager.GetComponent<AudioSource>();
-            JsonManager.Load(audioSetting, nameof(AudioManager));
+            JsonManager.Load(audioSetting, nameof(SoundManager));
         }
 
         public static async void PlayAudio(string name, Action<AudioSource> action = null)
@@ -83,7 +83,7 @@ namespace JFramework.Core
         {
             audioSetting.audioVolume = audioVolume;
             audioSource.volume = audioVolume;
-            JsonManager.Save(audioSetting, nameof(AudioManager));
+            JsonManager.Save(audioSetting, nameof(SoundManager));
         }
 
         public static void SetSound(float soundVolume)
@@ -94,7 +94,7 @@ namespace JFramework.Core
                 sound.volume = soundVolume;
             }
 
-            JsonManager.Save(audioSetting, nameof(AudioManager));
+            JsonManager.Save(audioSetting, nameof(SoundManager));
         }
 
         public static void StopAudio(bool pause = true)

@@ -31,10 +31,10 @@ namespace JFramework.Core
         [ShowInInspector] private static Dictionary<Type, Dictionary<Enum, IData>> enumData => DataManager.enumData;
         [ShowInInspector] private static Dictionary<Type, Dictionary<string, IData>> stringData => DataManager.stringData;
         [ShowInInspector] private static List<Timer> timerPlay => TimerManager.timers;
-        [ShowInInspector] private static List<AudioClip> audioStop => AudioManager.stops.Select(source => source.clip).ToList();
-        [ShowInInspector] private static List<AudioClip> audioPlay => AudioManager.plays.Select(source => source.clip).ToList();
-        [ShowInInspector] private static float audioVolume => AudioManager.audioValue;
-        [ShowInInspector] private static float soundVolume => AudioManager.soundValue;
+        [ShowInInspector] private static List<AudioClip> audioStop => SoundManager.stops.Select(source => source.clip).ToList();
+        [ShowInInspector] private static List<AudioClip> audioPlay => SoundManager.plays.Select(source => source.clip).ToList();
+        [ShowInInspector] private static float audioVolume => SoundManager.audioValue;
+        [ShowInInspector] private static float soundVolume => SoundManager.soundValue;
 #if UNITY_EDITOR
         public static void EditorWindow(string path, object editor) => EditorSetting.editors[path] = editor;
 #endif
@@ -63,7 +63,7 @@ namespace JFramework.Core
             UIManager.Register();
             JsonManager.Register();
             PoolManager.Register();
-            AudioManager.Register();
+            SoundManager.Register();
             TimerManager.Register();
         }
 
@@ -97,12 +97,12 @@ namespace JFramework.Core
             DataManager.UnRegister();
             PoolManager.UnRegister();
             AssetManager.UnRegister();
-            AudioManager.UnRegister();
+            SoundManager.UnRegister();
             SceneManager.UnRegister();
             TimerManager.UnRegister();
             EventManager.UnRegister();
             EntityManager.UnRegister();
-            RequestManager.UnRegister();
+            BundleManager.UnRegister();
         }
 
         private void OnApplicationQuit()
