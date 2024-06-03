@@ -31,6 +31,8 @@ namespace JFramework
         public string assetInfo = "AssetBundleInfo";
 
         public string buildPath = "AssetBundles";
+        
+        public string dataAssembly = "HotUpdate.Data";
 
         public string assetPath = "Assets/Template";
 
@@ -41,8 +43,6 @@ namespace JFramework
         public string editorPath = "Assets/Editor/Resources";
 
         public string remotePath = "http://192.168.0.3:8000/AssetBundles";
-
-        public string dataAssembly = "HotUpdate.Data";
 
         [OnValueChanged("UpdateSceneSetting")]
         public bool remoteLoad;

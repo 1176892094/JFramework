@@ -10,7 +10,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 using JFramework.Interface;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -18,12 +17,12 @@ using UnitySceneManager = UnityEngine.SceneManagement.SceneManager;
 
 namespace JFramework.Core
 {
-    public static class SceneManager
+    public static partial class SceneManager
     {
         internal static readonly Dictionary<Type, IEntity> objects = new();
         public static bool isLoading { get; private set; }
-
-        public static string sceneName => UnitySceneManager.GetActiveScene().name;
+        public static Scene current => UnitySceneManager.GetActiveScene();
+        public static string name => current.name;
 
         public static void Add<T>(T entity) where T : IEntity
         {
@@ -43,14 +42,23 @@ namespace JFramework.Core
             objects.Remove(typeof(T));
         }
 
-        public static async void LoadAsync(string name)
+        internal static void UnRegister()
+        {
+            objects.Clear();
+            isLoading = false;
+        }
+    }
+
+    public static partial class SceneManager
+    {
+        public static async void Load(string name)
         {
             if (!GlobalManager.Instance) return;
             try
             {
                 isLoading = true;
-                var scene = await AssetManager.LoadScene(SettingManager.GetScenePath(name));
-                await UnitySceneManager.LoadSceneAsync(scene, LoadSceneMode.Single);
+                var newScene = await AssetManager.LoadScene(SettingManager.GetScenePath(name));
+                await UnitySceneManager.LoadSceneAsync(newScene, LoadSceneMode.Single);
                 isLoading = false;
             }
             catch (Exception e)
@@ -59,16 +67,16 @@ namespace JFramework.Core
             }
         }
 
-        public static async void LoadAsync(string name, Action action)
+        public static async void Load(string name, Action action)
         {
             if (!GlobalManager.Instance) return;
             try
             {
                 isLoading = true;
-                var scene = await AssetManager.LoadScene(SettingManager.GetScenePath(name));
-                await UnitySceneManager.LoadSceneAsync(scene, LoadSceneMode.Single);
+                var newScene = await AssetManager.LoadScene(SettingManager.GetScenePath(name));
+                await UnitySceneManager.LoadSceneAsync(newScene, LoadSceneMode.Single);
+                isLoading = false;
                 action?.Invoke();
-                isLoading = false;
             }
             catch (Exception e)
             {
@@ -76,14 +84,14 @@ namespace JFramework.Core
             }
         }
 
-        public static async void LoadAsync(string name, Action<AsyncOperation> action)
+        public static async void Load(string name, Action<AsyncOperation> action)
         {
             if (!GlobalManager.Instance) return;
             try
             {
                 isLoading = true;
-                var scene = await AssetManager.LoadScene(SettingManager.GetScenePath(name));
-                var operation = UnitySceneManager.LoadSceneAsync(scene, LoadSceneMode.Single);
+                var newScene = await AssetManager.LoadScene(SettingManager.GetScenePath(name));
+                var operation = UnitySceneManager.LoadSceneAsync(newScene, LoadSceneMode.Single);
                 action?.Invoke(operation);
                 await operation;
                 isLoading = false;
@@ -92,12 +100,6 @@ namespace JFramework.Core
             {
                 Debug.LogWarning($"异步加载 {name.Red()} 场景失败\n{e}");
             }
-        }
-
-        internal static void UnRegister()
-        {
-            objects.Clear();
-            isLoading = false;
         }
     }
 }

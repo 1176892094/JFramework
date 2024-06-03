@@ -12,6 +12,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using JFramework.Core;
 using JFramework.Interface;
 using UnityEngine;
 using Object = UnityEngine.Object;
@@ -218,7 +219,10 @@ namespace JFramework.Core
             return panels.TryGetValue(type, out var panel) && panel.gameObject.activeInHierarchy;
         }
     }
+}
 
+namespace JFramework
+{
     [Serializable]
     public class UIScroll<TItem, TGrid> where TGrid : IGrid<TItem> where TItem : new()
     {

@@ -144,20 +144,20 @@ namespace JFramework.Core
         private static async Task<bool> GetAssetBundles()
         {
             var reloads = 5;
-            var startLoad = false;
-            var nameList = updateBundles.ToList();
+            var bundles = updateBundles.ToList();
             while (updateBundles.Count > 0 && reloads-- > 0)
             {
                 var sizeList = new List<long>();
-                foreach (var fileName in nameList)
+                foreach (var bundle in bundles)
                 {
-                    var fileUri = SettingManager.GetRemoteFilePath(fileName);
+                    var fileUri = SettingManager.GetRemoteFilePath(bundle);
                     using (var request = UnityWebRequest.Head(fileUri))
                     {
+                        request.timeout = 1;
                         await request.SendWebRequest();
                         if (request.result != UnityWebRequest.Result.Success)
                         {
-                            Debug.Log($"获取 {fileName} 文件失败\n");
+                            Debug.Log($"获取 {bundle} 文件失败\n");
                             continue;
                         }
 
@@ -165,38 +165,33 @@ namespace JFramework.Core
                     }
                 }
 
-                if (!startLoad)
+                OnLoadStart?.Invoke(sizeList);
+                foreach (var bundle in bundles)
                 {
-                    startLoad = true;
-                    OnLoadStart?.Invoke(sizeList);
-                }
-
-                foreach (var fileName in nameList)
-                {
-                    var fileUri = SettingManager.GetRemoteFilePath(fileName);
+                    var fileUri = SettingManager.GetRemoteFilePath(bundle);
                     using (var request = UnityWebRequest.Get(fileUri))
                     {
                         var result = request.SendWebRequest();
                         while (!result.isDone && GlobalManager.Instance)
                         {
-                            OnLoadUpdate?.Invoke(fileName, request.downloadProgress);
+                            OnLoadUpdate?.Invoke(bundle, request.downloadProgress);
                             await Task.Yield();
                         }
 
-                        OnLoadUpdate?.Invoke(fileName, 1);
+                        OnLoadUpdate?.Invoke(bundle, 1);
                         if (request.result != UnityWebRequest.Result.Success)
                         {
-                            Debug.Log($"下载 {fileName} 文件失败\n");
+                            Debug.Log($"下载 {bundle} 文件失败\n");
                             continue;
                         }
 
                         var contents = request.downloadHandler.data;
-                        await File.WriteAllBytesAsync(SettingManager.GetPersistentPath(fileName), contents);
+                        await File.WriteAllBytesAsync(SettingManager.GetPersistentPath(bundle), contents);
                     }
 
-                    if (updateBundles.Contains(fileName))
+                    if (updateBundles.Contains(bundle))
                     {
-                        updateBundles.Remove(fileName);
+                        updateBundles.Remove(bundle);
                     }
                 }
             }

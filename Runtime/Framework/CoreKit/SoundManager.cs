@@ -16,28 +16,29 @@ namespace JFramework.Core
 {
     public static class SoundManager
     {
-        internal static readonly List<AudioSource> stops = new();
-        internal static readonly List<AudioSource> plays = new();
-        private static readonly AudioSetting audioSetting = new AudioSetting();
         private static GameObject poolManager;
         private static AudioSource audioSource;
+        private static readonly SoundSetting setting = new SoundSetting();
+        internal static readonly List<AudioSource> stops = new();
+        internal static readonly List<AudioSource> plays = new();
+
         public static float audioValue
         {
-            get => audioSetting.audioVolume;
-            set => audioSetting.audioVolume = value;
+            get => setting.audioVolume;
+            set => setting.audioVolume = value;
         }
-        
+
         public static float soundValue
         {
-            get => audioSetting.soundVolume;
-            set => audioSetting.soundVolume = value;
+            get => setting.soundVolume;
+            set => setting.soundVolume = value;
         }
 
         internal static void Register()
         {
             poolManager = GlobalManager.Instance.transform.Find("PoolManager").gameObject;
             audioSource = poolManager.GetComponent<AudioSource>();
-            JsonManager.Load(audioSetting, nameof(SoundManager));
+            JsonManager.Load(setting, nameof(SoundManager));
         }
 
         public static async void PlayAudio(string name, Action<AudioSource> action = null)
@@ -81,20 +82,20 @@ namespace JFramework.Core
 
         public static void SetAudio(float audioVolume)
         {
-            audioSetting.audioVolume = audioVolume;
+            setting.audioVolume = audioVolume;
             audioSource.volume = audioVolume;
-            JsonManager.Save(audioSetting, nameof(SoundManager));
+            JsonManager.Save(setting, nameof(SoundManager));
         }
 
         public static void SetSound(float soundVolume)
         {
-            audioSetting.soundVolume = soundVolume;
+            setting.soundVolume = soundVolume;
             foreach (var sound in plays)
             {
                 sound.volume = soundVolume;
             }
 
-            JsonManager.Save(audioSetting, nameof(SoundManager));
+            JsonManager.Save(setting, nameof(SoundManager));
         }
 
         public static void StopAudio(bool pause = true)
@@ -126,9 +127,9 @@ namespace JFramework.Core
             poolManager = null;
             audioSource = null;
         }
-        
+
         [Serializable]
-        public class AudioSetting
+        public class SoundSetting
         {
             public float audioVolume = 0.5f;
             public float soundVolume = 0.5f;
