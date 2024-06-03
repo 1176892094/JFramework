@@ -59,22 +59,6 @@ namespace JFramework
             result = reason ?? string.Empty;
         }
 
-#if UNITY_EDITOR
-        public static void Input(this string reason, out Sprite result)
-        {
-            result = UnityEditor.AssetDatabase.LoadAssetAtPath<Sprite>(reason);
-        }
-
-        public static void Input(this string reason, out Sprite[] result)
-        {
-            var content = reason.Content(out result);
-            for (int i = 0; i < content.Length; ++i)
-            {
-                content[i].Input(out result[i]);
-            }
-        }
-#endif
-
         public static string InputString(this string reason)
         {
             return reason ?? string.Empty;
