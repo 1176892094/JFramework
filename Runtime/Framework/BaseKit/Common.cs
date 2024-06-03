@@ -11,6 +11,7 @@
 using System;
 using JFramework.Core;
 using System.Collections.Generic;
+using System.Linq;
 using JFramework.Interface;
 using Sirenix.OdinInspector;
 using UnityEngine;
@@ -158,6 +159,117 @@ namespace JFramework
             }
 
             states.Clear();
+        }
+    }
+
+    [Serializable]
+    public class UIScroll<TItem, TGrid> where TGrid : IGrid<TItem> where TItem : new()
+    {
+        private readonly Dictionary<int, TGrid> grids = new Dictionary<int, TGrid>();
+        private int oldMinIndex = -1;
+        private int oldMaxIndex = -1;
+        private int row;
+        private int column;
+        private float width;
+        private float height;
+        private string prefab;
+        private List<TItem> items;
+        private RectTransform content;
+        public List<TGrid> Values => grids.Values.ToList();
+
+        public UIScroll(float width, float height, int row, int column, string prefab, RectTransform content)
+        {
+            this.row = row;
+            this.width = width;
+            this.height = height;
+            this.column = column;
+            this.prefab = prefab;
+            this.content = content;
+            content.pivot = Vector2.up;
+            content.anchorMin = Vector2.up;
+            content.anchorMax = Vector2.one;
+        }
+
+        public void SetItem(List<TItem> items)
+        {
+            foreach (var i in grids.Keys)
+            {
+                if (grids.TryGetValue(i, out var grid))
+                {
+                    if (grid != null)
+                    {
+                        PoolManager.Push(grid.gameObject);
+                    }
+                }
+            }
+
+            grids.Clear();
+            this.items = items;
+            content.anchoredPosition = Vector2.zero;
+            content.sizeDelta = new Vector2(0, Mathf.CeilToInt((float)items.Count / column) * height + 1);
+        }
+
+        public async void OnUpdate()
+        {
+            if (items == null) return;
+            var position = content.anchoredPosition;
+            var minIndex = Math.Max(0, (int)(position.y / height) * column);
+            var maxIndex = Math.Min((int)((position.y + row * height) / height) * column + column - 1, items.Count - 1);
+
+            if (minIndex != oldMinIndex || maxIndex != oldMaxIndex)
+            {
+                for (int i = oldMinIndex; i < minIndex; ++i)
+                {
+                    if (grids.TryGetValue(i, out var grid))
+                    {
+                        if (grid != null)
+                        {
+                            PoolManager.Push(grid.gameObject);
+                        }
+
+                        grids.Remove(i);
+                    }
+                }
+
+                for (int i = maxIndex + 1; i <= oldMaxIndex; ++i)
+                {
+                    if (grids.TryGetValue(i, out var grid))
+                    {
+                        if (grid != null)
+                        {
+                            PoolManager.Push(grid.gameObject);
+                        }
+
+                        grids.Remove(i);
+                    }
+                }
+            }
+
+            oldMinIndex = minIndex;
+            oldMaxIndex = maxIndex;
+            for (int i = minIndex; i <= maxIndex; ++i)
+            {
+                if (!grids.TryAdd(i, default)) continue;
+                var obj = await PoolManager.Pop(prefab);
+                obj.transform.SetParent(content);
+                obj.transform.localScale = Vector3.one;
+                var x = i % column * width + width / 2;
+                var y = -(i / column) * height - height / 2;
+                obj.transform.localPosition = new Vector3(x, y, 0);
+                if (obj.TryGetComponent(out TGrid grid))
+                {
+                    grid.SetItem(items[i]);
+                }
+
+                if (grids.ContainsKey(i))
+                {
+                    grids[i] = grid;
+                }
+                else
+                {
+                    PoolManager.Push(obj);
+                }
+            }
         }
     }
 }
