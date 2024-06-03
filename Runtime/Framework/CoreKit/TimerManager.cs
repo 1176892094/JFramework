@@ -35,7 +35,7 @@ namespace JFramework.Core
         public static Timer Pop(float interval)
         {
             if (!GlobalManager.Instance) return null;
-            var timer = StreamPool.Pop<Timer>();
+            var timer = PoolManager.Dequeue<Timer>();
             timers.Add(timer);
             return timer.Pop(interval);
         }
@@ -44,7 +44,7 @@ namespace JFramework.Core
         {
             if (!GlobalManager.Instance) return;
             if (!timers.Remove(timer)) return;
-            StreamPool.Push(timer);
+            PoolManager.Enqueue(timer);
             timer.Push();
         }
 

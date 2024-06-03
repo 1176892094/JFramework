@@ -1,20 +1,16 @@
 // *********************************************************************************
-// # Project: Test
+// # Project: Forest
 // # Unity: 2022.3.5f1c1
-// # Author: Charlotte
+// # Author: jinyijie
 // # Version: 1.0.0
-// # History: 2024-02-04  18:08
-// # Copyright: 2024, Charlotte
+// # History: 2024-06-03  23:06
+// # Copyright: 2024, jinyijie
 // # Description: This is an automatically generated comment.
 // *********************************************************************************
 
 using System;
-using System.Collections.Generic;
 using System.Text;
-using JFramework;
 using JFramework.Core;
-using JFramework.Interface;
-using UnityEngine;
 using Random = UnityEngine.Random;
 
 namespace JFramework
@@ -209,119 +205,6 @@ namespace JFramework
         public override string ToString()
         {
             return Value;
-        }
-    }
-
-    [Serializable]
-    public class UIScroll<TItem, TGrid> where TGrid : IGrid<TItem> where TItem : new()
-    {
-        private readonly Dictionary<int, TGrid> grids = new Dictionary<int, TGrid>();
-        private RectTransform content;
-        private List<TItem> items;
-        private int oldMinIndex = -1;
-        private int oldMaxIndex = -1;
-        private int row;
-        private int column;
-        private float width;
-        private float height;
-        private string path;
-
-        public void SetContent(RectTransform content, string path)
-        {
-            this.path = path;
-            this.content = content;
-        }
-
-        public void InitGrids(int width, int height, int row, int column)
-        {
-            this.width = width;
-            this.height = height;
-            this.column = column;
-            this.row = row * height;
-        }
-
-        public void Refresh(List<TItem> items)
-        {
-            foreach (var i in grids.Keys)
-            {
-                if (grids.TryGetValue(i, out var grid))
-                {
-                    if (grid != null)
-                    {
-                        PoolManager.Push(grid.gameObject);
-                    }
-                }
-            }
-
-            grids.Clear();
-            this.items = items;
-            content.anchoredPosition = Vector2.zero;
-            content.sizeDelta = new Vector2(0, Mathf.CeilToInt((float)items.Count / column) * height + 1);
-        }
-
-        public async void OnUpdate()
-        {
-            if (items == null) return;
-            var fixHeight = height;
-            var position = content.anchoredPosition;
-            var minIndex = Math.Max(0, (int)(position.y / fixHeight) * column);
-            var maxIndex = Math.Min((int)((position.y + row) / fixHeight) * column + column - 1, items.Count - 1);
-
-            if (minIndex != oldMinIndex || maxIndex != oldMaxIndex)
-            {
-                for (int i = oldMinIndex; i < minIndex; ++i)
-                {
-                    if (grids.TryGetValue(i, out var grid))
-                    {
-                        if (grid != null)
-                        {
-                            PoolManager.Push(grid.gameObject);
-                        }
-
-                        grids.Remove(i);
-                    }
-                }
-
-                for (int i = maxIndex + 1; i <= oldMaxIndex; ++i)
-                {
-                    if (grids.TryGetValue(i, out var grid))
-                    {
-                        if (grid != null)
-                        {
-                            PoolManager.Push(grid.gameObject);
-                        }
-
-                        grids.Remove(i);
-                    }
-                }
-            }
-
-            oldMinIndex = minIndex;
-            oldMaxIndex = maxIndex;
-
-            for (int index = minIndex; index <= maxIndex; ++index)
-            {
-                if (!grids.TryAdd(index, default)) continue;
-                var obj = await PoolManager.Pop(path);
-                obj.transform.SetParent(content);
-                obj.transform.localScale = Vector3.one;
-                var posX = index % column * width + width / 2;
-                var posY = -(index / column) * fixHeight - height / 2;
-                obj.transform.localPosition = new Vector3(posX, posY, 0);
-                if (obj.TryGetComponent(out TGrid grid))
-                {
-                    grid.SetItem(items[index]);
-                }
-
-                if (grids.ContainsKey(index))
-                {
-                    grids[index] = grid;
-                }
-                else
-                {
-                    PoolManager.Push(obj);
-                }
-            }
         }
     }
 }

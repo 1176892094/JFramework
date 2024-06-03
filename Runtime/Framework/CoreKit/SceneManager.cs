@@ -21,10 +21,10 @@ namespace JFramework.Core
     {
         internal static readonly Dictionary<Type, IEntity> objects = new();
         public static bool isLoading { get; private set; }
-
+        
         public static string sceneName => UnitySceneManager.GetActiveScene().name;
-
-        public static void Register<T>(T entity) where T : IEntity
+        
+        public static void Add<T>(T entity) where T : IEntity
         {
             if (!GlobalManager.Instance) return;
             objects.TryAdd(typeof(T), entity);
@@ -36,7 +36,7 @@ namespace JFramework.Core
             return (T)objects.GetValueOrDefault(typeof(T));
         }
 
-        public static void UnRegister<T>() where T : IEntity
+        public static void Remove<T>() where T : IEntity
         {
             if (!GlobalManager.Instance) return;
             objects.Remove(typeof(T));

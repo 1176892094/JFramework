@@ -72,7 +72,7 @@ namespace JFramework
             using var file = new FileStream(filePath, FileMode.Open);
             var provider = new MD5CryptoServiceProvider();
             var infos = provider.ComputeHash(file);
-            var builder = StreamPool.Pop<StringBuilder>();
+            var builder = PoolManager.Dequeue<StringBuilder>();
             foreach (var info in infos)
             {
                 builder.Append(info.ToString("X2"));
@@ -80,7 +80,7 @@ namespace JFramework
 
             var result = builder.ToString();
             builder.Clear();
-            StreamPool.Push(builder);
+            PoolManager.Enqueue(builder);
             return result;
         }
 

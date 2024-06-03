@@ -11,6 +11,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.Networking;
@@ -25,49 +26,58 @@ namespace JFramework.Core
     {
         private static readonly Dictionary<string, Asset> assets = new();
         private static readonly Dictionary<string, AssetBundle> bundles = new();
-        private static readonly Dictionary<string, Task<AssetBundle>> assetTasks = new();
+        private static readonly Dictionary<string, Task<AssetBundle>> requests = new();
         private static AssetBundle mainAsset;
         private static AssetBundleManifest manifest;
 
-        private static async Task LoadDependency(string bundle)
+        private static async Task<Asset> LoadAssetData(string path)
         {
+            if (!assets.TryGetValue(path, out var assetData))
+            {
+                assetData = new Asset(path);
+                assets.Add(path, assetData);
+            }
+
             if (mainAsset == null)
             {
-                mainAsset = await LoadAssetTask(SettingManager.Instance.platform.ToString());
+                mainAsset = await LoadAssetBundle(SettingManager.Instance.platform.ToString());
                 manifest = mainAsset.LoadAsset<AssetBundleManifest>(nameof(AssetBundleManifest));
             }
 
-            var dependencies = manifest.GetAllDependencies(bundle);
+            var dependencies = manifest.GetAllDependencies(assetData.bundle);
             foreach (var dependency in dependencies)
             {
-                if (!bundles.ContainsKey(dependency))
-                {
-                    await LoadAssetTask(dependency);
-                }
-            }
-        }
-
-        private static async Task<AssetBundle> LoadAssetTask(string bundle)
-        {
-            if (assetTasks.TryGetValue(bundle, out var task))
-            {
-                return await task;
+                await LoadAssetBundle(dependency);
             }
 
-            var newTask = LoadAssetBundle(bundle);
-            assetTasks[bundle] = newTask;
-
-            try
-            {
-                return await newTask;
-            }
-            finally
-            {
-                assetTasks.Remove(bundle);
-            }
+            return assetData;
         }
 
         private static async Task<AssetBundle> LoadAssetBundle(string bundle)
+        {
+            if (bundles.TryGetValue(bundle, out var result))
+            {
+                return result;
+            }
+
+            if (requests.TryGetValue(bundle, out var request))
+            {
+                return await request;
+            }
+
+            request = LoadAssetRequest(bundle);
+            requests.Add(bundle, request);
+            try
+            {
+                return await request;
+            }
+            finally
+            {
+                requests.Remove(bundle);
+            }
+        }
+
+        private static async Task<AssetBundle> LoadAssetRequest(string bundle)
         {
             var path = SettingManager.GetPersistentPath(bundle);
             if (File.Exists(path))
@@ -115,22 +125,9 @@ namespace JFramework.Core
                     return SettingManager.Instance.Load<T>(path);
                 }
 #endif
-                if (!assets.TryGetValue(path, out var assetData))
-                {
-                    assetData = new Asset(path);
-                    assets.Add(path, assetData);
-                }
 
-                await LoadDependency(assetData.bundle);
-                if (!bundles.TryGetValue(assetData.bundle, out var assetBundle))
-                {
-                    assetBundle = await LoadAssetTask(assetData.bundle);
-                    if (assetBundle == null)
-                    {
-                        return null;
-                    }
-                }
-
+                var assetData = await LoadAssetData(path);
+                var assetBundle = await LoadAssetBundle(assetData.bundle);
                 if (typeof(T).IsSubclassOf(typeof(Component)))
                 {
                     var obj = assetBundle.LoadAssetAsync<GameObject>(assetData.asset);
@@ -149,7 +146,7 @@ namespace JFramework.Core
             }
         }
 
-        public static async void LoadAsync<T>(string path, Action<T> action = null) where T : Object
+        public static async void Load<T>(string path, Action<T> action) where T : Object
         {
             try
             {
@@ -162,22 +159,8 @@ namespace JFramework.Core
                     return;
                 }
 #endif
-                if (!assets.TryGetValue(path, out var assetData))
-                {
-                    assetData = new Asset(path);
-                    assets.Add(path, assetData);
-                }
-
-                await LoadDependency(assetData.bundle);
-                if (!bundles.TryGetValue(assetData.bundle, out var assetBundle))
-                {
-                    assetBundle = await LoadAssetTask(assetData.bundle);
-                    if (assetBundle == null)
-                    {
-                        return;
-                    }
-                }
-
+                var assetData = await LoadAssetData(path);
+                var assetBundle = await LoadAssetBundle(assetData.bundle);
                 if (typeof(T).IsSubclassOf(typeof(Component)))
                 {
                     var obj = assetBundle.LoadAssetAsync<GameObject>(assetData.asset);
@@ -199,38 +182,37 @@ namespace JFramework.Core
 
         internal static async Task<AsyncOperation> LoadSceneAsync(string path)
         {
-            if (!GlobalManager.Instance) return null;
+            try
+            {
+                if (!GlobalManager.Instance) return null;
 #if UNITY_EDITOR
-            if (!SettingManager.Instance.remoteLoad)
-            {
-                return UnitySceneManager.LoadSceneAsync(path.Split('/')[1], LoadSceneMode.Single);
-            }
-#endif
-            if (!assets.TryGetValue(path, out var assetData))
-            {
-                assetData = new Asset(path);
-                assets.Add(path, assetData);
-            }
-
-            await LoadDependency(assetData.bundle);
-            if (!bundles.TryGetValue(assetData.bundle, out var assetBundle))
-            {
-                assetBundle = await LoadAssetTask(assetData.bundle);
-                if (assetBundle == null)
+                if (!SettingManager.Instance.remoteLoad)
                 {
-                    return null;
+                    return UnitySceneManager.LoadSceneAsync(path.Split('/')[1], LoadSceneMode.Single);
+                }
+#endif
+                var assetData = await LoadAssetData(path);
+                var assetBundle = await LoadAssetBundle(assetData.bundle);
+                var scenePaths = assetBundle.GetAllScenePaths();
+                if (scenePaths.Any(scenePath => assetData.asset == scenePath))
+                {
+                    return UnitySceneManager.LoadSceneAsync(assetData.asset, LoadSceneMode.Single);
                 }
             }
+            catch (Exception e)
+            {
+                Debug.LogWarning(e);
+            }
 
-            return UnitySceneManager.LoadSceneAsync(assetData.asset, LoadSceneMode.Single);
+            return null;
         }
 
         internal static void UnRegister()
         {
             AssetBundle.UnloadAllAssetBundles(true);
-            assetTasks.Clear();
             assets.Clear();
             bundles.Clear();
+            requests.Clear();
             manifest = null;
             mainAsset = null;
         }

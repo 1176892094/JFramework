@@ -82,18 +82,7 @@ namespace JFramework.Interface
 
         void Clear();
     }
-
-    public interface IPanel : IEntity
-    {
-        UILayer layer { get; }
-
-        UIState state { get; }
-
-        void Show();
-
-        void Hide();
-    }
-
+    
     public interface IGrid<T> : IEntity, IDisposable
     {
         T item { get; }

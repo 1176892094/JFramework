@@ -17,14 +17,35 @@ using Object = UnityEngine.Object;
 
 namespace JFramework.Core
 {
-    internal static class EntityManager
+    public static class EntityManager
     {
-        public static readonly Dictionary<IEntity, Dictionary<Type, IComponent>> entities = new();
-        public static IEntity instance;
+        internal static readonly Dictionary<IEntity, Dictionary<Type, IComponent>> entities = new();
+        internal static IEntity instance;
 
-        public static IComponent FindComponent(IEntity entity, Type type)
+        public static T GetComponent<T>(IEntity entity) where T : ScriptableObject, IComponent
         {
             if (!GlobalManager.Instance) return null;
+            if (!entities.TryGetValue(entity, out var components))
+            {
+                components = new Dictionary<Type, IComponent>();
+                entities.Add(entity, components);
+            }
+
+            if (!components.TryGetValue(typeof(T), out var component))
+            {
+                instance = entity;
+                component = (T)ScriptableObject.CreateInstance(typeof(T));
+                ((ScriptableObject)component).name = typeof(T).Name;
+                components.Add(typeof(T), component);
+                component.OnAwake(instance);
+            }
+
+            return (T)entities[entity][typeof(T)];
+        }
+
+        public static IComponent GetComponent(IEntity entity, Type type)
+        {
+            if (!GlobalManager.Instance) return default;
             if (!entities.TryGetValue(entity, out var components))
             {
                 components = new Dictionary<Type, IComponent>();
@@ -42,7 +63,7 @@ namespace JFramework.Core
 
             return entities[entity][type];
         }
-
+        
         public static void Destroy(IEntity entity)
         {
             if (!GlobalManager.Instance) return;
@@ -58,7 +79,7 @@ namespace JFramework.Core
             }
         }
 
-        public static void UnRegister()
+        internal static void UnRegister()
         {
             var copies = entities.Keys.ToList();
             foreach (var entity in copies)

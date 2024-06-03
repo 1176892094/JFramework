@@ -19,17 +19,12 @@ namespace JFramework
     }
 
     [AttributeUsage(AttributeTargets.Field)]
-    public class InjectAttribute : Attribute
+    public class FolderAttribute : PropertyAttribute
     {
-        public readonly string name;
-
-        public InjectAttribute() => name = "";
-
-        public InjectAttribute(string name) => this.name = name;
     }
 
     [AttributeUsage(AttributeTargets.Field)]
-    public class FolderAttribute : PropertyAttribute
+    public class InjectAttribute : Attribute
     {
     }
 }

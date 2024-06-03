@@ -71,7 +71,7 @@ namespace JFramework
 
         public static bool operator ==(Bundle a, Bundle b) => a.code == b.code;
 
-        public static bool operator !=(Bundle a, Bundle b) => !(a == b);
+        public static bool operator !=(Bundle a, Bundle b) => a.code != b.code;
 
         private bool Equals(Bundle other) => size == other.size && code == other.code && name == other.name;
 

@@ -27,12 +27,7 @@ namespace JFramework.Core
 
         public static async Task LoadDataTable()
         {
-            var assembly = Reflection.GetAssembly("HotUpdate.Data");
-            if (assembly == null)
-            {
-                assembly = Reflection.GetAssembly("Assembly-CSharp");
-            }
-
+            var assembly = Reflection.GetAssembly(SettingManager.Instance.dataAssembly);
             var types = Reflection.GetTypes<IDataTable>(assembly);
             if (types == null || types.Length == 0) return;
             foreach (var type in types)

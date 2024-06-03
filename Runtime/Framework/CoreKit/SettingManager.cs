@@ -42,6 +42,8 @@ namespace JFramework
 
         public string remotePath = "http://192.168.0.3:8000/AssetBundles";
 
+        public string dataAssembly = "HotUpdate.Data";
+
         [OnValueChanged("UpdateSceneSetting")]
         public bool remoteLoad;
 

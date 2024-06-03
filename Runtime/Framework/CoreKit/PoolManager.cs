@@ -17,11 +17,11 @@ using Object = UnityEngine.Object;
 
 namespace JFramework.Core
 {
-    public static class PoolManager
+    public static partial class PoolManager
     {
+        private static Transform poolManager;
         private static readonly Dictionary<string, GameObject> parents = new();
         internal static readonly Dictionary<string, IPool<GameObject>> pools = new();
-        private static Transform poolManager;
 
         internal static void Register()
         {
@@ -48,7 +48,7 @@ namespace JFramework.Core
             return o;
         }
 
-        public static async void Pop(string path, Action<GameObject> action)
+        public static void Pop(string path, Action<GameObject> action)
         {
             if (!GlobalManager.Instance) return;
             if (pools.TryGetValue(path, out var pool) && pool.count > 0)
@@ -63,10 +63,12 @@ namespace JFramework.Core
                 }
             }
 
-            var o = await AssetManager.Load<GameObject>(path);
-            Object.DontDestroyOnLoad(o);
-            o.name = path;
-            action?.Invoke(o);
+            AssetManager.Load<GameObject>(path, obj =>
+            {
+                Object.DontDestroyOnLoad(obj);
+                obj.name = path;
+                action?.Invoke(obj);
+            });
         }
 
         public static void Push(GameObject obj)
@@ -102,6 +104,53 @@ namespace JFramework.Core
             pools.Clear();
             parents.Clear();
             poolManager = null;
+        }
+    }
+
+    public static partial class PoolManager
+    {
+        internal static readonly Dictionary<Type, IPool> activators = new Dictionary<Type, IPool>();
+
+        public static T Dequeue<T>()
+        {
+            if (activators.TryGetValue(typeof(T), out var stream) && stream.count > 0)
+            {
+                return ((IPool<T>)stream).Pop();
+            }
+
+            return Activator.CreateInstance<T>();
+        }
+
+        public static T Dequeue<T>(Type type)
+        {
+            if (activators.TryGetValue(type, out var stream) && stream.count > 0)
+            {
+                return ((IPool<T>)stream).Pop();
+            }
+
+            return (T)Activator.CreateInstance(type);
+        }
+
+        public static void Enqueue<T>(T obj)
+        {
+            if (activators.TryGetValue(typeof(T), out var pool))
+            {
+                ((IPool<T>)pool).Push(obj);
+                return;
+            }
+
+            activators.Add(typeof(T), new Pool<T>(obj));
+        }
+
+        public static void Enqueue<T>(T obj, Type type)
+        {
+            if (activators.TryGetValue(type, out var pool))
+            {
+                ((IPool<T>)pool).Push(obj);
+                return;
+            }
+
+            activators.Add(type, new Pool<T>(obj));
         }
     }
 }

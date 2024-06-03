@@ -21,9 +21,9 @@ namespace JFramework.Core
     {
         public static bool isRemote => SettingManager.Instance.remoteLoad;
         public static AssetPlatform platform => SettingManager.Instance.platform;
-        [ShowInInspector] private static Dictionary<Type, IPool> streams => StreamPool.streams;
+        [ShowInInspector] private static Dictionary<Type, IPool> activators => PoolManager.activators;
         [ShowInInspector] private static Dictionary<IEntity, Dictionary<Type, IComponent>> entities => EntityManager.entities;
-        [ShowInInspector] private static Dictionary<Type, IPanel> panels => UIManager.panels;
+        [ShowInInspector] private static Dictionary<Type, UIPanel> panels => UIManager.panels;
         [ShowInInspector] private static Dictionary<Type, IEvent> events => EventManager.observers;
         [ShowInInspector] private static Dictionary<Type, IEntity> scenes => SceneManager.objects;
         [ShowInInspector] private static Dictionary<string, IPool<GameObject>> objects => PoolManager.pools;

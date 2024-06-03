@@ -9,7 +9,6 @@
 // *********************************************************************************
 
 using System;
-using System.Collections.Generic;
 using System.Reflection;
 using JFramework.Core;
 using JFramework.Interface;
@@ -22,55 +21,6 @@ namespace JFramework
 {
     public static partial class Extensions
     {
-        public static T FindComponent<T>(this IEntity entity) where T : ScriptableObject, IComponent
-        {
-            return (T)EntityManager.FindComponent(entity, typeof(T));
-        }
-
-        public static IComponent FindComponent(this IEntity entity, Type type)
-        {
-            return EntityManager.FindComponent(entity, type);
-        }
-
-        public static void Destroy(this IEntity entity)
-        {
-            EntityManager.Destroy(entity);
-        }
-
-        public static void Refresh<TGird, TItem>(this TGird[] grids, List<TItem> items) where TGird : IGrid<TItem>
-        {
-            for (int i = 0; i < grids.Length; i++)
-            {
-                if (grids[i] != null && i < items.Count && items[i] != null)
-                {
-                    grids[i].SetItem(items[i]);
-                }
-                else
-                {
-                    grids[i].Dispose();
-                }
-            }
-        }
-
-        public static void AddListener(this UIBehaviour target, EventTriggerType type, Action<PointerEventData> action)
-        {
-            var trigger = target.GetComponent<EventTrigger>();
-            if (trigger == null)
-            {
-                trigger = target.gameObject.AddComponent<EventTrigger>();
-            }
-
-            var entry = new EventEntry
-            {
-                eventID = type
-            };
-            entry.callback.AddListener(eventData => action?.Invoke((PointerEventData)eventData));
-            trigger.triggers.Add(entry);
-        }
-    }
-
-    public static partial class Extensions
-    {
         public static void Inject(this IEntity inject)
         {
             var fields = inject.GetType().GetFields(Reflection.Instance);
@@ -78,32 +28,48 @@ namespace JFramework
             {
                 var attribute = field.GetCustomAttribute<InjectAttribute>(true);
                 if (attribute == null) continue;
-                
+
                 if (typeof(IComponent).IsAssignableFrom(field.FieldType))
                 {
-                    var component = EntityManager.FindComponent(inject, field.FieldType);
+                    var component = EntityManager.GetComponent(inject, field.FieldType);
                     field.SetValue(inject, component);
                 }
-                else if (typeof(Component).IsAssignableFrom(field.FieldType))
+                else if (field.FieldType.IsSubclassOf(typeof(Component)))
                 {
-                    var name = attribute.name;
-                    if (string.IsNullOrEmpty(name))
+                    if (!typeof(Transform).IsAssignableFrom(field.FieldType))
                     {
-                        if (!typeof(Transform).IsAssignableFrom(field.FieldType))
+                        var component = inject.transform.GetComponent(field.FieldType);
+                        if (component != null)
                         {
-                            var component = inject.transform.GetComponent(field.FieldType);
-                            if (component != null)
-                            {
-                                field.SetValue(inject, component);
-                                continue;
-                            }
+                            field.SetValue(inject, component);
+                            continue;
                         }
-
-                        name = char.ToUpper(field.Name[0]) + field.Name.Substring(1);
                     }
 
-                    inject.SetComponent(field, name);
+                    var name = char.ToUpper(field.Name[0]) + field.Name.Substring(1);
+                    inject.AddComponent(field, name);
                 }
+            }
+        }
+
+        private static void AddComponent(this IEntity inject, FieldInfo field, string name)
+        {
+            var child = inject.transform.GetChild(name);
+            if (child == null) return;
+
+            var component = child.GetComponent(field.FieldType);
+            if (component == null) return;
+
+            field.SetValue(inject, component);
+
+            switch (component)
+            {
+                case Button button:
+                    inject.SetButton(name, button);
+                    break;
+                case Toggle toggle:
+                    inject.SetToggle(name, toggle);
+                    break;
             }
         }
 
@@ -127,33 +93,9 @@ namespace JFramework
             return null;
         }
 
-        private static void SetComponent(this IEntity inject, FieldInfo field, string name)
-        {
-            var child = inject.transform.GetChild(name);
-            if (child == null) return;
-
-            var component = child.GetComponent(field.FieldType);
-            if (component == null) return;
-
-            field.SetValue(inject, component);
-
-            var method = inject.GetType().GetMethod(name, Reflection.Instance);
-            if (method == null) return;
-
-            switch (component)
-            {
-                case Button button:
-                    inject.SetButton(name, button);
-                    break;
-                case Toggle toggle:
-                    inject.SetToggle(name, toggle);
-                    break;
-            }
-        }
-
         private static void SetButton(this IEntity inject, string name, Button button)
         {
-            if (inject.transform.TryGetComponent(out IPanel panel))
+            if (inject.transform.TryGetComponent(out UIPanel panel))
             {
                 button.onClick.AddListener(() =>
                 {
@@ -171,7 +113,7 @@ namespace JFramework
 
         private static void SetToggle(this IEntity inject, string name, Toggle toggle)
         {
-            if (inject.transform.TryGetComponent(out IPanel panel))
+            if (inject.transform.TryGetComponent(out UIPanel panel))
             {
                 toggle.onValueChanged.AddListener(value =>
                 {
@@ -185,6 +127,19 @@ namespace JFramework
             {
                 toggle.onValueChanged.AddListener(value => inject.transform.SendMessage(name, value));
             }
+        }
+
+        public static void AddListener(this UIBehaviour target, EventTriggerType eventID, Action<PointerEventData> action)
+        {
+            var trigger = target.GetComponent<EventTrigger>();
+            if (trigger == null)
+            {
+                trigger = target.gameObject.AddComponent<EventTrigger>();
+            }
+
+            var entry = new EventEntry { eventID = eventID };
+            entry.callback.AddListener(data => action?.Invoke((PointerEventData)data));
+            trigger.triggers.Add(entry);
         }
     }
 }
