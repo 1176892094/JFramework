@@ -142,8 +142,7 @@ namespace JFramework
         {
             UpdateAsset();
             var directory = Directory.CreateDirectory(SettingManager.platformPath);
-            BuildPipeline.BuildAssetBundles(SettingManager.platformPath, BuildAssetBundleOptions.ChunkBasedCompression,
-                (BuildTarget)SettingManager.Instance.platform);
+            BuildPipeline.BuildAssetBundles(SettingManager.platformPath, BuildAssetBundleOptions.ChunkBasedCompression, (BuildTarget)SettingManager.Instance.platform);
             var infoList = directory.GetFiles().Where(info => info.Extension == "").ToList();
             var fileList = infoList.Select(info => new Bundle(GetProviderInfo(info.FullName), info.Name, info.Length.ToString())).ToList();
             var contents = JsonManager.Writer(fileList, true);
