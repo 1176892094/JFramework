@@ -10,7 +10,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using JFramework.Interface;
 using Sirenix.OdinInspector;
 using UnityEngine;
@@ -130,20 +129,48 @@ namespace JFramework.Core
     {
         public static AssetMode mode => SettingManager.Instance.assetMode;
         public static AssetPlatform platform => SettingManager.Instance.platform;
-        [ShowInInspector] private static Dictionary<Type, IPool> streams => PoolManager.streams;
-        [ShowInInspector] private static Dictionary<IEntity, Dictionary<Type, IComponent>> entities => EntityManager.entities;
-        [ShowInInspector] private static Dictionary<Type, UIPanel> panels => UIManager.panels;
-        [ShowInInspector] private static Dictionary<Type, IEvent> events => EventManager.observers;
-        [ShowInInspector] private static Dictionary<Type, IEntity> scenes => SceneManager.objects;
-        [ShowInInspector] private static Dictionary<string, IPool<GameObject>> objects => PoolManager.pools;
-        [ShowInInspector] private static Dictionary<Type, Dictionary<int, IData>> intData => DataManager.intData;
-        [ShowInInspector] private static Dictionary<Type, Dictionary<Enum, IData>> enumData => DataManager.enumData;
-        [ShowInInspector] private static Dictionary<Type, Dictionary<string, IData>> stringData => DataManager.stringData;
-        [ShowInInspector] private static Dictionary<GameObject, AudioSource> audios => SoundManager.audios;
-        [ShowInInspector] private static List<Timer> timerPlay => TimerManager.timers;
+#if UNITY_EDITOR
+        [ShowInInspector] private static Dictionary<IEntity, Dictionary<Type, IComponent>> entities;
+        [ShowInInspector] private static Dictionary<string, IPool<GameObject>> pools;
+        [ShowInInspector] private static Dictionary<Type, IPool> streams;
+        [ShowInInspector] private static Dictionary<Type, IEvent> events;
+        [ShowInInspector] private static Dictionary<Type, UIPanel> panels;
+        [ShowInInspector] private static Dictionary<Type, IEntity> objects;
+        [ShowInInspector] private static Dictionary<Type, Dictionary<int, IData>> intData;
+        [ShowInInspector] private static Dictionary<Type, Dictionary<Enum, IData>> enumData;
+        [ShowInInspector] private static Dictionary<Type, Dictionary<string, IData>> stringData;
+        [ShowInInspector] private static Dictionary<GameObject, AudioSource> audios;
+        [ShowInInspector] private static List<Timer> timers;
         [ShowInInspector] private static float audioVolume => SoundManager.audioValue;
         [ShowInInspector] private static float soundVolume => SoundManager.soundValue;
-#if UNITY_EDITOR
+
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
+        private static void RuntimeInitializeOnLoad()
+        {
+            var field = typeof(PoolManager).GetField("streams", Reflection.Static)?.GetValue(null);
+            streams = (Dictionary<Type, IPool>)field;
+            field = typeof(PoolManager).GetField("pools", Reflection.Static)?.GetValue(null);
+            pools = (Dictionary<string, IPool<GameObject>>)field;
+            field = typeof(EntityManager).GetField("entities", Reflection.Static)?.GetValue(null);
+            entities = (Dictionary<IEntity, Dictionary<Type, IComponent>>)field;
+            field = typeof(EventManager).GetField("events", Reflection.Static)?.GetValue(null);
+            events = (Dictionary<Type, IEvent>)field;
+            field = typeof(UIManager).GetField("panels", Reflection.Static)?.GetValue(null);
+            panels = (Dictionary<Type, UIPanel>)field;
+            field = typeof(SceneManager).GetField("objects", Reflection.Static)?.GetValue(null);
+            objects = (Dictionary<Type, IEntity>)field;
+            field = typeof(DataManager).GetField("intData", Reflection.Static)?.GetValue(null);
+            intData = (Dictionary<Type, Dictionary<int, IData>>)field;
+            field = typeof(DataManager).GetField("enumData", Reflection.Static)?.GetValue(null);
+            enumData = (Dictionary<Type, Dictionary<Enum, IData>>)field;
+            field = typeof(DataManager).GetField("stringData", Reflection.Static)?.GetValue(null);
+            stringData = (Dictionary<Type, Dictionary<string, IData>>)field;
+            field = typeof(SoundManager).GetField("audios", Reflection.Static)?.GetValue(null);
+            audios = (Dictionary<GameObject, AudioSource>)field;
+            field = typeof(TimerManager).GetField("timers", Reflection.Static)?.GetValue(null);
+            timers = (List<Timer>)field;
+        }
+
         public static void EditorWindow(string path, object editor) => EditorSetting.editors[path] = editor;
 #endif
     }

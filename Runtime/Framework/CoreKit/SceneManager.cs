@@ -19,7 +19,7 @@ namespace JFramework.Core
 {
     public static partial class SceneManager
     {
-        internal static readonly Dictionary<Type, IEntity> objects = new();
+        private static readonly Dictionary<Type, IEntity> objects = new();
         public static bool isLoading { get; private set; }
         public static Scene current => UnitySceneManager.GetActiveScene();
         public static string name => current.name;

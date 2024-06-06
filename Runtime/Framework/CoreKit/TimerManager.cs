@@ -17,7 +17,7 @@ namespace JFramework.Core
 {
     public static class TimerManager
     {
-        internal static readonly List<Timer> timers = new();
+        private static readonly List<Timer> timers = new();
         private static readonly List<Timer> copies = new();
 
         internal static void Register()

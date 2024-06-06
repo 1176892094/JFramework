@@ -19,8 +19,8 @@ namespace JFramework.Core
 {
     public static class EntityManager
     {
-        internal static readonly Dictionary<IEntity, Dictionary<Type, IComponent>> entities = new();
-        internal static IEntity instance;
+        private static readonly Dictionary<IEntity, Dictionary<Type, IComponent>> entities = new();
+        internal static IEntity instance { get; private set; }
 
         public static T GetComponent<T>(IEntity entity) where T : ScriptableObject, IComponent
         {
@@ -63,7 +63,7 @@ namespace JFramework.Core
 
             return entities[entity][type];
         }
-        
+
         public static void Destroy(IEntity entity)
         {
             if (!GlobalManager.Instance) return;

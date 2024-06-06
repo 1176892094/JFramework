@@ -20,7 +20,7 @@ namespace JFramework.Core
     public static partial class UIManager
     {
         public static Canvas canvas { get; private set; }
-        internal static readonly Dictionary<Type, UIPanel> panels = new();
+        private static readonly Dictionary<Type, UIPanel> panels = new();
         private static readonly Dictionary<UILayer, Transform> layers = new();
         private static readonly Dictionary<Type, Task<UIPanel>> requests = new();
 

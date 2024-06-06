@@ -20,8 +20,9 @@ namespace JFramework.Core
     public static partial class PoolManager
     {
         private static Transform poolManager;
+        private static readonly Dictionary<Type, IPool> streams = new();
         private static readonly Dictionary<string, GameObject> parents = new();
-        internal static readonly Dictionary<string, IPool<GameObject>> pools = new();
+        private static readonly Dictionary<string, IPool<GameObject>> pools = new();
 
         internal static void Register()
         {
@@ -104,13 +105,18 @@ namespace JFramework.Core
             pools.Clear();
             parents.Clear();
             poolManager = null;
+
+            foreach (var pool in streams.Values)
+            {
+                pool.Dispose();
+            }
+
+            streams.Clear();
         }
     }
 
     public static partial class PoolManager
     {
-        internal static readonly Dictionary<Type, IPool> streams = new Dictionary<Type, IPool>();
-
         public static T Dequeue<T>()
         {
             if (streams.TryGetValue(typeof(T), out var stream) && stream.count > 0)

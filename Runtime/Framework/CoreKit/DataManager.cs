@@ -20,9 +20,9 @@ namespace JFramework.Core
 {
     public static class DataManager
     {
-        internal static readonly Dictionary<Type, Dictionary<int, IData>> intData = new();
-        internal static readonly Dictionary<Type, Dictionary<Enum, IData>> enumData = new();
-        internal static readonly Dictionary<Type, Dictionary<string, IData>> stringData = new();
+        private static readonly Dictionary<Type, Dictionary<int, IData>> intData = new();
+        private static readonly Dictionary<Type, Dictionary<Enum, IData>> enumData = new();
+        private static readonly Dictionary<Type, Dictionary<string, IData>> stringData = new();
 
         public static async Task LoadDataTable()
         {

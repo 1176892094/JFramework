@@ -16,40 +16,40 @@ namespace JFramework.Core
 {
     public static class EventManager
     {
-        internal static readonly Dictionary<Type, IEvent> observers = new();
+        private static readonly Dictionary<Type, IEvent> events = new();
 
         public static void Listen<T>(Action<T> action) where T : struct, IEvent
         {
             if (!GlobalManager.Instance) return;
-            if (!observers.TryGetValue(typeof(T), out var observer))
+            if (!events.TryGetValue(typeof(T), out var @event))
             {
-                observers.Add(typeof(T), observer = new Event<T>());
+                events.Add(typeof(T), @event = new Event<T>());
             }
 
-            ((Event<T>)observer).action += action;
+            ((Event<T>)@event).action += action;
         }
 
         public static void Remove<T>(Action<T> action) where T : struct, IEvent
         {
             if (!GlobalManager.Instance) return;
-            if (observers.TryGetValue(typeof(T), out var observer))
+            if (events.TryGetValue(typeof(T), out var @event))
             {
-                ((Event<T>)observer).action -= action;
+                ((Event<T>)@event).action -= action;
             }
         }
 
         public static void Invoke<T>(T obj = default) where T : struct, IEvent
         {
             if (!GlobalManager.Instance) return;
-            if (observers.TryGetValue(typeof(T), out var observer))
+            if (events.TryGetValue(typeof(T), out var @event))
             {
-                ((Event<T>)observer).action?.Invoke(obj);
+                ((Event<T>)@event).action?.Invoke(obj);
             }
         }
 
         internal static void UnRegister()
         {
-            observers.Clear();
+            events.Clear();
         }
 
         private class Event<T> : IEvent where T : struct, IEvent
