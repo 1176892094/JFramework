@@ -16,28 +16,30 @@ namespace JFramework
     public abstract class GlobalSingleton<T> : MonoBehaviour where T : GlobalSingleton<T>
     {
         private static readonly object locked = typeof(T);
-        
+
         private static T instance;
-        
+
         public static T Instance
         {
             get
             {
-                if (!GlobalManager.Instance) return null;
-                if (instance == null)
+                if (GlobalManager.Instance)
                 {
-                    lock (locked)
+                    if (instance == null)
                     {
-                        instance ??= FindFirstObjectByType<T>();
-                        instance ??= new GameObject(typeof(T).Name).AddComponent<T>();
-                        instance.Register();
+                        lock (locked)
+                        {
+                            instance ??= FindFirstObjectByType<T>();
+                            instance ??= new GameObject(typeof(T).Name).AddComponent<T>();
+                            instance.Register();
+                        }
                     }
                 }
 
                 return instance;
             }
         }
-        
+
         private void Register()
         {
             if (instance == null)
@@ -51,9 +53,9 @@ namespace JFramework
                 Destroy(this);
             }
         }
-        
+
         protected virtual void Awake() => Register();
-        
+
         protected virtual void OnDestroy() => instance = null;
     }
 }

@@ -23,14 +23,16 @@ namespace JFramework
         {
             get
             {
-                if (!GlobalManager.Instance) return null;
-                if (instance == null)
+                if (GlobalManager.Instance)
                 {
-                    lock (locked)
+                    if (instance == null)
                     {
-                        instance ??= FindFirstObjectByType<T>();
-                        instance ??= new GameObject(typeof(T).Name).AddComponent<T>();
-                        instance.Register();
+                        lock (locked)
+                        {
+                            instance ??= FindFirstObjectByType<T>();
+                            instance ??= new GameObject(typeof(T).Name).AddComponent<T>();
+                            instance.Register();
+                        }
                     }
                 }
 

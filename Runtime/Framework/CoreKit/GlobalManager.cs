@@ -17,29 +17,6 @@ using UnityEngine;
 
 namespace JFramework.Core
 {
-    public sealed partial class GlobalManager
-    {
-        public static bool isRemote => SettingManager.Instance.remoteLoad;
-        public static AssetPlatform platform => SettingManager.Instance.platform;
-        [ShowInInspector] private static Dictionary<Type, IPool> activators => PoolManager.activators;
-        [ShowInInspector] private static Dictionary<IEntity, Dictionary<Type, IComponent>> entities => EntityManager.entities;
-        [ShowInInspector] private static Dictionary<Type, UIPanel> panels => UIManager.panels;
-        [ShowInInspector] private static Dictionary<Type, IEvent> events => EventManager.observers;
-        [ShowInInspector] private static Dictionary<Type, IEntity> scenes => SceneManager.objects;
-        [ShowInInspector] private static Dictionary<string, IPool<GameObject>> objects => PoolManager.pools;
-        [ShowInInspector] private static Dictionary<Type, Dictionary<int, IData>> intData => DataManager.intData;
-        [ShowInInspector] private static Dictionary<Type, Dictionary<Enum, IData>> enumData => DataManager.enumData;
-        [ShowInInspector] private static Dictionary<Type, Dictionary<string, IData>> stringData => DataManager.stringData;
-        [ShowInInspector] private static List<Timer> timerPlay => TimerManager.timers;
-        [ShowInInspector] private static List<AudioClip> audioStop => SoundManager.stops.Select(source => source.clip).ToList();
-        [ShowInInspector] private static List<AudioClip> audioPlay => SoundManager.plays.Select(source => source.clip).ToList();
-        [ShowInInspector] private static float audioVolume => SoundManager.audioValue;
-        [ShowInInspector] private static float soundVolume => SoundManager.soundValue;
-#if UNITY_EDITOR
-        public static void EditorWindow(string path, object editor) => EditorSetting.editors[path] = editor;
-#endif
-    }
-
     [AddComponentMenu(""), DefaultExecutionOrder(-10)]
     public sealed partial class GlobalManager : MonoBehaviour, IEntity
     {
@@ -48,6 +25,8 @@ namespace JFramework.Core
         public static event Action OnStart;
 
         public static event Action OnUpdate;
+
+        public static event Action OnFixedUpdate;
 
         public static event Action OnQuit;
 
@@ -91,6 +70,18 @@ namespace JFramework.Core
             }
         }
 
+        private void FixedUpdate()
+        {
+            try
+            {
+                OnFixedUpdate?.Invoke();
+            }
+            catch (Exception e)
+            {
+                Debug.Log(e.ToString());
+            }
+        }
+
         private void OnDisable()
         {
             UIManager.UnRegister();
@@ -123,6 +114,7 @@ namespace JFramework.Core
             OnQuit = null;
             OnStart = null;
             OnUpdate = null;
+            OnFixedUpdate = null;
             OnCheat = null;
             GC.Collect();
         }
@@ -132,5 +124,28 @@ namespace JFramework.Core
             Debug.LogWarning("检查到作弊！");
             OnCheat?.Invoke();
         }
+    }
+
+    public sealed partial class GlobalManager
+    {
+        public static bool isRemote => SettingManager.Instance.remoteLoad;
+        public static AssetPlatform platform => SettingManager.Instance.platform;
+        [ShowInInspector] private static Dictionary<Type, IPool> activators => PoolManager.activators;
+        [ShowInInspector] private static Dictionary<IEntity, Dictionary<Type, IComponent>> entities => EntityManager.entities;
+        [ShowInInspector] private static Dictionary<Type, UIPanel> panels => UIManager.panels;
+        [ShowInInspector] private static Dictionary<Type, IEvent> events => EventManager.observers;
+        [ShowInInspector] private static Dictionary<Type, IEntity> scenes => SceneManager.objects;
+        [ShowInInspector] private static Dictionary<string, IPool<GameObject>> objects => PoolManager.pools;
+        [ShowInInspector] private static Dictionary<Type, Dictionary<int, IData>> intData => DataManager.intData;
+        [ShowInInspector] private static Dictionary<Type, Dictionary<Enum, IData>> enumData => DataManager.enumData;
+        [ShowInInspector] private static Dictionary<Type, Dictionary<string, IData>> stringData => DataManager.stringData;
+        [ShowInInspector] private static List<Timer> timerPlay => TimerManager.timers;
+        [ShowInInspector] private static List<AudioClip> audioStop => SoundManager.stops.Select(source => source.clip).ToList();
+        [ShowInInspector] private static List<AudioClip> audioPlay => SoundManager.plays.Select(source => source.clip).ToList();
+        [ShowInInspector] private static float audioVolume => SoundManager.audioValue;
+        [ShowInInspector] private static float soundVolume => SoundManager.soundValue;
+#if UNITY_EDITOR
+        public static void EditorWindow(string path, object editor) => EditorSetting.editors[path] = editor;
+#endif
     }
 }

@@ -31,7 +31,7 @@ namespace JFramework
         public string assetInfo = "AssetBundleInfo";
 
         public string buildPath = "AssetBundles";
-        
+
         public string dataAssembly = "HotUpdate.Data";
 
         public string assetPath = "Assets/Template";
@@ -44,8 +44,7 @@ namespace JFramework
 
         public string remotePath = "http://192.168.0.3:8000/AssetBundles";
 
-        [OnValueChanged("UpdateSceneSetting")]
-        public bool remoteLoad;
+        [OnValueChanged("UpdateSceneSetting")] public bool remoteLoad;
 
         public bool remoteBuild;
 
@@ -82,8 +81,7 @@ namespace JFramework
 #if UNITY_EDITOR
         [HideInInspector] public string[] sceneEditor = new string[3];
         [HideInInspector] public List<string> sceneAssets = new List<string>();
-
-        public readonly Dictionary<string, Object> objects = new Dictionary<string, Object>();
+        [ShowInInspector] public Dictionary<string, string> objects = new Dictionary<string, string>();
 
         private static string remoteBuildPath => Instance.remoteBuild ? Instance.buildPath : Application.streamingAssetsPath;
 
@@ -93,25 +91,19 @@ namespace JFramework
 
         public T Load<T>(string path) where T : Object
         {
-            path = char.ToUpper(path[0]) + path.Substring(1);
-            if (objects.TryGetValue(path, out var obj))
+            if (objects.TryGetValue(path, out var fullPath))
             {
                 if (typeof(T).IsSubclassOf(typeof(Component)))
                 {
-                    return ((GameObject)Instantiate(obj)).GetComponent<T>();
+                    return Instantiate(AssetDatabase.LoadAssetAtPath<GameObject>(fullPath)).GetComponent<T>();
                 }
 
-                if (obj is GameObject)
+                if (typeof(T) == typeof(GameObject))
                 {
-                    return (T)Instantiate(obj);
+                    return Instantiate(AssetDatabase.LoadAssetAtPath<T>(fullPath));
                 }
 
-                if (obj is Texture2D texture)
-                {
-                    obj = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), Vector2.one * 0.5f);
-                }
-
-                return (T)obj;
+                return AssetDatabase.LoadAssetAtPath<T>(fullPath);
             }
 
             return null;

@@ -79,8 +79,8 @@ namespace JFramework
             }
 
             var result = builder.ToString();
-            builder.Clear();
             PoolManager.Enqueue(builder);
+            builder.Clear();
             return result;
         }
 
@@ -93,44 +93,49 @@ namespace JFramework
         [MenuItem("Tools/JFramework/Update Assets", priority = 2)]
         private static void UpdateAsset()
         {
-            var bundleNames = AssetDatabase.GetAllAssetBundleNames();
-            foreach (var bundleName in bundleNames)
+            var names = AssetDatabase.GetAllAssetBundleNames();
+            foreach (var name in names)
             {
-                if (AssetDatabase.GetAssetPathsFromAssetBundle(bundleName).Length == 0)
+                if (AssetDatabase.GetAssetPathsFromAssetBundle(name).Length == 0)
                 {
-                    AssetDatabase.RemoveAssetBundleName(bundleName, true);
+                    AssetDatabase.RemoveAssetBundleName(name, true);
                 }
             }
 
             SettingManager.Instance.sceneAssets.Clear();
-            var folderPaths = AssetDatabase.GetSubFolders(SettingManager.Instance.assetPath);
-            foreach (var folderPath in folderPaths)
+            var folders = AssetDatabase.GetSubFolders(SettingManager.Instance.assetPath);
+            foreach (var folder in folders)
             {
-                if (string.IsNullOrEmpty(folderPath)) continue;
-                var folder = Path.GetFileNameWithoutExtension(folderPath);
-                var guids = AssetDatabase.FindAssets("t:Object", new[] { folderPath });
+                if (string.IsNullOrEmpty(folder)) continue;
+                var name = Path.GetFileNameWithoutExtension(folder);
+                var guids = AssetDatabase.FindAssets("t:Object", new[] { folder });
+
                 foreach (var guid in guids)
                 {
                     var path = AssetDatabase.GUIDToAssetPath(guid);
-                    if (AssetDatabase.IsValidFolder(path)) continue;
-                    var importer = AssetImporter.GetAtPath(path);
-                    if (importer == null) continue;
-
-                    if (importer.assetBundleName != folder.ToLower())
+                    if (!AssetDatabase.IsValidFolder(path))
                     {
-                        Debug.Log($"增加 AssetBundles 资源: {path.Green()}");
-                        importer.assetBundleName = folder;
-                        importer.SaveAndReimport();
-                    }
+                        var importer = AssetImporter.GetAtPath(path);
+                        if (importer == null) continue;
 
-                    var asset = AssetDatabase.LoadAssetAtPath<Object>(path);
-                    if (asset is SceneAsset)
-                    {
-                        SettingManager.Instance.sceneAssets.Add(path);
-                    }
+                        if (importer.assetBundleName != name.ToLower())
+                        {
+                            Debug.Log($"增加 AssetBundles 资源: {path.Green()}");
+                            importer.assetBundleName = name;
+                            importer.SaveAndReimport();
+                        }
 
-                    if (asset == null) continue;
-                    SettingManager.Instance.objects[$"{folder}/{asset.name}"] = asset;
+                        if (!SettingManager.Instance.objects.ContainsValue(path))
+                        {
+                            var asset = AssetDatabase.LoadAssetAtPath<Object>(path);
+                            if (asset is SceneAsset)
+                            {
+                                SettingManager.Instance.sceneAssets.Add(path);
+                            }
+
+                            SettingManager.Instance.objects[$"{name}/{asset.name}"] = path;
+                        }
+                    }
                 }
             }
 
@@ -142,7 +147,8 @@ namespace JFramework
         {
             UpdateAsset();
             var directory = Directory.CreateDirectory(SettingManager.platformPath);
-            BuildPipeline.BuildAssetBundles(SettingManager.platformPath, BuildAssetBundleOptions.ChunkBasedCompression, (BuildTarget)SettingManager.Instance.platform);
+            BuildPipeline.BuildAssetBundles(SettingManager.platformPath, BuildAssetBundleOptions.ChunkBasedCompression,
+                (BuildTarget)SettingManager.Instance.platform);
             var infoList = directory.GetFiles().Where(info => info.Extension == "").ToList();
             var fileList = infoList.Select(info => new Bundle(GetProviderInfo(info.FullName), info.Name, info.Length.ToString())).ToList();
             var contents = JsonManager.Writer(fileList, true);

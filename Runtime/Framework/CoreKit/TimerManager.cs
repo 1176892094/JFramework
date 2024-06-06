@@ -10,7 +10,6 @@
 
 using System;
 using System.Collections.Generic;
-using JFramework.Core;
 using UnityEngine;
 
 namespace JFramework.Core
@@ -18,38 +17,47 @@ namespace JFramework.Core
     public static class TimerManager
     {
         internal static readonly List<Timer> timers = new();
+        private static readonly List<Timer> copies = new();
 
         internal static void Register()
         {
-            GlobalManager.OnUpdate += OnUpdate;
+            GlobalManager.OnFixedUpdate += OnFixedUpdate;
         }
 
-        private static void OnUpdate()
+        private static void OnFixedUpdate()
         {
-            for (int i = timers.Count - 1; i >= 0; i--)
+            copies.Clear();
+            copies.AddRange(timers);
+            foreach (var timer in copies)
             {
-                timers[i]?.Update();
+                if (timer.running)
+                {
+                    timer.Update();
+                    continue;
+                }
+
+                Push(timer);
             }
         }
 
-        public static Timer Pop(float interval)
+        public static Timer Pop(float waitTime)
         {
             if (!GlobalManager.Instance) return null;
             var timer = PoolManager.Dequeue<Timer>();
-            timers.Add(timer);
-            return timer.Pop(interval);
+            timers.Add(timer.Pop(waitTime));
+            return timer;
         }
 
         public static void Push(Timer timer)
         {
             if (!GlobalManager.Instance) return;
-            if (!timers.Remove(timer)) return;
+            timers.Remove(timer.Push());
             PoolManager.Enqueue(timer);
-            timer.Push();
         }
 
         internal static void UnRegister()
         {
+            copies.Clear();
             timers.Clear();
         }
     }
@@ -60,36 +68,36 @@ namespace JFramework
     [Serializable]
     public sealed class Timer
     {
-        private bool running;
+        public bool running;
         private bool unscale;
         [SerializeField] private int count;
-        [SerializeField] private float interval;
-        [SerializeField] private float duration;
-        private event Action callback;
-        private event Func<bool> condition;
-        private float seconds => unscale ? Time.unscaledTime : Time.time;
+        [SerializeField] private float waitTime;
+        [SerializeField] private float stayTime;
+        private event Action OnUpdate;
+        private float seconds => unscale ? Time.fixedUnscaledTime : Time.fixedTime;
 
-        public Timer Invoke(Action callback)
+        public Timer Invoke(Action OnUpdate)
         {
-            this.callback = callback;
+            this.OnUpdate = OnUpdate;
             return this;
         }
 
-        public Timer Invoke(Action<Timer> callback)
+        public Timer Invoke(Action<Timer> OnUpdate)
         {
-            this.callback = () => callback(this);
+            this.OnUpdate = () => OnUpdate(this);
             return this;
         }
 
-        public Timer When(Func<bool> condition)
+        public Timer Set(float waitTime)
         {
-            this.condition = condition;
+            this.waitTime = waitTime;
+            stayTime = seconds + waitTime;
             return this;
         }
 
-        public Timer When(Func<Timer, bool> condition)
+        public Timer Add(float stayTime)
         {
-            this.condition = () => condition(this);
+            this.stayTime += stayTime;
             return this;
         }
 
@@ -99,80 +107,52 @@ namespace JFramework
             return this;
         }
 
-        public Timer Unscale()
+        public Timer Unscale(bool unscale = true)
         {
-            unscale = true;
-            duration = seconds + interval;
+            this.unscale = unscale;
+            stayTime = seconds + waitTime;
             return this;
         }
 
-        public Timer Set(float interval)
-        {
-            this.interval = interval;
-            duration = seconds + interval;
-            return this;
-        }
-
-        public Timer Add(float duration)
-        {
-            this.duration += duration;
-            return this;
-        }
-
-        internal Timer Pop(float interval)
+        internal Timer Pop(float waitTime)
         {
             count = 1;
             running = true;
             unscale = false;
-            this.interval = interval;
-            duration = seconds + interval;
+            this.waitTime = waitTime;
+            stayTime = seconds + waitTime;
             return this;
         }
 
         internal void Update()
         {
-            if (!running || seconds <= duration)
+            if (seconds <= stayTime)
             {
                 return;
             }
 
-            duration = seconds + interval;
+            stayTime = seconds + waitTime;
             try
             {
-                if (condition != null)
+                if (--count == 0)
                 {
-                    if (condition())
-                    {
-                        callback?.Invoke();
-                    }
-                    else
-                    {
-                        TimerManager.Push(this);
-                    }
+                    running = false;
                 }
-                else
-                {
-                    count--;
-                    callback?.Invoke();
-                    if (count == 0)
-                    {
-                        TimerManager.Push(this);
-                    }
-                }
+
+                OnUpdate?.Invoke();
             }
             catch (Exception e)
             {
-                TimerManager.Push(this);
+                running = false;
                 Debug.LogWarning("计时器无法执行方法：\n" + e);
             }
         }
 
-        internal void Push()
+        internal Timer Push()
         {
-            running = false;
             unscale = false;
-            callback = null;
-            condition = null;
+            OnUpdate = null;
+            return this;
         }
     }
 }
