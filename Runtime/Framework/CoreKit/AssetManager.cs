@@ -33,36 +33,14 @@ namespace JFramework.Core
             try
             {
                 if (!GlobalManager.Instance) return null;
-                if (GlobalManager.mode == AssetMode.AssetBundle)
+                var asset = await LoadAsset<T>(path, GlobalManager.mode);
+                if (asset == null)
                 {
-                    var data = await LoadAssetData(path);
-                    var bundle = await LoadAssetBundle(data.bundle);
-                    var asset = await AssetLoader.LoadAsync<T>(bundle, data.asset);
-                    asset ??= await ResourcesLoader.LoadAsync<T>(path);
-                    if (asset == null)
-                    {
-                        Debug.LogWarning($"加载 {path} 资源为空！");
-                        return null;
-                    }
-
-                    return asset;
+                    Debug.LogWarning($"加载 {path} 资源为空！");
+                    return null;
                 }
-                else
-                {
-#if UNITY_EDITOR
-                    var asset = await EditorLoader.LoadAsync<T>(path);
-                    asset ??= await ResourcesLoader.LoadAsync<T>(path);
-#else
-                    var asset = await ResourcesLoader.LoadAsync<T>(path);
-#endif
-                    if (asset == null)
-                    {
-                        Debug.LogWarning($"加载 {path} 资源为空！");
-                        return null;
-                    }
 
-                    return asset;
-                }
+                return asset;
             }
             catch (Exception e)
             {
@@ -76,40 +54,40 @@ namespace JFramework.Core
             try
             {
                 if (!GlobalManager.Instance) return;
-                if (GlobalManager.mode == AssetMode.AssetBundle)
+                var asset = await LoadAsset<T>(path, GlobalManager.mode);
+                if (asset == null)
                 {
-                    var data = await LoadAssetData(path);
-                    var bundle = await LoadAssetBundle(data.bundle);
-                    var asset = await AssetLoader.LoadAsync<T>(bundle, data.asset);
-                    asset ??= await ResourcesLoader.LoadAsync<T>(path);
-                    if (asset == null)
-                    {
-                        Debug.LogWarning($"加载 {path} 资源为空！");
-                        return;
-                    }
-
-                    action.Invoke(asset);
+                    Debug.LogWarning($"加载 {path} 资源为空！");
+                    return;
                 }
-                else
-                {
-#if UNITY_EDITOR
-                    var asset = await EditorLoader.LoadAsync<T>(path);
-                    asset ??= await ResourcesLoader.LoadAsync<T>(path);
-#else
-                    var asset = await ResourcesLoader.LoadAsync<T>(path);
-#endif
-                    if (asset == null)
-                    {
-                        Debug.LogWarning($"加载 {path} 资源为空！");
-                        return;
-                    }
 
-                    action.Invoke(asset);
-                }
+                action?.Invoke(asset);
             }
             catch (Exception e)
             {
                 Debug.LogWarning(e);
+            }
+        }
+        
+        private static async Task<T> LoadAsset<T>(string path, AssetMode mode) where T : Object
+        {
+            if (mode == AssetMode.AssetBundle)
+            {
+                var data = await LoadAssetData(path);
+                var bundle = await LoadAssetBundle(data.bundle);
+                var asset = await AssetLoader.LoadAsync<T>(bundle, data.asset);
+                asset ??= await ResourcesLoader.LoadAsync<T>(path);
+                return asset;
+            }
+            else
+            {
+#if UNITY_EDITOR
+                var asset = await EditorLoader.LoadAsync<T>(path);
+                asset ??= await ResourcesLoader.LoadAsync<T>(path);
+#else
+                var asset = await ResourcesLoader.LoadAsync<T>(path);
+#endif
+                return asset;
             }
         }
 
@@ -282,7 +260,7 @@ namespace JFramework.Core
             {
                 if (SettingManager.Instance.objects.TryGetValue(assetPath, out var editorPath))
                 {
-                    if (typeof(T).IsSubclassOf(typeof(Component)))
+                    if (typeof(T).IsSubclassOf(typeof(MonoBehaviour)))
                     {
                         var request = UnityEditor.AssetDatabase.LoadAssetAtPath<GameObject>(editorPath);
                         return Object.Instantiate(request).GetComponent<T>();
