@@ -20,11 +20,11 @@ namespace JFramework.Core
 {
     public static class JsonManager
     {
-        private static Dictionary<string, Json> secrets = new();
+        private static Dictionary<string, JsonData> secrets = new();
 
         internal static void Register()
         {
-            var copies = new List<Json>();
+            var copies = new List<JsonData>();
             Load(copies, nameof(JsonManager));
             secrets = copies.ToDictionary(json => json.name);
         }
@@ -91,7 +91,7 @@ namespace JFramework.Core
             try
             {
                 using var aes = Aes.Create();
-                secrets[name] = new Json(name, aes.Key, aes.IV);
+                secrets[name] = new JsonData(name, aes.Key, aes.IV);
                 using var cryptoTransform = aes.CreateEncryptor(aes.Key, aes.IV);
                 using var memoryStream = new MemoryStream();
                 using var cryptoStream = new CryptoStream(memoryStream, cryptoTransform, CryptoStreamMode.Write);
@@ -104,7 +104,7 @@ namespace JFramework.Core
             }
             catch (Exception e)
             {
-                secrets[name] = new Json(name);
+                secrets[name] = new JsonData(name);
                 Debug.LogWarning($"存档 {name.Red()} 丢失!\n{e}");
                 return null;
             }
@@ -129,7 +129,7 @@ namespace JFramework.Core
             }
             catch (Exception e)
             {
-                secrets[name] = new Json(name);
+                secrets[name] = new JsonData(name);
                 Debug.LogWarning($"存档 {name.Red()} 丢失!\n{e}");
                 Save(secrets.Values.ToList(), nameof(JsonManager));
                 return null;
@@ -154,6 +154,33 @@ namespace JFramework.Core
             public JsonMapper(T value)
             {
                 this.value = value;
+            }
+        }
+
+        [Serializable]
+        private struct JsonData
+        {
+            public string name;
+            public byte[] key;
+            public byte[] iv;
+
+            public JsonData(string name)
+            {
+                this.name = name;
+                iv = Array.Empty<byte>();
+                key = Array.Empty<byte>();
+            }
+
+            public JsonData(string name, byte[] key, byte[] iv)
+            {
+                this.iv = iv;
+                this.key = key;
+                this.name = name;
+            }
+
+            public static implicit operator bool(JsonData data)
+            {
+                return data.key != null && data.key.Length != 0 && data.iv != null && data.iv.Length != 0;
             }
         }
     }

@@ -139,6 +139,11 @@ namespace JFramework.Core
             audios.Clear();
             audioSource = null;
         }
+        
+        private struct SoundData
+        {
+            
+        }
 
         [Serializable]
         public class SoundSetting

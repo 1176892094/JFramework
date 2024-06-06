@@ -152,5 +152,40 @@ namespace JFramework.Core
 
             streams.Add(type, new Pool<T>(obj));
         }
+
+        [Serializable]
+        private struct Pool<T> : IPool<T>
+        {
+            public List<T> pool;
+
+            public int count => pool.Count;
+
+            public Pool(T obj) => pool = new List<T>() { obj };
+
+            public T Pop()
+            {
+                if (count > 0)
+                {
+                    var obj = pool[0];
+                    pool.Remove(obj);
+                    return obj;
+                }
+
+                return Activator.CreateInstance<T>();
+            }
+
+            public bool Push(T obj)
+            {
+                if (!pool.Contains(obj))
+                {
+                    pool.Add(obj);
+                    return true;
+                }
+
+                return false;
+            }
+
+            public void Dispose() => pool.Clear();
+        }
     }
 }

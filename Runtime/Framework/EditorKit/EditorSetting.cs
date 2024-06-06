@@ -31,13 +31,6 @@ namespace JFramework
     {
         public static readonly SortedDictionary<string, object> editors = new SortedDictionary<string, object>();
 
-        [MenuItem("Tools/JFramework/Editor Window _F1", priority = 1)]
-        protected static void ShowEditorWindow()
-        {
-            var window = GetWindow<EditorSetting>();
-            window.position = GUIHelper.GetEditorWindowRect().AlignCenter(800, 600);
-        }
-
         protected override OdinMenuTree BuildMenuTree()
         {
             var tree = new OdinMenuTree
@@ -90,6 +83,13 @@ namespace JFramework
 
     internal partial class EditorSetting
     {
+        [MenuItem("Tools/JFramework/Editor Window _F1", priority = 1)]
+        protected static void ShowEditorWindow()
+        {
+            var window = GetWindow<EditorSetting>();
+            window.position = GUIHelper.GetEditorWindowRect().AlignCenter(800, 600);
+        }
+
         [MenuItem("Tools/JFramework/Update Assets", priority = 2)]
         public static void UpdateAsset()
         {
@@ -144,10 +144,9 @@ namespace JFramework
         {
             UpdateAsset();
             var directory = Directory.CreateDirectory(SettingManager.platformPath);
-            BuildPipeline.BuildAssetBundles(SettingManager.platformPath, BuildAssetBundleOptions.ChunkBasedCompression,
-                (BuildTarget)SettingManager.Instance.platform);
+            BuildPipeline.BuildAssetBundles(SettingManager.platformPath, BuildAssetBundleOptions.ChunkBasedCompression, (BuildTarget)SettingManager.Instance.platform);
             var infoList = directory.GetFiles().Where(info => info.Extension == "").ToList();
-            var fileList = infoList.Select(info => new Bundle(GetProviderInfo(info.FullName), info.Name, info.Length.ToString())).ToList();
+            var fileList = infoList.Select(info => new BundleManager.BundleData(GetProviderInfo(info.FullName), info.Name, info.Length.ToString())).ToList();
             var contents = JsonManager.Writer(fileList, true);
             File.WriteAllText(SettingManager.assetBundleInfo, contents);
             Debug.Log("构建 AssetBundles 成功!".Green());

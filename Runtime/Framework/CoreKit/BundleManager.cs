@@ -21,8 +21,8 @@ namespace JFramework.Core
     public static class BundleManager
     {
         private static readonly List<string> updateBundles = new();
-        private static Dictionary<string, Bundle> clientBundles = new();
-        private static Dictionary<string, Bundle> remoteBundles = new();
+        private static Dictionary<string, BundleData> clientBundles = new();
+        private static Dictionary<string, BundleData> remoteBundles = new();
         public static event Action<List<long>> OnLoadStart;
         public static event Action<string, float> OnLoadUpdate;
         public static event Action<bool> OnLoadComplete;
@@ -38,13 +38,13 @@ namespace JFramework.Core
             }
 
             var remote = await File.ReadAllTextAsync(SettingManager.remoteInfoPath);
-            var bundles = JsonManager.Reader<List<Bundle>>(remote);
+            var bundles = JsonManager.Reader<List<BundleData>>(remote);
             remoteBundles = bundles.ToDictionary(bundle => bundle.name);
 
             var client = await GetClientBundle();
             if (client != null)
             {
-                bundles = JsonManager.Reader<List<Bundle>>(client);
+                bundles = JsonManager.Reader<List<BundleData>>(client);
                 clientBundles = bundles.ToDictionary(bundle => bundle.name);
             }
 
@@ -207,6 +207,31 @@ namespace JFramework.Core
             clientBundles.Clear();
             remoteBundles.Clear();
             updateBundles.Clear();
+        }
+
+        [Serializable]
+        internal struct BundleData
+        {
+            public string code;
+            public string name;
+            public string size;
+
+            public BundleData(string code, string name, string size)
+            {
+                this.code = code;
+                this.name = name;
+                this.size = size;
+            }
+
+            public static bool operator ==(BundleData a, BundleData b) => a.code == b.code;
+
+            public static bool operator !=(BundleData a, BundleData b) => a.code != b.code;
+
+            private bool Equals(BundleData other) => size == other.size && code == other.code && name == other.name;
+
+            public override bool Equals(object obj) => obj is BundleData other && Equals(other);
+
+            public override int GetHashCode() => HashCode.Combine(size, code, name);
         }
     }
 }

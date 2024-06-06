@@ -24,7 +24,7 @@ namespace JFramework.Core
     {
         private static AssetBundle mainAsset;
         private static AssetBundleManifest manifest;
-        private static readonly Dictionary<string, Asset> assets = new();
+        private static readonly Dictionary<string, AssetData> assets = new();
         private static readonly Dictionary<string, AssetBundle> bundles = new();
         private static readonly Dictionary<string, Task<AssetBundle>> requests = new();
 
@@ -117,11 +117,11 @@ namespace JFramework.Core
             return null;
         }
 
-        private static async Task<Asset> LoadAssetData(string path)
+        private static async Task<AssetData> LoadAssetData(string path)
         {
             if (!assets.TryGetValue(path, out var assetData))
             {
-                assetData = new Asset(path);
+                assetData = new AssetData(path);
                 assets.Add(path, assetData);
             }
 
@@ -254,7 +254,7 @@ namespace JFramework.Core
         }
 
 #if UNITY_EDITOR
-        public static class SimulateLoader
+        private static class SimulateLoader
         {
             public static async Task<T> LoadAsync<T>(string assetPath) where T : Object
             {
@@ -277,5 +277,31 @@ namespace JFramework.Core
             }
         }
 #endif
+
+        [Serializable]
+        private struct AssetData
+        {
+            public string asset;
+            public string bundle;
+
+            public AssetData(string path)
+            {
+                var index = path.LastIndexOf('/');
+                if (index < 0)
+                {
+                    bundle = "";
+                    asset = path;
+                    return;
+                }
+
+                bundle = path.Substring(0, index).ToLower();
+                asset = path.Substring(index + 1);
+            }
+
+            public override string ToString()
+            {
+                return $"资源包：{bundle} 资源名称：{asset}";
+            }
+        }
     }
 }

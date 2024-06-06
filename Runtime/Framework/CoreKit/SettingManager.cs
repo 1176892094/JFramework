@@ -92,7 +92,6 @@ namespace JFramework
 
         public void UpdateSceneSetting()
         {
-            EditorSetting.UpdateAsset();
             var assets = EditorBuildSettings.scenes.Select(scene => scene.path).ToList();
             foreach (var scenePath in sceneAssets)
             {
