@@ -109,11 +109,11 @@ namespace JFramework.Core
 
     public static partial class PoolManager
     {
-        internal static readonly Dictionary<Type, IPool> activators = new Dictionary<Type, IPool>();
+        internal static readonly Dictionary<Type, IPool> streams = new Dictionary<Type, IPool>();
 
         public static T Dequeue<T>()
         {
-            if (activators.TryGetValue(typeof(T), out var stream) && stream.count > 0)
+            if (streams.TryGetValue(typeof(T), out var stream) && stream.count > 0)
             {
                 return ((IPool<T>)stream).Pop();
             }
@@ -123,7 +123,7 @@ namespace JFramework.Core
 
         public static T Dequeue<T>(Type type)
         {
-            if (activators.TryGetValue(type, out var stream) && stream.count > 0)
+            if (streams.TryGetValue(type, out var stream) && stream.count > 0)
             {
                 return ((IPool<T>)stream).Pop();
             }
@@ -133,24 +133,24 @@ namespace JFramework.Core
 
         public static void Enqueue<T>(T obj)
         {
-            if (activators.TryGetValue(typeof(T), out var pool))
+            if (streams.TryGetValue(typeof(T), out var pool))
             {
                 ((IPool<T>)pool).Push(obj);
                 return;
             }
 
-            activators.Add(typeof(T), new Pool<T>(obj));
+            streams.Add(typeof(T), new Pool<T>(obj));
         }
 
         public static void Enqueue<T>(T obj, Type type)
         {
-            if (activators.TryGetValue(type, out var pool))
+            if (streams.TryGetValue(type, out var pool))
             {
                 ((IPool<T>)pool).Push(obj);
                 return;
             }
 
-            activators.Add(type, new Pool<T>(obj));
+            streams.Add(type, new Pool<T>(obj));
         }
     }
 }

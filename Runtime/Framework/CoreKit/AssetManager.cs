@@ -33,23 +33,35 @@ namespace JFramework.Core
             try
             {
                 if (!GlobalManager.Instance) return null;
-#if UNITY_EDITOR
-                if (!SettingManager.Instance.remoteLoad)
+                if (GlobalManager.mode == AssetMode.AssetBundle)
                 {
-                    return SettingManager.Instance.Load<T>(path);
-                }
-#endif
-                var assetData = await LoadAssetData(path);
-                var assetBundle = await LoadAssetBundle(assetData.bundle);
-                if (typeof(T).IsSubclassOf(typeof(Component)))
-                {
-                    var obj = assetBundle.LoadAssetAsync<GameObject>(assetData.asset);
-                    return ((GameObject)Object.Instantiate(obj.asset)).GetComponent<T>();
+                    var data = await LoadAssetData(path);
+                    var bundle = await LoadAssetBundle(data.bundle);
+                    var asset = await AssetLoader.LoadAsync<T>(bundle, data.asset);
+                    asset ??= await ResourcesLoader.LoadAsync<T>(path);
+                    if (asset == null)
+                    {
+                        Debug.LogWarning($"加载 {path} 资源为空！");
+                        return null;
+                    }
+
+                    return asset;
                 }
                 else
                 {
-                    var obj = assetBundle.LoadAssetAsync<T>(assetData.asset);
-                    return obj.asset is GameObject ? (T)Object.Instantiate(obj.asset) : (T)obj.asset;
+#if UNITY_EDITOR
+                    var asset = await EditorLoader.LoadAsync<T>(path);
+                    asset ??= await ResourcesLoader.LoadAsync<T>(path);
+#else
+                    var asset = await ResourcesLoader.LoadAsync<T>(path);
+#endif
+                    if (asset == null)
+                    {
+                        Debug.LogWarning($"加载 {path} 资源为空！");
+                        return null;
+                    }
+
+                    return asset;
                 }
             }
             catch (Exception e)
@@ -64,24 +76,35 @@ namespace JFramework.Core
             try
             {
                 if (!GlobalManager.Instance) return;
-#if UNITY_EDITOR
-                if (!SettingManager.Instance.remoteLoad)
+                if (GlobalManager.mode == AssetMode.AssetBundle)
                 {
-                    action.Invoke(SettingManager.Instance.Load<T>(path));
-                    return;
-                }
-#endif
-                var assetData = await LoadAssetData(path);
-                var assetBundle = await LoadAssetBundle(assetData.bundle);
-                if (typeof(T).IsSubclassOf(typeof(Component)))
-                {
-                    var obj = assetBundle.LoadAssetAsync<GameObject>(assetData.asset);
-                    action.Invoke(((GameObject)Object.Instantiate(obj.asset)).GetComponent<T>());
+                    var data = await LoadAssetData(path);
+                    var bundle = await LoadAssetBundle(data.bundle);
+                    var asset = await AssetLoader.LoadAsync<T>(bundle, data.asset);
+                    asset ??= await ResourcesLoader.LoadAsync<T>(path);
+                    if (asset == null)
+                    {
+                        Debug.LogWarning($"加载 {path} 资源为空！");
+                        return;
+                    }
+
+                    action.Invoke(asset);
                 }
                 else
                 {
-                    var obj = assetBundle.LoadAssetAsync<T>(assetData.asset);
-                    action.Invoke(obj.asset is GameObject ? (T)Object.Instantiate(obj.asset) : (T)obj.asset);
+#if UNITY_EDITOR
+                    var asset = await EditorLoader.LoadAsync<T>(path);
+                    asset ??= await ResourcesLoader.LoadAsync<T>(path);
+#else
+                    var asset = await ResourcesLoader.LoadAsync<T>(path);
+#endif
+                    if (asset == null)
+                    {
+                        Debug.LogWarning($"加载 {path} 资源为空！");
+                        return;
+                    }
+
+                    action.Invoke(asset);
                 }
             }
             catch (Exception e)
@@ -95,19 +118,18 @@ namespace JFramework.Core
             try
             {
                 if (!GlobalManager.Instance) return null;
-#if UNITY_EDITOR
-                if (!SettingManager.Instance.remoteLoad)
+                if (GlobalManager.mode == AssetMode.AssetBundle)
                 {
-                    return path.Split('/')[1];
+                    var data = await LoadAssetData(path);
+                    var bundle = await LoadAssetBundle(data.bundle);
+                    var scenes = bundle.GetAllScenePaths();
+                    if (scenes.Any(scene => Path.GetFileNameWithoutExtension(scene) == data.asset))
+                    {
+                        return data.asset;
+                    }
                 }
-#endif
-                var assetData = await LoadAssetData(path);
-                var assetBundle = await LoadAssetBundle(assetData.bundle);
-                var scenePaths = assetBundle.GetAllScenePaths();
-                if (scenePaths.Any(scenePath => Path.GetFileNameWithoutExtension(scenePath) == assetData.asset))
-                {
-                    return assetData.asset;
-                }
+
+                return path.Split('/')[1];
             }
             catch (Exception e)
             {
@@ -142,6 +164,11 @@ namespace JFramework.Core
 
         private static async Task<AssetBundle> LoadAssetBundle(string bundle)
         {
+            if (string.IsNullOrEmpty(bundle))
+            {
+                return null;
+            }
+
             if (bundles.TryGetValue(bundle, out var result))
             {
                 return result;
@@ -196,7 +223,6 @@ namespace JFramework.Core
                 return assetBundle;
             }
 #endif
-            Debug.LogWarning($"加载 {bundle} 资源包失败");
             return null;
         }
 
@@ -209,5 +235,69 @@ namespace JFramework.Core
             manifest = null;
             mainAsset = null;
         }
+
+        private static class ResourcesLoader
+        {
+            public static async Task<T> LoadAsync<T>(string assetPath) where T : Object
+            {
+                if (typeof(T).IsSubclassOf(typeof(MonoBehaviour)))
+                {
+                    var request = await Resources.LoadAsync<GameObject>(assetPath);
+                    return ((GameObject)Object.Instantiate(request.asset)).GetComponent<T>();
+                }
+                else
+                {
+                    var request = await Resources.LoadAsync<T>(assetPath);
+                    return request.asset is GameObject ? (T)Object.Instantiate(request.asset) : (T)request.asset;
+                }
+            }
+        }
+
+        private static class AssetLoader
+        {
+            public static async Task<T> LoadAsync<T>(AssetBundle assetBundle, string assetName) where T : Object
+            {
+                if (assetBundle != null)
+                {
+                    if (typeof(T).IsSubclassOf(typeof(MonoBehaviour)))
+                    {
+                        var request = await assetBundle.LoadAssetAsync<GameObject>(assetName);
+                        return ((GameObject)Object.Instantiate(request.asset)).GetComponent<T>();
+                    }
+                    else
+                    {
+                        var request = await assetBundle.LoadAssetAsync<T>(assetName);
+                        return request.asset is GameObject ? (T)Object.Instantiate(request.asset) : (T)request.asset;
+                    }
+                }
+
+                return null;
+            }
+        }
+
+#if UNITY_EDITOR
+        public static class EditorLoader
+        {
+            public static async Task<T> LoadAsync<T>(string assetPath) where T : Object
+            {
+                if (SettingManager.Instance.objects.TryGetValue(assetPath, out var editorPath))
+                {
+                    if (typeof(T).IsSubclassOf(typeof(Component)))
+                    {
+                        var request = UnityEditor.AssetDatabase.LoadAssetAtPath<GameObject>(editorPath);
+                        return Object.Instantiate(request).GetComponent<T>();
+                    }
+                    else
+                    {
+                        var request = UnityEditor.AssetDatabase.LoadAssetAtPath<T>(editorPath);
+                        return request is GameObject ? Object.Instantiate(request) : request;
+                    }
+                }
+
+                await Task.Yield();
+                return null;
+            }
+        }
+#endif
     }
 }

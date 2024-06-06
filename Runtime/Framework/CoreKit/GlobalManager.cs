@@ -128,9 +128,9 @@ namespace JFramework.Core
 
     public sealed partial class GlobalManager
     {
-        public static bool isRemote => SettingManager.Instance.remoteLoad;
+        public static AssetMode mode => SettingManager.Instance.assetMode;
         public static AssetPlatform platform => SettingManager.Instance.platform;
-        [ShowInInspector] private static Dictionary<Type, IPool> activators => PoolManager.activators;
+        [ShowInInspector] private static Dictionary<Type, IPool> streams => PoolManager.streams;
         [ShowInInspector] private static Dictionary<IEntity, Dictionary<Type, IComponent>> entities => EntityManager.entities;
         [ShowInInspector] private static Dictionary<Type, UIPanel> panels => UIManager.panels;
         [ShowInInspector] private static Dictionary<Type, IEvent> events => EventManager.observers;

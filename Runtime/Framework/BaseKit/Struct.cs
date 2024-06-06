@@ -11,6 +11,7 @@
 using System;
 using System.Collections.Generic;
 using JFramework.Interface;
+using UnityEngine;
 
 namespace JFramework
 {
@@ -49,9 +50,21 @@ namespace JFramework
 
         public Asset(string path)
         {
-            var split = path.Split('/');
-            bundle = split[0].ToLower();
-            asset = split[1].TrimEnd();
+            var index = path.LastIndexOf('/');
+            if (index < 0)
+            {
+                bundle = "";
+                asset = path;
+                return;
+            }
+
+            bundle = path.Substring(0, index).ToLower();
+            asset = path.Substring(index + 1);
+        }
+
+        public override string ToString()
+        {
+            return $"资源包：{bundle} 资源名称：{asset}";
         }
     }
 

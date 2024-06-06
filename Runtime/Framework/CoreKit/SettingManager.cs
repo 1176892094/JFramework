@@ -13,7 +13,6 @@ using System.IO;
 using System.Linq;
 using Sirenix.OdinInspector;
 using UnityEngine;
-using Object = UnityEngine.Object;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -34,7 +33,7 @@ namespace JFramework
 
         public string dataAssembly = "HotUpdate.Data";
 
-        public string assetPath = "Assets/Template";
+        public string resourcePath = "Assets/Template";
 
         public string dataPath = "Assets/Template/DataTable";
 
@@ -44,9 +43,9 @@ namespace JFramework
 
         public string remotePath = "http://192.168.0.3:8000/AssetBundles";
 
-        [OnValueChanged("UpdateSceneSetting")] public bool remoteLoad;
+        [OnValueChanged("UpdateSceneSetting")] public AssetMode assetMode;
 
-        public bool remoteBuild;
+        public AssetBuild assetBuild = AssetBuild.StreamingAssets;
 
         [HideInInspector] public bool assetLoadKey;
 
@@ -80,34 +79,16 @@ namespace JFramework
 
 #if UNITY_EDITOR
         [HideInInspector] public string[] sceneEditor = new string[3];
-        [HideInInspector] public List<string> sceneAssets = new List<string>();
-        [ShowInInspector] public Dictionary<string, string> objects = new Dictionary<string, string>();
 
-        private static string remoteBuildPath => Instance.remoteBuild ? Instance.buildPath : Application.streamingAssetsPath;
+        [HideInInspector] public List<string> sceneAssets = new List<string>();
+
+        public readonly Dictionary<string, string> objects = new Dictionary<string, string>();
+
+        private static string remoteBuildPath => Instance.assetBuild == AssetBuild.BuildPath ? Instance.buildPath : Application.streamingAssetsPath;
 
         public static string platformPath => Path.Combine(remoteBuildPath, Instance.platform.ToString());
 
         public static string assetBundleInfo => Path.Combine(remoteBuildPath, GetPlatform(clientInfoName));
-
-        public T Load<T>(string path) where T : Object
-        {
-            if (objects.TryGetValue(path, out var fullPath))
-            {
-                if (typeof(T).IsSubclassOf(typeof(Component)))
-                {
-                    return Instantiate(AssetDatabase.LoadAssetAtPath<GameObject>(fullPath)).GetComponent<T>();
-                }
-
-                if (typeof(T) == typeof(GameObject))
-                {
-                    return Instantiate(AssetDatabase.LoadAssetAtPath<T>(fullPath));
-                }
-
-                return AssetDatabase.LoadAssetAtPath<T>(fullPath);
-            }
-
-            return null;
-        }
 
         public void UpdateSceneSetting()
         {
@@ -116,13 +97,13 @@ namespace JFramework
             {
                 if (assets.Contains(scenePath))
                 {
-                    if (!remoteLoad) continue;
+                    if (assetMode == AssetMode.Resources) continue;
                     var scenes = EditorBuildSettings.scenes.Where(scene => scene.path != scenePath);
                     EditorBuildSettings.scenes = scenes.ToArray();
                 }
                 else
                 {
-                    if (remoteLoad) continue;
+                    if (assetMode == AssetMode.AssetBundle) continue;
                     var scenes = EditorBuildSettings.scenes.ToList();
                     scenes.Add(new EditorBuildSettingsScene(scenePath, true));
                     EditorBuildSettings.scenes = scenes.ToArray();

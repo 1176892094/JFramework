@@ -10,6 +10,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace JFramework.Core
@@ -28,14 +29,8 @@ namespace JFramework.Core
         {
             copies.Clear();
             copies.AddRange(timers);
-            foreach (var timer in copies)
+            foreach (var timer in copies.Where(timer => !timer.Update()))
             {
-                if (timer.running)
-                {
-                    timer.Update();
-                    continue;
-                }
-
                 Push(timer);
             }
         }
@@ -51,8 +46,8 @@ namespace JFramework.Core
         public static void Push(Timer timer)
         {
             if (!GlobalManager.Instance) return;
-            timers.Remove(timer.Push());
             PoolManager.Enqueue(timer);
+            timers.Remove(timer);
         }
 
         internal static void UnRegister()
@@ -68,9 +63,8 @@ namespace JFramework
     [Serializable]
     public sealed class Timer
     {
-        public bool running;
+        private int count;
         private bool unscale;
-        [SerializeField] private int count;
         [SerializeField] private float waitTime;
         [SerializeField] private float stayTime;
         private event Action OnUpdate;
@@ -114,45 +108,34 @@ namespace JFramework
             return this;
         }
 
-        internal Timer Pop(float waitTime)
+        internal Timer Pop(float duration)
         {
             count = 1;
-            running = true;
             unscale = false;
-            this.waitTime = waitTime;
-            stayTime = seconds + waitTime;
+            waitTime = duration;
+            stayTime = seconds + duration;
             return this;
         }
 
-        internal void Update()
+        internal bool Update()
         {
             if (seconds <= stayTime)
             {
-                return;
+                return true;
             }
 
             stayTime = seconds + waitTime;
             try
             {
-                if (--count == 0)
-                {
-                    running = false;
-                }
-
+                count--;
                 OnUpdate?.Invoke();
+                return count != 0;
             }
             catch (Exception e)
             {
-                running = false;
                 Debug.LogWarning("计时器无法执行方法：\n" + e);
+                return false;
             }
-        }
-
-        internal Timer Push()
-        {
-            unscale = false;
-            OnUpdate = null;
-            return this;
         }
     }
 }

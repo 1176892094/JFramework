@@ -26,6 +26,18 @@ namespace JFramework
         DontDestroy = 2
     }
 
+    public enum AssetMode : byte
+    {
+        Resources,
+        AssetBundle
+    }
+    
+    public enum AssetBuild : byte
+    {
+        BuildPath,
+        StreamingAssets,
+    }
+
     public enum AssetPlatform : byte
     {
         StandaloneOSX = 2,
