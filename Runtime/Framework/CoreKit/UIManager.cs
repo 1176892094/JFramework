@@ -20,8 +20,9 @@ namespace JFramework.Core
     public static partial class UIManager
     {
         public static Canvas canvas { get; private set; }
-        private static readonly Dictionary<UILayer, Transform> layers = new();
         internal static readonly Dictionary<Type, UIPanel> panels = new();
+        private static readonly Dictionary<UILayer, Transform> layers = new();
+        private static readonly Dictionary<Type, Task<UIPanel>> requests = new();
 
         internal static void Register()
         {
@@ -31,6 +32,34 @@ namespace JFramework.Core
             layers[UILayer.Middle] = canvas.transform.Find("Layer3");
             layers[UILayer.Height] = canvas.transform.Find("Layer4");
             layers[UILayer.Ignore] = canvas.transform.Find("Layer5");
+        }
+
+        private static async Task<UIPanel> Load(Type type)
+        {
+            if (requests.TryGetValue(type, out var request))
+            {
+                return await request;
+            }
+
+            request = LoadAsync(type);
+            requests.Add(type, request);
+            try
+            {
+                return await request;
+            }
+            finally
+            {
+                requests.Remove(type);
+            }
+        }
+
+        private static async Task<UIPanel> LoadAsync(Type type)
+        {
+            var obj = await AssetManager.Load<GameObject>(SettingManager.GetUIPath(type.Name));
+            var panel = obj.GetComponent<UIPanel>() ?? (UIPanel)obj.AddComponent(type);
+            panel.transform.SetParent(layers[panel.layer], false);
+            panels.Add(type, panel);
+            return panel;
         }
 
         public static void Add<T>(T panel) where T : UIPanel
@@ -85,7 +114,7 @@ namespace JFramework.Core
             if (!GlobalManager.Instance) return;
             if (!panels.TryGetValue(typeof(TPanel), out var panel))
             {
-                panel = await Load<TPanel>();
+                panel = await Load(typeof(TPanel));
             }
 
             panel.Show();
@@ -96,7 +125,7 @@ namespace JFramework.Core
             if (!GlobalManager.Instance) return;
             if (!panels.TryGetValue(typeof(TPanel), out var panel))
             {
-                panel = await Load<TPanel>();
+                panel = await Load(typeof(TPanel));
             }
 
             panel.Show();
@@ -108,21 +137,11 @@ namespace JFramework.Core
             if (!GlobalManager.Instance) return;
             if (!panels.TryGetValue(typeof(TPanel), out var panel))
             {
-                panel = await Load<TPanel>();
+                panel = await Load(typeof(TPanel));
             }
 
             panel.Show();
             action?.Invoke((TPanel)panel);
-        }
-
-        private static async Task<TPanel> Load<TPanel>() where TPanel : UIPanel
-        {
-            panels[typeof(TPanel)] = null;
-            var obj = await AssetManager.Load<GameObject>(SettingManager.GetUIPath(typeof(TPanel).Name));
-            var panel = obj.GetComponent<TPanel>() ?? obj.AddComponent<TPanel>();
-            panel.transform.SetParent(layers[panel.layer], false);
-            panels[typeof(TPanel)] = panel;
-            return panel;
         }
 
         public static void Hide<TPanel>() where TPanel : UIPanel
@@ -185,16 +204,6 @@ namespace JFramework.Core
             action?.Invoke(panel);
         }
 
-        private static async Task<UIPanel> Load(Type type)
-        {
-            panels[type] = null;
-            var obj = await AssetManager.Load<GameObject>(SettingManager.GetUIPath(type.Name));
-            var panel = obj.GetComponent<UIPanel>() ?? (UIPanel)obj.AddComponent(type);
-            panel.transform.SetParent(layers[panel.layer], false);
-            panels[typeof(UIPanel)] = panel;
-            return panel;
-        }
-
         public static void Hide(Type type)
         {
             if (!GlobalManager.Instance) return;
@@ -207,9 +216,9 @@ namespace JFramework.Core
             }
         }
 
-        public static UIPanel Get(Type key)
+        public static UIPanel Get(Type type)
         {
-            return panels.GetValueOrDefault(key);
+            return panels.GetValueOrDefault(type);
         }
 
         public static bool IsActive(Type type)

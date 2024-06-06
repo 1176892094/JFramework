@@ -153,10 +153,10 @@ namespace JFramework
 
         protected virtual void OnDestroy()
         {
-            foreach (var value in states.Values)
-            {
-                PoolManager.Enqueue(value, value.GetType());
-            }
+            // foreach (var value in states.Values)
+            // {
+            //     PoolManager.Enqueue(value, value.GetType());
+            // }
 
             states.Clear();
         }
