@@ -26,7 +26,7 @@ namespace JFramework.Core
 
         internal static void Register()
         {
-            canvas = GlobalManager.Instance.transform.Find("UICanvas").GetComponent<Canvas>();
+            canvas = GlobalManager.Instance.GetComponentInChildren<Canvas>();
             layers[UILayer.Bottom] = canvas.transform.Find("Layer1");
             layers[UILayer.Normal] = canvas.transform.Find("Layer2");
             layers[UILayer.Middle] = canvas.transform.Find("Layer3");

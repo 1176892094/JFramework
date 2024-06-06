@@ -135,11 +135,7 @@ namespace JFramework
         public static void AddListener(this UIBehaviour target, EventTriggerType eventID, Action<PointerEventData> action)
         {
             var trigger = target.GetComponent<EventTrigger>();
-            if (trigger == null)
-            {
-                trigger = target.gameObject.AddComponent<EventTrigger>();
-            }
-
+            trigger ??= target.gameObject.AddComponent<EventTrigger>();
             var entry = new EventEntry { eventID = eventID };
             entry.callback.AddListener(data => action?.Invoke((PointerEventData)data));
             trigger.triggers.Add(entry);

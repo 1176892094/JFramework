@@ -10,6 +10,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using UnityEngine;
 
 namespace JFramework.Core
@@ -37,7 +38,7 @@ namespace JFramework.Core
         internal static void Register()
         {
             audioName = SettingManager.GetAudioPath(nameof(AudioSource));
-            audioSource = GlobalManager.Instance.gameObject.AddComponent<AudioSource>();
+            audioSource = GlobalManager.Instance.GetComponentInChildren<AudioSource>();
             JsonManager.Load(setting, nameof(SoundManager));
         }
 
@@ -56,44 +57,22 @@ namespace JFramework.Core
         {
             if (!GlobalManager.Instance) return;
             var clip = await AssetManager.Load<AudioClip>(SettingManager.GetAudioPath(name));
-            GameObject obj;
-            if (audios.Count == 0)
-            {
-                obj = new GameObject(audioName);
-                obj.AddComponent<AudioSource>();
-                PoolManager.Push(obj);
-            }
-
-            obj = await PoolManager.Pop(audioName);
-            var sound = obj.GetComponent<AudioSource>();
-            audios.Remove(obj);
-            sound.volume = soundValue;
-            sound.clip = clip;
-            sound.Play();
-            action?.Invoke(sound);
-            TimerManager.Pop(clip.length).Invoke(() => StopSound(obj, sound));
+            var data = await new SoundData().Build(clip);
+            audios.Remove(data.entity);
+            data.source.Play();
+            action?.Invoke(data.source);
+            TimerManager.Pop(clip.length).Invoke(() => StopSound(data.entity));
         }
 
         public static async void PlayLoop(string name, Action<AudioSource> action = null)
         {
             if (!GlobalManager.Instance) return;
             var clip = await AssetManager.Load<AudioClip>(SettingManager.GetAudioPath(name));
-            GameObject obj;
-            if (audios.Count == 0)
-            {
-                obj = new GameObject(audioName);
-                obj.AddComponent<AudioSource>();
-                PoolManager.Push(obj);
-            }
-
-            obj = await PoolManager.Pop(audioName);
-            var sound = obj.GetComponent<AudioSource>();
-            audios.Remove(obj);
-            sound.volume = soundValue;
-            sound.clip = clip;
-            sound.loop = true;
-            sound.Play();
-            action?.Invoke(sound);
+            var data = await new SoundData().Build(clip);
+            audios.Remove(data.entity);
+            data.source.loop = true;
+            data.source.Play();
+            action?.Invoke(data.source);
         }
 
         public static void SetAudio(float audioVolume)
@@ -127,11 +106,14 @@ namespace JFramework.Core
         }
 
 
-        public static void StopSound(GameObject obj, AudioSource sound)
+        public static void StopSound(GameObject obj)
         {
-            sound.Stop();
-            audios.Add(obj, sound);
-            PoolManager.Push(obj);
+            if (obj.TryGetComponent(out AudioSource source))
+            {
+                source.Stop();
+                audios.Add(obj, source);
+                PoolManager.Push(obj);
+            }
         }
 
         internal static void UnRegister()
@@ -139,17 +121,35 @@ namespace JFramework.Core
             audios.Clear();
             audioSource = null;
         }
-        
-        private struct SoundData
-        {
-            
-        }
 
         [Serializable]
         public class SoundSetting
         {
             public float audioVolume = 0.5f;
             public float soundVolume = 0.5f;
+        }
+
+        [Serializable]
+        private struct SoundData
+        {
+            public GameObject entity;
+            public AudioSource source;
+
+            public async Task<SoundData> Build(AudioClip clip)
+            {
+                if (audios.Count == 0)
+                {
+                    entity = new GameObject(audioName);
+                    source = entity.AddComponent<AudioSource>();
+                    PoolManager.Push(entity);
+                }
+
+                entity = await PoolManager.Pop(audioName);
+                source = entity.GetComponent<AudioSource>();
+                source.volume = soundValue;
+                source.clip = clip;
+                return this;
+            }
         }
     }
 }
