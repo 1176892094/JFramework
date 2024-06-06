@@ -130,7 +130,7 @@ namespace JFramework.Core
             if (!GlobalManager.Instance) return;
             if (panels.TryGetValue(typeof(TPanel), out var panel))
             {
-                if (IsActive<TPanel>())
+                if (panel.gameObject.activeInHierarchy)
                 {
                     panel.Hide();
                 }
@@ -200,7 +200,7 @@ namespace JFramework.Core
             if (!GlobalManager.Instance) return;
             if (panels.TryGetValue(type, out var panel))
             {
-                if (IsActive(type))
+                if (panel.gameObject.activeInHierarchy)
                 {
                     panel.Hide();
                 }

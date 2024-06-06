@@ -16,11 +16,11 @@ namespace JFramework.Core
 {
     public static class SoundManager
     {
-        private static GameObject poolManager;
+        private static string audioName;
         private static AudioSource audioSource;
         private static readonly SoundSetting setting = new SoundSetting();
-        internal static readonly List<AudioSource> stops = new();
-        internal static readonly List<AudioSource> plays = new();
+        internal static readonly Dictionary<GameObject, AudioSource> audios = new();
+
 
         public static float audioValue
         {
@@ -36,8 +36,8 @@ namespace JFramework.Core
 
         internal static void Register()
         {
-            poolManager = GlobalManager.Instance.transform.Find("PoolManager").gameObject;
-            audioSource = poolManager.GetComponent<AudioSource>();
+            audioName = SettingManager.GetAudioPath(nameof(AudioSource));
+            audioSource = GlobalManager.Instance.gameObject.AddComponent<AudioSource>();
             JsonManager.Load(setting, nameof(SoundManager));
         }
 
@@ -56,23 +56,39 @@ namespace JFramework.Core
         {
             if (!GlobalManager.Instance) return;
             var clip = await AssetManager.Load<AudioClip>(SettingManager.GetAudioPath(name));
-            var sound = stops.Count > 0 ? stops[0] : poolManager.AddComponent<AudioSource>();
-            stops.Remove(sound);
-            plays.Add(sound);
+            GameObject obj;
+            if (audios.Count == 0)
+            {
+                obj = new GameObject(audioName);
+                obj.AddComponent<AudioSource>();
+                PoolManager.Push(obj);
+            }
+
+            obj = await PoolManager.Pop(audioName);
+            var sound = obj.GetComponent<AudioSource>();
+            audios.Remove(obj);
             sound.volume = soundValue;
             sound.clip = clip;
-            TimerManager.Pop(clip.length).Invoke(() => StopSound(sound));
             sound.Play();
             action?.Invoke(sound);
+            TimerManager.Pop(clip.length).Invoke(() => StopSound(obj, sound));
         }
 
         public static async void PlayLoop(string name, Action<AudioSource> action = null)
         {
             if (!GlobalManager.Instance) return;
             var clip = await AssetManager.Load<AudioClip>(SettingManager.GetAudioPath(name));
-            var sound = stops.Count > 0 ? stops[0] : poolManager.AddComponent<AudioSource>();
-            stops.Remove(sound);
-            plays.Add(sound);
+            GameObject obj;
+            if (audios.Count == 0)
+            {
+                obj = new GameObject(audioName);
+                obj.AddComponent<AudioSource>();
+                PoolManager.Push(obj);
+            }
+
+            obj = await PoolManager.Pop(audioName);
+            var sound = obj.GetComponent<AudioSource>();
+            audios.Remove(obj);
             sound.volume = soundValue;
             sound.clip = clip;
             sound.loop = true;
@@ -90,7 +106,7 @@ namespace JFramework.Core
         public static void SetSound(float soundVolume)
         {
             setting.soundVolume = soundVolume;
-            foreach (var sound in plays)
+            foreach (var sound in audios.Values)
             {
                 sound.volume = soundVolume;
             }
@@ -110,21 +126,17 @@ namespace JFramework.Core
             }
         }
 
-        public static void StopSound(AudioSource sound)
+
+        public static void StopSound(GameObject obj, AudioSource sound)
         {
-            if (plays.Contains(sound))
-            {
-                sound.Stop();
-                plays.Remove(sound);
-                stops.Add(sound);
-            }
+            sound.Stop();
+            audios.Add(obj, sound);
+            PoolManager.Push(obj);
         }
 
         internal static void UnRegister()
         {
-            plays.Clear();
-            stops.Clear();
-            poolManager = null;
+            audios.Clear();
             audioSource = null;
         }
 

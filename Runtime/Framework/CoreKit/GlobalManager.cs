@@ -139,9 +139,8 @@ namespace JFramework.Core
         [ShowInInspector] private static Dictionary<Type, Dictionary<int, IData>> intData => DataManager.intData;
         [ShowInInspector] private static Dictionary<Type, Dictionary<Enum, IData>> enumData => DataManager.enumData;
         [ShowInInspector] private static Dictionary<Type, Dictionary<string, IData>> stringData => DataManager.stringData;
+        [ShowInInspector] private static Dictionary<GameObject, AudioSource> audios => SoundManager.audios;
         [ShowInInspector] private static List<Timer> timerPlay => TimerManager.timers;
-        [ShowInInspector] private static List<AudioClip> audioStop => SoundManager.stops.Select(source => source.clip).ToList();
-        [ShowInInspector] private static List<AudioClip> audioPlay => SoundManager.plays.Select(source => source.clip).ToList();
         [ShowInInspector] private static float audioVolume => SoundManager.audioValue;
         [ShowInInspector] private static float soundVolume => SoundManager.soundValue;
 #if UNITY_EDITOR
