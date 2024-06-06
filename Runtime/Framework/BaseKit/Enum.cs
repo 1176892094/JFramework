@@ -28,7 +28,7 @@ namespace JFramework
 
     public enum AssetMode : byte
     {
-        Resources,
+        Simulate,
         AssetBundle
     }
     

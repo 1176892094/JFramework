@@ -68,21 +68,21 @@ namespace JFramework.Core
                 Debug.LogWarning(e);
             }
         }
-        
+
         private static async Task<T> LoadAsset<T>(string path, AssetMode mode) where T : Object
         {
             if (mode == AssetMode.AssetBundle)
             {
                 var data = await LoadAssetData(path);
                 var bundle = await LoadAssetBundle(data.bundle);
-                var asset = await AssetLoader.LoadAsync<T>(bundle, data.asset);
+                var asset = await AssetBundleLoader.LoadAsync<T>(bundle, data.asset);
                 asset ??= await ResourcesLoader.LoadAsync<T>(path);
                 return asset;
             }
             else
             {
 #if UNITY_EDITOR
-                var asset = await EditorLoader.LoadAsync<T>(path);
+                var asset = await SimulateLoader.LoadAsync<T>(path);
                 asset ??= await ResourcesLoader.LoadAsync<T>(path);
 #else
                 var asset = await ResourcesLoader.LoadAsync<T>(path);
@@ -214,24 +214,7 @@ namespace JFramework.Core
             mainAsset = null;
         }
 
-        private static class ResourcesLoader
-        {
-            public static async Task<T> LoadAsync<T>(string assetPath) where T : Object
-            {
-                if (typeof(T).IsSubclassOf(typeof(MonoBehaviour)))
-                {
-                    var request = await Resources.LoadAsync<GameObject>(assetPath);
-                    return ((GameObject)Object.Instantiate(request.asset)).GetComponent<T>();
-                }
-                else
-                {
-                    var request = await Resources.LoadAsync<T>(assetPath);
-                    return request.asset is GameObject ? (T)Object.Instantiate(request.asset) : (T)request.asset;
-                }
-            }
-        }
-
-        private static class AssetLoader
+        private static class AssetBundleLoader
         {
             public static async Task<T> LoadAsync<T>(AssetBundle assetBundle, string assetName) where T : Object
             {
@@ -253,8 +236,25 @@ namespace JFramework.Core
             }
         }
 
+        private static class ResourcesLoader
+        {
+            public static async Task<T> LoadAsync<T>(string assetPath) where T : Object
+            {
+                if (typeof(T).IsSubclassOf(typeof(MonoBehaviour)))
+                {
+                    var request = await Resources.LoadAsync<GameObject>(assetPath);
+                    return ((GameObject)Object.Instantiate(request.asset)).GetComponent<T>();
+                }
+                else
+                {
+                    var request = await Resources.LoadAsync<T>(assetPath);
+                    return request.asset is GameObject ? (T)Object.Instantiate(request.asset) : (T)request.asset;
+                }
+            }
+        }
+
 #if UNITY_EDITOR
-        public static class EditorLoader
+        public static class SimulateLoader
         {
             public static async Task<T> LoadAsync<T>(string assetPath) where T : Object
             {

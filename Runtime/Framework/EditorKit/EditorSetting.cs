@@ -91,7 +91,7 @@ namespace JFramework
     internal partial class EditorSetting
     {
         [MenuItem("Tools/JFramework/Update Assets", priority = 2)]
-        private static void UpdateAsset()
+        public static void UpdateAsset()
         {
             var names = AssetDatabase.GetAllAssetBundleNames();
             foreach (var name in names)
@@ -125,16 +125,13 @@ namespace JFramework
                             importer.SaveAndReimport();
                         }
 
-                        if (!SettingManager.Instance.objects.ContainsValue(path))
+                        var asset = AssetDatabase.LoadAssetAtPath<Object>(path);
+                        if (asset is SceneAsset)
                         {
-                            var asset = AssetDatabase.LoadAssetAtPath<Object>(path);
-                            if (asset is SceneAsset)
-                            {
-                                SettingManager.Instance.sceneAssets.Add(path);
-                            }
-
-                            SettingManager.Instance.objects[$"{name}/{asset.name}"] = path;
+                            SettingManager.Instance.sceneAssets.Add(path);
                         }
+
+                        SettingManager.Instance.objects[$"{name}/{asset.name}"] = path;
                     }
                 }
             }

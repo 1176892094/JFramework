@@ -80,7 +80,7 @@ namespace JFramework
 #if UNITY_EDITOR
         [HideInInspector] public string[] sceneEditor = new string[3];
 
-        [HideInInspector] public List<string> sceneAssets = new List<string>();
+        public List<string> sceneAssets = new List<string>();
 
         public readonly Dictionary<string, string> objects = new Dictionary<string, string>();
 
@@ -92,12 +92,13 @@ namespace JFramework
 
         public void UpdateSceneSetting()
         {
+            EditorSetting.UpdateAsset();
             var assets = EditorBuildSettings.scenes.Select(scene => scene.path).ToList();
             foreach (var scenePath in sceneAssets)
             {
                 if (assets.Contains(scenePath))
                 {
-                    if (assetMode == AssetMode.Resources) continue;
+                    if (assetMode == AssetMode.Simulate) continue;
                     var scenes = EditorBuildSettings.scenes.Where(scene => scene.path != scenePath);
                     EditorBuildSettings.scenes = scenes.ToArray();
                 }
