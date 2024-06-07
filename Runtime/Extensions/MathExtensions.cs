@@ -15,6 +15,8 @@ namespace JFramework
 {
     public static partial class Extensions
     {
+        public static readonly Collider2D[] results = new Collider2D[16];
+
         public static void Rotation(this Transform transform, Transform target)
         {
             transform.Rotation(target.position);
@@ -25,19 +27,9 @@ namespace JFramework
             transform.localScale = new Vector3(transform.position.x > target.x ? -1 : 1, 1, 1);
         }
 
-        public static void Raycast<T>(this Transform transform, Vector2 direction, float distance, int layer, Action<T> action)
-            where T : Component
+        public static void FindTarget<T>(this Transform transform, Vector2 direction, float distance, int layer, Action<T> action) where T : Component
         {
-            transform.position.Raycast(direction, distance, layer, action);
-        }
-
-        public static void Raycast<T>(this Vector3 position, Vector2 direction, float distance, int layer, Action<T> action) where T : Component
-        {
-            var collider = Physics2D.Raycast(position, direction, distance, layer).collider;
-            if (collider && collider.TryGetComponent(out T component))
-            {
-                action?.Invoke(component);
-            }
+            transform.position.FindTarget(direction, distance, layer, action);
         }
 
         public static void FindTarget<T>(this Transform transform, float radius, int layer, Action<T> action) where T : Component
@@ -45,27 +37,9 @@ namespace JFramework
             transform.position.FindTarget(radius, layer, action);
         }
 
-        public static void FindTarget<T>(this Vector3 position, float radius, int layer, Action<T> action) where T : Component
-        {
-            var collider = Physics2D.OverlapCircle(position, radius, layer);
-            if (collider && collider.TryGetComponent(out T component))
-            {
-                action?.Invoke(component);
-            }
-        }
-
         public static void FindTarget<T>(this Transform transform, Vector2 size, int layer, Action<T> action) where T : Component
         {
             transform.position.FindTarget(size, layer, action);
-        }
-
-        public static void FindTarget<T>(this Vector3 position, Vector2 size, int layer, Action<T> action) where T : Component
-        {
-            var collider = Physics2D.OverlapBox(position, size, layer);
-            if (collider && collider.TryGetComponent(out T component))
-            {
-                action?.Invoke(component);
-            }
         }
 
         public static void FindTargets<T>(this Transform transform, float radius, int layer, Action<T> action) where T : Component
@@ -73,31 +47,101 @@ namespace JFramework
             transform.position.FindTargets(radius, layer, action);
         }
 
+        public static void FindTargets<T>(this Transform transform, Vector2 size, float angle, int layer, Action<T> action) where T : Component
+        {
+            transform.position.FindTargets(size, angle, layer, action);
+        }
+
+        public static void FindTargets<T>(this Transform transform, float radius, int layer, Func<T, bool> func) where T : Component
+        {
+            transform.position.FindTargets(radius, layer, func);
+        }
+
+        public static void FindTargets<T>(this Transform transform, Vector2 size, float angle, int layer, Func<T, bool> func) where T : Component
+        {
+            transform.position.FindTargets(size, angle, layer, func);
+        }
+
+        public static void FindTarget<T>(this Vector3 position, Vector2 direction, float distance, int layer, Action<T> action) where T : Component
+        {
+            var collider = Physics2D.Raycast(position, direction, distance, layer).collider;
+            if (collider && collider.TryGetComponent(out T component))
+            {
+                action.Invoke(component);
+            }
+        }
+        public static void FindTarget<T>(this Vector3 position, float radius, int layer, Action<T> action) where T : Component
+        {
+            var collider = Physics2D.OverlapCircle(position, radius, layer);
+            if (collider && collider.TryGetComponent(out T component))
+            {
+                action.Invoke(component);
+            }
+        }
+        
+        public static void FindTarget<T>(this Vector3 position, Vector2 size, int layer, Action<T> action) where T : Component
+        {
+            var collider = Physics2D.OverlapBox(position, size, layer);
+            if (collider && collider.TryGetComponent(out T component))
+            {
+                action.Invoke(component);
+            }
+        }
+
         public static void FindTargets<T>(this Vector3 position, float radius, int layer, Action<T> action) where T : Component
         {
-            var colliders = Physics2D.OverlapCircleAll(position, radius, layer);
-            foreach (var collider in colliders)
+            var result = Physics2D.OverlapCircleNonAlloc(position, radius, results, layer);
+            for (int i = 0; i < result; i++)
             {
+                var collider = results[i];
                 if (collider && collider.TryGetComponent(out T component))
                 {
-                    action?.Invoke(component);
+                    action.Invoke(component);
                 }
             }
         }
 
-        public static void FindTargets<T>(this Transform transform, Vector2 size, int layer, Action<T> action) where T : Component
+        public static void FindTargets<T>(this Vector3 position, Vector2 size, float angle, int layer, Action<T> action) where T : Component
         {
-            transform.position.FindTargets(size, layer, action);
-        }
-
-        public static void FindTargets<T>(this Vector3 position, Vector2 size, int layer, Action<T> action) where T : Component
-        {
-            var colliders = Physics2D.OverlapBoxAll(position, size, 0, layer);
-            foreach (var collider in colliders)
+            var result = Physics2D.OverlapBoxNonAlloc(position, size, angle, results, layer);
+            for (int i = 0; i < result; i++)
             {
+                var collider = results[i];
                 if (collider && collider.TryGetComponent(out T component))
                 {
-                    action?.Invoke(component);
+                    action.Invoke(component);
+                }
+            }
+        }
+
+        public static void FindTargets<T>(this Vector3 position, float radius, int layer, Func<T, bool> func) where T : Component
+        {
+            var result = Physics2D.OverlapCircleNonAlloc(position, radius, results, layer);
+            for (int i = 0; i < result; i++)
+            {
+                var collider = results[i];
+                if (collider && collider.TryGetComponent(out T component))
+                {
+                    if (func.Invoke(component))
+                    {
+                        break;
+                    }
+                }
+            }
+        }
+
+        public static void FindTargets<T>(this Vector3 position, Vector2 size, float angle, int layer, Func<T, bool> func) where T : Component
+        {
+            var result = Physics2D.OverlapBoxNonAlloc(position, size, angle, results, layer);
+            for (int i = 0; i < result; i++)
+            {
+                var collider = results[i];
+                if (collider && collider.TryGetComponent(out T component))
+                {
+                    if (func.Invoke(component))
+                    {
+                        break;
+                    }
                 }
             }
         }
