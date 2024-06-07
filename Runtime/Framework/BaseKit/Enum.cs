@@ -26,11 +26,15 @@ namespace JFramework
         DontDestroy = 2
     }
 
-    public enum InputState
+    public enum InputState : byte
     {
-        Up,
-        Press,
-        Down,
+        Up = 0,
+        Press = 1,
+        Down = 2,
+        AxisX = 3,
+        AxisY = 4,
+        AxisRawX = 5,
+        AxisRawY = 6,
     }
 
     public enum AssetMode : byte

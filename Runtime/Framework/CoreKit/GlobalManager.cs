@@ -41,6 +41,7 @@ namespace JFramework.Core
             UIManager.Register();
             JsonManager.Register();
             PoolManager.Register();
+            InputManager.Register();
             SoundManager.Register();
             TimerManager.Register();
         }
@@ -86,6 +87,7 @@ namespace JFramework.Core
             UIManager.UnRegister();
             DataManager.UnRegister();
             PoolManager.UnRegister();
+            InputManager.UnRegister();
             AssetManager.UnRegister();
             SoundManager.UnRegister();
             SceneManager.UnRegister();
@@ -136,6 +138,7 @@ namespace JFramework.Core
         [ShowInInspector] private static Dictionary<Type, IEvent> events;
         [ShowInInspector] private static Dictionary<Type, UIPanel> panels;
         [ShowInInspector] private static Dictionary<Type, IEntity> objects;
+        [ShowInInspector] private static Dictionary<Type, InputManager.InputData> inputs;
         [ShowInInspector] private static Dictionary<Type, Dictionary<int, IData>> intData;
         [ShowInInspector] private static Dictionary<Type, Dictionary<Enum, IData>> enumData;
         [ShowInInspector] private static Dictionary<Type, Dictionary<string, IData>> stringData;
@@ -143,6 +146,8 @@ namespace JFramework.Core
         [ShowInInspector] private static List<Timer> timers;
         [ShowInInspector] private static float audioVolume => SoundManager.audioValue;
         [ShowInInspector] private static float soundVolume => SoundManager.soundValue;
+        [ShowInInspector] private static float horizontal => InputManager.Horizontal;
+        [ShowInInspector] private static float vertical => InputManager.Vertical;
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
         private static void RuntimeInitializeOnLoad()
@@ -159,6 +164,8 @@ namespace JFramework.Core
             panels = (Dictionary<Type, UIPanel>)field;
             field = typeof(SceneManager).GetField("objects", Reflection.Static)?.GetValue(null);
             objects = (Dictionary<Type, IEntity>)field;
+            field = typeof(InputManager).GetField("inputs", Reflection.Static)?.GetValue(null);
+            inputs = (Dictionary<Type, InputManager.InputData>)field;
             field = typeof(DataManager).GetField("intData", Reflection.Static)?.GetValue(null);
             intData = (Dictionary<Type, Dictionary<int, IData>>)field;
             field = typeof(DataManager).GetField("enumData", Reflection.Static)?.GetValue(null);

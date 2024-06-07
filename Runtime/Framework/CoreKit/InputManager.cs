@@ -15,33 +15,43 @@ using UnityEngine;
 
 namespace JFramework.Core
 {
-    public static partial class InputSystem
+    public static partial class InputManager
     {
         private static readonly Dictionary<Type, InputData> inputs = new();
-        private static readonly Dictionary<InputMode, Dictionary<InputState, Action<Type, InputData>>> inputActions = new();
+        private static readonly Dictionary<InputMode, Dictionary<InputState, Action<InputData>>> inputActions = new();
+        public static float Vertical;
+        public static float Horizontal;
 
         internal static void Register()
         {
             GlobalManager.OnUpdate += OnUpdate;
-            var keyActions = new Dictionary<InputState, Action<Type, InputData>>
-            {
-                { InputState.Up, GetKeyUp },
-                { InputState.Press, GetKey },
-                { InputState.Down, GetKeyDown },
-            };
-            var mouseActions = new Dictionary<InputState, Action<Type, InputData>>
-            {
-                { InputState.Up, GetMouseUp },
-                { InputState.Press, GetMouse },
-                { InputState.Down, GetMouseDown },
-            };
-            var buttonActions = new Dictionary<InputState, Action<Type, InputData>>
+            var buttonActions = new Dictionary<InputState, Action<InputData>>
             {
                 { InputState.Up, GetButtonUp },
                 { InputState.Press, GetButton },
                 { InputState.Down, GetButtonDown },
             };
+            var keyActions = new Dictionary<InputState, Action<InputData>>
+            {
+                { InputState.Up, GetKeyUp },
+                { InputState.Press, GetKey },
+                { InputState.Down, GetKeyDown },
+            };
+            var mouseActions = new Dictionary<InputState, Action<InputData>>
+            {
+                { InputState.Up, GetMouseUp },
+                { InputState.Press, GetMouse },
+                { InputState.Down, GetMouseDown },
+            };
+            var axisActions = new Dictionary<InputState, Action<InputData>>
+            {
+                { InputState.AxisX, GetAxisX },
+                { InputState.AxisY, GetAxisY },
+                { InputState.AxisRawX, GetAxisRawX },
+                { InputState.AxisRawY, GetAxisRawY },
+            };
             inputActions.Add(InputMode.Key, keyActions);
+            inputActions.Add(InputMode.Axis, axisActions);
             inputActions.Add(InputMode.Mouse, mouseActions);
             inputActions.Add(InputMode.Button, buttonActions);
         }
@@ -59,18 +69,19 @@ namespace JFramework.Core
                 {
                     if (action.TryGetValue(input.state, out var method))
                     {
-                        method.Invoke(type, input);
+                        method.Invoke(input);
                     }
                 }
             }
         }
 
-        public static void Add<T>(KeyCode key, InputState state)
+        public static void Add<T>(KeyCode key, InputState state) where T : struct, IEvent
         {
             if (!inputs.TryGetValue(typeof(T), out var input))
             {
-                input = new InputData();
+                input = new InputData<T>();
                 inputs.Add(typeof(T), input);
+                input.Listen();
             }
 
             input.key = key;
@@ -78,12 +89,27 @@ namespace JFramework.Core
             input.mode = InputMode.Key;
         }
 
-        public static void Add<T>(int mouse, InputState state)
+        public static void Add<T>(string button, InputState state) where T : struct, IEvent
         {
             if (!inputs.TryGetValue(typeof(T), out var input))
             {
-                input = new InputData();
+                input = new InputData<T>();
                 inputs.Add(typeof(T), input);
+                input.Listen();
+            }
+
+            input.state = state;
+            input.button = button;
+            input.mode = state > InputState.Down ? InputMode.Axis : InputMode.Button;
+        }
+
+        public static void Add<T>(int mouse, InputState state) where T : struct, IEvent
+        {
+            if (!inputs.TryGetValue(typeof(T), out var input))
+            {
+                input = new InputData<T>();
+                inputs.Add(typeof(T), input);
+                input.Listen();
             }
 
             input.state = state;
@@ -91,120 +117,144 @@ namespace JFramework.Core
             input.mode = InputMode.Mouse;
         }
 
-        public static void Add<T>(string button, InputState state)
+        public static void Remove<T>() where T : struct, IEvent
         {
-            if (!inputs.TryGetValue(typeof(T), out var input))
+            if (inputs.TryGetValue(typeof(T), out var input))
             {
-                input = new InputData();
-                inputs.Add(typeof(T), input);
+                input.Remove();
+                inputs.Remove(typeof(T));
             }
-
-            input.state = state;
-            input.button = button;
-            input.mode = InputMode.Button;
         }
 
         internal static void UnRegister()
         {
             inputs.Clear();
+            inputActions.Clear();
+            Vertical = 0;
+            Horizontal = 0;
         }
 
-        [Serializable]
-        private class InputData
+        internal abstract class InputData
         {
             public int mouse;
-            public KeyCode key;
             public string button;
+            public KeyCode key;
             public InputMode mode;
             public InputState state;
+            public abstract void Listen();
+            public abstract void Remove();
+            public abstract void Invoke();
         }
 
         [Serializable]
-        public struct InputAction : IEvent
+        private class InputData<T> : InputData where T : struct, IEvent
         {
-            public Type type;
-            public InputAction(Type type) => this.type = type;
+            private event Action<T> OnInput;
+            public override void Listen() => OnInput += EventManager.Invoke;
+            public override void Remove() => OnInput -= EventManager.Invoke;
+            public override void Invoke() => OnInput?.Invoke(default);
         }
 
-        private enum InputMode
+        internal enum InputMode
         {
             Key,
+            Axis,
             Mouse,
             Button
         }
     }
 
-    public static partial class InputSystem
+    public static partial class InputManager
     {
-        private static void GetKeyDown(Type type, InputData input)
+        private static void GetAxisX(InputData input)
+        {
+            Horizontal = Input.GetAxis(input.button);
+        }
+
+        private static void GetAxisY(InputData input)
+        {
+            Vertical = Input.GetAxis(input.button);
+        }
+
+        private static void GetAxisRawX(InputData input)
+        {
+            Horizontal = Input.GetAxisRaw(input.button);
+        }
+
+        private static void GetAxisRawY(InputData input)
+        {
+            Vertical = Input.GetAxisRaw(input.button);
+        }
+
+        private static void GetKeyDown(InputData input)
         {
             if (Input.GetKeyDown(input.key))
             {
-                EventManager.Invoke(new InputAction(type));
+                input.Invoke();
             }
         }
 
-        private static void GetKeyUp(Type type, InputData input)
+        private static void GetKeyUp(InputData input)
         {
             if (Input.GetKeyUp(input.key))
             {
-                EventManager.Invoke(new InputAction(type));
+                input.Invoke();
             }
         }
 
-        private static void GetKey(Type type, InputData input)
+        private static void GetKey(InputData input)
         {
             if (Input.GetKey(input.key))
             {
-                EventManager.Invoke(new InputAction(type));
+                input.Invoke();
             }
         }
 
-        private static void GetMouseDown(Type type, InputData input)
+        private static void GetMouseDown(InputData input)
         {
             if (Input.GetMouseButtonDown(input.mouse))
             {
-                EventManager.Invoke(new InputAction(type));
+                input.Invoke();
             }
         }
 
-        private static void GetMouseUp(Type type, InputData input)
+        private static void GetMouseUp(InputData input)
         {
             if (Input.GetMouseButtonUp(input.mouse))
             {
-                EventManager.Invoke(new InputAction(type));
+                input.Invoke();
             }
         }
 
-        private static void GetMouse(Type type, InputData input)
+        private static void GetMouse(InputData input)
         {
             if (Input.GetMouseButton(input.mouse))
             {
-                EventManager.Invoke(new InputAction(type));
+                input.Invoke();
             }
         }
 
-        private static void GetButtonDown(Type type, InputData input)
+        private static void GetButtonDown(InputData input)
         {
             if (Input.GetButtonDown(input.button))
             {
-                EventManager.Invoke(new InputAction(type));
+                input.Invoke();
             }
         }
 
-        private static void GetButtonUp(Type type, InputData input)
+        private static void GetButtonUp(InputData input)
         {
             if (Input.GetButtonUp(input.button))
             {
-                EventManager.Invoke(new InputAction(type));
+                input.Invoke();
             }
         }
 
-        private static void GetButton(Type type, InputData input)
+        private static void GetButton(InputData input)
         {
             if (Input.GetButton(input.button))
             {
-                EventManager.Invoke(new InputAction(type));
+                input.Invoke();
             }
         }
     }
