@@ -19,14 +19,17 @@ namespace JFramework.Core
 {
     public static partial class PoolManager
     {
-        private static Transform poolManager;
+        public static Transform manager;
         private static readonly Dictionary<Type, IPool> streams = new();
         private static readonly Dictionary<string, GameObject> parents = new();
         private static readonly Dictionary<string, IPool<GameObject>> pools = new();
 
         internal static void Register()
         {
-            poolManager = GlobalManager.Instance.transform.Find("PoolManager");
+            var obj = new GameObject();
+            Object.DontDestroyOnLoad(obj);
+            obj.name = nameof(PoolManager);
+            manager = obj.transform;
         }
 
         public static async Task<GameObject> Pop(string path)
@@ -79,7 +82,7 @@ namespace JFramework.Core
             if (!parents.TryGetValue(obj.name, out var parent))
             {
                 parent = new GameObject(obj.name + "-Pool");
-                parent.transform.SetParent(poolManager);
+                parent.transform.SetParent(manager);
                 pools.Add(obj.name, new Pool<GameObject>(obj));
                 obj.transform.SetParent(parent.transform);
                 parents.Add(obj.name, parent);
@@ -104,7 +107,7 @@ namespace JFramework.Core
 
             pools.Clear();
             parents.Clear();
-            poolManager = null;
+            manager = null;
 
             foreach (var pool in streams.Values)
             {

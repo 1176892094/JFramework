@@ -103,7 +103,7 @@ namespace JFramework
             }
 
             SettingManager.Instance.sceneAssets.Clear();
-            var folders = AssetDatabase.GetSubFolders(SettingManager.Instance.resourcePath);
+            var folders = AssetDatabase.GetSubFolders(SettingManager.Instance.assetPath);
             foreach (var folder in folders)
             {
                 if (string.IsNullOrEmpty(folder)) continue;

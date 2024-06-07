@@ -33,13 +33,13 @@ namespace JFramework
 
         public string dataAssembly = "HotUpdate.Data";
 
-        public string resourcePath = "Assets/Template";
+        public string assetPath = "Assets/Template";
+
+        public string editorPath = "Assets/Editor/Resources";
 
         public string dataPath = "Assets/Template/DataTable";
 
         public string scriptPath = "Assets/Scripts/DataTable";
-
-        public string editorPath = "Assets/Editor/Resources";
 
         public string remotePath = "http://192.168.0.3:8000/AssetBundles";
 
@@ -80,7 +80,7 @@ namespace JFramework
 #if UNITY_EDITOR
         [HideInInspector] public string[] sceneEditor = new string[3];
 
-        public List<string> sceneAssets = new List<string>();
+        [HideInInspector] public List<string> sceneAssets = new List<string>();
 
         public readonly Dictionary<string, string> objects = new Dictionary<string, string>();
 

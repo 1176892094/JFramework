@@ -18,23 +18,40 @@ public abstract class EditorSingleton<T> : ScriptableObject where T : EditorSing
 {
     private static T instance;
 
+    private static string fileName => typeof(T).Name;
+
+    private static string filePath => editorPath + "/" + fileName + ".asset";
+    
+    private static string editorPath => SettingManager.Instance.editorPath;
+
     public static T Instance
     {
         get
         {
-            if (instance != null) return instance;
-            instance = Resources.Load<T>(typeof(T).Name);
-            if (instance != null) return instance;
-            var asset = $"{SettingManager.Instance.editorPath}/{typeof(T).Name}.asset";
-            instance = AssetDatabase.LoadAssetAtPath<T>(asset);
-            if (instance != null) return instance;
-            if (!Directory.Exists(SettingManager.Instance.editorPath))
+            if (instance != null)
             {
-                Directory.CreateDirectory(SettingManager.Instance.editorPath);
+                return instance;
+            }
+
+            instance = Resources.Load<T>(fileName);
+            if (instance != null)
+            {
+                return instance;
+            }
+
+            instance = AssetDatabase.LoadAssetAtPath<T>(filePath);
+            if (instance != null)
+            {
+                return instance;
+            }
+
+            if (!Directory.Exists(editorPath))
+            {
+                Directory.CreateDirectory(editorPath);
             }
 
             instance = CreateInstance<T>();
-            AssetDatabase.CreateAsset(instance, asset);
+            AssetDatabase.CreateAsset(instance, filePath);
             AssetDatabase.Refresh();
             return instance;
         }

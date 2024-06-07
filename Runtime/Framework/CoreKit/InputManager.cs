@@ -19,8 +19,8 @@ namespace JFramework.Core
     {
         private static readonly Dictionary<Type, InputData> inputs = new();
         private static readonly Dictionary<InputMode, Dictionary<InputState, Action<InputData>>> inputActions = new();
-        public static float Vertical;
-        public static float Horizontal;
+        public static float vertical;
+        public static float horizontal;
 
         internal static void Register()
         {
@@ -128,10 +128,10 @@ namespace JFramework.Core
 
         internal static void UnRegister()
         {
+            vertical = 0;
+            horizontal = 0;
             inputs.Clear();
             inputActions.Clear();
-            Vertical = 0;
-            Horizontal = 0;
         }
 
         internal abstract class InputData
@@ -146,6 +146,14 @@ namespace JFramework.Core
             public abstract void Invoke();
         }
 
+        internal enum InputMode
+        {
+            Key,
+            Axis,
+            Mouse,
+            Button
+        }
+        
         [Serializable]
         private class InputData<T> : InputData where T : struct, IEvent
         {
@@ -154,36 +162,28 @@ namespace JFramework.Core
             public override void Remove() => OnInput -= EventManager.Invoke;
             public override void Invoke() => OnInput?.Invoke(default);
         }
-
-        internal enum InputMode
-        {
-            Key,
-            Axis,
-            Mouse,
-            Button
-        }
     }
 
     public static partial class InputManager
     {
         private static void GetAxisX(InputData input)
         {
-            Horizontal = Input.GetAxis(input.button);
+            horizontal = Input.GetAxis(input.button);
         }
 
         private static void GetAxisY(InputData input)
         {
-            Vertical = Input.GetAxis(input.button);
+            vertical = Input.GetAxis(input.button);
         }
 
         private static void GetAxisRawX(InputData input)
         {
-            Horizontal = Input.GetAxisRaw(input.button);
+            horizontal = Input.GetAxisRaw(input.button);
         }
 
         private static void GetAxisRawY(InputData input)
         {
-            Vertical = Input.GetAxisRaw(input.button);
+            vertical = Input.GetAxisRaw(input.button);
         }
 
         private static void GetKeyDown(InputData input)

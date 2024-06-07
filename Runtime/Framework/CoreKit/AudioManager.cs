@@ -15,37 +15,29 @@ using UnityEngine;
 
 namespace JFramework.Core
 {
-    public static class SoundManager
+    public static class AudioManager
     {
         private static string sourceName;
         private static AudioSource mainSource;
         private static readonly AudioSetting setting = new AudioSetting();
         private static readonly Dictionary<GameObject, AudioSource> audios = new();
-
-        public static float audioValue
-        {
-            get => setting.mainVolume;
-            set => setting.mainVolume = value;
-        }
-
-        public static float soundValue
-        {
-            get => setting.audioVolume;
-            set => setting.audioVolume = value;
-        }
+        public static float mainVolume => setting.mainValue;
+        public static float audioVolume => setting.audioValue;
 
         internal static void Register()
         {
+            var manager = PoolManager.manager.gameObject;
+            mainSource = manager.AddComponent<AudioSource>();
             sourceName = SettingManager.GetAudioPath(nameof(AudioSource));
-            mainSource = GlobalManager.Instance.GetComponentInChildren<AudioSource>();
-            JsonManager.Load(setting, nameof(SoundManager));
+            JsonManager.Load(setting, nameof(AudioManager));
+            manager.AddComponent<AudioListener>();
         }
 
         public static async void PlayMain(string name, Action<AudioSource> action = null)
         {
             if (!GlobalManager.Instance) return;
             var clip = await AssetManager.Load<AudioClip>(SettingManager.GetAudioPath(name));
-            mainSource.volume = audioValue;
+            mainSource.volume = mainVolume;
             mainSource.clip = clip;
             mainSource.loop = true;
             mainSource.Play();
@@ -67,29 +59,29 @@ namespace JFramework.Core
         {
             if (!GlobalManager.Instance) return;
             var clip = await AssetManager.Load<AudioClip>(SettingManager.GetAudioPath(name));
-            var data = await new AudioData().Build(clip);
-            audios.Remove(data.entity);
-            data.source.loop = true;
-            data.source.Play();
-            action?.Invoke(data.source);
+            var audio = await new AudioData().Build(clip);
+            audios.Remove(audio.entity);
+            audio.source.loop = true;
+            audio.source.Play();
+            action?.Invoke(audio.source);
         }
 
         public static void SetMain(float mainVolume)
         {
-            setting.mainVolume = mainVolume;
+            setting.mainValue = mainVolume;
             mainSource.volume = mainVolume;
-            JsonManager.Save(setting, nameof(SoundManager));
+            JsonManager.Save(setting, nameof(AudioManager));
         }
 
         public static void SetAudio(float audioVolume)
         {
-            setting.audioVolume = audioVolume;
+            setting.audioValue = audioVolume;
             foreach (var audio in audios.Values)
             {
                 audio.volume = audioVolume;
             }
 
-            JsonManager.Save(setting, nameof(SoundManager));
+            JsonManager.Save(setting, nameof(AudioManager));
         }
 
         public static void StopMain(bool pause = true)
@@ -124,8 +116,8 @@ namespace JFramework.Core
         [Serializable]
         public class AudioSetting
         {
-            public float mainVolume = 0.5f;
-            public float audioVolume = 0.5f;
+            public float mainValue = 0.5f;
+            public float audioValue = 0.5f;
         }
 
         [Serializable]
@@ -145,7 +137,7 @@ namespace JFramework.Core
 
                 entity = await PoolManager.Pop(sourceName);
                 source = entity.GetComponent<AudioSource>();
-                source.volume = soundValue;
+                source.volume = audioVolume;
                 source.clip = clip;
                 return this;
             }

@@ -42,7 +42,7 @@ namespace JFramework.Core
             JsonManager.Register();
             PoolManager.Register();
             InputManager.Register();
-            SoundManager.Register();
+            AudioManager.Register();
             TimerManager.Register();
         }
 
@@ -89,7 +89,7 @@ namespace JFramework.Core
             PoolManager.UnRegister();
             InputManager.UnRegister();
             AssetManager.UnRegister();
-            SoundManager.UnRegister();
+            AudioManager.UnRegister();
             SceneManager.UnRegister();
             TimerManager.UnRegister();
             EventManager.UnRegister();
@@ -132,22 +132,22 @@ namespace JFramework.Core
         public static AssetMode mode => SettingManager.Instance.assetMode;
         public static AssetPlatform platform => SettingManager.Instance.platform;
 #if UNITY_EDITOR
-        [ShowInInspector] private static Dictionary<IEntity, Dictionary<Type, IComponent>> entities;
-        [ShowInInspector] private static Dictionary<string, IPool<GameObject>> pools;
-        [ShowInInspector] private static Dictionary<Type, IPool> streams;
-        [ShowInInspector] private static Dictionary<Type, IEvent> events;
-        [ShowInInspector] private static Dictionary<Type, UIPanel> panels;
-        [ShowInInspector] private static Dictionary<Type, IEntity> objects;
-        [ShowInInspector] private static Dictionary<Type, InputManager.InputData> inputs;
-        [ShowInInspector] private static Dictionary<Type, Dictionary<int, IData>> intData;
-        [ShowInInspector] private static Dictionary<Type, Dictionary<Enum, IData>> enumData;
-        [ShowInInspector] private static Dictionary<Type, Dictionary<string, IData>> stringData;
-        [ShowInInspector] private static Dictionary<GameObject, AudioSource> audios;
-        [ShowInInspector] private static List<Timer> timers;
-        [ShowInInspector] private static float audioVolume => SoundManager.audioValue;
-        [ShowInInspector] private static float soundVolume => SoundManager.soundValue;
-        [ShowInInspector] private static float horizontal => InputManager.Horizontal;
-        [ShowInInspector] private static float vertical => InputManager.Vertical;
+        [ShowInInspector] private static Dictionary<IEntity, Dictionary<Type, IComponent>> entities = new();
+        [ShowInInspector] private static Dictionary<string, IPool<GameObject>> pools = new();
+        [ShowInInspector] private static Dictionary<Type, IPool> streams = new();
+        [ShowInInspector] private static Dictionary<Type, IEvent> events = new();
+        [ShowInInspector] private static Dictionary<Type, UIPanel> panels = new();
+        [ShowInInspector] private static Dictionary<Type, IEntity> objects = new();
+        [ShowInInspector] private static Dictionary<Type, InputManager.InputData> inputs = new();
+        [ShowInInspector] private static Dictionary<Type, Dictionary<int, IData>> intData = new();
+        [ShowInInspector] private static Dictionary<Type, Dictionary<Enum, IData>> enumData = new();
+        [ShowInInspector] private static Dictionary<Type, Dictionary<string, IData>> stringData = new();
+        [ShowInInspector] private static Dictionary<GameObject, AudioSource> audios = new();
+        [ShowInInspector] private static List<Timer> timers = new();
+        [ShowInInspector] private static float audioVolume => AudioManager.mainVolume;
+        [ShowInInspector] private static float soundVolume => AudioManager.audioVolume;
+        [ShowInInspector] private static float horizontal => InputManager.horizontal;
+        [ShowInInspector] private static float vertical => InputManager.vertical;
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
         private static void RuntimeInitializeOnLoad()
@@ -172,7 +172,7 @@ namespace JFramework.Core
             enumData = (Dictionary<Type, Dictionary<Enum, IData>>)field;
             field = typeof(DataManager).GetField("stringData", Reflection.Static)?.GetValue(null);
             stringData = (Dictionary<Type, Dictionary<string, IData>>)field;
-            field = typeof(SoundManager).GetField("audios", Reflection.Static)?.GetValue(null);
+            field = typeof(AudioManager).GetField("audios", Reflection.Static)?.GetValue(null);
             audios = (Dictionary<GameObject, AudioSource>)field;
             field = typeof(TimerManager).GetField("timers", Reflection.Static)?.GetValue(null);
             timers = (List<Timer>)field;
