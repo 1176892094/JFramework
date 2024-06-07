@@ -19,6 +19,7 @@ namespace JFramework.Core
     {
         private static readonly List<Timer> timers = new();
         private static readonly List<Timer> copies = new();
+        private static int index;
 
         internal static void Register()
         {

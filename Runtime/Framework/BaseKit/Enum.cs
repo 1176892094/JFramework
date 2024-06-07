@@ -26,12 +26,19 @@ namespace JFramework
         DontDestroy = 2
     }
 
+    public enum InputState
+    {
+        Up,
+        Press,
+        Down,
+    }
+
     public enum AssetMode : byte
     {
         Simulate,
         AssetBundle
     }
-    
+
     public enum AssetBuild : byte
     {
         BuildPath,
