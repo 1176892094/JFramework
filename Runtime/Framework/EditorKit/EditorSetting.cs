@@ -107,7 +107,7 @@ namespace JFramework
             foreach (var folder in folders)
             {
                 if (string.IsNullOrEmpty(folder)) continue;
-                var name = Path.GetFileNameWithoutExtension(folder);
+                var name = Path.GetFileNameWithoutExtension(folder).ToLower();
                 var guids = AssetDatabase.FindAssets("t:Object", new[] { folder });
 
                 foreach (var guid in guids)
@@ -117,8 +117,8 @@ namespace JFramework
                     {
                         var importer = AssetImporter.GetAtPath(path);
                         if (importer == null) continue;
-
-                        if (importer.assetBundleName != name.ToLower())
+                        
+                        if (importer.assetBundleName != name)
                         {
                             Debug.Log($"增加 AssetBundles 资源: {path.Green()}");
                             importer.assetBundleName = name;

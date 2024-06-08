@@ -15,19 +15,20 @@ MonoBehaviour:
   platform: 13
   assetInfo: AssetBundleInfo
   buildPath: AssetBundles
-  assetPath: Assets/Template
+  dataAssembly: HotUpdate.Data
+  resourcePath: Assets/Template
   dataPath: Assets/Template/DataTable
-  scriptPath: Assets/Scripts/DataTable
+  scriptPath: "Assets/Scripts/09.\u6E38\u620F\u6570\u636E"
   editorPath: Assets/Editor/Resources
   remotePath: http://192.168.0.4:8000/Files/Unity/Forest/AssetBundles
-  remoteLoad: 0
-  remoteBuild: 1
+  assetMode: 0
+  assetBuild: 0
   assetLoadKey: 0
   excelPathKey: /Users/jinyijie/Files/Unity/Forest/DataTable
   sceneEditor:
-  - Assets/Template/Scenes/AwakeScene.unity
   - Assets/Template/Scenes/BossScene2.unity
   - Assets/Template/Scenes/BossScene4.unity
+  - Assets/Template/Scenes/LevelScene5.unity
   sceneAssets:
   - Assets/Template/Scenes/AwakeScene.unity
   - Assets/Template/Scenes/BossScene1.unity
