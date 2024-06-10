@@ -82,7 +82,7 @@ namespace JFramework
 
         [HideInInspector] public List<string> sceneAssets = new List<string>();
 
-        public readonly Dictionary<string, string> objects = new Dictionary<string, string>();
+        [ShowInInspector] public readonly Dictionary<string, string> objects = new Dictionary<string, string>();
 
         private static string remoteBuildPath => Instance.assetBuild == AssetBuild.BuildPath ? Instance.buildPath : Application.streamingAssetsPath;
 
