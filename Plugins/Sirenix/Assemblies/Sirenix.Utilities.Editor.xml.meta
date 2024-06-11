@@ -5,3 +5,10 @@ DefaultImporter:
   userData: 
   assetBundleName: 
   assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89041
+  packageName: Odin Inspector and Serializer
+  packageVersion: 3.3.1.3
+  assetPath: Assets/JFramework/Plugins/Sirenix/Assemblies/Sirenix.Utilities.Editor.xml
+  uploadId: 669372
