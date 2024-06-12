@@ -42,24 +42,24 @@ namespace JFramework
             transform.position.FindTarget(size, layer, action);
         }
 
-        public static void FindTargets<T>(this Transform transform, float radius, int layer, Action<T> action) where T : Component
+        public static void FindTargets<T>(this Transform transform, float radius, ContactFilter2D filter, Action<T> action) where T : Component
         {
-            transform.position.FindTargets(radius, layer, action);
+            transform.position.FindTargets(radius, filter, action);
         }
 
-        public static void FindTargets<T>(this Transform transform, Vector2 size, float angle, int layer, Action<T> action) where T : Component
+        public static void FindTargets<T>(this Transform transform, Vector2 size, float angle, ContactFilter2D filter,  Action<T> action) where T : Component
         {
-            transform.position.FindTargets(size, angle, layer, action);
+            transform.position.FindTargets(size, angle, filter, action);
         }
 
-        public static void FindTargets<T>(this Transform transform, float radius, int layer, Func<T, bool> func) where T : Component
+        public static void FindTargets<T>(this Transform transform, float radius, ContactFilter2D filter, Func<T, bool> func) where T : Component
         {
-            transform.position.FindTargets(radius, layer, func);
+            transform.position.FindTargets(radius, filter, func);
         }
 
-        public static void FindTargets<T>(this Transform transform, Vector2 size, float angle, int layer, Func<T, bool> func) where T : Component
+        public static void FindTargets<T>(this Transform transform, Vector2 size, float angle, ContactFilter2D filter, Func<T, bool> func) where T : Component
         {
-            transform.position.FindTargets(size, angle, layer, func);
+            transform.position.FindTargets(size, angle, filter, func);
         }
 
         public static void FindTarget<T>(this Vector3 position, Vector2 direction, float distance, int layer, Action<T> action) where T : Component
@@ -88,9 +88,9 @@ namespace JFramework
             }
         }
 
-        public static void FindTargets<T>(this Vector3 position, float radius, int layer, Action<T> action) where T : Component
+        public static void FindTargets<T>(this Vector3 position, float radius, ContactFilter2D filter, Action<T> action) where T : Component
         {
-            var result = Physics2D.OverlapCircleNonAlloc(position, radius, results, layer);
+            var result = Physics2D.OverlapCircle(position, radius, filter, results);
             for (int i = 0; i < result; i++)
             {
                 var collider = results[i];
@@ -101,9 +101,9 @@ namespace JFramework
             }
         }
 
-        public static void FindTargets<T>(this Vector3 position, Vector2 size, float angle, int layer, Action<T> action) where T : Component
+        public static void FindTargets<T>(this Vector3 position, Vector2 size, float angle, ContactFilter2D filter, Action<T> action) where T : Component
         {
-            var result = Physics2D.OverlapBoxNonAlloc(position, size, angle, results, layer);
+            var result = Physics2D.OverlapBox(position, size, angle, filter, results);
             for (int i = 0; i < result; i++)
             {
                 var collider = results[i];
@@ -114,9 +114,9 @@ namespace JFramework
             }
         }
 
-        public static void FindTargets<T>(this Vector3 position, float radius, int layer, Func<T, bool> func) where T : Component
+        public static void FindTargets<T>(this Vector3 position, float radius, ContactFilter2D filter, Func<T, bool> func) where T : Component
         {
-            var result = Physics2D.OverlapCircleNonAlloc(position, radius, results, layer);
+            var result = Physics2D.OverlapCircle(position, radius, filter, results);
             for (int i = 0; i < result; i++)
             {
                 var collider = results[i];
@@ -130,9 +130,9 @@ namespace JFramework
             }
         }
 
-        public static void FindTargets<T>(this Vector3 position, Vector2 size, float angle, int layer, Func<T, bool> func) where T : Component
+        public static void FindTargets<T>(this Vector3 position, Vector2 size, float angle, ContactFilter2D filter, Func<T, bool> func) where T : Component
         {
-            var result = Physics2D.OverlapBoxNonAlloc(position, size, angle, results, layer);
+            var result = Physics2D.OverlapBox(position, size, angle, filter, results);
             for (int i = 0; i < result; i++)
             {
                 var collider = results[i];
