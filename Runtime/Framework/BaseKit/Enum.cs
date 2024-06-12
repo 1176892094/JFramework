@@ -26,7 +26,7 @@ namespace JFramework
         DontDestroy = 2
     }
 
-    public enum InputState : byte
+    public enum InputMode : byte
     {
         Up = 0,
         Press = 1,
@@ -43,10 +43,10 @@ namespace JFramework
         AssetBundle
     }
 
-    public enum AssetBuild : byte
+    public enum BuildMode : byte
     {
-        BuildPath,
         StreamingAssets,
+        BuildPath,
     }
 
     public enum AssetPlatform : byte

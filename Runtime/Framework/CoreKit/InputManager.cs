@@ -18,42 +18,42 @@ namespace JFramework.Core
     public static partial class InputManager
     {
         private static readonly Dictionary<Type, InputData> inputs = new();
-        private static readonly Dictionary<InputMode, Dictionary<InputState, Action<InputData>>> inputActions = new();
+        private static readonly Dictionary<InputType, Dictionary<InputMode, Action<InputData>>> inputActions = new();
         public static float vertical;
         public static float horizontal;
 
         internal static void Register()
         {
             GlobalManager.OnUpdate += OnUpdate;
-            var buttonActions = new Dictionary<InputState, Action<InputData>>
+            var buttonActions = new Dictionary<InputMode, Action<InputData>>
             {
-                { InputState.Up, GetButtonUp },
-                { InputState.Press, GetButton },
-                { InputState.Down, GetButtonDown },
+                { InputMode.Up, GetButtonUp },
+                { InputMode.Press, GetButton },
+                { InputMode.Down, GetButtonDown },
             };
-            var keyActions = new Dictionary<InputState, Action<InputData>>
+            var keyActions = new Dictionary<InputMode, Action<InputData>>
             {
-                { InputState.Up, GetKeyUp },
-                { InputState.Press, GetKey },
-                { InputState.Down, GetKeyDown },
+                { InputMode.Up, GetKeyUp },
+                { InputMode.Press, GetKey },
+                { InputMode.Down, GetKeyDown },
             };
-            var mouseActions = new Dictionary<InputState, Action<InputData>>
+            var mouseActions = new Dictionary<InputMode, Action<InputData>>
             {
-                { InputState.Up, GetMouseUp },
-                { InputState.Press, GetMouse },
-                { InputState.Down, GetMouseDown },
+                { InputMode.Up, GetMouseUp },
+                { InputMode.Press, GetMouse },
+                { InputMode.Down, GetMouseDown },
             };
-            var axisActions = new Dictionary<InputState, Action<InputData>>
+            var axisActions = new Dictionary<InputMode, Action<InputData>>
             {
-                { InputState.AxisX, GetAxisX },
-                { InputState.AxisY, GetAxisY },
-                { InputState.AxisRawX, GetAxisRawX },
-                { InputState.AxisRawY, GetAxisRawY },
+                { InputMode.AxisX, GetAxisX },
+                { InputMode.AxisY, GetAxisY },
+                { InputMode.AxisRawX, GetAxisRawX },
+                { InputMode.AxisRawY, GetAxisRawY },
             };
-            inputActions.Add(InputMode.Key, keyActions);
-            inputActions.Add(InputMode.Axis, axisActions);
-            inputActions.Add(InputMode.Mouse, mouseActions);
-            inputActions.Add(InputMode.Button, buttonActions);
+            inputActions.Add(InputType.Key, keyActions);
+            inputActions.Add(InputType.Axis, axisActions);
+            inputActions.Add(InputType.Mouse, mouseActions);
+            inputActions.Add(InputType.Button, buttonActions);
         }
 
         private static void OnUpdate()
@@ -65,9 +65,9 @@ namespace JFramework.Core
                     continue;
                 }
 
-                if (inputActions.TryGetValue(input.mode, out var action))
+                if (inputActions.TryGetValue(input.type, out var action))
                 {
-                    if (action.TryGetValue(input.state, out var method))
+                    if (action.TryGetValue(input.mode, out var method))
                     {
                         method.Invoke(input);
                     }
@@ -75,7 +75,7 @@ namespace JFramework.Core
             }
         }
 
-        public static void Add<T>(KeyCode key, InputState state) where T : struct, IEvent
+        public static void Add<T>(KeyCode key, InputMode mode) where T : struct, IEvent
         {
             if (!inputs.TryGetValue(typeof(T), out var input))
             {
@@ -85,11 +85,11 @@ namespace JFramework.Core
             }
 
             input.key = key;
-            input.state = state;
-            input.mode = InputMode.Key;
+            input.mode = mode;
+            input.type = InputType.Key;
         }
 
-        public static void Add<T>(string button, InputState state) where T : struct, IEvent
+        public static void Add<T>(string button, InputMode mode) where T : struct, IEvent
         {
             if (!inputs.TryGetValue(typeof(T), out var input))
             {
@@ -98,12 +98,12 @@ namespace JFramework.Core
                 input.Listen();
             }
 
-            input.state = state;
+            input.mode = mode;
             input.button = button;
-            input.mode = state > InputState.Down ? InputMode.Axis : InputMode.Button;
+            input.type = mode > InputMode.Down ? InputType.Axis : InputType.Button;
         }
 
-        public static void Add<T>(int mouse, InputState state) where T : struct, IEvent
+        public static void Add<T>(int mouse, InputMode mode) where T : struct, IEvent
         {
             if (!inputs.TryGetValue(typeof(T), out var input))
             {
@@ -112,9 +112,9 @@ namespace JFramework.Core
                 input.Listen();
             }
 
-            input.state = state;
+            input.mode = mode;
             input.mouse = mouse;
-            input.mode = InputMode.Mouse;
+            input.type = InputType.Mouse;
         }
 
         public static void Remove<T>() where T : struct, IEvent
@@ -139,14 +139,14 @@ namespace JFramework.Core
             public int mouse;
             public string button;
             public KeyCode key;
+            public InputType type;
             public InputMode mode;
-            public InputState state;
             public abstract void Listen();
             public abstract void Remove();
             public abstract void Invoke();
         }
 
-        internal enum InputMode
+        internal enum InputType
         {
             Key,
             Axis,

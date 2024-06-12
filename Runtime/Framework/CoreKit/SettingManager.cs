@@ -45,7 +45,7 @@ namespace JFramework
 
         [OnValueChanged("UpdateSceneSetting")] public AssetMode assetMode;
 
-        public AssetBuild assetBuild = AssetBuild.StreamingAssets;
+        public BuildMode assetBuild = BuildMode.StreamingAssets;
 
         [HideInInspector] public bool assetLoadKey;
 
@@ -84,7 +84,7 @@ namespace JFramework
 
         [ShowInInspector] public readonly Dictionary<string, string> objects = new Dictionary<string, string>();
 
-        private static string remoteBuildPath => Instance.assetBuild == AssetBuild.BuildPath ? Instance.buildPath : Application.streamingAssetsPath;
+        private static string remoteBuildPath => Instance.assetBuild == BuildMode.BuildPath ? Instance.buildPath : Application.streamingAssetsPath;
 
         public static string platformPath => Path.Combine(remoteBuildPath, Instance.platform.ToString());
 
