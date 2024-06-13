@@ -117,7 +117,7 @@ namespace JFramework
                     {
                         var importer = AssetImporter.GetAtPath(path);
                         if (importer == null) continue;
-                        
+
                         if (importer.assetBundleName != name.ToLower())
                         {
                             Debug.Log($"增加 AssetBundles 资源: {path.Green()}");
@@ -126,12 +126,15 @@ namespace JFramework
                         }
 
                         var asset = AssetDatabase.LoadAssetAtPath<Object>(path);
-                        if (asset is SceneAsset)
+                        if (asset != null)
                         {
-                            SettingManager.Instance.sceneAssets.Add(path);
+                            if (asset is SceneAsset)
+                            {
+                                SettingManager.Instance.sceneAssets.Add(path);
+                            }
+                            
+                            SettingManager.objects[$"{name}/{asset.name}"] = path;
                         }
-
-                        SettingManager.Instance.objects[$"{name}/{asset.name}"] = path;
                     }
                 }
             }
@@ -144,9 +147,11 @@ namespace JFramework
         {
             UpdateAsset();
             var directory = Directory.CreateDirectory(SettingManager.platformPath);
-            BuildPipeline.BuildAssetBundles(SettingManager.platformPath, BuildAssetBundleOptions.ChunkBasedCompression, (BuildTarget)SettingManager.Instance.platform);
+            BuildPipeline.BuildAssetBundles(SettingManager.platformPath, BuildAssetBundleOptions.ChunkBasedCompression,
+                (BuildTarget)SettingManager.Instance.platform);
             var infoList = directory.GetFiles().Where(info => info.Extension == "").ToList();
-            var fileList = infoList.Select(info => new BundleManager.BundleData(GetProviderInfo(info.FullName), info.Name, info.Length.ToString())).ToList();
+            var fileList = infoList
+                .Select(info => new BundleManager.BundleData(GetProviderInfo(info.FullName), info.Name, info.Length.ToString())).ToList();
             var contents = JsonManager.Writer(fileList, true);
             File.WriteAllText(SettingManager.assetBundleInfo, contents);
             Debug.Log("构建 AssetBundles 成功!".Green());

@@ -258,7 +258,7 @@ namespace JFramework.Core
         {
             public static async Task<T> LoadAsync<T>(string assetPath) where T : Object
             {
-                if (SettingManager.Instance.objects.TryGetValue(assetPath, out var editorPath))
+                if (SettingManager.objects.TryGetValue(assetPath, out var editorPath))
                 {
                     if (typeof(T).IsSubclassOf(typeof(MonoBehaviour)))
                     {

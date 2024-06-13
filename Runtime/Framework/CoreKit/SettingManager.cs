@@ -26,6 +26,10 @@ namespace JFramework
         public static SettingManager Instance => instance ??= Resources.Load<SettingManager>(nameof(SettingManager));
 
         public AssetPlatform platform = AssetPlatform.StandaloneWindows;
+        
+        [OnValueChanged("UpdateSceneSetting")] public AssetMode assetMode;
+
+        public BuildMode assetBuild = BuildMode.StreamingAssets;
 
         public string assetInfo = "AssetBundleInfo";
 
@@ -37,19 +41,7 @@ namespace JFramework
 
         public string editorPath = "Assets/Editor/Resources";
 
-        public string dataPath = "Assets/Template/DataTable";
-
-        public string scriptPath = "Assets/Scripts/DataTable";
-
         public string remotePath = "http://192.168.0.3:8000/AssetBundles";
-
-        [OnValueChanged("UpdateSceneSetting")] public AssetMode assetMode;
-
-        public BuildMode assetBuild = BuildMode.StreamingAssets;
-
-        [HideInInspector] public bool assetLoadKey;
-
-        [HideInInspector] public string excelPathKey;
 
         public static string clientInfoName => Instance.assetInfo + ".json";
 
@@ -78,11 +70,23 @@ namespace JFramework
         private static string GetPlatform(string fileName) => Path.Combine(Instance.platform.ToString(), fileName);
 
 #if UNITY_EDITOR
-        [HideInInspector] public string[] sceneEditor = new string[3];
+        [ShowInInspector]
+        public static string ScriptPath
+        {
+            get => EditorPrefs.GetString(nameof(ScriptPath), "Assets/Template/DataTable");
+            set => EditorPrefs.SetString(nameof(ScriptPath), value);
+        }
 
+        [ShowInInspector]
+        public static string DataTablePath
+        {
+            get => EditorPrefs.GetString(nameof(DataTablePath), "Assets/Scripts/DataTable");
+            set => EditorPrefs.SetString(nameof(DataTablePath), value);
+        }
+        
         [HideInInspector] public List<string> sceneAssets = new List<string>();
 
-        [ShowInInspector] public readonly Dictionary<string, string> objects = new Dictionary<string, string>();
+        public static readonly Dictionary<string, string> objects = new Dictionary<string, string>();
 
         private static string remoteBuildPath => Instance.assetBuild == BuildMode.BuildPath ? Instance.buildPath : Application.streamingAssetsPath;
 
