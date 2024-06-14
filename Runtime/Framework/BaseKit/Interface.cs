@@ -39,7 +39,12 @@ namespace JFramework.Interface
     public interface IEvent
     {
     }
-    
+
+    public interface IEvent<in T> : IEvent where T : struct, IEvent
+    {
+        void Execute(T message);
+    }
+
     public interface IPool : IDisposable
     {
         int count { get; }
@@ -66,7 +71,7 @@ namespace JFramework.Interface
 
         void Clear();
     }
-    
+
     public interface IGrid<T> : IEntity, IDisposable
     {
         T item { get; }

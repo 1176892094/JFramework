@@ -18,7 +18,7 @@ namespace JFramework.Core
     {
         private static readonly Dictionary<Type, IEvent> events = new();
 
-        public static void Listen<T>(Action<T> action) where T : struct, IEvent
+        public static void Listen<T>(IEvent<T> obj) where T : struct, IEvent
         {
             if (!GlobalManager.Instance) return;
             if (!events.TryGetValue(typeof(T), out var @event))
@@ -26,15 +26,15 @@ namespace JFramework.Core
                 events.Add(typeof(T), @event = new Event<T>());
             }
 
-            ((Event<T>)@event).action += action;
+            ((Event<T>)@event).action += obj.Execute;
         }
 
-        public static void Remove<T>(Action<T> action) where T : struct, IEvent
+        public static void Remove<T>(IEvent<T> obj) where T : struct, IEvent
         {
             if (!GlobalManager.Instance) return;
             if (events.TryGetValue(typeof(T), out var @event))
             {
-                ((Event<T>)@event).action -= action;
+                ((Event<T>)@event).action -= obj.Execute;
             }
         }
 
