@@ -75,14 +75,14 @@ namespace JFramework.Core
             {
                 var data = await LoadAssetData(path);
                 var bundle = await LoadAssetBundle(data.bundle);
-                var asset = await AssetBundleLoader.LoadAsync<T>(bundle, data.asset);
+                var asset = AssetBundleLoader.LoadAsync<T>(bundle, data.asset);
                 asset ??= await ResourcesLoader.LoadAsync<T>(path);
                 return asset;
             }
             else
             {
 #if UNITY_EDITOR
-                var asset = await SimulateLoader.LoadAsync<T>(path);
+                var asset = SimulateLoader.LoadAsync<T>(path);
                 asset ??= await ResourcesLoader.LoadAsync<T>(path);
 #else
                 var asset = await ResourcesLoader.LoadAsync<T>(path);
@@ -216,18 +216,18 @@ namespace JFramework.Core
 
         private static class AssetBundleLoader
         {
-            public static async Task<T> LoadAsync<T>(AssetBundle assetBundle, string assetName) where T : Object
+            public static T LoadAsync<T>(AssetBundle assetBundle, string assetName) where T : Object
             {
                 if (assetBundle != null)
                 {
                     if (typeof(T).IsSubclassOf(typeof(MonoBehaviour)))
                     {
-                        var request = await assetBundle.LoadAssetAsync<GameObject>(assetName);
+                        var request = assetBundle.LoadAssetAsync<GameObject>(assetName);
                         return ((GameObject)Object.Instantiate(request.asset)).GetComponent<T>();
                     }
                     else
                     {
-                        var request = await assetBundle.LoadAssetAsync<T>(assetName);
+                        var request = assetBundle.LoadAssetAsync<T>(assetName);
                         return request.asset is GameObject ? (T)Object.Instantiate(request.asset) : (T)request.asset;
                     }
                 }
@@ -256,7 +256,7 @@ namespace JFramework.Core
 #if UNITY_EDITOR
         private static class SimulateLoader
         {
-            public static async Task<T> LoadAsync<T>(string assetPath) where T : Object
+            public static T LoadAsync<T>(string assetPath) where T : Object
             {
                 if (SettingManager.objects.TryGetValue(char.ToUpper(assetPath[0]) + assetPath.Substring(1), out var editorPath))
                 {
@@ -271,8 +271,7 @@ namespace JFramework.Core
                         return request is GameObject ? Object.Instantiate(request) : request;
                     }
                 }
-
-                await Task.Yield();
+                
                 return null;
             }
         }
