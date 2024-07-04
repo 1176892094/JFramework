@@ -20,6 +20,7 @@ namespace JFramework.Core
     public static partial class UIManager
     {
         public static Canvas canvas { get; private set; }
+        public static readonly Dictionary<Type, string> prefabs = new();
         private static readonly Dictionary<Type, UIPanel> panels = new();
         private static readonly Dictionary<UILayer, Transform> layers = new();
         private static readonly Dictionary<Type, Task<UIPanel>> requests = new();
@@ -55,7 +56,8 @@ namespace JFramework.Core
 
         private static async Task<UIPanel> LoadAsync(Type type)
         {
-            var obj = await AssetManager.Load<GameObject>(SettingManager.GetUIPath(type.Name));
+            var path = prefabs.TryGetValue(type, out var prefab) ? prefab : type.Name;
+            var obj = await AssetManager.Load<GameObject>(SettingManager.GetUIPath(path));
             var panel = obj.GetComponent<UIPanel>() ?? (UIPanel)obj.AddComponent(type);
             panel.transform.SetParent(layers[panel.layer], false);
             panels.Add(type, panel);
