@@ -30,24 +30,25 @@ namespace JFramework.Core
         public static async void UpdateAssetBundles()
         {
             if (!GlobalManager.Instance) return;
-            if (!await GetRemoteBundle())
+            var remote = await GetRemoteBundle();
+            if (string.IsNullOrEmpty(remote))
             {
                 Debug.Log("更新失败。");
                 OnLoadComplete?.Invoke(false);
                 return;
             }
 
-            var remote = await File.ReadAllTextAsync(SettingManager.remoteInfoPath);
             var bundles = JsonManager.Reader<List<BundleData>>(remote);
             remoteBundles = bundles.ToDictionary(bundle => bundle.name);
 
             var client = await GetClientBundle();
-            if (client != null)
+            if (!string.IsNullOrEmpty(client))
             {
                 bundles = JsonManager.Reader<List<BundleData>>(client);
                 clientBundles = bundles.ToDictionary(bundle => bundle.name);
             }
-
+            
+            updateBundles.Clear();
             foreach (var key in remoteBundles.Keys)
             {
                 if (clientBundles.TryGetValue(key, out var bundle))
@@ -81,23 +82,10 @@ namespace JFramework.Core
             }
         }
 
-        public static void ClearAssetBundles()
-        {
-            foreach (var key in remoteBundles.Keys)
-            {
-                var path = SettingManager.GetPersistentPath(key);
-                if (File.Exists(path))
-                {
-                    File.Delete(path);
-                }
-            }
-        }
-        
-        private static async Task<bool> GetRemoteBundle()
+        private static async Task<string> GetRemoteBundle()
         {
             var reloads = 5;
-            var success = false;
-            while (!success && reloads-- > 0)
+            while (reloads-- > 0)
             {
                 var fileUri = SettingManager.GetRemoteFilePath(SettingManager.clientInfoName);
                 using (var request = UnityWebRequest.Head(fileUri))
@@ -120,14 +108,11 @@ namespace JFramework.Core
                         continue;
                     }
 
-                    var contents = request.downloadHandler.text;
-                    await File.WriteAllTextAsync(SettingManager.remoteInfoPath, contents);
+                    return request.downloadHandler.text;
                 }
-
-                success = true;
             }
 
-            return success;
+            return null;
         }
 
         private static async Task<string> GetClientBundle()
@@ -199,15 +184,14 @@ namespace JFramework.Core
 
                         var contents = request.downloadHandler.data;
                         await File.WriteAllBytesAsync(SettingManager.GetPersistentPath(bundle), contents);
-                    }
-
-                    if (updateBundles.Contains(bundle))
-                    {
-                        updateBundles.Remove(bundle);
+                        if (updateBundles.Contains(bundle))
+                        {
+                            updateBundles.Remove(bundle);
+                        }
                     }
                 }
             }
-
+            
             return updateBundles.Count == 0;
         }
 
@@ -218,7 +202,6 @@ namespace JFramework.Core
             OnLoadComplete = null;
             clientBundles.Clear();
             remoteBundles.Clear();
-            updateBundles.Clear();
         }
 
         [Serializable]
