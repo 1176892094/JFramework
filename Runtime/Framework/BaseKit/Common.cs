@@ -175,7 +175,7 @@ namespace JFramework
         private string prefab;
         private List<TItem> items;
         private RectTransform content;
-        public List<TGrid> Values => grids.Values.ToList();
+        public event Action<List<TGrid>> OnUpdate;
 
         public UIScroll(float width, float height, int row, int column, string prefab, RectTransform content)
         {
@@ -209,7 +209,7 @@ namespace JFramework
             content.sizeDelta = new Vector2(0, Mathf.CeilToInt((float)items.Count / column) * height + 1);
         }
 
-        public async void OnUpdate()
+        public async void Update()
         {
             if (items == null) return;
             var position = content.anchoredPosition;
@@ -244,7 +244,7 @@ namespace JFramework
                     }
                 }
             }
-
+            
             oldMinIndex = minIndex;
             oldMaxIndex = maxIndex;
             for (int i = minIndex; i <= maxIndex; ++i)
@@ -268,6 +268,11 @@ namespace JFramework
                 else
                 {
                     PoolManager.Push(obj);
+                }
+
+                if (i == maxIndex)
+                {
+                    OnUpdate?.Invoke(grids.Values.ToList());
                 }
             }
         }

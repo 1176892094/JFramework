@@ -81,6 +81,18 @@ namespace JFramework.Core
             }
         }
 
+        public static void ClearAssetBundles()
+        {
+            foreach (var key in remoteBundles.Keys)
+            {
+                var path = SettingManager.GetPersistentPath(key);
+                if (File.Exists(path))
+                {
+                    File.Delete(path);
+                }
+            }
+        }
+        
         private static async Task<bool> GetRemoteBundle()
         {
             var reloads = 5;
