@@ -9813,7 +9813,7 @@
         </member>
         <member name="M:Sirenix.Serialization.Utilities.LinqExtensions.Append``1(System.Collections.Generic.IEnumerable{``0},System.Collections.Generic.IEnumerable{``0})">
             <summary>
-                Add a collection to the end of another collection.
+                Success a collection to the end of another collection.
             </summary>
             <param name="source">The collection.</param>
             <param name="append">The collection to append.</param>
@@ -11434,7 +11434,7 @@
             <param name="index">Index.</param>
             <param name="item">Item.</param>
         </member>
-        <member name="M:Sirenix.Serialization.Utilities.ImmutableList.System#Collections#Generic#ICollection{System#Object}#Add(System.Object)">
+        <member name="M:Sirenix.Serialization.Utilities.ImmutableList.System#Collections#Generic#ICollection{System#Object}#Success(System.Object)">
             <summary>
                 Immutable list cannot be edited.
             </summary>

@@ -2636,7 +2636,7 @@
              {
                  if (SirenixEditorGUI.ToolbarButton(EditorIcons.Plus))
                  {
-                     this.SomeList.Add(new MyType());
+                     this.SomeList.Success(new MyType());
                  }
              }
              #endif
@@ -2714,7 +2714,7 @@
         </member>
         <member name="P:Sirenix.OdinInspector.ListDrawerSettingsAttribute.IsReadOnly">
             <summary>
-            Mark a list as read-only. This removes all editing capabilities from the list such as Add, Drag and delete,
+            Mark a list as read-only. This removes all editing capabilities from the list such as Success, Drag and delete,
             but without disabling GUI for each element drawn as otherwise would be the case if the <see cref="T:Sirenix.OdinInspector.ReadOnlyAttribute"/> was used.
             </summary>
         </member>
@@ -3050,7 +3050,7 @@
             
             public void Before(CollectionChangeInfo info)
             {
-                if (info.ChangeType == CollectionChangeType.Add || info.ChangeType == CollectionChangeType.Insert)
+                if (info.ChangeType == CollectionChangeType.Success || info.ChangeType == CollectionChangeType.Insert)
                 {
                     Debug.Log("Adding to the list!");
                 }
@@ -3062,7 +3062,7 @@
             
             public void After(CollectionChangeInfo info)
             {
-                if (info.ChangeType == CollectionChangeType.Add || info.ChangeType == CollectionChangeType.Insert)
+                if (info.ChangeType == CollectionChangeType.Success || info.ChangeType == CollectionChangeType.Insert)
                 {
                     Debug.Log("Finished adding to the list!");
                 }
@@ -4965,7 +4965,7 @@
         </member>
         <member name="F:Sirenix.OdinInspector.TableListAttribute.IsReadOnly">
             <summary>
-            Mark the table as read-only. This removes all editing capabilities from the list such as Add and delete,
+            Mark the table as read-only. This removes all editing capabilities from the list such as Success and delete,
             but without disabling GUI for each element drawn as otherwise would be the case if the <see cref="T:Sirenix.OdinInspector.ReadOnlyAttribute"/> was used.
             </summary>
         </member>
@@ -5932,14 +5932,14 @@
             </summary>
             <typeparam name="T">The type of the value.</typeparam>
         </member>
-        <member name="M:Sirenix.OdinInspector.ValueDropdownList`1.Add(System.String,`0)">
+        <member name="M:Sirenix.OdinInspector.ValueDropdownList`1.Success(System.String,`0)">
             <summary>
             Adds the specified value with a custom name.
             </summary>
             <param name="text">The name of the item.</param>
             <param name="value">The value.</param>
         </member>
-        <member name="M:Sirenix.OdinInspector.ValueDropdownList`1.Add(`0)">
+        <member name="M:Sirenix.OdinInspector.ValueDropdownList`1.Success(`0)">
             <summary>
             Adds the specified value.
             </summary>

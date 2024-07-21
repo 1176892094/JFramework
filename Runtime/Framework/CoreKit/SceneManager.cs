@@ -9,48 +9,18 @@
 // *********************************************************************************
 
 using System;
-using System.Collections.Generic;
-using JFramework.Interface;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnitySceneManager = UnityEngine.SceneManagement.SceneManager;
 
 namespace JFramework.Core
 {
-    public static partial class SceneManager
+    public static class SceneManager
     {
-        private static readonly Dictionary<Type, IEntity> objects = new();
         public static bool isLoading { get; private set; }
         public static Scene current => UnitySceneManager.GetActiveScene();
         public static string name => current.name;
 
-        public static void Add<T>(T entity) where T : IEntity
-        {
-            if (!GlobalManager.Instance) return;
-            objects.TryAdd(typeof(T), entity);
-        }
-
-        public static T Get<T>() where T : IEntity
-        {
-            if (!GlobalManager.Instance) return default;
-            return (T)objects.GetValueOrDefault(typeof(T));
-        }
-
-        public static void Remove<T>() where T : IEntity
-        {
-            if (!GlobalManager.Instance) return;
-            objects.Remove(typeof(T));
-        }
-
-        internal static void UnRegister()
-        {
-            objects.Clear();
-            isLoading = false;
-        }
-    }
-
-    public static partial class SceneManager
-    {
         public static async void Load(string name)
         {
             if (!GlobalManager.Instance) return;
@@ -100,6 +70,11 @@ namespace JFramework.Core
             {
                 Debug.LogWarning($"异步加载 {name.Red()} 场景失败\n{e}");
             }
+        }
+
+        internal static void UnRegister()
+        {
+            isLoading = false;
         }
     }
 }

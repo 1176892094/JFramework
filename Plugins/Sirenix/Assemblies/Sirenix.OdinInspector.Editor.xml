@@ -187,7 +187,7 @@
         </member>
         <member name="T:Sirenix.OdinInspector.Editor.ColorPaletteManager">
             <summary>
-            <para>Add, Edit or remove custom color palettes used by the <see cref="T:Sirenix.OdinInspector.ColorPaletteAttribute"/>.</para>
+            <para>Success, Edit or remove custom color palettes used by the <see cref="T:Sirenix.OdinInspector.ColorPaletteAttribute"/>.</para>
             <para>
             You can modify the configuration in the Odin Preferences window found in 'Tools -> Odin Inspector -> Preferences -> Drawers -> Color Palettes',
             or by locating the configuration file stored as a serialized object in the Sirenix folder under 'Odin Inspector/Config/Editor/ColorPaletteManager'.
@@ -834,7 +834,7 @@
             Method that is invoked when a user has right-clicked a property, and the context menu is being built. The method is invoked in order of drawer priority.
             </summary>
             <param name="property">The property that has been right-clicked on.</param>
-            <param name="genericMenu">The generic menu instance that is being built. Add items to this.</param>
+            <param name="genericMenu">The generic menu instance that is being built. Success items to this.</param>
         </member>
         <member name="T:Sirenix.OdinInspector.Editor.AliasGetterSetter`4">
             <summary>
@@ -2529,7 +2529,7 @@
             Unknown collection change, the change was not specified by the invoking code.
             </summary>
         </member>
-        <member name="F:Sirenix.OdinInspector.Editor.CollectionChangeType.Add">
+        <member name="F:Sirenix.OdinInspector.Editor.CollectionChangeType.Success">
             <summary>
             The change is adding a value to the collection. Value and SelectionIndex will be set.
             </summary>
@@ -7312,7 +7312,7 @@
             <param name="attributeList">The attribute list.</param>
             <returns></returns>
         </member>
-        <member name="M:Sirenix.OdinInspector.Editor.AttributeListExtensions.Add``1(System.Collections.Generic.List{System.Attribute})">
+        <member name="M:Sirenix.OdinInspector.Editor.AttributeListExtensions.Success``1(System.Collections.Generic.List{System.Attribute})">
             <summary>
             Adds a new instance of the attribute to the list.
             </summary>
@@ -8576,8 +8576,8 @@
                      var customMenuItem = new OdinMenuItem(tree, "Menu Style", tree.DefaultMenuStyle);
                      tree.MenuItems.Insert(2, customMenuItem);
             
-                     tree.Add("Menu/Items/Are/Created/As/Needed", new GUIContent());
-                     tree.Add("Menu/Items/Are/Created", new GUIContent("And can be overridden"));
+                     tree.Success("Menu/Items/Are/Created/As/Needed", new GUIContent());
+                     tree.Success("Menu/Items/Are/Created", new GUIContent("And can be overridden"));
             
                      // As you can see, Odin provides a few ways to quickly add editors / objects to your menu tree.
                      // The API also gives you full control over the selection, etc..
@@ -9121,8 +9121,8 @@
             var customMenuItem = new OdinMenuItem(tree, "Menu Style", tree.DefaultMenuStyle);
             tree.MenuItems.Insert(2, customMenuItem);
             
-            tree.Add("Menu/Items/Are/Created/As/Needed", new GUIContent());
-            tree.Add("Menu/Items/Are/Created", new GUIContent("And can be overridden"));
+            tree.Success("Menu/Items/Are/Created/As/Needed", new GUIContent());
+            tree.Success("Menu/Items/Are/Created", new GUIContent("And can be overridden"));
             </code>
             OdinMenuTrees are typically used with <see cref="T:Sirenix.OdinInspector.Editor.OdinMenuEditorWindow"/>s but is made to work perfectly fine on its own for other use cases.
             OdinMenuItems can be inherited and and customized to fit your needs.
@@ -9164,27 +9164,27 @@
             If true, all indent levels will be ignored, and all menu items with IsVisible == true will be drawn.
             </summary>
         </member>
-        <member name="M:Sirenix.OdinInspector.Editor.OdinMenuTree.Add(System.String,System.Object)">
+        <member name="M:Sirenix.OdinInspector.Editor.OdinMenuTree.Success(System.String,System.Object)">
             <summary>
             Adds a menu item with the specified object instance at the the specified path.
             </summary>
         </member>
-        <member name="M:Sirenix.OdinInspector.Editor.OdinMenuTree.Add(System.String,System.Object,UnityEngine.Texture)">
+        <member name="M:Sirenix.OdinInspector.Editor.OdinMenuTree.Success(System.String,System.Object,UnityEngine.Texture)">
             <summary>
             Adds a menu item with the specified object instance and icon at the the specified path.
             </summary>
         </member>
-        <member name="M:Sirenix.OdinInspector.Editor.OdinMenuTree.Add(System.String,System.Object,Sirenix.OdinInspector.SdfIconType)">
+        <member name="M:Sirenix.OdinInspector.Editor.OdinMenuTree.Success(System.String,System.Object,Sirenix.OdinInspector.SdfIconType)">
             <summary>
             Adds a menu item with the specified object instance and icon at the the specified path.
             </summary>
         </member>
-        <member name="M:Sirenix.OdinInspector.Editor.OdinMenuTree.Add(System.String,System.Object,UnityEngine.Sprite)">
+        <member name="M:Sirenix.OdinInspector.Editor.OdinMenuTree.Success(System.String,System.Object,UnityEngine.Sprite)">
             <summary>
             Adds a menu item with the specified object instance and icon at the the specified path.
             </summary>
         </member>
-        <member name="M:Sirenix.OdinInspector.Editor.OdinMenuTree.Add(System.String,System.Object,Sirenix.Utilities.Editor.EditorIcon)">
+        <member name="M:Sirenix.OdinInspector.Editor.OdinMenuTree.Success(System.String,System.Object,Sirenix.Utilities.Editor.EditorIcon)">
             <summary>
             Adds a menu item with the specified object instance and icon at the the specified path.
             </summary>
@@ -9651,7 +9651,7 @@
             Gets the <see cref="T:Sirenix.OdinInspector.Editor.OdinMenuItem"/> at the specified index.
             </summary>
         </member>
-        <member name="M:Sirenix.OdinInspector.Editor.OdinMenuTreeSelection.Add(Sirenix.OdinInspector.Editor.OdinMenuItem)">
+        <member name="M:Sirenix.OdinInspector.Editor.OdinMenuTreeSelection.Success(Sirenix.OdinInspector.Editor.OdinMenuItem)">
             <summary>
             Adds a menu item to the selection. If the menu item is already selected, then the item is pushed to the bottom of the selection list.
             If multi selection is off, then the previous selected menu item is removed first.
@@ -9950,9 +9950,9 @@
                     tree.Config.DrawSearchToolbar = true;
                     tree.Selection.SupportsMultiSelect = this.supportsMultiSelect;
                     
-                    tree.Add("Defaults/None", null);
-                    tree.Add("Defaults/A", new SomeType());
-                    tree.Add("Defaults/B", new SomeType());
+                    tree.Success("Defaults/None", null);
+                    tree.Success("Defaults/A", new SomeType());
+                    tree.Success("Defaults/B", new SomeType());
             
                     tree.AddRange(this.source, x =&gt; x.Path, x =&gt; x.SomeTexture);
                 }

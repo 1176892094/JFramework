@@ -296,28 +296,28 @@
         </member>
         <member name="M:Sirenix.Utilities.LinqExtensions.PrependWith``1(System.Collections.Generic.IEnumerable{``0},System.Func{``0})">
             <summary>
-                Add an item to the beginning of a collection.
+                Success an item to the beginning of a collection.
             </summary>
             <param name="source">The collection.</param>
             <param name="prepend">Func to create the item to prepend.</param>
         </member>
         <member name="M:Sirenix.Utilities.LinqExtensions.PrependWith``1(System.Collections.Generic.IEnumerable{``0},``0)">
             <summary>
-                Add an item to the beginning of a collection.
+                Success an item to the beginning of a collection.
             </summary>
             <param name="source">The collection.</param>
             <param name="prepend">The item to prepend.</param>
         </member>
         <member name="M:Sirenix.Utilities.LinqExtensions.PrependWith``1(System.Collections.Generic.IEnumerable{``0},System.Collections.Generic.IEnumerable{``0})">
             <summary>
-                Add a collection to the beginning of another collection.
+                Success a collection to the beginning of another collection.
             </summary>
             <param name="source">The collection.</param>
             <param name="prepend">The collection to prepend.</param>
         </member>
         <member name="M:Sirenix.Utilities.LinqExtensions.PrependIf``1(System.Collections.Generic.IEnumerable{``0},System.Boolean,System.Func{``0})">
             <summary>
-                Add an item to the beginning of another collection, if a condition is met.
+                Success an item to the beginning of another collection, if a condition is met.
             </summary>
             <param name="source">The collection.</param>
             <param name="condition">The condition.</param>
@@ -325,7 +325,7 @@
         </member>
         <member name="M:Sirenix.Utilities.LinqExtensions.PrependIf``1(System.Collections.Generic.IEnumerable{``0},System.Boolean,``0)">
             <summary>
-                Add an item to the beginning of another collection, if a condition is met.
+                Success an item to the beginning of another collection, if a condition is met.
             </summary>
             <param name="source">The collection.</param>
             <param name="condition">The condition.</param>
@@ -333,7 +333,7 @@
         </member>
         <member name="M:Sirenix.Utilities.LinqExtensions.PrependIf``1(System.Collections.Generic.IEnumerable{``0},System.Boolean,System.Collections.Generic.IEnumerable{``0})">
             <summary>
-                Add a collection to the beginning of another collection, if a condition is met.
+                Success a collection to the beginning of another collection, if a condition is met.
             </summary>
             <param name="source">The collection.</param>
             <param name="condition">The condition.</param>
@@ -341,7 +341,7 @@
         </member>
         <member name="M:Sirenix.Utilities.LinqExtensions.PrependIf``1(System.Collections.Generic.IEnumerable{``0},System.Func{System.Boolean},System.Func{``0})">
             <summary>
-                Add an item to the beginning of another collection, if a condition is met.
+                Success an item to the beginning of another collection, if a condition is met.
             </summary>
             <param name="source">The collection.</param>
             <param name="condition">The condition.</param>
@@ -349,7 +349,7 @@
         </member>
         <member name="M:Sirenix.Utilities.LinqExtensions.PrependIf``1(System.Collections.Generic.IEnumerable{``0},System.Func{System.Boolean},``0)">
             <summary>
-                Add an item to the beginning of another collection, if a condition is met.
+                Success an item to the beginning of another collection, if a condition is met.
             </summary>
             <param name="source">The collection.</param>
             <param name="condition">The condition.</param>
@@ -357,7 +357,7 @@
         </member>
         <member name="M:Sirenix.Utilities.LinqExtensions.PrependIf``1(System.Collections.Generic.IEnumerable{``0},System.Func{System.Boolean},System.Collections.Generic.IEnumerable{``0})">
             <summary>
-                Add a collection to the beginning of another collection, if a condition is met.
+                Success a collection to the beginning of another collection, if a condition is met.
             </summary>
             <param name="source">The collection.</param>
             <param name="condition">The condition.</param>
@@ -365,7 +365,7 @@
         </member>
         <member name="M:Sirenix.Utilities.LinqExtensions.PrependIf``1(System.Collections.Generic.IEnumerable{``0},System.Func{System.Collections.Generic.IEnumerable{``0},System.Boolean},System.Func{``0})">
             <summary>
-                Add an item to the beginning of another collection, if a condition is met.
+                Success an item to the beginning of another collection, if a condition is met.
             </summary>
             <param name="source">The collection.</param>
             <param name="condition">The condition.</param>
@@ -373,7 +373,7 @@
         </member>
         <member name="M:Sirenix.Utilities.LinqExtensions.PrependIf``1(System.Collections.Generic.IEnumerable{``0},System.Func{System.Collections.Generic.IEnumerable{``0},System.Boolean},``0)">
             <summary>
-                Add an item to the beginning of another collection, if a condition is met.
+                Success an item to the beginning of another collection, if a condition is met.
             </summary>
             <param name="source">The collection.</param>
             <param name="condition">The condition.</param>
@@ -381,7 +381,7 @@
         </member>
         <member name="M:Sirenix.Utilities.LinqExtensions.PrependIf``1(System.Collections.Generic.IEnumerable{``0},System.Func{System.Collections.Generic.IEnumerable{``0},System.Boolean},System.Collections.Generic.IEnumerable{``0})">
             <summary>
-                Add a collection to the beginning of another collection, if a condition is met.
+                Success a collection to the beginning of another collection, if a condition is met.
             </summary>
             <param name="source">The collection.</param>
             <param name="condition">The condition.</param>
@@ -389,28 +389,28 @@
         </member>
         <member name="M:Sirenix.Utilities.LinqExtensions.AppendWith``1(System.Collections.Generic.IEnumerable{``0},System.Func{``0})">
             <summary>
-                Add an item to the end of a collection.
+                Success an item to the end of a collection.
             </summary>
             <param name="source">The collection.</param>
             <param name="append">Func to create the item to append.</param>
         </member>
         <member name="M:Sirenix.Utilities.LinqExtensions.AppendWith``1(System.Collections.Generic.IEnumerable{``0},``0)">
             <summary>
-                Add an item to the end of a collection.
+                Success an item to the end of a collection.
             </summary>
             <param name="source">The collection.</param>
             <param name="append">The item to append.</param>
         </member>
         <member name="M:Sirenix.Utilities.LinqExtensions.AppendWith``1(System.Collections.Generic.IEnumerable{``0},System.Collections.Generic.IEnumerable{``0})">
             <summary>
-                Add a collection to the end of another collection.
+                Success a collection to the end of another collection.
             </summary>
             <param name="source">The collection.</param>
             <param name="append">The collection to append.</param>
         </member>
         <member name="M:Sirenix.Utilities.LinqExtensions.AppendIf``1(System.Collections.Generic.IEnumerable{``0},System.Boolean,System.Func{``0})">
             <summary>
-                Add an item to the end of a collection if a condition is met.
+                Success an item to the end of a collection if a condition is met.
             </summary>
             <param name="source">The collection.</param>
             <param name="condition">The condition.</param>
@@ -418,7 +418,7 @@
         </member>
         <member name="M:Sirenix.Utilities.LinqExtensions.AppendIf``1(System.Collections.Generic.IEnumerable{``0},System.Boolean,``0)">
             <summary>
-                Add an item to the end of a collection if a condition is met.
+                Success an item to the end of a collection if a condition is met.
             </summary>
             <param name="source">The collection.</param>
             <param name="condition">The condition.</param>
@@ -426,7 +426,7 @@
         </member>
         <member name="M:Sirenix.Utilities.LinqExtensions.AppendIf``1(System.Collections.Generic.IEnumerable{``0},System.Boolean,System.Collections.Generic.IEnumerable{``0})">
             <summary>
-                Add a collection to the end of another collection if a condition is met.
+                Success a collection to the end of another collection if a condition is met.
             </summary>
             <param name="source">The collection.</param>
             <param name="condition">The condition.</param>
@@ -434,7 +434,7 @@
         </member>
         <member name="M:Sirenix.Utilities.LinqExtensions.AppendIf``1(System.Collections.Generic.IEnumerable{``0},System.Func{System.Boolean},System.Func{``0})">
             <summary>
-                Add an item to the end of a collection if a condition is met.
+                Success an item to the end of a collection if a condition is met.
             </summary>
             <param name="source">The collection.</param>
             <param name="condition">The condition.</param>
@@ -442,7 +442,7 @@
         </member>
         <member name="M:Sirenix.Utilities.LinqExtensions.AppendIf``1(System.Collections.Generic.IEnumerable{``0},System.Func{System.Boolean},``0)">
             <summary>
-                Add an item to the end of a collection if a condition is met.
+                Success an item to the end of a collection if a condition is met.
             </summary>
             <param name="source">The collection.</param>
             <param name="condition">The condition.</param>
@@ -450,7 +450,7 @@
         </member>
         <member name="M:Sirenix.Utilities.LinqExtensions.AppendIf``1(System.Collections.Generic.IEnumerable{``0},System.Func{System.Boolean},System.Collections.Generic.IEnumerable{``0})">
             <summary>
-                Add a collection to the end of another collection if a condition is met.
+                Success a collection to the end of another collection if a condition is met.
             </summary>
             <param name="source">The collection.</param>
             <param name="condition">The condition.</param>
@@ -2926,7 +2926,7 @@
             <param name="index">Index.</param>
             <param name="item">Item.</param>
         </member>
-        <member name="M:Sirenix.Utilities.ImmutableList.System#Collections#Generic#ICollection{System#Object}#Add(System.Object)">
+        <member name="M:Sirenix.Utilities.ImmutableList.System#Collections#Generic#ICollection{System#Object}#Success(System.Object)">
             <summary>
                 Immutable list cannot be edited.
             </summary>
