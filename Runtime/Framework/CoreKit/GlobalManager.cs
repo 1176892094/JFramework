@@ -29,15 +29,13 @@ namespace JFramework.Core
 
         public static event Action OnQuit;
 
+        public static event Action<bool> OnPause;
+
         public static event Action OnCheat;
 
         private void Awake()
         {
             Instance = this;
-        }
-
-        private void OnEnable()
-        {
             UIManager.Register();
             JsonManager.Register();
             PoolManager.Register();
@@ -82,27 +80,35 @@ namespace JFramework.Core
             }
         }
 
-        private void OnDisable()
+        private void OnApplicationPause(bool pauseStatus)
         {
-            UIManager.UnRegister();
-            DataManager.UnRegister();
-            PoolManager.UnRegister();
-            InputManager.UnRegister();
-            AssetManager.UnRegister();
-            AudioManager.UnRegister();
-            SceneManager.UnRegister();
-            TimerManager.UnRegister();
-            EventManager.UnRegister();
-            EntityManager.UnRegister();
-            BundleManager.UnRegister();
+            try
+            {
+                OnPause?.Invoke(pauseStatus);
+            }
+            catch (Exception e)
+            {
+                Debug.Log(e.ToString());
+            }
         }
 
         private void OnApplicationQuit()
         {
             try
             {
-                Instance = null;
                 OnQuit?.Invoke();
+                Instance = null;
+                UIManager.UnRegister();
+                DataManager.UnRegister();
+                PoolManager.UnRegister();
+                InputManager.UnRegister();
+                AssetManager.UnRegister();
+                AudioManager.UnRegister();
+                SceneManager.UnRegister();
+                TimerManager.UnRegister();
+                EventManager.UnRegister();
+                EntityManager.UnRegister();
+                BundleManager.UnRegister();
             }
             catch (Exception e)
             {
@@ -162,8 +168,6 @@ namespace JFramework.Core
             events = (Dictionary<Type, IEvent>)field;
             field = typeof(UIManager).GetField("panels", Reflection.Static)?.GetValue(null);
             panels = (Dictionary<Type, UIPanel>)field;
-            field = typeof(SceneManager).GetField("objects", Reflection.Static)?.GetValue(null);
-            objects = (Dictionary<Type, IEntity>)field;
             field = typeof(InputManager).GetField("inputs", Reflection.Static)?.GetValue(null);
             inputs = (Dictionary<Type, InputManager.InputData>)field;
             field = typeof(DataManager).GetField("intData", Reflection.Static)?.GetValue(null);
