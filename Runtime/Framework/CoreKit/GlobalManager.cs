@@ -26,10 +26,10 @@ namespace JFramework.Core
         public static event Action OnUpdate;
 
         public static event Action OnFixedUpdate;
+        
+        public static event Action<bool> OnPause;
 
         public static event Action OnQuit;
-
-        public static event Action<bool> OnPause;
 
         public static event Action OnCheat;
 
