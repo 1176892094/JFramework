@@ -47,6 +47,8 @@ namespace JFramework
     [Serializable]
     public abstract class UIPanel : MonoBehaviour, IEntity
     {
+        public Type group;
+        
         public UILayer layer = UILayer.Normal;
 
         public UIState state = UIState.Common;

@@ -143,6 +143,7 @@ namespace JFramework.Core
         [ShowInInspector] private static Dictionary<Type, IPool> streams = new();
         [ShowInInspector] private static Dictionary<Type, IEvent> events = new();
         [ShowInInspector] private static Dictionary<Type, UIPanel> panels = new();
+        [ShowInInspector] private static Dictionary<Type, List<UIPanel>> groups = new();
         [ShowInInspector] private static Dictionary<Type, IEntity> objects = new();
         [ShowInInspector] private static Dictionary<Type, InputManager.InputData> inputs = new();
         [ShowInInspector] private static Dictionary<Type, Dictionary<int, IData>> intData = new();
@@ -168,6 +169,8 @@ namespace JFramework.Core
             events = (Dictionary<Type, IEvent>)field;
             field = typeof(UIManager).GetField("panels", Reflection.Static)?.GetValue(null);
             panels = (Dictionary<Type, UIPanel>)field;
+            field = typeof(UIManager).GetField("groups", Reflection.Static)?.GetValue(null);
+            groups = (Dictionary<Type, List<UIPanel>>)field;
             field = typeof(InputManager).GetField("inputs", Reflection.Static)?.GetValue(null);
             inputs = (Dictionary<Type, InputManager.InputData>)field;
             field = typeof(DataManager).GetField("intData", Reflection.Static)?.GetValue(null);

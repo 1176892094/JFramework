@@ -20,10 +20,10 @@ namespace JFramework.Core
     public static partial class UIManager
     {
         public static Canvas canvas { get; private set; }
-        public static readonly Dictionary<Type, string> prefabs = new();
         private static readonly Dictionary<Type, UIPanel> panels = new();
-        private static readonly Dictionary<UILayer, Transform> layers = new();
+        private static readonly Dictionary<Type, List<UIPanel>> groups = new();
         private static readonly Dictionary<Type, Task<UIPanel>> requests = new();
+        private static readonly Dictionary<UILayer, Transform> layers = new();
 
         internal static void Register()
         {
@@ -56,15 +56,14 @@ namespace JFramework.Core
 
         private static async Task<UIPanel> LoadAsync(Type type)
         {
-            var path = prefabs.TryGetValue(type, out var prefab) ? prefab : type.Name;
-            var obj = await AssetManager.Load<GameObject>(SettingManager.GetUIPath(path));
+            var obj = await AssetManager.Load<GameObject>(SettingManager.GetUIPath(type.Name));
             var panel = obj.GetComponent<UIPanel>() ?? (UIPanel)obj.AddComponent(type);
             panel.transform.SetParent(layers[panel.layer], false);
             panels.Add(type, panel);
             return panel;
         }
 
-        public static void Add<T>(T panel) where T : UIPanel
+        public static void AddPanel<T>(T panel) where T : UIPanel
         {
             if (!panels.ContainsKey(typeof(T)))
             {
@@ -72,7 +71,7 @@ namespace JFramework.Core
             }
         }
 
-        public static void Remove<T>(T panel) where T : UIPanel
+        public static void RemovePanel<T>(T panel) where T : UIPanel
         {
             if (panels.Remove(typeof(T)))
             {
@@ -106,6 +105,86 @@ namespace JFramework.Core
             canvas = null;
             panels.Clear();
             layers.Clear();
+            groups.Clear();
+        }
+    }
+
+    public static partial class UIManager
+    {
+        public static void AddGroup<TGroup>(UIPanel panel)
+        {
+            if (!groups.TryGetValue(typeof(TGroup), out var group))
+            {
+                group = new List<UIPanel>();
+                groups.Add(typeof(TGroup), group);
+            }
+
+            if (!group.Contains(panel))
+            {
+                panel.group = typeof(TGroup);
+                group.Add(panel);
+            }
+        }
+
+        public static void RemoveGroup<TGroup>(UIPanel panel)
+        {
+            if (!groups.TryGetValue(typeof(TGroup), out var group))
+            {
+                return;
+            }
+
+            if (group.Contains(panel))
+            {
+                panel.group = null;
+                group.Remove(panel);
+            }
+        }
+        
+        public static void ShowGroup<TGroup>()
+        {
+            if (groups.TryGetValue(typeof(TGroup), out var group))
+            {
+                foreach (var target in group)
+                {
+                    if (!target.gameObject.activeInHierarchy)
+                    {
+                        target.Show();
+                    }
+                }
+            }
+        }
+
+        public static void HideGroup<TGroup>()
+        {
+            if (groups.TryGetValue(typeof(TGroup), out var group))
+            {
+                foreach (var target in group)
+                {
+                    if (target.gameObject.activeInHierarchy)
+                    {
+                        target.Hide();
+                    }
+                }
+            }
+        }
+
+        private static void ShowInGroup(UIPanel panel)
+        {
+            if (panel.group != null)
+            {
+                if (groups.TryGetValue(panel.group, out var group))
+                {
+                    foreach (var target in group.Where(target => target != panel))
+                    {
+                        if (target.gameObject.activeInHierarchy)
+                        {
+                            target.Hide();
+                        }
+                    }
+                }
+            }
+
+            panel.Show();
         }
     }
 
@@ -119,7 +198,7 @@ namespace JFramework.Core
                 panel = await Load(typeof(TPanel));
             }
 
-            panel.Show();
+            ShowInGroup(panel);
         }
 
         public static async void Show<TPanel>(Action action) where TPanel : UIPanel
@@ -130,7 +209,7 @@ namespace JFramework.Core
                 panel = await Load(typeof(TPanel));
             }
 
-            panel.Show();
+            ShowInGroup(panel);
             action?.Invoke();
         }
 
@@ -142,7 +221,7 @@ namespace JFramework.Core
                 panel = await Load(typeof(TPanel));
             }
 
-            panel.Show();
+            ShowInGroup(panel);
             action?.Invoke((TPanel)panel);
         }
 
@@ -166,66 +245,6 @@ namespace JFramework.Core
         public static bool IsActive<TPanel>() where TPanel : UIPanel
         {
             return panels.TryGetValue(typeof(TPanel), out var panel) && panel.gameObject.activeInHierarchy;
-        }
-    }
-
-    public static partial class UIManager
-    {
-        public static async void Show(Type type)
-        {
-            if (!GlobalManager.Instance) return;
-            if (!panels.TryGetValue(type, out var panel))
-            {
-                panel = await Load(type);
-            }
-
-            panel.Show();
-        }
-
-        public static async void Show(Type type, Action action)
-        {
-            if (!GlobalManager.Instance) return;
-            if (!panels.TryGetValue(type, out var panel))
-            {
-                panel = await Load(type);
-            }
-
-            panel.Show();
-            action?.Invoke();
-        }
-
-        public static async void Show(Type type, Action<UIPanel> action)
-        {
-            if (!GlobalManager.Instance) return;
-            if (!panels.TryGetValue(type, out var panel))
-            {
-                panel = await Load(type);
-            }
-
-            panel.Show();
-            action?.Invoke(panel);
-        }
-
-        public static void Hide(Type type)
-        {
-            if (!GlobalManager.Instance) return;
-            if (panels.TryGetValue(type, out var panel))
-            {
-                if (panel.gameObject.activeInHierarchy)
-                {
-                    panel.Hide();
-                }
-            }
-        }
-
-        public static UIPanel Get(Type type)
-        {
-            return panels.GetValueOrDefault(type);
-        }
-
-        public static bool IsActive(Type type)
-        {
-            return panels.TryGetValue(type, out var panel) && panel.gameObject.activeInHierarchy;
         }
     }
 }
