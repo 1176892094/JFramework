@@ -45,11 +45,7 @@ namespace JFramework
 
         public static string clientInfoName => Instance.assetInfo + ".json";
 
-        private static string remoteInfoName => Instance.assetInfo + "_TMP.json";
-
         public static string clientInfoPath => GetPersistentPath(clientInfoName);
-
-        public static string remoteInfoPath => GetPersistentPath(remoteInfoName);
 
         public static string streamingInfoPath => GetStreamingPath(clientInfoName);
 

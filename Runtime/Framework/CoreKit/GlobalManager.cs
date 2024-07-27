@@ -142,7 +142,7 @@ namespace JFramework.Core
         [ShowInInspector] private static Dictionary<string, IPool<GameObject>> pools = new();
         [ShowInInspector] private static Dictionary<Type, IPool> streams = new();
         [ShowInInspector] private static Dictionary<Type, IEvent> events = new();
-        [ShowInInspector] private static Dictionary<Type, UIPanel> panels = new();
+        [ShowInInspector] private static Dictionary<string, UIPanel> panels = new();
         [ShowInInspector] private static Dictionary<Type, List<UIPanel>> groups = new();
         [ShowInInspector] private static Dictionary<Type, IEntity> objects = new();
         [ShowInInspector] private static Dictionary<Type, InputManager.InputData> inputs = new();
@@ -168,7 +168,7 @@ namespace JFramework.Core
             field = typeof(EventManager).GetField("events", Reflection.Static)?.GetValue(null);
             events = (Dictionary<Type, IEvent>)field;
             field = typeof(UIManager).GetField("panels", Reflection.Static)?.GetValue(null);
-            panels = (Dictionary<Type, UIPanel>)field;
+            panels = (Dictionary<string, UIPanel>)field;
             field = typeof(UIManager).GetField("groups", Reflection.Static)?.GetValue(null);
             groups = (Dictionary<Type, List<UIPanel>>)field;
             field = typeof(InputManager).GetField("inputs", Reflection.Static)?.GetValue(null);

@@ -20,7 +20,8 @@ namespace JFramework.Core
     public static partial class UIManager
     {
         public static Canvas canvas { get; private set; }
-        private static readonly Dictionary<Type, UIPanel> panels = new();
+        private static readonly Dictionary<string, string> paths = new();
+        private static readonly Dictionary<string, UIPanel> panels = new();
         private static readonly Dictionary<Type, List<UIPanel>> groups = new();
         private static readonly Dictionary<Type, Task<UIPanel>> requests = new();
         private static readonly Dictionary<UILayer, Transform> layers = new();
@@ -56,24 +57,36 @@ namespace JFramework.Core
 
         private static async Task<UIPanel> LoadAsync(Type type)
         {
-            var obj = await AssetManager.Load<GameObject>(SettingManager.GetUIPath(type.Name));
+            if (!paths.TryGetValue(type.Name, out var path))
+            {
+                path = SettingManager.GetUIPath(type.Name);
+            }
+
+            var obj = await AssetManager.Load<GameObject>(path);
             var panel = obj.GetComponent<UIPanel>() ?? (UIPanel)obj.AddComponent(type);
             panel.transform.SetParent(layers[panel.layer], false);
-            panels.Add(type, panel);
+            panels.Add(type.Name, panel);
             return panel;
+        }
+
+        public static async void LoadPath(string path)
+        {
+            var asset = await AssetManager.Load<TextAsset>(path);
+            var copies = JsonManager.Reader<List<UIData>>(asset.text);
+            foreach (var data in copies)
+            {
+                paths.Add(data.name, data.path);
+            }
         }
 
         public static void AddPanel<T>(T panel) where T : UIPanel
         {
-            if (!panels.ContainsKey(typeof(T)))
-            {
-                panels.Add(typeof(T), panel);
-            }
+            panels.TryAdd(typeof(T).Name, panel);
         }
 
         public static void RemovePanel<T>(T panel) where T : UIPanel
         {
-            if (panels.Remove(typeof(T)))
+            if (panels.Remove(typeof(T).Name))
             {
                 Object.Destroy(panel.gameObject);
             }
@@ -139,7 +152,7 @@ namespace JFramework.Core
                 group.Remove(panel);
             }
         }
-        
+
         public static void ShowGroup<TGroup>()
         {
             if (groups.TryGetValue(typeof(TGroup), out var group))
@@ -193,7 +206,7 @@ namespace JFramework.Core
         public static async void Show<TPanel>() where TPanel : UIPanel
         {
             if (!GlobalManager.Instance) return;
-            if (!panels.TryGetValue(typeof(TPanel), out var panel))
+            if (!panels.TryGetValue(typeof(TPanel).Name, out var panel))
             {
                 panel = await Load(typeof(TPanel));
             }
@@ -204,7 +217,7 @@ namespace JFramework.Core
         public static async void Show<TPanel>(Action action) where TPanel : UIPanel
         {
             if (!GlobalManager.Instance) return;
-            if (!panels.TryGetValue(typeof(TPanel), out var panel))
+            if (!panels.TryGetValue(typeof(TPanel).Name, out var panel))
             {
                 panel = await Load(typeof(TPanel));
             }
@@ -216,7 +229,7 @@ namespace JFramework.Core
         public static async void Show<TPanel>(Action<TPanel> action) where TPanel : UIPanel
         {
             if (!GlobalManager.Instance) return;
-            if (!panels.TryGetValue(typeof(TPanel), out var panel))
+            if (!panels.TryGetValue(typeof(TPanel).Name, out var panel))
             {
                 panel = await Load(typeof(TPanel));
             }
@@ -228,7 +241,7 @@ namespace JFramework.Core
         public static void Hide<TPanel>() where TPanel : UIPanel
         {
             if (!GlobalManager.Instance) return;
-            if (panels.TryGetValue(typeof(TPanel), out var panel))
+            if (panels.TryGetValue(typeof(TPanel).Name, out var panel))
             {
                 if (panel.gameObject.activeInHierarchy)
                 {
@@ -239,12 +252,25 @@ namespace JFramework.Core
 
         public static TPanel Get<TPanel>() where TPanel : UIPanel
         {
-            return (TPanel)panels.GetValueOrDefault(typeof(TPanel));
+            return (TPanel)panels.GetValueOrDefault(typeof(TPanel).Name);
         }
 
         public static bool IsActive<TPanel>() where TPanel : UIPanel
         {
-            return panels.TryGetValue(typeof(TPanel), out var panel) && panel.gameObject.activeInHierarchy;
+            return panels.TryGetValue(typeof(TPanel).Name, out var panel) && panel.gameObject.activeInHierarchy;
+        }
+
+        [Serializable]
+        private struct UIData
+        {
+            public string name;
+            public string path;
+
+            public UIData(string name, string path)
+            {
+                this.name = name;
+                this.path = path;
+            }
         }
     }
 }
