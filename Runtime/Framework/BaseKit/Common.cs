@@ -165,7 +165,7 @@ namespace JFramework
     }
 
     [Serializable]
-    public class UIScroll<TItem, TGrid> where TGrid : IGrid<TItem> where TItem : new()
+    public class UIScroll<TItem, TGrid> where TGrid : Component, IGrid<TItem> where TItem : new()
     {
         private readonly Dictionary<int, TGrid> grids = new Dictionary<int, TGrid>();
         private int oldMinIndex = -1;
@@ -246,7 +246,7 @@ namespace JFramework
                     }
                 }
             }
-            
+
             oldMinIndex = minIndex;
             oldMaxIndex = maxIndex;
             for (int i = minIndex; i <= maxIndex; ++i)
@@ -258,11 +258,12 @@ namespace JFramework
                 var x = i % column * width + width / 2;
                 var y = -(i / column) * height - height / 2;
                 obj.transform.localPosition = new Vector3(x, y, 0);
-                if (obj.TryGetComponent(out TGrid grid))
+                if (!obj.TryGetComponent(out TGrid grid))
                 {
-                    grid.SetItem(items[i]);
+                    grid = obj.AddComponent<TGrid>();
                 }
 
+                grid.SetItem(items[i]);
                 if (grids.ContainsKey(i))
                 {
                     grids[i] = grid;

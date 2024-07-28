@@ -66,6 +66,7 @@ namespace JFramework.Core
             var panel = obj.GetComponent<UIPanel>() ?? (UIPanel)obj.AddComponent(type);
             panel.transform.SetParent(layers[panel.layer], false);
             panels.Add(type.Name, panel);
+            panel.name = type.Name;
             return panel;
         }
 
@@ -116,6 +117,7 @@ namespace JFramework.Core
         internal static void UnRegister()
         {
             canvas = null;
+            paths.Clear();
             panels.Clear();
             layers.Clear();
             groups.Clear();
