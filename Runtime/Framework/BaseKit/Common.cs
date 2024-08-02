@@ -48,7 +48,7 @@ namespace JFramework
     public abstract class UIPanel : MonoBehaviour, IEntity
     {
         public Type group;
-        
+
         public UILayer layer = UILayer.Normal;
 
         public UIState state = UIState.Common;
@@ -85,6 +85,18 @@ namespace JFramework
         {
             attributes.TryAdd(key, 0);
             attributes[key] = value;
+        }
+
+        public void Add(T2 key, float value)
+        {
+            attributes.TryAdd(key, 0);
+            attributes[key] += value;
+        }
+        
+        public void Sub(T2 key, float value)
+        {
+            attributes.TryAdd(key, 0);
+            attributes[key] -= value;
         }
 
         protected virtual void OnDestroy()
