@@ -11,7 +11,6 @@
 using System;
 using JFramework.Core;
 using System.Collections.Generic;
-using System.Linq;
 using JFramework.Interface;
 using Sirenix.OdinInspector;
 using UnityEngine;
@@ -92,7 +91,7 @@ namespace JFramework
             attributes.TryAdd(key, 0);
             attributes[key] += value;
         }
-        
+
         public void Sub(T2 key, float value)
         {
             attributes.TryAdd(key, 0);
@@ -189,7 +188,6 @@ namespace JFramework
         private string prefab;
         private List<TItem> items;
         private RectTransform content;
-        public event Action<List<TGrid>> OnUpdate;
 
         public UIScroll(float width, float height, int row, int column, string prefab, RectTransform content)
         {
@@ -223,7 +221,7 @@ namespace JFramework
             content.sizeDelta = new Vector2(0, Mathf.CeilToInt((float)items.Count / column) * height + 1);
         }
 
-        public async void Update()
+        public void Update()
         {
             if (items == null) return;
             var position = content.anchoredPosition;
@@ -263,31 +261,27 @@ namespace JFramework
             oldMaxIndex = maxIndex;
             for (int i = minIndex; i <= maxIndex; ++i)
             {
-                if (!grids.TryAdd(i, default)) continue;
-                var obj = await PoolManager.Pop(prefab);
-                obj.transform.SetParent(content);
-                obj.transform.localScale = Vector3.one;
-                var x = i % column * width + width / 2;
-                var y = -(i / column) * height - height / 2;
-                obj.transform.localPosition = new Vector3(x, y, 0);
-                if (!obj.TryGetComponent(out TGrid grid))
+                if (grids.TryAdd(i, default))
                 {
-                    grid = obj.AddComponent<TGrid>();
-                }
+                    var index = i;
+                    PoolManager.Pop(prefab, obj =>
+                    {
+                        obj.transform.SetParent(content);
+                        obj.transform.localScale = Vector3.one;
+                        var x = index % column * width + width / 2;
+                        var y = -(index / column) * height - height / 2;
+                        obj.transform.localPosition = new Vector3(x, y, 0);
+                        var grid = obj.GetComponent<TGrid>() ?? obj.AddComponent<TGrid>();
+                        if (!grids.ContainsKey(index))
+                        {
+                            grid.Dispose();
+                            PoolManager.Push(obj);
+                            return;
+                        }
 
-                grid.SetItem(items[i]);
-                if (grids.ContainsKey(i))
-                {
-                    grids[i] = grid;
-                }
-                else
-                {
-                    PoolManager.Push(obj);
-                }
-
-                if (i == maxIndex)
-                {
-                    OnUpdate?.Invoke(grids.Values.ToList());
+                        grids[index] = grid;
+                        grid.SetItem(items[index]);
+                    });
                 }
             }
         }
