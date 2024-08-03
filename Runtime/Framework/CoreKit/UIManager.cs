@@ -80,19 +80,6 @@ namespace JFramework.Core
             }
         }
 
-        public static void AddPanel<T>(T panel) where T : UIPanel
-        {
-            panels.TryAdd(typeof(T).Name, panel);
-        }
-
-        public static void RemovePanel<T>(T panel) where T : UIPanel
-        {
-            if (panels.Remove(typeof(T).Name))
-            {
-                Object.Destroy(panel.gameObject);
-            }
-        }
-
         public static Transform Layer(UILayer layer)
         {
             return layers.GetValueOrDefault(layer);
@@ -152,20 +139,6 @@ namespace JFramework.Core
             {
                 panel.group = null;
                 group.Remove(panel);
-            }
-        }
-
-        public static void ShowGroup<TGroup>()
-        {
-            if (groups.TryGetValue(typeof(TGroup), out var group))
-            {
-                foreach (var target in group)
-                {
-                    if (!target.gameObject.activeInHierarchy)
-                    {
-                        target.Show();
-                    }
-                }
             }
         }
 
