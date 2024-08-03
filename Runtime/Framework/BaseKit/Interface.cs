@@ -10,6 +10,7 @@
 
 using System;
 using UnityEngine;
+using Object = UnityEngine.Object;
 
 namespace JFramework.Interface
 {
@@ -23,6 +24,17 @@ namespace JFramework.Interface
     public interface IComponent
     {
         void OnAwake(IEntity owner);
+    }
+
+    public interface IDontDestroy
+    {
+        void DontDestroy(GameObject obj)
+        {
+            if (Application.isPlaying)
+            {
+                Object.DontDestroyOnLoad(obj);
+            }
+        }
     }
 
     public interface IState

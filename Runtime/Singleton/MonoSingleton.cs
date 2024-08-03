@@ -9,11 +9,12 @@
 // *********************************************************************************
 
 using JFramework.Core;
+using JFramework.Interface;
 using UnityEngine;
 
 namespace JFramework
 {
-    public abstract class SceneSingleton<T> : MonoBehaviour where T : SceneSingleton<T>
+    public abstract class MonoSingleton<T> : MonoBehaviour where T : MonoSingleton<T>
     {
         private static readonly object locked = typeof(T);
 
@@ -44,6 +45,11 @@ namespace JFramework
         {
             if (instance == null)
             {
+                if (this is IDontDestroy singleton)
+                {
+                    singleton.DontDestroy(gameObject);
+                }
+
                 instance = (T)this;
             }
             else if (instance != this)
