@@ -33,12 +33,6 @@ public abstract class EditorSingleton<T> : ScriptableObject where T : EditorSing
                 return instance;
             }
 
-            instance = Resources.Load<T>(fileName);
-            if (instance != null)
-            {
-                return instance;
-            }
-
             instance = AssetDatabase.LoadAssetAtPath<T>(filePath);
             if (instance != null)
             {
