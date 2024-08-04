@@ -16,7 +16,7 @@ using Unity.Collections.LowLevel.Unsafe;
 
 namespace JFramework
 {
-    internal static class Extension
+    public static partial class Extensions
     {
         private static readonly Dictionary<Type, Delegate> writers = new Dictionary<Type, Delegate>()
         {
@@ -38,7 +38,7 @@ namespace JFramework
             { typeof(bool), new Func<byte[], bool>(ReadBool) },
         };
 
-        public static byte[] Write<T>(this T value)
+        internal static byte[] Write<T>(this T value)
         {
             if (writers.TryGetValue(typeof(T), out var func))
             {
@@ -48,7 +48,7 @@ namespace JFramework
             return default;
         }
 
-        public static T Read<T>(this byte[] bytes)
+        internal static T Read<T>(this byte[] bytes)
         {
             if (readers.TryGetValue(typeof(T), out var func))
             {
@@ -59,7 +59,7 @@ namespace JFramework
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static unsafe byte[] Serialize<T>(T value) where T : unmanaged
+        private static unsafe byte[] Serialize<T>(T value) where T : unmanaged
         {
             var data = new byte[sizeof(T)];
             fixed (byte* ptr = &data[0])
@@ -76,7 +76,7 @@ namespace JFramework
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static unsafe T Deserialize<T>(byte[] data) where T : unmanaged
+        private static unsafe T Deserialize<T>(byte[] data) where T : unmanaged
         {
             T value;
             fixed (byte* ptr = &data[0])
@@ -93,22 +93,22 @@ namespace JFramework
             return value;
         }
 
-        public static byte[] WriteBool(bool value)
+        private static byte[] WriteBool(bool value)
         {
             return Serialize((byte)(value ? 1 : 0));
         }
 
-        public static bool ReadBool(byte[] value)
+        private static bool ReadBool(byte[] value)
         {
             return Deserialize<byte>(value) != 0;
         }
 
-        public static byte[] WriteString(string value)
+        private static byte[] WriteString(string value)
         {
             return value == null ? Array.Empty<byte>() : Encoding.UTF8.GetBytes(value);
         }
 
-        public static string ReadString(this byte[] value)
+        private static string ReadString(this byte[] value)
         {
             return value.Length == 0 ? null : Encoding.UTF8.GetString(value);
         }
