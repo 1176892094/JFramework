@@ -38,7 +38,7 @@ namespace JFramework
                 }
 
                 var value = target.Read<T>();
-                if (origin != null && !origin.Equals(value))
+                if (!origin.Equals(value))
                 {
                     GlobalManager.Cheat();
                 }
@@ -47,8 +47,8 @@ namespace JFramework
             }
             set
             {
-                origin = value;
-                buffer = origin.Write();
+                buffer = value.Write();
+                origin = buffer.Read<T>();
                 offset = Random.Range(1, byte.MaxValue);
                 for (int i = 0; i < buffer.Length; i++)
                 {
@@ -77,7 +77,7 @@ namespace JFramework
 
         public override string ToString()
         {
-            return origin != null ? Value.ToString() : "Null";
+            return Value.ToString();
         }
     }
 

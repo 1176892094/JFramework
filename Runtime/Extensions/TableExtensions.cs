@@ -161,7 +161,13 @@ namespace JFramework
         {
             if (!typeof(T).IsArray)
             {
-                return (T)InputGeneric(reason, typeof(T));
+                var result = InputGeneric(reason, typeof(T));
+                if (result != null)
+                {
+                    return (T)result;
+                }
+
+                return default;
             }
 
             if (!string.IsNullOrEmpty(reason))

@@ -105,12 +105,12 @@ namespace JFramework
 
         private static byte[] WriteString(string value)
         {
-            return value == null ? Array.Empty<byte>() : Encoding.UTF8.GetBytes(value);
+            return Encoding.UTF8.GetBytes(value ?? string.Empty);
         }
 
         private static string ReadString(this byte[] value)
         {
-            return value.Length == 0 ? null : Encoding.UTF8.GetString(value);
+            return Encoding.UTF8.GetString(value);
         }
     }
 }
