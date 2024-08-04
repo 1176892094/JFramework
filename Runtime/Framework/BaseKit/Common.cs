@@ -72,7 +72,7 @@ namespace JFramework
     [Serializable]
     public abstract class AttributeComponent<T1, T2> : Component<T1> where T1 : IEntity where T2 : Enum
     {
-        private readonly Dictionary<T2, SecretFloat> attributes = new Dictionary<T2, SecretFloat>();
+        private readonly Dictionary<T2, Variable<float>> attributes = new Dictionary<T2, Variable<float>>();
 
         public float Get(T2 key)
         {
