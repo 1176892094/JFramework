@@ -29,20 +29,19 @@ namespace JFramework
                 {
                     Value = default;
                 }
-
+                
                 var target = new byte[buffer.Length];
                 for (int i = 0; i < buffer.Length; i++)
                 {
                     target[i] = (byte)(buffer[i] - offset);
                 }
 
-                var value = target.Read<T>();
-                if (!origin.Equals(value))
+                if (!origin.Equals(target.Read<T>()))
                 {
                     GlobalManager.Cheat();
                 }
 
-                return value;
+                return origin;
             }
             set
             {
@@ -93,7 +92,7 @@ namespace JFramework
             {
                 if (offset == 0)
                 {
-                    this = new SecretInt(0);
+                    Value = 0;
                 }
 
                 var target = buffer - offset;
