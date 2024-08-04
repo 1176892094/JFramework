@@ -30,7 +30,7 @@ namespace JFramework
             { typeof(Vector3Int[]), new Func<string, Vector3Int[]>(InputVector3IntArray) },
         };
 
-        public static T Parse<T>(this SecretString reason)
+        public static T Parse<T>(this Variable<string> reason)
         {
             if (parsers.TryGetValue(typeof(T), out var func))
             {
@@ -40,17 +40,7 @@ namespace JFramework
             return reason.Value.InputGeneric<T>();
         }
 
-        public static T[] Array<T>(this SecretString reason)
-        {
-            if (parsers.TryGetValue(typeof(T[]), out var func))
-            {
-                return ((Func<string, T[]>)func).Invoke(reason.Value);
-            }
-
-            return reason.Value.InputGenericArray<T>();
-        }
-
-        public static void Input(this string reason, out SecretString result)
+        public static void Input(this string reason, out Variable<string> result)
         {
             result = reason ?? string.Empty;
         }
@@ -92,35 +82,6 @@ namespace JFramework
             var y = int.Parse(points[1]);
             var z = int.Parse(points[2]);
             return new Vector3Int(x, y, z);
-        }
-
-        public static T InputGeneric<T>(this string reason)
-        {
-            if (!string.IsNullOrEmpty(reason))
-            {
-                var type = typeof(T);
-                if (type.IsEnum)
-                {
-                    return (T)Enum.Parse(type, reason);
-                }
-
-                if (type.IsPrimitive)
-                {
-                    return (T)Convert.ChangeType(reason, type);
-                }
-
-                var obj = Activator.CreateInstance(type);
-                var fields = type.GetFields(Reflection.Instance);
-                var members = reason.Split(',');
-                for (int i = 0; i < fields.Length; i++)
-                {
-                    fields[i].SetValue(obj, new SecretString(members[i]));
-                }
-
-                return (T)obj;
-            }
-
-            return default;
         }
 
         public static string[] InputStringArray(this string reason)
@@ -178,17 +139,6 @@ namespace JFramework
             return result;
         }
 
-        public static T[] InputGenericArray<T>(this string reason)
-        {
-            var content = reason.Content(out T[] result);
-            for (int i = 0; i < content.Length; ++i)
-            {
-                result[i] = content[i].InputGeneric<T>();
-            }
-
-            return result;
-        }
-
         private static string[] Content<T>(this string reason, out T[] result)
         {
             result = default;
@@ -205,6 +155,65 @@ namespace JFramework
             }
 
             return new string[0];
+        }
+
+        public static T InputGeneric<T>(this string reason)
+        {
+            if (!typeof(T).IsArray)
+            {
+                return (T)InputGeneric(reason, typeof(T));
+            }
+
+            if (!string.IsNullOrEmpty(reason))
+            {
+                if (reason.EndsWith(';'))
+                {
+                    reason = reason[..^1];
+                }
+
+                var members = reason.Split(';');
+                var element = typeof(T).GetElementType();
+                if (element != null)
+                {
+                    var result = Array.CreateInstance(element, members.Length);
+                    for (int i = 0; i < members.Length; ++i)
+                    {
+                        result.SetValue(InputGeneric(members[i], element), i);
+                    }
+
+                    return (T)(object)result;
+                }
+            }
+
+            return default;
+        }
+
+        public static object InputGeneric(this string reason, Type type)
+        {
+            if (!string.IsNullOrEmpty(reason))
+            {
+                if (type.IsEnum)
+                {
+                    return Enum.Parse(type, reason);
+                }
+
+                if (type.IsPrimitive)
+                {
+                    return Convert.ChangeType(reason, type);
+                }
+
+                var member = reason.Split(',');
+                var result = Activator.CreateInstance(type);
+                var fields = type.GetFields(Reflection.Instance);
+                for (int i = 0; i < fields.Length; i++)
+                {
+                    fields[i].SetValue(result, new Variable<string>(member[i]));
+                }
+
+                return result;
+            }
+
+            return default;
         }
     }
 }
