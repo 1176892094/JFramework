@@ -16,17 +16,13 @@ namespace JFramework
 {
     public static partial class Extensions
     {
-        private static readonly Dictionary<Type, Delegate> parse = new Dictionary<Type, Delegate>()
+        private static readonly Dictionary<Type, Delegate> parsers = new Dictionary<Type, Delegate>()
         {
             { typeof(string), new Func<string, string>(InputString) },
             { typeof(Vector2), new Func<string, Vector2>(InputVector2) },
             { typeof(Vector3), new Func<string, Vector3>(InputVector3) },
             { typeof(Vector2Int), new Func<string, Vector2Int>(InputVector2Int) },
             { typeof(Vector3Int), new Func<string, Vector3Int>(InputVector3Int) },
-        };
-
-        private static readonly Dictionary<Type, Delegate> parseArray = new Dictionary<Type, Delegate>()
-        {
             { typeof(string[]), new Func<string, string[]>(InputStringArray) },
             { typeof(Vector2[]), new Func<string, Vector2[]>(InputVector2Array) },
             { typeof(Vector3[]), new Func<string, Vector3[]>(InputVector3Array) },
@@ -36,9 +32,9 @@ namespace JFramework
 
         public static T Parse<T>(this SecretString reason)
         {
-            if (parse.TryGetValue(typeof(T), out var func))
+            if (parsers.TryGetValue(typeof(T), out var func))
             {
-                return (T)func.DynamicInvoke(reason.Value);
+                return ((Func<string, T>)func).Invoke(reason.Value);
             }
 
             return reason.Value.InputGeneric<T>();
@@ -46,9 +42,9 @@ namespace JFramework
 
         public static T[] Array<T>(this SecretString reason)
         {
-            if (parseArray.TryGetValue(typeof(T[]), out var func))
+            if (parsers.TryGetValue(typeof(T[]), out var func))
             {
-                return (T[])func.DynamicInvoke(reason.Value);
+                return ((Func<string, T[]>)func).Invoke(reason.Value);
             }
 
             return reason.Value.InputGenericArray<T>();
@@ -181,7 +177,7 @@ namespace JFramework
 
             return result;
         }
-        
+
         public static T[] InputGenericArray<T>(this string reason)
         {
             var content = reason.Content(out T[] result);

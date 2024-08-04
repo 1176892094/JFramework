@@ -16,6 +16,72 @@ using Random = UnityEngine.Random;
 namespace JFramework
 {
     [Serializable]
+    public struct Variable<T>
+    {
+        public T origin;
+        public byte[] buffer;
+        public int offset;
+
+        public T Value
+        {
+            get
+            {
+                if (offset == 0)
+                {
+                    Value = default;
+                }
+
+                var target = new byte[buffer.Length];
+                for (int i = 0; i < buffer.Length; i++)
+                {
+                    target[i] = (byte)(buffer[i] - offset);
+                }
+
+                var value = target.Read<T>();
+                if (origin != null && !origin.Equals(value))
+                {
+                    GlobalManager.Cheat();
+                }
+
+                return value;
+            }
+            set
+            {
+                origin = value;
+                buffer = origin.Write();
+                offset = Random.Range(1, byte.MaxValue);
+                for (int i = 0; i < buffer.Length; i++)
+                {
+                    buffer[i] = (byte)(buffer[i] + offset);
+                }
+            }
+        }
+
+        public Variable(T value = default)
+        {
+            offset = 0;
+            buffer = null;
+            origin = default;
+            Value = value;
+        }
+
+        public static implicit operator T(Variable<T> secret)
+        {
+            return secret.Value;
+        }
+
+        public static implicit operator Variable<T>(T value)
+        {
+            return new Variable<T>(value);
+        }
+
+        public override string ToString()
+        {
+            return origin != null ? Value.ToString() : "Null";
+        }
+    }
+
+    [Serializable]
     public struct SecretInt
     {
         public int origin;
