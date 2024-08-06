@@ -11,6 +11,7 @@
 using JFramework.Core;
 using JFramework.Interface;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace JFramework
 {
@@ -21,57 +22,143 @@ namespace JFramework
             return TimerManager.Pop(entity.gameObject, waitTime);
         }
 
-        // public static Tween DOScaleX(this Transform transform, float endValue, float duration)
-        // {
-        //     var localScale = transform.localScale;
-        //     return TweenManager.Tween(transform.gameObject, duration).Invoke(timer =>
-        //     {
-        //         var localScaleX = Mathf.Lerp(localScale.x, endValue, timer / duration);
-        //         transform.localScale = new Vector3(localScaleX, localScale.y, localScale.z);
-        //     });
-        // }
-        //
-        // public static Tween DOScaleY(this Transform transform, float endValue, float duration)
-        // {
-        //     var localScale = transform.localScale;
-        //     return TweenManager.Tween(transform.gameObject, duration).Invoke(timer =>
-        //     {
-        //         var localScaleY = Mathf.Lerp(localScale.y, endValue, timer / duration);
-        //         transform.localScale = new Vector3(localScale.x, localScaleY, localScale.z);
-        //     });
-        // }
-        //
-        // public static Tween DOScaleZ(this Transform transform, float endValue, float duration)
-        // {
-        //     var localScale = transform.localScale;
-        //     return TweenManager.Tween(transform.gameObject, duration).Invoke(timer =>
-        //     {
-        //         var localScaleZ = Mathf.Lerp(localScale.y, endValue, timer / duration);
-        //         transform.localScale = new Vector3(localScale.x, localScale.y, localScaleZ);
-        //     });
-        // }
+        public static Tween DOScaleX(this Transform transform, float endValue, float duration)
+        {
+            var localScale = transform.localScale;
+            return TweenManager.Tween(transform.gameObject, duration).Invoke(progress =>
+            {
+                var localScaleX = Mathf.Lerp(localScale.x, endValue, progress);
+                transform.localScale = new Vector3(localScaleX, localScale.y, localScale.z);
+            });
+        }
+
+        public static Tween DOScaleY(this Transform transform, float endValue, float duration)
+        {
+            var localScale = transform.localScale;
+            return TweenManager.Tween(transform.gameObject, duration).Invoke(progress =>
+            {
+                var localScaleY = Mathf.Lerp(localScale.y, endValue, progress);
+                transform.localScale = new Vector3(localScale.x, localScaleY, localScale.z);
+            });
+        }
+
+        public static Tween DOScaleZ(this Transform transform, float endValue, float duration)
+        {
+            var localScale = transform.localScale;
+            return TweenManager.Tween(transform.gameObject, duration).Invoke(progress =>
+            {
+                var localScaleZ = Mathf.Lerp(localScale.y, endValue, progress);
+                transform.localScale = new Vector3(localScale.x, localScale.y, localScaleZ);
+            });
+        }
 
         public static Tween DOScale(this Transform transform, Vector3 endValue, float duration)
         {
             var localScale = transform.localScale;
-            return TweenManager.Tween(transform.gameObject, duration).Invoke(timer =>
+            return TweenManager.Tween(transform.gameObject, duration).Invoke(progress =>
             {
-                var localScaleX = Mathf.Lerp(localScale.x, endValue.x, timer / duration);
-                var localScaleY = Mathf.Lerp(localScale.y, endValue.y, timer / duration);
-                var localScaleZ = Mathf.Lerp(localScale.y, endValue.z, timer / duration);
+                var localScaleX = Mathf.Lerp(localScale.x, endValue.x, progress);
+                var localScaleY = Mathf.Lerp(localScale.y, endValue.y, progress);
+                var localScaleZ = Mathf.Lerp(localScale.y, endValue.z, progress);
                 transform.localScale = new Vector3(localScaleX, localScaleY, localScaleZ);
             });
         }
-        
+
+        public static Tween DOMoveX(this Transform transform, float endValue, float duration)
+        {
+            var position = transform.position;
+            return TweenManager.Tween(transform.gameObject, duration).Invoke(progress =>
+            {
+                var positionX = Mathf.Lerp(position.x, endValue, progress);
+                transform.position = new Vector3(positionX, position.y, position.z);
+            });
+        }
+
+        public static Tween DOMoveY(this Transform transform, float endValue, float duration)
+        {
+            var position = transform.position;
+            return TweenManager.Tween(transform.gameObject, duration).Invoke(progress =>
+            {
+                var positionY = Mathf.Lerp(position.y, endValue, progress);
+                transform.position = new Vector3(position.x, positionY, position.z);
+            });
+        }
+
+        public static Tween DOMoveZ(this Transform transform, float endValue, float duration)
+        {
+            var position = transform.position;
+            return TweenManager.Tween(transform.gameObject, duration).Invoke(progress =>
+            {
+                var positionZ = Mathf.Lerp(position.y, endValue, progress);
+                transform.position = new Vector3(position.x, position.y, positionZ);
+            });
+        }
+
         public static Tween DOMove(this Transform transform, Vector3 endValue, float duration)
         {
             var position = transform.position;
-            return TweenManager.Tween(transform.gameObject, duration).Invoke(timer =>
+            return TweenManager.Tween(transform.gameObject, duration).Invoke(progress =>
             {
-                var positionX = Mathf.Lerp(position.x, endValue.x, timer / duration);
-                var positionY = Mathf.Lerp(position.y, endValue.y, timer / duration);
-                var positionZ = Mathf.Lerp(position.y, endValue.z, timer / duration);
+                var positionX = Mathf.Lerp(position.x, endValue.x, progress);
+                var positionY = Mathf.Lerp(position.y, endValue.y, progress);
+                var positionZ = Mathf.Lerp(position.y, endValue.z, progress);
                 transform.position = new Vector3(positionX, positionY, positionZ);
+            });
+        }
+
+        public static Tween DOColor(this SpriteRenderer component, Color endValue, float duration)
+        {
+            var color = component.color;
+            return TweenManager.Tween(component.gameObject, duration).Invoke(progress =>
+            {
+                var colorR = Mathf.Lerp(color.r, endValue.r, progress);
+                var colorG = Mathf.Lerp(color.g, endValue.g, progress);
+                var colorB = Mathf.Lerp(color.b, endValue.b, progress);
+                var colorA = Mathf.Lerp(color.a, endValue.a, progress);
+                component.color = new Color(colorR, colorG, colorB, colorA);
+            });
+        }
+
+        public static Tween DOFade(this SpriteRenderer component, float endValue, float duration)
+        {
+            var color = component.color;
+            return TweenManager.Tween(component.gameObject, duration).Invoke(progress =>
+            {
+                var colorA = Mathf.Lerp(color.a, endValue, progress);
+                component.color = new Color(color.r, color.g, color.b, colorA);
+            });
+        }
+
+        public static Tween DOColor(this Image component, Color endValue, float duration)
+        {
+            var color = component.color;
+            return TweenManager.Tween(component.gameObject, duration).Invoke(progress =>
+            {
+                var colorR = Mathf.Lerp(color.r, endValue.r, progress);
+                var colorG = Mathf.Lerp(color.g, endValue.g, progress);
+                var colorB = Mathf.Lerp(color.b, endValue.b, progress);
+                var colorA = Mathf.Lerp(color.a, endValue.a, progress);
+                component.color = new Color(colorR, colorG, colorB, colorA);
+            });
+        }
+
+        public static Tween DOFade(this Image component, float endValue, float duration)
+        {
+            var color = component.color;
+            return TweenManager.Tween(component.gameObject, duration).Invoke(progress =>
+            {
+                var colorA = Mathf.Lerp(color.a, endValue, progress);
+                component.color = new Color(color.r, color.g, color.b, colorA);
+            });
+        }
+
+        public static Tween DOFillAmount(this Image component, float endValue, float duration)
+        {
+            var fillAmount = component.fillAmount;
+            return TweenManager.Tween(component.gameObject, duration).Invoke(progress =>
+            {
+                var value = Mathf.Lerp(fillAmount, endValue, progress);
+                component.fillAmount = value;
             });
         }
     }

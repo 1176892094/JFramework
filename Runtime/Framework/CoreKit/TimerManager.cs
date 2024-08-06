@@ -11,7 +11,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using JFramework.Core;
 using UnityEngine;
 
 namespace JFramework.Core
@@ -36,20 +35,13 @@ namespace JFramework.Core
                 {
                     for (int i = runs.Count - 1; i >= 0; i--)
                     {
-                        if (!runs[i].FixedUpdate())
-                        {
-                            runs.RemoveAt(i);
-                            if (runs.Count == 0)
-                            {
-                                timers.Remove(id);
-                            }
-                        }
+                        runs[i].FixedUpdate();
                     }
                 }
             }
         }
 
-        public static Timer Pop(GameObject entity, float waitTime)
+        public static Timer Pop(GameObject entity, float duration)
         {
             if (!GlobalManager.Instance) return null;
             var id = entity.GetInstanceID();
@@ -60,9 +52,21 @@ namespace JFramework.Core
             }
 
             var timer = PoolManager.Dequeue<Timer>();
-            timer.Start(entity, waitTime);
+            timer.Start(entity, duration, Dispose);
             runs.Add(timer);
             return timer;
+
+            void Dispose()
+            {
+                timer.owner = null;
+                runs.Remove(timer);
+                if (runs.Count == 0)
+                {
+                    timers.Remove(id);
+                }
+
+                PoolManager.Enqueue(timer);
+            }
         }
 
         internal static void UnRegister()
@@ -82,8 +86,9 @@ namespace JFramework
         private bool unscale;
         private float interval;
         private float duration;
-        [SerializeField] private GameObject owner;
+        public GameObject owner;
         private event Action OnUpdate;
+        private event Action OnDispose;
         private float seconds => unscale ? Time.fixedUnscaledTime : Time.fixedTime;
 
         public Timer Invoke(Action OnUpdate)
@@ -117,33 +122,33 @@ namespace JFramework
             interval = seconds + duration;
             return this;
         }
-
+        
         public void Dispose()
         {
-            owner = null;
-            PoolManager.Enqueue(this);
+            OnDispose?.Invoke();
         }
 
-        internal void Start(GameObject owner, float duration)
+        internal void Start(GameObject owner, float duration, Action OnDispose)
         {
             count = 1;
             unscale = false;
             this.owner = owner;
             this.duration = duration;
             interval = seconds + duration;
+            this.OnDispose = OnDispose;
         }
 
-        internal bool FixedUpdate()
+        internal void FixedUpdate()
         {
             if (owner == null)
             {
                 Dispose();
-                return false;
+                return;
             }
 
             if (seconds <= interval)
             {
-                return true;
+                return;
             }
 
             interval = seconds + duration;
@@ -153,17 +158,15 @@ namespace JFramework
                 OnUpdate?.Invoke();
                 if (count != 0)
                 {
-                    return true;
+                    return;
                 }
 
                 Dispose();
-                return false;
             }
             catch (Exception e)
             {
                 Dispose();
                 Debug.Log("计时器无法执行方法：\n" + e);
-                return false;
             }
         }
     }

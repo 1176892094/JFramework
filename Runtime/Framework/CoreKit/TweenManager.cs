@@ -11,7 +11,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using JFramework.Core;
 using UnityEngine;
 
 namespace JFramework.Core
@@ -19,7 +18,7 @@ namespace JFramework.Core
     public static class TweenManager
     {
         private static readonly Dictionary<int, List<Tween>> motions = new();
-        private static readonly List<int> copies = new List<int>();
+        private static readonly List<int> copies = new();
 
         internal static void Register()
         {
@@ -36,14 +35,7 @@ namespace JFramework.Core
                 {
                     for (int i = runs.Count - 1; i >= 0; i--)
                     {
-                        if (runs[i].Update())
-                        {
-                            runs.RemoveAt(i);
-                            if (runs.Count == 0)
-                            {
-                                motions.Remove(id);
-                            }
-                        }
+                        runs[i].Update();
                     }
                 }
             }
@@ -51,6 +43,7 @@ namespace JFramework.Core
 
         public static Tween Tween(GameObject entity, float duration)
         {
+            if (!GlobalManager.Instance) return null;
             var id = entity.GetInstanceID();
             if (!motions.TryGetValue(id, out var runs))
             {
@@ -58,10 +51,22 @@ namespace JFramework.Core
                 motions.Add(id, runs);
             }
 
-            var motion = PoolManager.Dequeue<Tween>();
-            motion.Start(entity, duration);
-            runs.Add(motion);
-            return motion;
+            var tween = PoolManager.Dequeue<Tween>();
+            tween.Start(entity, duration, Dispose);
+            runs.Add(tween);
+            return tween;
+
+            void Dispose()
+            {
+                tween.owner = null;
+                runs.Remove(tween);
+                if (runs.Count == 0)
+                {
+                    motions.Remove(id);
+                }
+
+                PoolManager.Enqueue(tween);
+            }
         }
 
         internal static void UnRegister()
@@ -79,9 +84,11 @@ namespace JFramework
     {
         private float timer;
         private float duration;
+        public GameObject owner;
         private event Action OnFinish;
         private event Action<float> OnUpdate;
-        [SerializeField] private GameObject owner;
+        private event Action OnDispose;
+        private float progress => timer / duration;
 
         public Tween Invoke(Action<float> OnUpdate)
         {
@@ -94,32 +101,45 @@ namespace JFramework
             this.OnFinish = OnFinish;
         }
 
-        internal void Start(GameObject owner, float duration)
+        public void Dispose()
+        {
+            OnDispose?.Invoke();
+        }
+
+        internal void Start(GameObject owner, float duration, Action OnDispose)
         {
             timer = 0;
             OnFinish = null;
             this.owner = owner;
             this.duration = duration;
+            this.OnDispose = OnDispose;
         }
 
-        internal bool Update()
+        internal void Update()
         {
             if (owner == null)
             {
-                PoolManager.Enqueue(this);
-                return true;
+                Dispose();
+                return;
             }
 
-            timer += Time.deltaTime;
-            OnUpdate?.Invoke(timer);
-            if (timer / duration > 1)
+            try
             {
-                PoolManager.Enqueue(this);
-                OnFinish?.Invoke();
-                return true;
-            }
+                timer += Time.deltaTime;
+                OnUpdate?.Invoke(progress);
+                if (progress < 1)
+                {
+                    return;
+                }
 
-            return false;
+                OnFinish?.Invoke();
+                Dispose();
+            }
+            catch (Exception e)
+            {
+                Dispose();
+                Debug.Log("线性动画无法执行方法：\n" + e);
+            }
         }
     }
 }
