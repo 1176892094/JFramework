@@ -17,10 +17,10 @@ namespace JFramework.Core
 {
     public static class AudioManager
     {
+        private static readonly List<AudioSource> audios = new List<AudioSource>();
+        private static readonly AudioSetting setting = new AudioSetting();
         private static string sourceName;
         private static AudioSource mainSource;
-        private static readonly AudioSetting setting = new AudioSetting();
-        private static readonly Dictionary<GameObject, AudioSource> audios = new();
         public static float mainVolume => setting.mainValue;
         public static float audioVolume => setting.audioValue;
 
@@ -48,22 +48,39 @@ namespace JFramework.Core
         {
             if (!GlobalManager.Instance || name.IsEmpty()) return;
             var clip = await AssetManager.Load<AudioClip>(SettingManager.GetAudioPath(name));
-            var audio = await new AudioData().Build(clip);
-            audios.Remove(audio.entity);
-            audio.source.Play();
-            action?.Invoke(audio.source);
-            TimerManager.Pop(clip.length).Invoke(() => StopAudio(audio.entity));
+            var audio = await LoadSource(clip);
+            audios.Remove(audio);
+            audio.Play();
+            action?.Invoke(audio);
+            TimerManager.Pop(clip.length).Invoke(() => StopAudio(audio.gameObject));
         }
 
         public static async void PlayLoop(string name, Action<AudioSource> action = null)
         {
             if (!GlobalManager.Instance || name.IsEmpty()) return;
             var clip = await AssetManager.Load<AudioClip>(SettingManager.GetAudioPath(name));
-            var audio = await new AudioData().Build(clip);
-            audios.Remove(audio.entity);
-            audio.source.loop = true;
-            audio.source.Play();
-            action?.Invoke(audio.source);
+            var audio = await LoadSource(clip);
+            audios.Remove(audio);
+            audio.loop = true;
+            audio.Play();
+            action?.Invoke(audio);
+        }
+        
+        public static async Task<AudioSource> LoadSource(AudioClip clip)
+        {
+            GameObject obj;
+            if (audios.Count == 0)
+            {
+                obj = new GameObject(sourceName);
+                obj.AddComponent<AudioSource>();
+                PoolManager.Push(obj);
+            }
+
+            obj = await PoolManager.Pop(sourceName);
+            var source = obj.GetComponent<AudioSource>();
+            source.volume = audioVolume;
+            source.clip = clip;
+            return source;
         }
 
         public static void SetMain(float mainVolume)
@@ -76,7 +93,7 @@ namespace JFramework.Core
         public static void SetAudio(float audioVolume)
         {
             setting.audioValue = audioVolume;
-            foreach (var audio in audios.Values)
+            foreach (var audio in audios)
             {
                 audio.volume = audioVolume;
             }
@@ -102,7 +119,7 @@ namespace JFramework.Core
             if (obj.TryGetComponent(out AudioSource source))
             {
                 source.Stop();
-                audios.Add(obj, source);
+                audios.Add(source);
                 PoolManager.Push(obj);
             }
         }
@@ -118,29 +135,6 @@ namespace JFramework.Core
         {
             public float mainValue = 0.5f;
             public float audioValue = 0.5f;
-        }
-
-        [Serializable]
-        private struct AudioData
-        {
-            public GameObject entity;
-            public AudioSource source;
-
-            public async Task<AudioData> Build(AudioClip clip)
-            {
-                if (audios.Count == 0)
-                {
-                    entity = new GameObject(sourceName);
-                    source = entity.AddComponent<AudioSource>();
-                    PoolManager.Push(entity);
-                }
-
-                entity = await PoolManager.Pop(sourceName);
-                source = entity.GetComponent<AudioSource>();
-                source.volume = audioVolume;
-                source.clip = clip;
-                return this;
-            }
         }
     }
 }

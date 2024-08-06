@@ -144,12 +144,11 @@ namespace JFramework.Core
         [ShowInInspector] private static Dictionary<Type, IEvent> events = new();
         [ShowInInspector] private static Dictionary<string, UIPanel> panels = new();
         [ShowInInspector] private static Dictionary<Type, List<UIPanel>> groups = new();
-        [ShowInInspector] private static Dictionary<Type, IEntity> objects = new();
         [ShowInInspector] private static Dictionary<Type, InputManager.InputData> inputs = new();
         [ShowInInspector] private static Dictionary<Type, Dictionary<int, IData>> intData = new();
         [ShowInInspector] private static Dictionary<Type, Dictionary<Enum, IData>> enumData = new();
         [ShowInInspector] private static Dictionary<Type, Dictionary<string, IData>> stringData = new();
-        [ShowInInspector] private static Dictionary<GameObject, AudioSource> audios = new();
+        [ShowInInspector] private static List<AudioSource> audios = new();
         [ShowInInspector] private static List<Timer> timers = new();
         [ShowInInspector] private static float audioVolume => AudioManager.mainVolume;
         [ShowInInspector] private static float soundVolume => AudioManager.audioVolume;
@@ -180,7 +179,7 @@ namespace JFramework.Core
             field = typeof(DataManager).GetField("stringData", Reflection.Static)?.GetValue(null);
             stringData = (Dictionary<Type, Dictionary<string, IData>>)field;
             field = typeof(AudioManager).GetField("audios", Reflection.Static)?.GetValue(null);
-            audios = (Dictionary<GameObject, AudioSource>)field;
+            audios = (List<AudioSource>)field;
             field = typeof(TimerManager).GetField("timers", Reflection.Static)?.GetValue(null);
             timers = (List<Timer>)field;
         }

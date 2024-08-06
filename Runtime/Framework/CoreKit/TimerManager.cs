@@ -10,7 +10,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 
 namespace JFramework.Core
@@ -18,7 +17,6 @@ namespace JFramework.Core
     public static class TimerManager
     {
         private static readonly List<Timer> timers = new();
-        private static readonly List<Timer> copies = new();
 
         internal static void Register()
         {
@@ -27,11 +25,12 @@ namespace JFramework.Core
 
         private static void OnFixedUpdate()
         {
-            copies.Clear();
-            copies.AddRange(timers);
-            foreach (var timer in copies.Where(timer => !timer.Update()))
+            for (int i = timers.Count - 1; i >= 0; i--)
             {
-                Push(timer);
+                if (!timers[i].Update())
+                {
+                    Push(timers[i]);
+                }
             }
         }
 
@@ -52,7 +51,6 @@ namespace JFramework.Core
 
         internal static void UnRegister()
         {
-            copies.Clear();
             timers.Clear();
         }
     }
