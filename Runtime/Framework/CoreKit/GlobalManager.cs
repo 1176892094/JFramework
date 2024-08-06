@@ -26,7 +26,7 @@ namespace JFramework.Core
         public static event Action OnUpdate;
 
         public static event Action OnFixedUpdate;
-        
+
         public static event Action<bool> OnPause;
 
         public static event Action OnQuit;
@@ -42,6 +42,7 @@ namespace JFramework.Core
             InputManager.Register();
             AudioManager.Register();
             TimerManager.Register();
+            TweenManager.Register();
         }
 
         private void Start()
@@ -105,6 +106,7 @@ namespace JFramework.Core
                 AssetManager.UnRegister();
                 AudioManager.UnRegister();
                 SceneManager.UnRegister();
+                TweenManager.UnRegister();
                 TimerManager.UnRegister();
                 EventManager.UnRegister();
                 EntityManager.UnRegister();
@@ -148,12 +150,12 @@ namespace JFramework.Core
         [ShowInInspector] private static Dictionary<Type, Dictionary<int, IData>> intData = new();
         [ShowInInspector] private static Dictionary<Type, Dictionary<Enum, IData>> enumData = new();
         [ShowInInspector] private static Dictionary<Type, Dictionary<string, IData>> stringData = new();
+        [ShowInInspector] private static Dictionary<int, List<Timer>> timers = new();
+        [ShowInInspector] private static Dictionary<int, List<Tween>> motions = new();
         [ShowInInspector] private static List<AudioSource> audios = new();
-        [ShowInInspector] private static List<Timer> timers = new();
-        [ShowInInspector] private static float audioVolume => AudioManager.mainVolume;
-        [ShowInInspector] private static float soundVolume => AudioManager.audioVolume;
-        [ShowInInspector] private static float horizontal => InputManager.horizontal;
-        [ShowInInspector] private static float vertical => InputManager.vertical;
+
+        [ShowInInspector] private static Vector2 audioSetting => new Vector2(AudioManager.mainVolume, AudioManager.audioVolume);
+        [ShowInInspector] private static Vector2 direction => new Vector2(InputManager.horizontal, InputManager.vertical);
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
         private static void RuntimeInitializeOnLoad()
@@ -181,7 +183,9 @@ namespace JFramework.Core
             field = typeof(AudioManager).GetField("audios", Reflection.Static)?.GetValue(null);
             audios = (List<AudioSource>)field;
             field = typeof(TimerManager).GetField("timers", Reflection.Static)?.GetValue(null);
-            timers = (List<Timer>)field;
+            timers = (Dictionary<int, List<Timer>>)field;
+            field = typeof(TweenManager).GetField("motions", Reflection.Static)?.GetValue(null);
+            motions = (Dictionary<int, List<Tween>>)field;
         }
 
         public static void EditorWindow(string path, object editor) => EditorSetting.editors[path] = editor;

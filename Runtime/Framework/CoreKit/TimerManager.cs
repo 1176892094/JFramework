@@ -10,13 +10,16 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using JFramework.Core;
 using UnityEngine;
 
 namespace JFramework.Core
 {
-    public static class TimerManager
+    internal static class TimerManager
     {
-        private static readonly List<Timer> timers = new();
+        private static readonly Dictionary<int, List<Timer>> timers = new();
+        private static readonly List<int> copies = new();
 
         internal static void Register()
         {
@@ -25,32 +28,46 @@ namespace JFramework.Core
 
         private static void OnFixedUpdate()
         {
-            for (int i = timers.Count - 1; i >= 0; i--)
+            copies.Clear();
+            copies.AddRange(timers.Keys.ToList());
+            foreach (var id in copies)
             {
-                if (!timers[i].Update())
+                if (timers.TryGetValue(id, out var runs))
                 {
-                    Push(timers[i]);
+                    for (int i = runs.Count - 1; i >= 0; i--)
+                    {
+                        if (!runs[i].FixedUpdate())
+                        {
+                            runs.RemoveAt(i);
+                            if (runs.Count == 0)
+                            {
+                                timers.Remove(id);
+                            }
+                        }
+                    }
                 }
             }
         }
 
-        public static Timer Pop(float waitTime)
+        public static Timer Pop(GameObject entity, float waitTime)
         {
             if (!GlobalManager.Instance) return null;
-            var timer = PoolManager.Dequeue<Timer>();
-            timers.Add(timer.Pop(waitTime));
-            return timer;
-        }
+            var id = entity.GetInstanceID();
+            if (!timers.TryGetValue(id, out var runs))
+            {
+                runs = new List<Timer>();
+                timers.Add(id, runs);
+            }
 
-        public static void Push(Timer timer)
-        {
-            if (!GlobalManager.Instance) return;
-            PoolManager.Enqueue(timer);
-            timers.Remove(timer);
+            var timer = PoolManager.Dequeue<Timer>();
+            timer.Start(entity, waitTime);
+            runs.Add(timer);
+            return timer;
         }
 
         internal static void UnRegister()
         {
+            copies.Clear();
             timers.Clear();
         }
     }
@@ -63,8 +80,9 @@ namespace JFramework
     {
         private int count;
         private bool unscale;
-        [SerializeField] private float waitTime;
-        [SerializeField] private float stayTime;
+        private float interval;
+        private float duration;
+        [SerializeField] private GameObject owner;
         private event Action OnUpdate;
         private float seconds => unscale ? Time.fixedUnscaledTime : Time.fixedTime;
 
@@ -74,22 +92,16 @@ namespace JFramework
             return this;
         }
 
-        public Timer Invoke(Action<Timer> OnUpdate)
+        public Timer Set(float duration)
         {
-            this.OnUpdate = () => OnUpdate(this);
+            this.duration = duration;
+            interval = seconds + duration;
             return this;
         }
 
-        public Timer Set(float waitTime)
+        public Timer Add(float interval)
         {
-            this.waitTime = waitTime;
-            stayTime = seconds + waitTime;
-            return this;
-        }
-
-        public Timer Add(float stayTime)
-        {
-            this.stayTime += stayTime;
+            this.interval += interval;
             return this;
         }
 
@@ -102,36 +114,55 @@ namespace JFramework
         public Timer Unscale(bool unscale = true)
         {
             this.unscale = unscale;
-            stayTime = seconds + waitTime;
+            interval = seconds + duration;
             return this;
         }
 
-        internal Timer Pop(float duration)
+        public void Dispose()
+        {
+            owner = null;
+            PoolManager.Enqueue(this);
+        }
+
+        internal void Start(GameObject owner, float duration)
         {
             count = 1;
             unscale = false;
-            waitTime = duration;
-            stayTime = seconds + duration;
-            return this;
+            this.owner = owner;
+            this.duration = duration;
+            interval = seconds + duration;
         }
 
-        internal bool Update()
+        internal bool FixedUpdate()
         {
-            if (seconds <= stayTime)
+            if (owner == null)
+            {
+                Dispose();
+                return false;
+            }
+
+            if (seconds <= interval)
             {
                 return true;
             }
 
-            stayTime = seconds + waitTime;
+            interval = seconds + duration;
             try
             {
                 count--;
                 OnUpdate?.Invoke();
-                return count != 0;
+                if (count != 0)
+                {
+                    return true;
+                }
+
+                Dispose();
+                return false;
             }
             catch (Exception e)
             {
-                Debug.LogWarning("计时器无法执行方法：\n" + e);
+                Dispose();
+                Debug.Log("计时器无法执行方法：\n" + e);
                 return false;
             }
         }

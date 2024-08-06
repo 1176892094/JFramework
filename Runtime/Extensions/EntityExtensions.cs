@@ -61,7 +61,7 @@ namespace JFramework
             if (component == null) return;
 
             field.SetValue(inject, component);
-            
+
             var method = inject.GetType().GetMethod(name, Reflection.Instance);
             if (method == null) return;
 

@@ -52,7 +52,7 @@ namespace JFramework.Core
             audios.Remove(audio);
             audio.Play();
             action?.Invoke(audio);
-            TimerManager.Pop(clip.length).Invoke(() => StopAudio(audio.gameObject));
+            GlobalManager.Instance.Wait(clip.length).Invoke(() => StopAudio(audio.gameObject));
         }
 
         public static async void PlayLoop(string name, Action<AudioSource> action = null)
