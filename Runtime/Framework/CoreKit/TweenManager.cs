@@ -22,10 +22,10 @@ namespace JFramework.Core
 
         internal static void Register()
         {
-            GlobalManager.OnUpdate += OnUpdate;
+            GlobalManager.OnLateUpdate += OnLateUpdate;
         }
 
-        private static void OnUpdate()
+        private static void OnLateUpdate()
         {
             copies.Clear();
             copies.AddRange(motions.Keys.ToList());
@@ -35,7 +35,7 @@ namespace JFramework.Core
                 {
                     for (int i = runs.Count - 1; i >= 0; i--)
                     {
-                        runs[i].Update();
+                        runs[i].LateUpdate();
                     }
                 }
             }
@@ -58,7 +58,6 @@ namespace JFramework.Core
 
             void Dispose()
             {
-                tween.owner = null;
                 runs.Remove(tween);
                 if (runs.Count == 0)
                 {
@@ -82,13 +81,12 @@ namespace JFramework
     [Serializable]
     public sealed class Tween
     {
-        private float timer;
+        private float fadeTime;
         private float duration;
-        public GameObject owner;
-        private event Action OnFinish;
+        private float progress;
+        private GameObject owner;
         private event Action<float> OnUpdate;
         private event Action OnDispose;
-        private float progress => timer / duration;
 
         public Tween Invoke(Action<float> OnUpdate)
         {
@@ -96,49 +94,50 @@ namespace JFramework
             return this;
         }
 
-        public void OnComplete(Action OnFinish)
+        public void OnComplete(Action OnDispose)
         {
-            this.OnFinish = OnFinish;
+            this.OnDispose += OnDispose;
         }
 
         public void Dispose()
         {
+            owner = null;
+            OnUpdate = null;
             OnDispose?.Invoke();
+            OnDispose = null;
         }
 
         internal void Start(GameObject owner, float duration, Action OnDispose)
         {
-            timer = 0;
-            OnFinish = null;
+            fadeTime = 0;
+            progress = 0;
             this.owner = owner;
             this.duration = duration;
             this.OnDispose = OnDispose;
         }
 
-        internal void Update()
+        internal void LateUpdate()
         {
-            if (owner == null)
-            {
-                Dispose();
-                return;
-            }
-
             try
             {
-                timer += Time.deltaTime;
-                OnUpdate?.Invoke(progress);
-                if (progress < 1)
+                if (owner == null)
                 {
+                    Dispose();
                     return;
                 }
 
-                OnFinish?.Invoke();
-                Dispose();
+                fadeTime += Time.deltaTime;
+                progress = Math.Clamp(fadeTime / duration, 0, 1);
+                OnUpdate?.Invoke(progress);
+                if (progress >= 1)
+                {
+                    Dispose();
+                }
             }
             catch (Exception e)
             {
                 Dispose();
-                Debug.Log("线性动画无法执行方法：\n" + e);
+                Debug.Log("差值动画无法执行方法：\n" + e);
             }
         }
     }

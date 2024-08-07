@@ -26,6 +26,8 @@ namespace JFramework.Core
         public static event Action OnUpdate;
 
         public static event Action OnFixedUpdate;
+        
+        public static event Action OnLateUpdate;
 
         public static event Action<bool> OnPause;
 
@@ -80,6 +82,18 @@ namespace JFramework.Core
                 Debug.Log(e.ToString());
             }
         }
+        
+        private void LateUpdate()
+        {
+            try
+            {
+                OnLateUpdate?.Invoke();
+            }
+            catch (Exception e)
+            {
+                Debug.Log(e.ToString());
+            }
+        }
 
         private void OnApplicationPause(bool pauseStatus)
         {
@@ -123,6 +137,7 @@ namespace JFramework.Core
             OnQuit = null;
             OnStart = null;
             OnUpdate = null;
+            OnLateUpdate = null;
             OnFixedUpdate = null;
             OnCheat = null;
             GC.Collect();

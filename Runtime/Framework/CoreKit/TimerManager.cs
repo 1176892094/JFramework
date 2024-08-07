@@ -58,7 +58,6 @@ namespace JFramework.Core
 
             void Dispose()
             {
-                timer.owner = null;
                 runs.Remove(timer);
                 if (runs.Count == 0)
                 {
@@ -86,7 +85,7 @@ namespace JFramework
         private bool unscale;
         private float interval;
         private float duration;
-        public GameObject owner;
+        private GameObject owner;
         private event Action OnUpdate;
         private event Action OnDispose;
         private float seconds => unscale ? Time.fixedUnscaledTime : Time.fixedTime;
@@ -122,10 +121,13 @@ namespace JFramework
             interval = seconds + duration;
             return this;
         }
-        
+
         public void Dispose()
         {
+            owner = null;
+            OnUpdate = null;
             OnDispose?.Invoke();
+            OnDispose = null;
         }
 
         internal void Start(GameObject owner, float duration, Action OnDispose)
@@ -140,28 +142,26 @@ namespace JFramework
 
         internal void FixedUpdate()
         {
-            if (owner == null)
-            {
-                Dispose();
-                return;
-            }
-
-            if (seconds <= interval)
-            {
-                return;
-            }
-
-            interval = seconds + duration;
             try
             {
-                count--;
-                OnUpdate?.Invoke();
-                if (count != 0)
+                if (owner == null)
+                {
+                    Dispose();
+                    return;
+                }
+
+                if (seconds <= interval)
                 {
                     return;
                 }
 
-                Dispose();
+                count--;
+                interval = seconds + duration;
+                OnUpdate?.Invoke();
+                if (count == 0)
+                {
+                    Dispose();
+                }
             }
             catch (Exception e)
             {

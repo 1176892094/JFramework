@@ -106,6 +106,25 @@ namespace JFramework
             });
         }
 
+        public static Tween DOShake(this Camera camera, float strength, float duration)
+        {
+            var position = camera.transform.localPosition;
+            return TweenManager.Tween(camera.gameObject, duration).Invoke(progress =>
+            {
+                if (progress < 1.0f)
+                {
+                    var offsetX = Mathf.Lerp(0, Random.Range(-strength, strength), progress);
+                    var offsetY = Mathf.Lerp(0, Random.Range(-strength, strength), progress);
+                    var offsetZ = Mathf.Lerp(0, Random.Range(-strength, strength), progress);
+                    camera.transform.localPosition = position + new Vector3(offsetX, offsetY, offsetZ);
+                }
+                else
+                {
+                    camera.transform.localPosition = position;
+                }
+            });
+        }
+
         public static Tween DOColor(this SpriteRenderer component, Color endValue, float duration)
         {
             var color = component.color;
@@ -149,16 +168,6 @@ namespace JFramework
             {
                 var colorA = Mathf.Lerp(color.a, endValue, progress);
                 component.color = new Color(color.r, color.g, color.b, colorA);
-            });
-        }
-
-        public static Tween DOFillAmount(this Image component, float endValue, float duration)
-        {
-            var fillAmount = component.fillAmount;
-            return TweenManager.Tween(component.gameObject, duration).Invoke(progress =>
-            {
-                var value = Mathf.Lerp(fillAmount, endValue, progress);
-                component.fillAmount = value;
             });
         }
     }
