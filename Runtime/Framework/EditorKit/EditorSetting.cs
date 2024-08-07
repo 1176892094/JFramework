@@ -60,21 +60,39 @@ namespace JFramework
             return tree;
         }
 
-        private static string GetProviderInfo(string filePath)
+        private static string GetHashValue(string filePath)
         {
-            using var file = new FileStream(filePath, FileMode.Open);
-            var provider = new MD5CryptoServiceProvider();
-            var infos = provider.ComputeHash(file);
-            var builder = PoolManager.Dequeue<StringBuilder>();
-            foreach (var info in infos)
+            using var provider = MD5.Create();
+            using var stream = File.OpenRead(filePath);
+            var hash = provider.ComputeHash(stream);
+            var builder = new StringBuilder();
+            foreach (var bytes in hash)
             {
-                builder.Append(info.ToString("X2"));
+                builder.Append(bytes.ToString("x2"));
             }
 
-            var result = builder.ToString();
-            PoolManager.Enqueue(builder);
-            builder.Clear();
-            return result;
+            return builder.ToString();
+        }
+
+        public static void EncryptAssetBundle(string filePath)
+        {
+            using var aes = Aes.Create();
+            aes.Key = Encoding.UTF8.GetBytes(AssetManager.AES_KEY);
+            var ivBytes = new byte[16];
+            RandomNumberGenerator.Fill(ivBytes);
+            aes.IV = ivBytes;
+            var tempPath = filePath + ".temp";
+            Debug.Log(filePath + "\n" + BitConverter.ToString(ivBytes, 0, 16));
+            using (var inputFs = new FileStream(filePath, FileMode.Open, FileAccess.Read))
+            using (var outputFs = new FileStream(tempPath, FileMode.Create, FileAccess.Write))
+            using (var cs = new CryptoStream(outputFs, aes.CreateEncryptor(), CryptoStreamMode.Write))
+            {
+                outputFs.Write(ivBytes, 0, ivBytes.Length);
+                inputFs.CopyTo(cs);
+            }
+
+            File.Delete(filePath);
+            File.Move(tempPath, filePath);
         }
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
@@ -132,7 +150,7 @@ namespace JFramework
                             {
                                 SettingManager.Instance.sceneAssets.Add(path);
                             }
-                            
+
                             SettingManager.objects[$"{name}/{asset.name}"] = path;
                         }
                     }
@@ -147,12 +165,36 @@ namespace JFramework
         {
             UpdateAsset();
             var directory = Directory.CreateDirectory(SettingManager.platformPath);
-            BuildPipeline.BuildAssetBundles(SettingManager.platformPath, BuildAssetBundleOptions.ChunkBasedCompression,
-                (BuildTarget)SettingManager.Instance.platform);
-            var infoList = directory.GetFiles().Where(info => info.Extension == "").ToList();
-            var fileList = infoList
-                .Select(info => new BundleManager.BundleData(GetProviderInfo(info.FullName), info.Name, info.Length.ToString())).ToList();
-            var contents = JsonManager.Writer(fileList, true);
+            var platform = (BuildTarget)SettingManager.Instance.platform;
+            BuildPipeline.BuildAssetBundles(SettingManager.platformPath, BuildAssetBundleOptions.None, platform);
+            var dataFiles = directory.GetFiles().Where(info => info.Extension == "").ToList();
+            var dataInfos = new List<BundleManager.BundleData>();
+            if (File.Exists(SettingManager.assetBundleInfo))
+            {
+                var json = File.ReadAllText(SettingManager.assetBundleInfo);
+                var readFiles = JsonManager.Reader<List<BundleManager.BundleData>>(json);
+                var readInfos = readFiles.Select(data => data.code).ToList();
+
+                foreach (var file in dataFiles)
+                {
+                    if (!readInfos.Contains(GetHashValue(file.FullName)))
+                    {
+                        EncryptAssetBundle(file.FullName);
+                    }
+
+                    dataInfos.Add(new BundleManager.BundleData(GetHashValue(file.FullName), file.Name, file.Length.ToString()));
+                }
+            }
+            else
+            {
+                foreach (var file in dataFiles)
+                {
+                    EncryptAssetBundle(file.FullName);
+                    dataInfos.Add(new BundleManager.BundleData(GetHashValue(file.FullName), file.Name, file.Length.ToString()));
+                }
+            }
+
+            var contents = JsonManager.Writer(dataInfos, true);
             File.WriteAllText(SettingManager.assetBundleInfo, contents);
             Debug.Log("构建 AssetBundles 成功!".Green());
             AssetDatabase.Refresh();

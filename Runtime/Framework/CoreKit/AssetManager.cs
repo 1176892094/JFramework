@@ -12,6 +12,8 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Security.Cryptography;
+using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.Networking;
@@ -22,6 +24,7 @@ namespace JFramework.Core
 {
     public static class AssetManager
     {
+        internal const string AES_KEY = "ABCDEFGHIJKLMNOP";
         private static AssetBundle mainAsset;
         private static AssetBundleManifest manifest;
         private static readonly Dictionary<string, AssetData> assets = new();
@@ -67,6 +70,23 @@ namespace JFramework.Core
             {
                 Debug.LogWarning(e);
             }
+        }
+
+        public static async void LoadAssetBundles(Action action)
+        {
+            if (mainAsset == null)
+            {
+                mainAsset = await LoadAssetBundle(SettingManager.Instance.platform.ToString());
+                manifest = mainAsset.LoadAsset<AssetBundleManifest>(nameof(AssetBundleManifest));
+            }
+
+            var assetBundles = manifest.GetAllAssetBundles();
+            foreach (var assetBundle in assetBundles)
+            {
+                await LoadAssetBundle(assetBundle);
+            }
+
+            action?.Invoke();
         }
 
         private static async Task<T> LoadAsset<T>(string path, AssetMode mode) where T : Object
@@ -174,8 +194,7 @@ namespace JFramework.Core
             var path = SettingManager.GetPersistentPath(bundle);
             if (File.Exists(path))
             {
-                var request = await AssetBundle.LoadFromFileAsync(path);
-                var assetBundle = request.assetBundle;
+                var assetBundle = await DecryptAssetBundle(path);
                 bundles.Add(bundle, assetBundle);
                 return assetBundle;
             }
@@ -187,7 +206,9 @@ namespace JFramework.Core
                 await request.SendWebRequest();
                 if (request.result == UnityWebRequest.Result.Success)
                 {
-                    var assetBundle = DownloadHandlerAssetBundle.GetContent(request);
+                    var decryptedPath = Path.Combine(Application.temporaryCachePath, bundle);
+                    await File.WriteAllBytesAsync(decryptedPath, request.downloadHandler.data);
+                    var assetBundle = await DecryptAssetBundle(decryptedPath);
                     bundles.Add(bundle, assetBundle);
                     return assetBundle;
                 }
@@ -195,13 +216,29 @@ namespace JFramework.Core
 #else
             if (File.Exists(path))
             {
-                var request = await AssetBundle.LoadFromFileAsync(path);
-                var assetBundle = request.assetBundle;
+                var assetBundle = await DecryptAssetBundle(path);
                 bundles.Add(bundle, assetBundle);
                 return assetBundle;
             }
 #endif
             return null;
+        }
+
+        private static async Task<AssetBundle> DecryptAssetBundle(string filePath)
+        {
+            using var aes = Aes.Create();
+            aes.Key = Encoding.UTF8.GetBytes(AES_KEY);
+            var ivBytes = new byte[16];
+            await using var fs = new FileStream(filePath, FileMode.Open, FileAccess.Read);
+            fs.Read(ivBytes, 0, ivBytes.Length);
+            aes.IV = ivBytes;
+            Debug.Log(filePath + "\n" + BitConverter.ToString(ivBytes, 0, 16));
+            await using var cs = new CryptoStream(fs, aes.CreateDecryptor(), CryptoStreamMode.Read);
+            using var ms = new MemoryStream();
+            await cs.CopyToAsync(ms);
+            var decryptedBytes = ms.ToArray();
+            var request = await AssetBundle.LoadFromMemoryAsync(decryptedBytes);
+            return request.assetBundle;
         }
 
         internal static void UnRegister()
@@ -271,7 +308,7 @@ namespace JFramework.Core
                         return request is GameObject ? Object.Instantiate(request) : request;
                     }
                 }
-                
+
                 return null;
             }
         }
