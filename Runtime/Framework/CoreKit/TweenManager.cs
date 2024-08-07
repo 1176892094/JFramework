@@ -87,6 +87,7 @@ namespace JFramework
         private GameObject owner;
         private event Action<float> OnUpdate;
         private event Action OnDispose;
+        private event Action OnFinish;
 
         public Tween Invoke(Action<float> OnUpdate)
         {
@@ -94,14 +95,15 @@ namespace JFramework
             return this;
         }
 
-        public void OnComplete(Action OnDispose)
+        public void OnComplete(Action OnFinish)
         {
-            this.OnDispose += OnDispose;
+            this.OnFinish = OnFinish;
         }
 
         public void Dispose()
         {
             owner = null;
+            OnFinish = null;
             OnUpdate = null;
             OnDispose?.Invoke();
             OnDispose = null;
@@ -131,6 +133,7 @@ namespace JFramework
                 OnUpdate?.Invoke(progress);
                 if (progress >= 1)
                 {
+                    OnFinish?.Invoke();
                     Dispose();
                 }
             }
