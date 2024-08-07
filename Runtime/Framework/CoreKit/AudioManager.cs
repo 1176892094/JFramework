@@ -37,6 +37,7 @@ namespace JFramework.Core
         {
             if (!GlobalManager.Instance || name.IsEmpty()) return;
             var clip = await AssetManager.Load<AudioClip>(SettingManager.GetAudioPath(name));
+            if (clip == null) return;
             mainSource.volume = mainVolume;
             mainSource.clip = clip;
             mainSource.loop = true;
@@ -48,6 +49,7 @@ namespace JFramework.Core
         {
             if (!GlobalManager.Instance || name.IsEmpty()) return;
             var clip = await AssetManager.Load<AudioClip>(SettingManager.GetAudioPath(name));
+            if (clip == null) return;
             var audio = await LoadSource(clip);
             audios.Remove(audio);
             audio.Play();
@@ -59,6 +61,7 @@ namespace JFramework.Core
         {
             if (!GlobalManager.Instance || name.IsEmpty()) return;
             var clip = await AssetManager.Load<AudioClip>(SettingManager.GetAudioPath(name));
+            if (clip == null) return;
             var audio = await LoadSource(clip);
             audios.Remove(audio);
             audio.loop = true;

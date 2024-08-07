@@ -230,7 +230,7 @@ namespace JFramework.Core
             aes.Key = Encoding.UTF8.GetBytes(AES_KEY);
             var ivBytes = new byte[16];
             await using var fs = new FileStream(filePath, FileMode.Open, FileAccess.Read);
-            fs.Read(ivBytes, 0, ivBytes.Length);
+            await fs.ReadAsync(ivBytes, 0, ivBytes.Length);
             aes.IV = ivBytes;
             Debug.Log(filePath + "\n" + BitConverter.ToString(ivBytes, 0, 16));
             await using var cs = new CryptoStream(fs, aes.CreateDecryptor(), CryptoStreamMode.Read);
@@ -240,7 +240,7 @@ namespace JFramework.Core
             var request = await AssetBundle.LoadFromMemoryAsync(decryptedBytes);
             return request.assetBundle;
         }
-
+        
         internal static void UnRegister()
         {
             AssetBundle.UnloadAllAssetBundles(true);
