@@ -17,6 +17,16 @@ namespace JFramework
 {
     public static partial class Extensions
     {
+        public static T Search<T>(this IEntity entity) where T : ScriptableObject, IComponent
+        {
+            return (T)EntityManager.GetComponent(entity, typeof(T));
+        }
+
+        public static void Destroy(this IEntity entity)
+        {
+            EntityManager.Destroy(entity);
+        }
+
         public static Timer Wait(this IEntity entity, float waitTime)
         {
             return TimerManager.Pop(entity.gameObject, waitTime);

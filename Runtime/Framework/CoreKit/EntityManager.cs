@@ -17,31 +17,10 @@ using Object = UnityEngine.Object;
 
 namespace JFramework.Core
 {
-    public static class EntityManager
+    internal static class EntityManager
     {
         private static readonly Dictionary<IEntity, Dictionary<Type, IComponent>> entities = new();
-        internal static IEntity instance { get; private set; }
-
-        public static T GetComponent<T>(IEntity entity) where T : ScriptableObject, IComponent
-        {
-            if (!GlobalManager.Instance) return null;
-            if (!entities.TryGetValue(entity, out var components))
-            {
-                components = new Dictionary<Type, IComponent>();
-                entities.Add(entity, components);
-            }
-
-            if (!components.TryGetValue(typeof(T), out var component))
-            {
-                instance = entity;
-                component = (T)ScriptableObject.CreateInstance(typeof(T));
-                ((ScriptableObject)component).name = typeof(T).Name;
-                components.Add(typeof(T), component);
-                component.OnAwake(instance);
-            }
-
-            return (T)entities[entity][typeof(T)];
-        }
+        public static IEntity instance { get; private set; }
 
         public static IComponent GetComponent(IEntity entity, Type type)
         {
