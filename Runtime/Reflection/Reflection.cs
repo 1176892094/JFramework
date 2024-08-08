@@ -16,8 +16,8 @@ namespace JFramework
 {
     public static class Reflection
     {
-        public const BindingFlags Instance = BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic;
         public const BindingFlags Static = BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic;
+        public const BindingFlags Instance = BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic;
 
         public static Assembly GetAssembly(string name)
         {

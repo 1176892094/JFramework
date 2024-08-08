@@ -32,7 +32,7 @@ namespace JFramework
                         {
                             instance ??= FindFirstObjectByType<T>();
                             instance ??= new GameObject(typeof(T).Name).AddComponent<T>();
-                            instance.Register();
+                            instance.Awake();
                         }
                     }
                 }
@@ -41,7 +41,7 @@ namespace JFramework
             }
         }
 
-        private void Register()
+        protected virtual void Awake()
         {
             if (instance == null)
             {
@@ -59,8 +59,9 @@ namespace JFramework
             }
         }
 
-        protected virtual void Awake() => Register();
-
-        protected virtual void OnDestroy() => instance = null;
+        protected virtual void OnDestroy()
+        {
+            instance = null;
+        }
     }
 }
