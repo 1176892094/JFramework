@@ -9,22 +9,9 @@
 // *********************************************************************************
 
 using System;
-using System.Runtime.CompilerServices;
-using System.Threading.Tasks;
-using UnityEngine;
 
 namespace JFramework
 {
-    public static partial class Extensions
-    {
-        public static TaskAwaiter<T> GetAwaiter<T>(this T request) where T : AsyncOperation
-        {
-            var completion = new TaskCompletionSource<T>();
-            request.completed += operation => completion.SetResult(operation as T);
-            return completion.Task.GetAwaiter();
-        }
-    }
-
     public static partial class Extensions
     {
         public static T ToNext<T>(this T current) where T : Enum

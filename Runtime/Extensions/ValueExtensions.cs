@@ -21,21 +21,21 @@ namespace JFramework
         private static readonly Dictionary<Type, Delegate> writers = new Dictionary<Type, Delegate>()
         {
             { typeof(int), new Func<int, byte[]>(Serialize) },
+            { typeof(bool), new Func<bool, byte[]>(value => Serialize((byte)(value ? 1 : 0))) },
             { typeof(long), new Func<long, byte[]>(Serialize) },
             { typeof(float), new Func<float, byte[]>(Serialize) },
             { typeof(double), new Func<double, byte[]>(Serialize) },
-            { typeof(string), new Func<string, byte[]>(WriteString) },
-            { typeof(bool), new Func<bool, byte[]>(WriteBool) },
+            { typeof(string), new Func<string, byte[]>(value => Encoding.UTF8.GetBytes(value ?? string.Empty)) },
         };
 
         private static readonly Dictionary<Type, Delegate> readers = new Dictionary<Type, Delegate>()
         {
             { typeof(int), new Func<byte[], int>(Deserialize<int>) },
+            { typeof(bool), new Func<byte[], bool>(value => Deserialize<byte>(value) != 0) },
             { typeof(long), new Func<byte[], long>(Deserialize<long>) },
             { typeof(float), new Func<byte[], float>(Deserialize<float>) },
             { typeof(double), new Func<byte[], double>(Deserialize<double>) },
-            { typeof(string), new Func<byte[], string>(ReadString) },
-            { typeof(bool), new Func<byte[], bool>(ReadBool) },
+            { typeof(string), new Func<byte[], string>(Encoding.UTF8.GetString) },
         };
 
         internal static byte[] Write<T>(this T value)
@@ -91,26 +91,6 @@ namespace JFramework
             }
 
             return value;
-        }
-
-        private static byte[] WriteBool(bool value)
-        {
-            return Serialize((byte)(value ? 1 : 0));
-        }
-
-        private static bool ReadBool(byte[] value)
-        {
-            return Deserialize<byte>(value) != 0;
-        }
-
-        private static byte[] WriteString(string value)
-        {
-            return Encoding.UTF8.GetBytes(value ?? string.Empty);
-        }
-
-        private static string ReadString(this byte[] value)
-        {
-            return Encoding.UTF8.GetString(value);
         }
     }
 }
