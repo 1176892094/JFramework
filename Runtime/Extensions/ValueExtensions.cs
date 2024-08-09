@@ -20,9 +20,16 @@ namespace JFramework
     {
         private static readonly Dictionary<Type, Delegate> writers = new Dictionary<Type, Delegate>()
         {
+            { typeof(byte), new Func<byte, byte[]>(Serialize) },
+            { typeof(sbyte), new Func<sbyte, byte[]>(Serialize) },
+            { typeof(char), new Func<char, byte[]>(value => Serialize((ushort)value)) },
+            { typeof(short), new Func<short, byte[]>(Serialize) },
+            { typeof(ushort), new Func<ushort, byte[]>(Serialize) },
             { typeof(int), new Func<int, byte[]>(Serialize) },
+            { typeof(uint), new Func<uint, byte[]>(Serialize) },
             { typeof(bool), new Func<bool, byte[]>(value => Serialize((byte)(value ? 1 : 0))) },
             { typeof(long), new Func<long, byte[]>(Serialize) },
+            { typeof(ulong), new Func<ulong, byte[]>(Serialize) },
             { typeof(float), new Func<float, byte[]>(Serialize) },
             { typeof(double), new Func<double, byte[]>(Serialize) },
             { typeof(string), new Func<string, byte[]>(value => Encoding.UTF8.GetBytes(value ?? string.Empty)) },
@@ -30,9 +37,16 @@ namespace JFramework
 
         private static readonly Dictionary<Type, Delegate> readers = new Dictionary<Type, Delegate>()
         {
+            { typeof(byte), new Func<byte[], byte>(Deserialize<byte>) },
+            { typeof(sbyte), new Func<byte[], sbyte>(Deserialize<sbyte>) },
+            { typeof(char), new Func<byte[], char>(value => (char)Deserialize<ushort>(value)) },
+            { typeof(short), new Func<byte[], short>(Deserialize<short>) },
+            { typeof(ushort), new Func<byte[], ushort>(Deserialize<ushort>) },
             { typeof(int), new Func<byte[], int>(Deserialize<int>) },
+            { typeof(uint), new Func<byte[], uint>(Deserialize<uint>) },
             { typeof(bool), new Func<byte[], bool>(value => Deserialize<byte>(value) != 0) },
             { typeof(long), new Func<byte[], long>(Deserialize<long>) },
+            { typeof(ulong), new Func<byte[], ulong>(Deserialize<ulong>) },
             { typeof(float), new Func<byte[], float>(Deserialize<float>) },
             { typeof(double), new Func<byte[], double>(Deserialize<double>) },
             { typeof(string), new Func<byte[], string>(Encoding.UTF8.GetString) },

@@ -10,6 +10,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace JFramework
@@ -38,11 +39,6 @@ namespace JFramework
             }
 
             return reason.Value.InputGeneric<T>();
-        }
-
-        public static void Input(this string reason, out Variable<string> result)
-        {
-            result = reason ?? string.Empty;
         }
 
         public static string InputString(this string reason)
@@ -84,64 +80,9 @@ namespace JFramework
             return new Vector3Int(x, y, z);
         }
 
-        public static string[] InputStringArray(this string reason)
+        private static List<string> InputArray(this string reason)
         {
-            var content = reason.Content(out string[] result);
-            for (int i = 0; i < content.Length; ++i)
-            {
-                result[i] = content[i].InputString();
-            }
-
-            return result;
-        }
-
-        public static Vector2[] InputVector2Array(this string reason)
-        {
-            var content = reason.Content(out Vector2[] result);
-            for (int i = 0; i < content.Length; ++i)
-            {
-                result[i] = content[i].InputVector2();
-            }
-
-            return result;
-        }
-
-        public static Vector3[] InputVector3Array(this string reason)
-        {
-            var content = reason.Content(out Vector3[] result);
-            for (int i = 0; i < content.Length; ++i)
-            {
-                result[i] = content[i].InputVector3();
-            }
-
-            return result;
-        }
-
-        public static Vector2Int[] InputVector2IntArray(this string reason)
-        {
-            var content = reason.Content(out Vector2Int[] result);
-            for (int i = 0; i < content.Length; ++i)
-            {
-                result[i] = content[i].InputVector2Int();
-            }
-
-            return result;
-        }
-
-        public static Vector3Int[] InputVector3IntArray(this string reason)
-        {
-            var content = reason.Content(out Vector3Int[] result);
-            for (int i = 0; i < content.Length; ++i)
-            {
-                result[i] = content[i].InputVector3Int();
-            }
-
-            return result;
-        }
-
-        private static string[] Content<T>(this string reason, out T[] result)
-        {
-            result = default;
+            var result = new List<string>();
             if (!string.IsNullOrEmpty(reason))
             {
                 if (reason.EndsWith(';'))
@@ -149,12 +90,35 @@ namespace JFramework
                     reason = reason[..^1];
                 }
 
-                var splits = reason.Split(';');
-                result = new T[splits.Length];
-                return splits;
+                result.AddRange(reason.Split(';'));
             }
 
-            return new string[0];
+            return result;
+        }
+
+        public static string[] InputStringArray(this string reason)
+        {
+            return reason.InputArray().Select(InputString).ToArray();
+        }
+
+        public static Vector2[] InputVector2Array(this string reason)
+        {
+            return reason.InputArray().Select(InputVector2).ToArray();
+        }
+
+        public static Vector3[] InputVector3Array(this string reason)
+        {
+            return reason.InputArray().Select(InputVector3).ToArray();
+        }
+
+        public static Vector2Int[] InputVector2IntArray(this string reason)
+        {
+            return reason.InputArray().Select(InputVector2Int).ToArray();
+        }
+
+        public static Vector3Int[] InputVector3IntArray(this string reason)
+        {
+            return reason.InputArray().Select(InputVector3Int).ToArray();
         }
 
         public static T InputGeneric<T>(this string reason)
@@ -170,25 +134,28 @@ namespace JFramework
                 return default;
             }
 
-            if (!string.IsNullOrEmpty(reason))
+            if (string.IsNullOrEmpty(reason))
             {
-                if (reason.EndsWith(';'))
+                return default;
+            }
+
+            if (reason.EndsWith(';'))
+            {
+                reason = reason[..^1];
+            }
+
+            var members = reason.Split(';');
+            var element = typeof(T).GetElementType();
+            if (element != null)
+            {
+                var instance = Array.CreateInstance(element, members.Length);
+                for (int i = 0; i < members.Length; ++i)
                 {
-                    reason = reason[..^1];
+                    var result = InputGeneric(members[i], element);
+                    instance.SetValue(result, i);
                 }
 
-                var members = reason.Split(';');
-                var element = typeof(T).GetElementType();
-                if (element != null)
-                {
-                    var result = Array.CreateInstance(element, members.Length);
-                    for (int i = 0; i < members.Length; ++i)
-                    {
-                        result.SetValue(InputGeneric(members[i], element), i);
-                    }
-
-                    return (T)(object)result;
-                }
+                return (T)(object)instance;
             }
 
             return default;

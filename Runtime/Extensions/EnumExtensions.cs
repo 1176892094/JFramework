@@ -17,7 +17,7 @@ namespace JFramework
         public static T ToNext<T>(this T current) where T : Enum
         {
             var enumArray = (T[])Enum.GetValues(typeof(T));
-            var currIndex = System.Array.IndexOf(enumArray, current);
+            var currIndex = Array.IndexOf(enumArray, current);
             var nextIndex = (currIndex + 1) % enumArray.Length;
             return enumArray[nextIndex];
         }
@@ -25,7 +25,7 @@ namespace JFramework
         public static T ToLast<T>(this T current) where T : Enum
         {
             var enumArray = (T[])Enum.GetValues(typeof(T));
-            var currIndex = System.Array.IndexOf(enumArray, current);
+            var currIndex = Array.IndexOf(enumArray, current);
             var lastIndex = (currIndex - 1 + enumArray.Length) % enumArray.Length;
             return enumArray[lastIndex];
         }
