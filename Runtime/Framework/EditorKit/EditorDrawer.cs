@@ -84,20 +84,6 @@ namespace JFramework
             return base.GetPropertyHeight(property, label);
         }
     }
-
-    [CustomPropertyDrawer(typeof(SecretInt))]
-    public class SecretIntDrawer : PropertyDrawer
-    {
-        public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
-        {
-            EditorGUI.BeginProperty(position, label, property);
-            var contentPosition = EditorGUI.PrefixLabel(position, GUIUtility.GetControlID(FocusType.Passive), label);
-            contentPosition.width -= 15;
-            SerializedProperty myIntProperty = property.FindPropertyRelative("origin");
-            EditorGUI.PropertyField(contentPosition, myIntProperty, GUIContent.none);
-            EditorGUI.EndProperty();
-        }
-    }
     
     [CustomPropertyDrawer(typeof(Variable<>))]
     public class VariableDrawer : PropertyDrawer
