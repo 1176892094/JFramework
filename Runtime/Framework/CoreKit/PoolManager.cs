@@ -163,20 +163,24 @@ namespace JFramework.Core
         }
 
         [Serializable]
-        private struct Pool<T> : IPool<T>
+        private class Pool<T> : IPool<T>
         {
-            public List<T> pool;
+            private readonly Queue<T> objects = new Queue<T>();
+            private readonly HashSet<T> unique = new HashSet<T>();
+            public int count => objects.Count;
 
-            public int count => pool.Count;
-
-            public Pool(T obj) => pool = new List<T>() { obj };
+            public Pool(T obj)
+            {
+                unique.Add(obj);
+                objects.Enqueue(obj);
+            }
 
             public T Pop()
             {
-                if (count > 0)
+                if (objects.Count > 0)
                 {
-                    var obj = pool[0];
-                    pool.Remove(obj);
+                    var obj = objects.Dequeue();
+                    unique.Remove(obj);
                     return obj;
                 }
 
@@ -185,16 +189,20 @@ namespace JFramework.Core
 
             public bool Push(T obj)
             {
-                if (!pool.Contains(obj))
+                if (unique.Add(obj))
                 {
-                    pool.Add(obj);
+                    objects.Enqueue(obj);
                     return true;
                 }
 
                 return false;
             }
 
-            public void Dispose() => pool.Clear();
+            public void Dispose()
+            {
+                unique.Clear();
+                objects.Clear();
+            }
         }
     }
 }
