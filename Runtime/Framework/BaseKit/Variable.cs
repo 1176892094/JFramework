@@ -27,7 +27,7 @@ namespace JFramework
             {
                 if (offset == 0)
                 {
-                    Value = default;
+                    Value = origin;
                 }
                 
                 var target = new byte[buffer.Length];
