@@ -35,7 +35,7 @@ namespace JFramework.Core
 
         public static async void PlayMain(string name, Action<AudioSource> action = null)
         {
-            if (!GlobalManager.Instance || name.IsEmpty()) return;
+            if (!GlobalManager.Instance || string.IsNullOrEmpty(name)) return;
             var clip = await AssetManager.Load<AudioClip>(SettingManager.GetAudioPath(name));
             if (clip == null) return;
             mainSource.volume = mainVolume;
@@ -47,7 +47,7 @@ namespace JFramework.Core
 
         public static async void PlayOnce(string name, Action<AudioSource> action = null)
         {
-            if (!GlobalManager.Instance || name.IsEmpty()) return;
+            if (!GlobalManager.Instance || string.IsNullOrEmpty(name)) return;
             var clip = await AssetManager.Load<AudioClip>(SettingManager.GetAudioPath(name));
             if (clip == null) return;
             var audio = await LoadSource(clip);
@@ -59,7 +59,7 @@ namespace JFramework.Core
 
         public static async void PlayLoop(string name, Action<AudioSource> action = null)
         {
-            if (!GlobalManager.Instance || name.IsEmpty()) return;
+            if (!GlobalManager.Instance || string.IsNullOrEmpty(name)) return;
             var clip = await AssetManager.Load<AudioClip>(SettingManager.GetAudioPath(name));
             if (clip == null) return;
             var audio = await LoadSource(clip);

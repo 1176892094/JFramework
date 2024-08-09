@@ -56,7 +56,7 @@ namespace JFramework
                     continue;
                 }
 
-                if (field.FieldType.IsSubclassOf(typeof(IComponent)))
+                if (typeof(IComponent).IsAssignableFrom(field.FieldType))
                 {
                     var component = EntityManager.GetComponent(inject, field.FieldType);
                     field.SetValue(inject, component);

@@ -21,17 +21,11 @@ namespace JFramework.Core
     {
         public static GlobalManager Instance { get; private set; }
 
-        public static event Action OnStart;
-
         public static event Action OnUpdate;
 
         public static event Action OnFixedUpdate;
         
         public static event Action OnLateUpdate;
-
-        public static event Action<bool> OnPause;
-
-        public static event Action OnQuit;
 
         public static event Action OnCheat;
 
@@ -45,18 +39,6 @@ namespace JFramework.Core
             AudioManager.Register();
             TimerManager.Register();
             TweenManager.Register();
-        }
-
-        private void Start()
-        {
-            try
-            {
-                OnStart?.Invoke();
-            }
-            catch (Exception e)
-            {
-                Debug.Log(e.ToString());
-            }
         }
 
         private void Update()
@@ -95,23 +77,10 @@ namespace JFramework.Core
             }
         }
 
-        private void OnApplicationPause(bool pauseStatus)
-        {
-            try
-            {
-                OnPause?.Invoke(pauseStatus);
-            }
-            catch (Exception e)
-            {
-                Debug.Log(e.ToString());
-            }
-        }
-
         private void OnApplicationQuit()
         {
             try
             {
-                OnQuit?.Invoke();
                 Instance = null;
                 UIManager.UnRegister();
                 DataManager.UnRegister();
@@ -134,12 +103,10 @@ namespace JFramework.Core
 
         private void OnDestroy()
         {
-            OnQuit = null;
-            OnStart = null;
+            OnCheat = null;
             OnUpdate = null;
             OnLateUpdate = null;
             OnFixedUpdate = null;
-            OnCheat = null;
             GC.Collect();
         }
 
@@ -168,9 +135,8 @@ namespace JFramework.Core
         [ShowInInspector] private static Dictionary<int, List<Timer>> timers = new();
         [ShowInInspector] private static Dictionary<int, List<Tween>> motions = new();
         [ShowInInspector] private static List<AudioSource> audios = new();
-
-        [ShowInInspector] private static Vector2 audioSetting => new Vector2(AudioManager.mainVolume, AudioManager.audioVolume);
-        [ShowInInspector] private static Vector2 direction => new Vector2(InputManager.horizontal, InputManager.vertical);
+        [ShowInInspector] private static Vector2 audioManager => new Vector2(AudioManager.mainVolume, AudioManager.audioVolume);
+        [ShowInInspector] private static Vector2 inputManager => new Vector2(InputManager.horizontal, InputManager.vertical);
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
         private static void RuntimeInitializeOnLoad()
