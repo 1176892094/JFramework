@@ -194,14 +194,11 @@ namespace JFramework.Core
 
         private static async Task<AssetBundle> LoadAssetRequest(string bundle)
         {
-            if (!GlobalManager.Instance) return null;
             var path = SettingManager.GetPersistentPath(bundle);
             if (File.Exists(path))
             {
                 var bytes = await File.ReadAllBytesAsync(path);
-                var assetBundle = await LoadAssetRequest(bundle, bytes);
-                bundles.Add(bundle, assetBundle);
-                return assetBundle;
+                return await LoadAssetRequest(bundle, bytes);
             }
 
             path = SettingManager.GetStreamingPath(bundle);
@@ -211,18 +208,14 @@ namespace JFramework.Core
                 await request.SendWebRequest();
                 if (request.result == UnityWebRequest.Result.Success)
                 {
-                    var assetBundle = await LoadAssetRequest(bundle, request.downloadHandler.data);
-                    bundles.Add(bundle, assetBundle);
-                    return assetBundle;
+                    return await LoadAssetRequest(bundle, request.downloadHandler.data);
                 }
             }
 #else
             if (File.Exists(path))
             {
                 var bytes = await File.ReadAllBytesAsync(path);
-                var assetBundle = await LoadAssetRequest(bundle, bytes);
-                bundles.Add(bundle, assetBundle);
-                return assetBundle;
+                return await LoadAssetRequest(bundle, bytes);
             }
 
 #endif
@@ -231,9 +224,12 @@ namespace JFramework.Core
 
         private static async Task<AssetBundle> LoadAssetRequest(string bundle, byte[] bytes)
         {
-            Debug.Log("解密AB包：" + bundle);
+            if (!GlobalManager.Instance) return null;
             bytes = await Obfuscator.DecryptAsync(bytes, AES_KEY);
+            if (!GlobalManager.Instance) return null;
+            Debug.Log("解密AB包：" + bundle);
             var result = AssetBundle.LoadFromMemoryAsync(bytes);
+            bundles.Add(bundle, result.assetBundle);
             OnLoadUpdate?.Invoke(bundle);
             return result.assetBundle;
         }
