@@ -13,6 +13,7 @@ using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Text;
 using Unity.Collections.LowLevel.Unsafe;
+using UnityEngine;
 
 namespace JFramework
 {
@@ -20,11 +21,6 @@ namespace JFramework
     {
         private static readonly Dictionary<Type, Delegate> writers = new Dictionary<Type, Delegate>()
         {
-            { typeof(byte), new Func<byte, byte[]>(Serialize) },
-            { typeof(sbyte), new Func<sbyte, byte[]>(Serialize) },
-            { typeof(char), new Func<char, byte[]>(value => Serialize((ushort)value)) },
-            { typeof(short), new Func<short, byte[]>(Serialize) },
-            { typeof(ushort), new Func<ushort, byte[]>(Serialize) },
             { typeof(int), new Func<int, byte[]>(Serialize) },
             { typeof(uint), new Func<uint, byte[]>(Serialize) },
             { typeof(bool), new Func<bool, byte[]>(value => Serialize((byte)(value ? 1 : 0))) },
@@ -33,15 +29,14 @@ namespace JFramework
             { typeof(float), new Func<float, byte[]>(Serialize) },
             { typeof(double), new Func<double, byte[]>(Serialize) },
             { typeof(string), new Func<string, byte[]>(value => Encoding.UTF8.GetBytes(value ?? string.Empty)) },
+            { typeof(Vector2), new Func<Vector2, byte[]>(Serialize) },
+            { typeof(Vector3), new Func<Vector3, byte[]>(Serialize) },
+            { typeof(Vector2Int), new Func<Vector2Int, byte[]>(Serialize) },
+            { typeof(Vector3Int), new Func<Vector3Int, byte[]>(Serialize) },
         };
 
         private static readonly Dictionary<Type, Delegate> readers = new Dictionary<Type, Delegate>()
         {
-            { typeof(byte), new Func<byte[], byte>(Deserialize<byte>) },
-            { typeof(sbyte), new Func<byte[], sbyte>(Deserialize<sbyte>) },
-            { typeof(char), new Func<byte[], char>(value => (char)Deserialize<ushort>(value)) },
-            { typeof(short), new Func<byte[], short>(Deserialize<short>) },
-            { typeof(ushort), new Func<byte[], ushort>(Deserialize<ushort>) },
             { typeof(int), new Func<byte[], int>(Deserialize<int>) },
             { typeof(uint), new Func<byte[], uint>(Deserialize<uint>) },
             { typeof(bool), new Func<byte[], bool>(value => Deserialize<byte>(value) != 0) },
@@ -50,6 +45,10 @@ namespace JFramework
             { typeof(float), new Func<byte[], float>(Deserialize<float>) },
             { typeof(double), new Func<byte[], double>(Deserialize<double>) },
             { typeof(string), new Func<byte[], string>(Encoding.UTF8.GetString) },
+            { typeof(Vector2), new Func<byte[], Vector2>(Deserialize<Vector2>) },
+            { typeof(Vector3), new Func<byte[], Vector3>(Deserialize<Vector3>) },
+            { typeof(Vector2Int), new Func<byte[], Vector2Int>(Deserialize<Vector2Int>) },
+            { typeof(Vector3Int), new Func<byte[], Vector3Int>(Deserialize<Vector3Int>) },
         };
 
         internal static byte[] Write<T>(this T value)
