@@ -28,6 +28,9 @@ namespace JFramework.Core
         private static readonly Dictionary<string, AssetData> assets = new();
         private static readonly Dictionary<string, AssetBundle> bundles = new();
         private static readonly Dictionary<string, Task<AssetBundle>> requests = new();
+        public static event Action<string[]> OnLoadEntry;
+        public static event Action<string> OnLoadUpdate;
+        public static event Action OnLoadComplete;
 
         public static async Task<T> Load<T>(string path) where T : Object
         {
@@ -70,12 +73,13 @@ namespace JFramework.Core
             }
         }
 
-        public static async void LoadAssetBundles(Action action)
+        public static async void LoadAssetBundles()
         {
             if (mainAsset == null)
             {
                 mainAsset = await LoadAssetBundle(SettingManager.Instance.platform.ToString());
                 manifest = mainAsset.LoadAsset<AssetBundleManifest>(nameof(AssetBundleManifest));
+                OnLoadEntry?.Invoke(manifest.GetAllAssetBundles());
             }
 
             var assetBundles = manifest.GetAllAssetBundles();
@@ -84,7 +88,7 @@ namespace JFramework.Core
                 await LoadAssetBundle(assetBundle);
             }
 
-            action?.Invoke();
+            OnLoadComplete?.Invoke();
         }
 
         private static async Task<T> LoadAsset<T>(string path, AssetMode mode) where T : Object
@@ -147,6 +151,7 @@ namespace JFramework.Core
             {
                 mainAsset = await LoadAssetBundle(SettingManager.Instance.platform.ToString());
                 manifest = mainAsset.LoadAsset<AssetBundleManifest>(nameof(AssetBundleManifest));
+                OnLoadEntry?.Invoke(manifest.GetAllAssetBundles());
             }
 
             var dependencies = manifest.GetAllDependencies(assetData.bundle);
@@ -189,15 +194,14 @@ namespace JFramework.Core
 
         private static async Task<AssetBundle> LoadAssetRequest(string bundle)
         {
-            Debug.Log("解密AB包：" + bundle);
+            if (!GlobalManager.Instance) return null;
             var path = SettingManager.GetPersistentPath(bundle);
             if (File.Exists(path))
             {
                 var bytes = await File.ReadAllBytesAsync(path);
-                bytes = await Obfuscator.DecryptAsync(bytes, AES_KEY);
-                var result = await AssetBundle.LoadFromMemoryAsync(bytes);
-                bundles.Add(bundle, result.assetBundle);
-                return result.assetBundle;
+                var assetBundle = await LoadAssetRequest(bundle, bytes);
+                bundles.Add(bundle, assetBundle);
+                return assetBundle;
             }
 
             path = SettingManager.GetStreamingPath(bundle);
@@ -207,24 +211,31 @@ namespace JFramework.Core
                 await request.SendWebRequest();
                 if (request.result == UnityWebRequest.Result.Success)
                 {
-                    var bytes = await Obfuscator.DecryptAsync(request.downloadHandler.data, AES_KEY);
-                    var result = await AssetBundle.LoadFromMemoryAsync(bytes);
-                    bundles.Add(bundle, result.assetBundle);
-                    return result.assetBundle;
+                    var assetBundle = await LoadAssetRequest(bundle, request.downloadHandler.data);
+                    bundles.Add(bundle, assetBundle);
+                    return assetBundle;
                 }
             }
 #else
             if (File.Exists(path))
             {
                 var bytes = await File.ReadAllBytesAsync(path);
-                bytes = await Obfuscator.DecryptAsync(bytes, AES_KEY);
-                var result = await AssetBundle.LoadFromMemoryAsync(bytes);
-                bundles.Add(bundle, result.assetBundle);
-                return result.assetBundle;
+                var assetBundle = await LoadAssetRequest(bundle, bytes);
+                bundles.Add(bundle, assetBundle);
+                return assetBundle;
             }
 
 #endif
             return null;
+        }
+
+        private static async Task<AssetBundle> LoadAssetRequest(string bundle, byte[] bytes)
+        {
+            Debug.Log("解密AB包：" + bundle);
+            bytes = await Obfuscator.DecryptAsync(bytes, AES_KEY);
+            var result = AssetBundle.LoadFromMemoryAsync(bytes);
+            OnLoadUpdate?.Invoke(bundle);
+            return result.assetBundle;
         }
 
         internal static void UnRegister()
@@ -235,6 +246,9 @@ namespace JFramework.Core
             requests.Clear();
             manifest = null;
             mainAsset = null;
+            OnLoadEntry = null;
+            OnLoadUpdate = null;
+            OnLoadComplete = null;
         }
 
         private static class AssetBundleLoader

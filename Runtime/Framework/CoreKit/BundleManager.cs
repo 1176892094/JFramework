@@ -23,7 +23,7 @@ namespace JFramework.Core
         private static readonly List<string> updateBundles = new();
         private static Dictionary<string, BundleData> clientBundles = new();
         private static Dictionary<string, BundleData> remoteBundles = new();
-        public static event Action<List<long>> OnLoadStart;
+        public static event Action<List<long>> OnLoadEntry;
         public static event Action<string, float> OnLoadUpdate;
         public static event Action<bool> OnLoadComplete;
 
@@ -162,7 +162,7 @@ namespace JFramework.Core
                     }
                 }
 
-                OnLoadStart?.Invoke(sizeList);
+                OnLoadEntry?.Invoke(sizeList);
                 foreach (var bundle in bundles)
                 {
                     var fileUri = SettingManager.GetRemoteFilePath(bundle);
@@ -197,7 +197,7 @@ namespace JFramework.Core
 
         internal static void UnRegister()
         {
-            OnLoadStart = null;
+            OnLoadEntry = null;
             OnLoadUpdate = null;
             OnLoadComplete = null;
             clientBundles.Clear();
