@@ -74,27 +74,6 @@ namespace JFramework
             return builder.ToString();
         }
 
-        public static void EncryptAssetBundle(string filePath)
-        {
-            using var aes = Aes.Create();
-            aes.Key = Encoding.UTF8.GetBytes(AssetManager.AES_KEY);
-            var ivBytes = new byte[16];
-            RandomNumberGenerator.Fill(ivBytes);
-            aes.IV = ivBytes;
-            var tempPath = filePath + ".temp";
-            Debug.Log(filePath + "\n" + BitConverter.ToString(ivBytes, 0, 16));
-            using (var inputFs = new FileStream(filePath, FileMode.Open, FileAccess.Read))
-            using (var outputFs = new FileStream(tempPath, FileMode.Create, FileAccess.Write))
-            using (var cs = new CryptoStream(outputFs, aes.CreateEncryptor(), CryptoStreamMode.Write))
-            {
-                outputFs.Write(ivBytes, 0, ivBytes.Length);
-                inputFs.CopyTo(cs);
-            }
-
-            File.Delete(filePath);
-            File.Move(tempPath, filePath);
-        }
-
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
         private static void RuntimeInitializeOnLoad() => UpdateAsset();
     }
@@ -161,7 +140,7 @@ namespace JFramework
         }
 
         [MenuItem("Tools/JFramework/Build Assets", priority = 3)]
-        private static void BuildAsset()
+        private static async void BuildAsset()
         {
             UpdateAsset();
             var directory = Directory.CreateDirectory(SettingManager.platformPath);
@@ -171,7 +150,7 @@ namespace JFramework
             var dataInfos = new List<BundleManager.BundleData>();
             if (File.Exists(SettingManager.assetBundleInfo))
             {
-                var json = File.ReadAllText(SettingManager.assetBundleInfo);
+                var json = await File.ReadAllTextAsync(SettingManager.assetBundleInfo);
                 var readFiles = JsonManager.Reader<List<BundleManager.BundleData>>(json);
                 var readInfos = readFiles.Select(data => data.code).ToList();
 
@@ -179,7 +158,10 @@ namespace JFramework
                 {
                     if (!readInfos.Contains(GetHashValue(file.FullName)))
                     {
-                        EncryptAssetBundle(file.FullName);
+                        Debug.Log("加密AB包：" + file.FullName);
+                        var loadBytes = await File.ReadAllBytesAsync(file.FullName);
+                        var saveBytes = await Obfuscator.EncryptAsync(loadBytes, AssetManager.AES_KEY);
+                        await File.WriteAllBytesAsync(file.FullName, saveBytes);
                     }
 
                     dataInfos.Add(new BundleManager.BundleData(GetHashValue(file.FullName), file.Name, file.Length.ToString()));
@@ -189,13 +171,16 @@ namespace JFramework
             {
                 foreach (var file in dataFiles)
                 {
-                    EncryptAssetBundle(file.FullName);
+                    Debug.Log("加密AB包：" + file.FullName);
+                    var loadBytes = await File.ReadAllBytesAsync(file.FullName);
+                    var saveBytes = await Obfuscator.EncryptAsync(loadBytes, AssetManager.AES_KEY);
+                    await File.WriteAllBytesAsync(file.FullName, saveBytes);
                     dataInfos.Add(new BundleManager.BundleData(GetHashValue(file.FullName), file.Name, file.Length.ToString()));
                 }
             }
 
             var contents = JsonManager.Writer(dataInfos, true);
-            File.WriteAllText(SettingManager.assetBundleInfo, contents);
+            await File.WriteAllTextAsync(SettingManager.assetBundleInfo, contents);
             Debug.Log("构建 AssetBundles 成功!".Green());
             AssetDatabase.Refresh();
         }

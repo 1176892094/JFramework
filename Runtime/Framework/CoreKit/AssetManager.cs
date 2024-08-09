@@ -12,8 +12,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Security.Cryptography;
-using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.Networking;
@@ -191,12 +189,15 @@ namespace JFramework.Core
 
         private static async Task<AssetBundle> LoadAssetRequest(string bundle)
         {
+            Debug.Log("解密AB包：" + bundle);
             var path = SettingManager.GetPersistentPath(bundle);
             if (File.Exists(path))
             {
-                var assetBundle = await DecryptAssetBundle(path);
-                bundles.Add(bundle, assetBundle);
-                return assetBundle;
+                var bytes = await File.ReadAllBytesAsync(path);
+                bytes = await Obfuscator.DecryptAsync(bytes, AES_KEY);
+                var result = await AssetBundle.LoadFromMemoryAsync(bytes);
+                bundles.Add(bundle, result.assetBundle);
+                return result.assetBundle;
             }
 
             path = SettingManager.GetStreamingPath(bundle);
@@ -206,77 +207,24 @@ namespace JFramework.Core
                 await request.SendWebRequest();
                 if (request.result == UnityWebRequest.Result.Success)
                 {
-                    var assetBundle = await DecryptAssetBundle(path, request.downloadHandler.data);
-                    bundles.Add(bundle, assetBundle);
-                    return assetBundle;
+                    var bytes = await Obfuscator.DecryptAsync(request.downloadHandler.data, AES_KEY);
+                    var result = await AssetBundle.LoadFromMemoryAsync(bytes);
+                    bundles.Add(bundle, result.assetBundle);
+                    return result.assetBundle;
                 }
             }
 #else
             if (File.Exists(path))
             {
-                var assetBundle = await DecryptAssetBundle(path);
-                bundles.Add(bundle, assetBundle);
-                return assetBundle;
+                var bytes = await File.ReadAllBytesAsync(path);
+                bytes = await Obfuscator.DecryptAsync(bytes, AES_KEY);
+                var result = await AssetBundle.LoadFromMemoryAsync(bytes);
+                bundles.Add(bundle, result.assetBundle);
+                return result.assetBundle;
             }
+
 #endif
             return null;
-        }
-
-#if UNITY_ANDROID && !UNITY_EDITOR
-        private static async Task<AssetBundle> DecryptAssetBundle(string filePath, byte[] fileData)
-        {
-            try
-            {
-                using var aes = Aes.Create();
-                aes.Key = Encoding.UTF8.GetBytes(AES_KEY);
-                var ivBytes = new byte[16];
-                Array.Copy(fileData, ivBytes, ivBytes.Length);
-                Debug.Log(filePath + "\n" + BitConverter.ToString(ivBytes, 0, 16));
-                aes.IV = ivBytes;
-
-                using var inputStream = new MemoryStream(fileData, ivBytes.Length, fileData.Length - ivBytes.Length);
-                await using var cs = new CryptoStream(inputStream, aes.CreateDecryptor(), CryptoStreamMode.Read);
-                using var outputStream = new MemoryStream();
-                await cs.CopyToAsync(outputStream);
-        
-                var decryptedBytes = outputStream.ToArray();
-                var request = await AssetBundle.LoadFromMemoryAsync(decryptedBytes);
-                return request.assetBundle;
-            }
-            catch (Exception e)
-            {
-                 Debug.LogError($"无法将AB包解密: {e.Message}");
-                return null;
-            }
-        }
-#endif
-        private static async Task<AssetBundle> DecryptAssetBundle(string filePath)
-        {
-            try
-            {
-                using var aes = Aes.Create();
-                aes.Key = Encoding.UTF8.GetBytes(AES_KEY);
-                var ivBytes = new byte[16];
-
-                await using var fs = new FileStream(filePath, FileMode.Open, FileAccess.Read);
-                await fs.ReadAsync(ivBytes, 0, ivBytes.Length);
-                Debug.Log(filePath + "\n" + BitConverter.ToString(ivBytes, 0, 16));
-                aes.IV = ivBytes;
-
-                await using var cs = new CryptoStream(fs, aes.CreateDecryptor(), CryptoStreamMode.Read);
-                using var ms = new MemoryStream();
-                await cs.CopyToAsync(ms);
-
-                var decryptedBytes = ms.ToArray();
-
-                var request = await AssetBundle.LoadFromMemoryAsync(decryptedBytes);
-                return request.assetBundle;
-            }
-            catch (Exception e)
-            {
-                Debug.LogError($"无法将AB包解密: {e.Message}");
-                return null;
-            }
         }
 
         internal static void UnRegister()
