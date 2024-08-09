@@ -25,20 +25,22 @@ namespace JFramework
         {
             get
             {
-                if (offset == 0)
+                if (buffer == null)
                 {
                     Value = origin;
                 }
-                
-                var target = new byte[buffer.Length];
-                for (int i = 0; i < buffer.Length; i++)
+                else
                 {
-                    target[i] = (byte)(buffer[i] - offset);
-                }
+                    var target = new byte[buffer.Length];
+                    for (int i = 0; i < buffer.Length; i++)
+                    {
+                        target[i] = (byte)(buffer[i] - offset);
+                    }
 
-                if (!origin.Equals(target.Read<T>()))
-                {
-                    GlobalManager.Cheat();
+                    if (!origin.Equals(target.Read<T>()))
+                    {
+                        GlobalManager.Cheat();
+                    }
                 }
 
                 return origin;
