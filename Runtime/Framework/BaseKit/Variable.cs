@@ -20,27 +20,28 @@ namespace JFramework
         public T origin;
         public byte[] buffer;
         public int offset;
+        private bool isFirst;
 
         public T Value
         {
             get
             {
-                if (buffer == null)
+                if (!isFirst)
                 {
+                    isFirst = true;
                     Value = origin;
+                    return origin;
                 }
-                else
-                {
-                    var target = new byte[buffer.Length];
-                    for (int i = 0; i < buffer.Length; i++)
-                    {
-                        target[i] = (byte)(buffer[i] - offset);
-                    }
 
-                    if (!origin.Equals(target.Read<T>()))
-                    {
-                        GlobalManager.Cheat();
-                    }
+                var target = new byte[buffer.Length];
+                for (int i = 0; i < buffer.Length; i++)
+                {
+                    target[i] = (byte)(buffer[i] - offset);
+                }
+                
+                if (!origin.Equals(target.Read<T>()))
+                {
+                    GlobalManager.Cheat();
                 }
 
                 return origin;
@@ -61,6 +62,7 @@ namespace JFramework
         {
             offset = 0;
             buffer = null;
+            isFirst = false;
             origin = default;
             Value = value;
         }
