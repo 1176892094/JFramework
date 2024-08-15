@@ -20,9 +20,7 @@ public abstract class EditorSingleton<T> : ScriptableObject where T : EditorSing
 
     private static string fileName => typeof(T).Name;
 
-    private static string filePath => editorPath + "/" + fileName + ".asset";
-    
-    private static string editorPath => SettingManager.Instance.editorPath;
+    private static string filePath => SettingManager.Instance.EditorPath + "/" + fileName + ".asset";
 
     public static T Instance
     {
@@ -39,9 +37,9 @@ public abstract class EditorSingleton<T> : ScriptableObject where T : EditorSing
                 return instance;
             }
 
-            if (!Directory.Exists(editorPath))
+            if (!Directory.Exists(SettingManager.Instance.EditorPath))
             {
-                Directory.CreateDirectory(editorPath);
+                Directory.CreateDirectory(SettingManager.Instance.EditorPath);
             }
 
             instance = CreateInstance<T>();

@@ -17,7 +17,6 @@ using UnityEngine;
 using UnityEditor;
 #endif
 
-
 namespace JFramework
 {
     internal class SettingManager : ScriptableObject
@@ -26,7 +25,7 @@ namespace JFramework
         public static SettingManager Instance => instance ??= Resources.Load<SettingManager>(nameof(SettingManager));
 
         public AssetPlatform platform = AssetPlatform.StandaloneWindows;
-        
+
         [OnValueChanged("UpdateSceneSetting")] public AssetMode assetMode;
 
         public BuildMode assetBuild = BuildMode.StreamingAssets;
@@ -38,8 +37,6 @@ namespace JFramework
         public string dataAssembly = "HotUpdate.Data";
 
         public string assetPath = "Assets/Template";
-
-        public string editorPath = "Assets/Editor/Resources";
 
         public string remotePath = "http://192.168.0.3:8000/AssetBundles";
 
@@ -66,6 +63,12 @@ namespace JFramework
         private static string GetPlatform(string fileName) => Path.Combine(Instance.platform.ToString(), fileName);
 
 #if UNITY_EDITOR
+        public string EditorPath
+        {
+            get => EditorPrefs.GetString(nameof(EditorPath), "Assets/Editor/Resources");
+            set => EditorPrefs.SetString(nameof(EditorPath), value);
+        }
+
         [ShowInInspector]
         public static string ScriptPath
         {
@@ -79,7 +82,7 @@ namespace JFramework
             get => EditorPrefs.GetString(nameof(DataTablePath), "Assets/Scripts/DataTable");
             set => EditorPrefs.SetString(nameof(DataTablePath), value);
         }
-        
+
         [HideInInspector] public List<string> sceneAssets = new List<string>();
 
         public static readonly Dictionary<string, string> objects = new Dictionary<string, string>();
