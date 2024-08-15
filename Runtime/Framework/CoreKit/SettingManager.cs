@@ -63,6 +63,7 @@ namespace JFramework
         private static string GetPlatform(string fileName) => Path.Combine(Instance.platform.ToString(), fileName);
 
 #if UNITY_EDITOR
+        [ShowInInspector]
         public string EditorPath
         {
             get => EditorPrefs.GetString(nameof(EditorPath), "Assets/Editor/Resources");
