@@ -203,7 +203,7 @@ namespace JFramework.Core
 
             path = SettingManager.GetStreamingPath(bundle);
 #if UNITY_ANDROID && !UNITY_EDITOR
-            using (var request = UnityWebRequestAssetBundle.GetAssetBundle(path))
+            using (var request = UnityWebRequest.Get(path))
             {
                 await request.SendWebRequest();
                 if (request.result == UnityWebRequest.Result.Success)
