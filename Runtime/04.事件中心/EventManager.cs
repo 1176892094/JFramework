@@ -26,7 +26,7 @@ namespace JFramework.Core
                 events.Add(typeof(T), @event = new Event<T>());
             }
 
-            ((Event<T>)@event).Execute += obj.Execute;
+            ((Event<T>)@event).Listen(obj);
         }
 
         public static void Remove<T>(IEvent<T> obj) where T : struct, IEvent
@@ -34,7 +34,7 @@ namespace JFramework.Core
             if (!GlobalManager.Instance) return;
             if (events.TryGetValue(typeof(T), out var @event))
             {
-                ((Event<T>)@event).Execute -= obj.Execute;
+                ((Event<T>)@event).Remove(obj);
             }
         }
 
@@ -43,7 +43,7 @@ namespace JFramework.Core
             if (!GlobalManager.Instance) return;
             if (events.TryGetValue(typeof(T), out var @event))
             {
-                ((Event<T>)@event).Execute?.Invoke(obj);
+                ((Event<T>)@event).Invoke(obj);
             }
         }
 

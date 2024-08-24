@@ -19,8 +19,6 @@ namespace JFramework.Core
     {
         private static readonly Dictionary<Type, InputData> inputs = new();
         private static readonly Dictionary<InputType, Dictionary<InputMode, Action<InputData>>> inputActions = new();
-        public static float vertical;
-        public static float horizontal;
 
         internal static void Register()
         {
@@ -132,101 +130,6 @@ namespace JFramework.Core
             horizontal = 0;
             inputs.Clear();
             inputActions.Clear();
-        }
-    }
-
-    public static partial class InputManager
-    {
-        private static void GetAxisX(InputData input)
-        {
-            horizontal = Input.GetAxis(input.button);
-        }
-
-        private static void GetAxisY(InputData input)
-        {
-            vertical = Input.GetAxis(input.button);
-        }
-
-        private static void GetAxisRawX(InputData input)
-        {
-            horizontal = Input.GetAxisRaw(input.button);
-        }
-
-        private static void GetAxisRawY(InputData input)
-        {
-            vertical = Input.GetAxisRaw(input.button);
-        }
-
-        private static void GetKeyDown(InputData input)
-        {
-            if (Input.GetKeyDown(input.key))
-            {
-                input.Invoke();
-            }
-        }
-
-        private static void GetKeyUp(InputData input)
-        {
-            if (Input.GetKeyUp(input.key))
-            {
-                input.Invoke();
-            }
-        }
-
-        private static void GetKey(InputData input)
-        {
-            if (Input.GetKey(input.key))
-            {
-                input.Invoke();
-            }
-        }
-
-        private static void GetMouseDown(InputData input)
-        {
-            if (Input.GetMouseButtonDown(input.mouse))
-            {
-                input.Invoke();
-            }
-        }
-
-        private static void GetMouseUp(InputData input)
-        {
-            if (Input.GetMouseButtonUp(input.mouse))
-            {
-                input.Invoke();
-            }
-        }
-
-        private static void GetMouse(InputData input)
-        {
-            if (Input.GetMouseButton(input.mouse))
-            {
-                input.Invoke();
-            }
-        }
-
-        private static void GetButtonDown(InputData input)
-        {
-            if (Input.GetButtonDown(input.button))
-            {
-                input.Invoke();
-            }
-        }
-
-        private static void GetButtonUp(InputData input)
-        {
-            if (Input.GetButtonUp(input.button))
-            {
-                input.Invoke();
-            }
-        }
-
-        private static void GetButton(InputData input)
-        {
-            if (Input.GetButton(input.button))
-            {
-                input.Invoke();
-            }
         }
     }
 }

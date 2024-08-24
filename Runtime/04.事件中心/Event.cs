@@ -17,7 +17,10 @@ namespace JFramework.Core
     {
         private class Event<T> : IEvent where T : struct, IEvent
         {
-            public Action<T> Execute;
+            private event Action<T> Execute;
+            public void Listen(IEvent<T> obj) => Execute += obj.Execute;
+            public void Remove(IEvent<T> obj) => Execute -= obj.Execute;
+            public void Invoke(T obj) => Execute?.Invoke(obj);
         }
     }
 }

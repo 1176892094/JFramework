@@ -18,7 +18,7 @@ namespace JFramework.Core
         [Serializable]
         private class InputEvent<T> : InputData where T : struct, IEvent
         {
-            private Action<T> Execute;
+            private event Action<T> Execute;
             public override void Listen() => Execute += EventManager.Invoke;
             public override void Remove() => Execute -= EventManager.Invoke;
             public override void Invoke() => Execute?.Invoke(default);
