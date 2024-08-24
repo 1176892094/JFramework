@@ -37,7 +37,7 @@ namespace JFramework
                     target[i] = (byte)(buffer[i] - offset);
                 }
 
-                if (!origin.Equals(target.Read<T>()))
+                if (!origin.Equals(Serialization.Read<T>(target)))
                 {
                     GlobalManager.Cheat();
                 }
@@ -46,8 +46,8 @@ namespace JFramework
             }
             set
             {
-                buffer = value.Write();
-                origin = buffer.Read<T>();
+                buffer = Serialization.Write(value);
+                origin = Serialization.Read<T>(buffer);
                 offset = Random.Range(1, byte.MaxValue);
                 for (int i = 0; i < buffer.Length; i++)
                 {

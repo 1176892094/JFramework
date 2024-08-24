@@ -9,15 +9,15 @@
 // *********************************************************************************
 
 using System;
+using System.Text;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
-using System.Text;
 using Unity.Collections.LowLevel.Unsafe;
 using UnityEngine;
 
 namespace JFramework
 {
-    public static partial class Extensions
+    public static class Serialization
     {
         private static readonly Dictionary<Type, Delegate> writers = new Dictionary<Type, Delegate>()
         {
@@ -47,7 +47,7 @@ namespace JFramework
             { typeof(Vector3Int), new Func<byte[], Vector3Int>(Deserialize<Vector3Int>) },
         };
 
-        internal static byte[] Write<T>(this T value)
+        internal static byte[] Write<T>(T value)
         {
             if (writers.TryGetValue(typeof(T), out var func))
             {
@@ -57,7 +57,7 @@ namespace JFramework
             return default;
         }
 
-        internal static T Read<T>(this byte[] bytes)
+        internal static T Read<T>(byte[] bytes)
         {
             if (readers.TryGetValue(typeof(T), out var func))
             {
