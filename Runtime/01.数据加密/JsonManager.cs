@@ -18,7 +18,7 @@ namespace JFramework.Core
 {
     public static class JsonManager
     {
-        public const string AES_KEY = "0123456789ABCDEF";
+        private const string AES_KEY = "0123456789ABCDEF";
 
         public static void Save<T>(T obj, string name)
         {
@@ -77,14 +77,14 @@ namespace JFramework.Core
             return filePath;
         }
 
-        public static T Reader<T>(string json)
+        public static T Read<T>(string json)
         {
             return JsonUtility.FromJson<JsonMapper<T>>(json).value;
         }
 
-        public static string Writer<T>(T obj, bool isPretty = false)
+        public static string Write<T>(T obj)
         {
-            return JsonUtility.ToJson(new JsonMapper<T>(obj), isPretty);
+            return JsonUtility.ToJson(new JsonMapper<T>(obj));
         }
 
         [Serializable]

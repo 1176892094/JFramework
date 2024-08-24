@@ -61,7 +61,7 @@ namespace JFramework.Core
         {
             public static T LoadAsync<T>(string assetPath) where T : Object
             {
-                if (SettingManager.objects.TryGetValue(char.ToUpper(assetPath[0]) + assetPath.Substring(1), out var editorPath))
+                if (GlobalSetting.objects.TryGetValue(char.ToUpper(assetPath[0]) + assetPath.Substring(1), out var editorPath))
                 {
                     if (typeof(T).IsSubclassOf(typeof(MonoBehaviour)))
                     {

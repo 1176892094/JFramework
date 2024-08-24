@@ -77,7 +77,7 @@ namespace JFramework.Core
         {
             if (mainAsset == null)
             {
-                mainAsset = await LoadAssetBundle(SettingManager.Instance.platform.ToString());
+                mainAsset = await LoadAssetBundle(GlobalSetting.Instance.platform.ToString());
                 manifest = mainAsset.LoadAsset<AssetBundleManifest>(nameof(AssetBundleManifest));
                 OnLoadEntry?.Invoke(manifest.GetAllAssetBundles());
             }
@@ -149,7 +149,7 @@ namespace JFramework.Core
 
             if (mainAsset == null)
             {
-                mainAsset = await LoadAssetBundle(SettingManager.Instance.platform.ToString());
+                mainAsset = await LoadAssetBundle(GlobalSetting.Instance.platform.ToString());
                 manifest = mainAsset.LoadAsset<AssetBundleManifest>(nameof(AssetBundleManifest));
                 OnLoadEntry?.Invoke(manifest.GetAllAssetBundles());
             }
@@ -194,14 +194,14 @@ namespace JFramework.Core
 
         private static async Task<AssetBundle> LoadAssetRequest(string bundle)
         {
-            var path = SettingManager.GetPersistentPath(bundle);
+            var path = GlobalSetting.GetPersistentPath(bundle);
             if (File.Exists(path))
             {
                 var bytes = await File.ReadAllBytesAsync(path);
                 return await LoadAssetRequest(bundle, bytes);
             }
 
-            path = SettingManager.GetStreamingPath(bundle);
+            path = GlobalSetting.GetStreamingPath(bundle);
 #if UNITY_ANDROID && !UNITY_EDITOR
             using (var request = UnityWebRequest.Get(path))
             {

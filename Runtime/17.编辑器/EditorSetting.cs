@@ -35,7 +35,7 @@ namespace JFramework
         {
             var tree = new OdinMenuTree
             {
-                { "主页", SettingManager.Instance, EditorIcons.House },
+                { "主页", GlobalSetting.Instance, EditorIcons.House },
             };
 
             var icon = 0;
@@ -99,8 +99,8 @@ namespace JFramework
                 }
             }
 
-            SettingManager.Instance.sceneAssets.Clear();
-            var folders = AssetDatabase.GetSubFolders(SettingManager.Instance.assetPath);
+            GlobalSetting.Instance.sceneAssets.Clear();
+            var folders = AssetDatabase.GetSubFolders(GlobalSetting.Instance.assetPath);
             foreach (var folder in folders)
             {
                 if (string.IsNullOrEmpty(folder)) continue;
@@ -127,10 +127,10 @@ namespace JFramework
                         {
                             if (asset is SceneAsset)
                             {
-                                SettingManager.Instance.sceneAssets.Add(path);
+                                GlobalSetting.Instance.sceneAssets.Add(path);
                             }
 
-                            SettingManager.objects[$"{name}/{asset.name}"] = path;
+                            GlobalSetting.objects[$"{name}/{asset.name}"] = path;
                         }
                     }
                 }
@@ -143,15 +143,15 @@ namespace JFramework
         private static async void BuildAsset()
         {
             UpdateAsset();
-            var directory = Directory.CreateDirectory(SettingManager.platformPath);
-            var platform = (BuildTarget)SettingManager.Instance.platform;
-            BuildPipeline.BuildAssetBundles(SettingManager.platformPath, BuildAssetBundleOptions.None, platform);
+            var directory = Directory.CreateDirectory(GlobalSetting.platformPath);
+            var platform = (BuildTarget)GlobalSetting.Instance.platform;
+            BuildPipeline.BuildAssetBundles(GlobalSetting.platformPath, BuildAssetBundleOptions.None, platform);
             var dataFiles = directory.GetFiles().Where(info => info.Extension == "").ToList();
             var dataInfos = new List<BundleData>();
-            if (File.Exists(SettingManager.assetBundleInfo))
+            if (File.Exists(GlobalSetting.assetBundleInfo))
             {
-                var json = await File.ReadAllTextAsync(SettingManager.assetBundleInfo);
-                var readFiles = JsonManager.Reader<List<BundleData>>(json);
+                var json = await File.ReadAllTextAsync(GlobalSetting.assetBundleInfo);
+                var readFiles = JsonManager.Read<List<BundleData>>(json);
                 var readInfos = readFiles.Select(data => data.code).ToList();
 
                 foreach (var file in dataFiles)
@@ -179,8 +179,8 @@ namespace JFramework
                 }
             }
 
-            var contents = JsonManager.Writer(dataInfos, true);
-            await File.WriteAllTextAsync(SettingManager.assetBundleInfo, contents);
+            var contents = JsonManager.Write(dataInfos);
+            await File.WriteAllTextAsync(GlobalSetting.assetBundleInfo, contents);
             Debug.Log("构建 AssetBundles 成功!".Green());
             AssetDatabase.Refresh();
         }

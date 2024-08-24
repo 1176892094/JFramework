@@ -17,7 +17,7 @@ using UnityEngine;
 
 namespace JFramework
 {
-    public static class Serialization
+    internal static class Serialization
     {
         private static readonly Dictionary<Type, Delegate> writers = new Dictionary<Type, Delegate>()
         {
@@ -47,7 +47,7 @@ namespace JFramework
             { typeof(Vector3Int), new Func<byte[], Vector3Int>(Deserialize<Vector3Int>) },
         };
 
-        internal static byte[] Write<T>(T value)
+        public static byte[] Write<T>(T value)
         {
             if (writers.TryGetValue(typeof(T), out var func))
             {
@@ -57,7 +57,7 @@ namespace JFramework
             return default;
         }
 
-        internal static T Read<T>(byte[] bytes)
+        public static T Read<T>(byte[] bytes)
         {
             if (readers.TryGetValue(typeof(T), out var func))
             {

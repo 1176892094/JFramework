@@ -59,7 +59,7 @@ namespace JFramework.Core
         {
             if (!paths.TryGetValue(type.Name, out var path))
             {
-                path = SettingManager.GetUIPath(type.Name);
+                path = GlobalSetting.GetUIPath(type.Name);
             }
 
             var obj = await AssetManager.Load<GameObject>(path);
@@ -73,7 +73,7 @@ namespace JFramework.Core
         public static async void LoadPath(string path)
         {
             var asset = await AssetManager.Load<TextAsset>(path);
-            var copies = JsonManager.Reader<List<UIData>>(asset.text);
+            var copies = JsonManager.Read<List<UIData>>(asset.text);
             foreach (var data in copies)
             {
                 paths.Add(data.name, data.path);

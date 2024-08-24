@@ -38,13 +38,13 @@ namespace JFramework.Core
                 return;
             }
 
-            var bundles = JsonManager.Reader<List<BundleData>>(remote);
+            var bundles = JsonManager.Read<List<BundleData>>(remote);
             remoteBundles = bundles.ToDictionary(bundle => bundle.name);
 
             var client = await GetClientBundle();
             if (!string.IsNullOrEmpty(client))
             {
-                bundles = JsonManager.Reader<List<BundleData>>(client);
+                bundles = JsonManager.Read<List<BundleData>>(client);
                 clientBundles = bundles.ToDictionary(bundle => bundle.name);
             }
             
@@ -68,7 +68,7 @@ namespace JFramework.Core
 
             foreach (var key in clientBundles.Keys)
             {
-                var path = SettingManager.GetPersistentPath(key);
+                var path = GlobalSetting.GetPersistentPath(key);
                 if (File.Exists(path))
                 {
                     File.Delete(path);
@@ -77,7 +77,7 @@ namespace JFramework.Core
 
             if (await GetAssetBundles())
             {
-                await File.WriteAllTextAsync(SettingManager.clientInfoPath, remote);
+                await File.WriteAllTextAsync(GlobalSetting.clientInfoPath, remote);
                 OnLoadComplete?.Invoke(true);
             }
         }
@@ -87,14 +87,14 @@ namespace JFramework.Core
             var reloads = 5;
             while (reloads-- > 0)
             {
-                var fileUri = SettingManager.GetRemoteFilePath(SettingManager.clientInfoName);
+                var fileUri = GlobalSetting.GetRemoteFilePath(GlobalSetting.clientInfoName);
                 using (var request = UnityWebRequest.Head(fileUri))
                 {
                     request.timeout = 1;
                     await request.SendWebRequest();
                     if (request.result != UnityWebRequest.Result.Success)
                     {
-                        Debug.Log($"校验 {SettingManager.Instance.assetInfo} 失败\n");
+                        Debug.Log($"校验 {GlobalSetting.Instance.assetInfo} 失败\n");
                         continue;
                     }
                 }
@@ -104,7 +104,7 @@ namespace JFramework.Core
                     await request.SendWebRequest();
                     if (request.result != UnityWebRequest.Result.Success)
                     {
-                        Debug.Log($"下载 {SettingManager.Instance.assetInfo} 失败\n");
+                        Debug.Log($"下载 {GlobalSetting.Instance.assetInfo} 失败\n");
                         continue;
                     }
 
@@ -117,9 +117,9 @@ namespace JFramework.Core
 
         private static async Task<string> GetClientBundle()
         {
-            if (File.Exists(SettingManager.clientInfoPath))
+            if (File.Exists(GlobalSetting.clientInfoPath))
             {
-                return await File.ReadAllTextAsync(SettingManager.clientInfoPath);
+                return await File.ReadAllTextAsync(GlobalSetting.clientInfoPath);
             }
 
 #if UNITY_ANDROID && !UNITY_EDITOR
@@ -130,9 +130,9 @@ namespace JFramework.Core
                 return request.downloadHandler.text;
             }
 #else
-            if (File.Exists(SettingManager.streamingInfoPath))
+            if (File.Exists(GlobalSetting.streamingInfoPath))
             {
-                return await File.ReadAllTextAsync(SettingManager.streamingInfoPath);
+                return await File.ReadAllTextAsync(GlobalSetting.streamingInfoPath);
             }
 #endif
             return null;
@@ -147,7 +147,7 @@ namespace JFramework.Core
                 var sizeList = new List<long>();
                 foreach (var bundle in bundles)
                 {
-                    var fileUri = SettingManager.GetRemoteFilePath(bundle);
+                    var fileUri = GlobalSetting.GetRemoteFilePath(bundle);
                     using (var request = UnityWebRequest.Head(fileUri))
                     {
                         request.timeout = 1;
@@ -165,7 +165,7 @@ namespace JFramework.Core
                 OnLoadEntry?.Invoke(sizeList);
                 foreach (var bundle in bundles)
                 {
-                    var fileUri = SettingManager.GetRemoteFilePath(bundle);
+                    var fileUri = GlobalSetting.GetRemoteFilePath(bundle);
                     using (var request = UnityWebRequest.Get(fileUri))
                     {
                         var result = request.SendWebRequest();
@@ -183,7 +183,7 @@ namespace JFramework.Core
                         }
 
                         var contents = request.downloadHandler.data;
-                        await File.WriteAllBytesAsync(SettingManager.GetPersistentPath(bundle), contents);
+                        await File.WriteAllBytesAsync(GlobalSetting.GetPersistentPath(bundle), contents);
                         if (updateBundles.Contains(bundle))
                         {
                             updateBundles.Remove(bundle);

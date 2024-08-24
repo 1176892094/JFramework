@@ -26,14 +26,14 @@ namespace JFramework.Core
 
         public static async Task LoadDataTable()
         {
-            var assembly = Reflection.GetAssembly(SettingManager.Instance.dataAssembly);
+            var assembly = Reflection.GetAssembly(GlobalSetting.Instance.dataAssembly);
             var types = Reflection.GetTypes<IDataTable>(assembly);
             if (types == null || types.Length == 0) return;
             foreach (var type in types)
             {
                 try
                 {
-                    var obj = await AssetManager.Load<ScriptableObject>(SettingManager.GetTablePath(type.Name));
+                    var obj = await AssetManager.Load<ScriptableObject>(GlobalSetting.GetTablePath(type.Name));
                     var table = (IDataTable)obj;
                     if (type.FullName == null) return;
                     var data = assembly.GetType(type.FullName[..^5]);

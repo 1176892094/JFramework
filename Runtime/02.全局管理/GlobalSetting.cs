@@ -19,10 +19,10 @@ using UnityEditor;
 
 namespace JFramework
 {
-    internal class SettingManager : ScriptableObject
+    internal class GlobalSetting : ScriptableObject
     {
-        private static SettingManager instance;
-        public static SettingManager Instance => instance ??= Resources.Load<SettingManager>(nameof(SettingManager));
+        private static GlobalSetting instance;
+        public static GlobalSetting Instance => instance ??= Resources.Load<GlobalSetting>(nameof(GlobalSetting));
 
         public AssetPlatform platform = AssetPlatform.StandaloneWindows;
 

@@ -28,7 +28,7 @@ namespace JFramework.Core
         {
             var manager = PoolManager.manager.gameObject;
             mainSource = manager.AddComponent<AudioSource>();
-            sourceName = SettingManager.GetAudioPath(nameof(AudioSource));
+            sourceName = GlobalSetting.GetAudioPath(nameof(AudioSource));
             JsonManager.Load(setting, nameof(AudioManager));
             manager.AddComponent<AudioListener>();
         }
@@ -36,7 +36,7 @@ namespace JFramework.Core
         public static async void PlayMain(string name, Action<AudioSource> action = null)
         {
             if (!GlobalManager.Instance || string.IsNullOrEmpty(name)) return;
-            var clip = await AssetManager.Load<AudioClip>(SettingManager.GetAudioPath(name));
+            var clip = await AssetManager.Load<AudioClip>(GlobalSetting.GetAudioPath(name));
             if (clip == null) return;
             mainSource.volume = mainVolume;
             mainSource.clip = clip;
@@ -48,7 +48,7 @@ namespace JFramework.Core
         public static async void PlayOnce(string name, Action<AudioSource> action = null)
         {
             if (!GlobalManager.Instance || string.IsNullOrEmpty(name)) return;
-            var clip = await AssetManager.Load<AudioClip>(SettingManager.GetAudioPath(name));
+            var clip = await AssetManager.Load<AudioClip>(GlobalSetting.GetAudioPath(name));
             if (clip == null) return;
             var audio = await LoadSource(clip);
             audios.Remove(audio);
@@ -60,7 +60,7 @@ namespace JFramework.Core
         public static async void PlayLoop(string name, Action<AudioSource> action = null)
         {
             if (!GlobalManager.Instance || string.IsNullOrEmpty(name)) return;
-            var clip = await AssetManager.Load<AudioClip>(SettingManager.GetAudioPath(name));
+            var clip = await AssetManager.Load<AudioClip>(GlobalSetting.GetAudioPath(name));
             if (clip == null) return;
             var audio = await LoadSource(clip);
             audios.Remove(audio);

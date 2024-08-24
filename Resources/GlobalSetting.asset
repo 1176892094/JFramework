@@ -10,36 +10,23 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 44ad09f1d6a94a539d03bf46ca54214f, type: 3}
-  m_Name: SettingManager
+  m_Name: GlobalSetting
   m_EditorClassIdentifier: 
-  platform: 9
+  platform: 13
+  assetMode: 0
+  assetBuild: 0
   assetInfo: AssetBundleInfo
   buildPath: AssetBundles
   dataAssembly: HotUpdate.Data
   assetPath: Assets/Template
-  editorPath: Assets/Editor/Resources
-  dataPath: Assets/Template/DataTable
-  scriptPath: Assets/Scripts/DataTable
-  remotePath: http://192.168.0.4:8000/Files/Unity/Forest/AssetBundles
-  assetMode: 1
-  assetBuild: 0
-  assetLoadKey: 0
-  excelPathKey: /Users/jinyijie/Files/Unity/Forest/DataTable
-  sceneEditor:
-  - Assets/Template/Scenes/BossScene2.unity
-  - Assets/Template/Scenes/BossScene4.unity
-  - Assets/Template/Scenes/LevelScene5.unity
+  remotePath: http://106.54.7.123/AssetBundles12
   sceneAssets:
-  - Assets/Template/Scenes/AwakeScene.unity
-  - Assets/Template/Scenes/BossScene1.unity
-  - Assets/Template/Scenes/BossScene2.unity
-  - Assets/Template/Scenes/BossScene3.unity
-  - Assets/Template/Scenes/BossScene4.unity
   - Assets/Template/Scenes/GameScene.unity
   - Assets/Template/Scenes/LevelScene1.unity
   - Assets/Template/Scenes/LevelScene2.unity
   - Assets/Template/Scenes/LevelScene3.unity
   - Assets/Template/Scenes/LevelScene4.unity
   - Assets/Template/Scenes/LevelScene5.unity
+  - Assets/Template/Scenes/LevelScene6.unity
   - Assets/Template/Scenes/LoginScene.unity
   - Assets/Template/Scenes/TechScene.unity

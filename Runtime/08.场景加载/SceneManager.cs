@@ -27,7 +27,7 @@ namespace JFramework.Core
             try
             {
                 isLoading = true;
-                var newScene = await AssetManager.LoadScene(SettingManager.GetScenePath(name));
+                var newScene = await AssetManager.LoadScene(GlobalSetting.GetScenePath(name));
                 await UnitySceneManager.LoadSceneAsync(newScene, LoadSceneMode.Single);
                 isLoading = false;
             }
@@ -43,7 +43,7 @@ namespace JFramework.Core
             try
             {
                 isLoading = true;
-                var newScene = await AssetManager.LoadScene(SettingManager.GetScenePath(name));
+                var newScene = await AssetManager.LoadScene(GlobalSetting.GetScenePath(name));
                 await UnitySceneManager.LoadSceneAsync(newScene, LoadSceneMode.Single);
                 isLoading = false;
                 action?.Invoke();
@@ -60,7 +60,7 @@ namespace JFramework.Core
             try
             {
                 isLoading = true;
-                var newScene = await AssetManager.LoadScene(SettingManager.GetScenePath(name));
+                var newScene = await AssetManager.LoadScene(GlobalSetting.GetScenePath(name));
                 var operation = UnitySceneManager.LoadSceneAsync(newScene, LoadSceneMode.Single);
                 action?.Invoke(operation);
                 await operation;
