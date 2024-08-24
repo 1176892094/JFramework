@@ -15,7 +15,7 @@ using UnityEngine;
 
 namespace JFramework.Core
 {
-    public static class AudioManager
+    public static partial class AudioManager
     {
         private static readonly List<AudioSource> audios = new List<AudioSource>();
         private static readonly AudioSetting setting = new AudioSetting();
@@ -68,7 +68,7 @@ namespace JFramework.Core
             audio.Play();
             action?.Invoke(audio);
         }
-        
+
         public static async Task<AudioSource> LoadSource(AudioClip clip)
         {
             GameObject obj;
@@ -131,13 +131,6 @@ namespace JFramework.Core
         {
             audios.Clear();
             mainSource = null;
-        }
-
-        [Serializable]
-        private class AudioSetting
-        {
-            public float mainValue = 0.5f;
-            public float audioValue = 0.5f;
         }
     }
 }

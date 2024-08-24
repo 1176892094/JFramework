@@ -16,7 +16,7 @@ using Object = UnityEngine.Object;
 
 namespace JFramework.Core
 {
-    public static class JsonManager
+    public static partial class JsonManager
     {
         private const string AES_KEY = "0123456789ABCDEF";
 
@@ -75,27 +75,6 @@ namespace JFramework.Core
             }
 
             return filePath;
-        }
-
-        public static T Read<T>(string json)
-        {
-            return JsonUtility.FromJson<JsonMapper<T>>(json).value;
-        }
-
-        public static string Write<T>(T obj)
-        {
-            return JsonUtility.ToJson(new JsonMapper<T>(obj));
-        }
-
-        [Serializable]
-        private class JsonMapper<T>
-        {
-            public T value;
-
-            public JsonMapper(T value)
-            {
-                this.value = value;
-            }
         }
     }
 }

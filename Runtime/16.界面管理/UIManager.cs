@@ -234,18 +234,5 @@ namespace JFramework.Core
         {
             return panels.TryGetValue(typeof(TPanel).Name, out var panel) && panel.gameObject.activeInHierarchy;
         }
-
-        [Serializable]
-        private struct UIData
-        {
-            public string name;
-            public string path;
-
-            public UIData(string name, string path)
-            {
-                this.name = name;
-                this.path = path;
-            }
-        }
     }
 }
