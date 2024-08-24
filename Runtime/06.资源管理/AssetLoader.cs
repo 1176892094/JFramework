@@ -8,7 +8,6 @@
 // # Description: This is an automatically generated comment.
 // *********************************************************************************
 
-using System;
 using System.Threading.Tasks;
 using UnityEngine;
 using Object = UnityEngine.Object;
@@ -79,31 +78,5 @@ namespace JFramework.Core
             }
         }
 #endif
-
-        [Serializable]
-        private struct AssetData
-        {
-            public string asset;
-            public string bundle;
-
-            public AssetData(string path)
-            {
-                var index = path.LastIndexOf('/');
-                if (index < 0)
-                {
-                    bundle = "";
-                    asset = path;
-                    return;
-                }
-
-                bundle = path.Substring(0, index).ToLower();
-                asset = path.Substring(index + 1);
-            }
-
-            public override string ToString()
-            {
-                return $"资源包：{bundle} 资源名称：{asset}";
-            }
-        }
     }
 }

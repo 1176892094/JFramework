@@ -20,7 +20,6 @@ namespace JFramework.Core
     public static partial class PoolManager
     {
         public static Transform manager;
-
         private static readonly Dictionary<string, GameObject> parents = new();
         private static readonly Dictionary<string, IPool<GameObject>> pools = new();
 
@@ -105,59 +104,15 @@ namespace JFramework.Core
                 pool.Dispose();
             }
 
-            pools.Clear();
-            parents.Clear();
-            manager = null;
-
             foreach (var pool in streams.Values)
             {
                 pool.Dispose();
             }
-
+            
+            pools.Clear();
+            parents.Clear();
             streams.Clear();
-        }
-
-        [Serializable]
-        private class Pool<T> : IPool<T>
-        {
-            private readonly Queue<T> objects = new Queue<T>();
-            private readonly HashSet<T> unique = new HashSet<T>();
-            public int count => objects.Count;
-
-            public Pool(T obj)
-            {
-                unique.Add(obj);
-                objects.Enqueue(obj);
-            }
-
-            public T Pop()
-            {
-                if (objects.Count > 0)
-                {
-                    var obj = objects.Dequeue();
-                    unique.Remove(obj);
-                    return obj;
-                }
-
-                return Activator.CreateInstance<T>();
-            }
-
-            public bool Push(T obj)
-            {
-                if (unique.Add(obj))
-                {
-                    objects.Enqueue(obj);
-                    return true;
-                }
-
-                return false;
-            }
-
-            public void Dispose()
-            {
-                unique.Clear();
-                objects.Clear();
-            }
+            manager = null;
         }
     }
 }

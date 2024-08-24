@@ -14,7 +14,7 @@ using JFramework.Interface;
 
 namespace JFramework.Core
 {
-    public static class EventManager
+    public static partial class EventManager
     {
         private static readonly Dictionary<Type, IEvent> events = new();
 
@@ -26,7 +26,7 @@ namespace JFramework.Core
                 events.Add(typeof(T), @event = new Event<T>());
             }
 
-            ((Event<T>)@event).action += obj.Execute;
+            ((Event<T>)@event).Execute += obj.Execute;
         }
 
         public static void Remove<T>(IEvent<T> obj) where T : struct, IEvent
@@ -34,7 +34,7 @@ namespace JFramework.Core
             if (!GlobalManager.Instance) return;
             if (events.TryGetValue(typeof(T), out var @event))
             {
-                ((Event<T>)@event).action -= obj.Execute;
+                ((Event<T>)@event).Execute -= obj.Execute;
             }
         }
 
@@ -43,18 +43,13 @@ namespace JFramework.Core
             if (!GlobalManager.Instance) return;
             if (events.TryGetValue(typeof(T), out var @event))
             {
-                ((Event<T>)@event).action?.Invoke(obj);
+                ((Event<T>)@event).Execute?.Invoke(obj);
             }
         }
 
         internal static void UnRegister()
         {
             events.Clear();
-        }
-
-        private class Event<T> : IEvent where T : struct, IEvent
-        {
-            public Action<T> action;
         }
     }
 }

@@ -126,7 +126,7 @@ namespace JFramework.Core
         [ShowInInspector] private static Dictionary<Type, IEvent> events = new();
         [ShowInInspector] private static Dictionary<string, UIPanel> panels = new();
         [ShowInInspector] private static Dictionary<Type, List<UIPanel>> groups = new();
-        [ShowInInspector] private static Dictionary<Type, InputManager.InputData> inputs = new();
+        [ShowInInspector] private static Dictionary<Type, InputData> inputs = new();
         [ShowInInspector] private static Dictionary<Type, Dictionary<int, IData>> intData = new();
         [ShowInInspector] private static Dictionary<Type, Dictionary<Enum, IData>> enumData = new();
         [ShowInInspector] private static Dictionary<Type, Dictionary<string, IData>> stringData = new();
@@ -152,7 +152,7 @@ namespace JFramework.Core
             field = typeof(UIManager).GetField("groups", Reflection.Static)?.GetValue(null);
             groups = (Dictionary<Type, List<UIPanel>>)field;
             field = typeof(InputManager).GetField("inputs", Reflection.Static)?.GetValue(null);
-            inputs = (Dictionary<Type, InputManager.InputData>)field;
+            inputs = (Dictionary<Type, InputData>)field;
             field = typeof(DataManager).GetField("intData", Reflection.Static)?.GetValue(null);
             intData = (Dictionary<Type, Dictionary<int, IData>>)field;
             field = typeof(DataManager).GetField("enumData", Reflection.Static)?.GetValue(null);

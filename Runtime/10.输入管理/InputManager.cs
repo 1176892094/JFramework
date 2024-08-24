@@ -79,7 +79,7 @@ namespace JFramework.Core
         {
             if (!inputs.TryGetValue(typeof(T), out var input))
             {
-                input = new InputData<T>();
+                input = new InputEvent<T>();
                 inputs.Add(typeof(T), input);
                 input.Listen();
             }
@@ -93,7 +93,7 @@ namespace JFramework.Core
         {
             if (!inputs.TryGetValue(typeof(T), out var input))
             {
-                input = new InputData<T>();
+                input = new InputEvent<T>();
                 inputs.Add(typeof(T), input);
                 input.Listen();
             }
@@ -107,7 +107,7 @@ namespace JFramework.Core
         {
             if (!inputs.TryGetValue(typeof(T), out var input))
             {
-                input = new InputData<T>();
+                input = new InputEvent<T>();
                 inputs.Add(typeof(T), input);
                 input.Listen();
             }
@@ -132,35 +132,6 @@ namespace JFramework.Core
             horizontal = 0;
             inputs.Clear();
             inputActions.Clear();
-        }
-
-        internal abstract class InputData
-        {
-            public int mouse;
-            public string button;
-            public KeyCode key;
-            public InputType type;
-            public InputMode mode;
-            public abstract void Listen();
-            public abstract void Remove();
-            public abstract void Invoke();
-        }
-
-        internal enum InputType
-        {
-            Key,
-            Axis,
-            Mouse,
-            Button
-        }
-        
-        [Serializable]
-        private class InputData<T> : InputData where T : struct, IEvent
-        {
-            private event Action<T> OnInput;
-            public override void Listen() => OnInput += EventManager.Invoke;
-            public override void Remove() => OnInput -= EventManager.Invoke;
-            public override void Invoke() => OnInput?.Invoke(default);
         }
     }
 
