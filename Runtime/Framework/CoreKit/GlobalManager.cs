@@ -33,7 +33,6 @@ namespace JFramework.Core
         {
             Instance = this;
             UIManager.Register();
-            JsonManager.Register();
             PoolManager.Register();
             InputManager.Register();
             AudioManager.Register();
