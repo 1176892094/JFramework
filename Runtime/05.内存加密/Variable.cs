@@ -18,15 +18,17 @@ namespace JFramework
     public struct Variable<T>
     {
         public T origin;
-        public byte[] buffer;
         public int offset;
+        public byte[] buffer;
+        private bool enable;
 
         public T Value
         {
             get
             {
-                if (offset == 0 || buffer == null)
+                if (!enable)
                 {
+                    enable = true;
                     Value = origin;
                     return origin;
                 }
@@ -60,6 +62,7 @@ namespace JFramework
         {
             offset = 0;
             buffer = null;
+            enable = false;
             origin = default;
             Value = value;
         }
