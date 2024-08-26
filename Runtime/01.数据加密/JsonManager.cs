@@ -35,19 +35,17 @@ namespace JFramework.Core
                 Save(obj, name);
             }
 
-            var saveJson = File.ReadAllText(filePath);
-            if (string.IsNullOrEmpty(saveJson)) return;
+            var loadJson = File.ReadAllText(filePath);
             object jsonData = obj is Object ? obj : new JsonMapper<T>(obj);
-            JsonUtility.FromJsonOverwrite(saveJson, jsonData);
+            JsonUtility.FromJsonOverwrite(loadJson, jsonData);
         }
 
         public static void Encrypt<T>(T obj, string name)
         {
             var filePath = FilePath(name);
             object jsonData = obj is Object ? obj : new JsonMapper<T>(obj);
-            var saveJson = JsonUtility.ToJson(jsonData);
-            var saveBytes = Obfuscator.Encrypt(Encoding.UTF8.GetBytes(saveJson), AES_KEY);
-            File.WriteAllBytes(filePath, saveBytes);
+            var saveBytes = Encoding.UTF8.GetBytes(JsonUtility.ToJson(jsonData));
+            File.WriteAllBytes(filePath, Obfuscator.Encrypt(saveBytes, AES_KEY));
         }
 
         public static void Decrypt<T>(T obj, string name)
@@ -59,10 +57,8 @@ namespace JFramework.Core
             }
 
             var loadBytes = Obfuscator.Decrypt(File.ReadAllBytes(filePath), AES_KEY);
-            var loadJson = Encoding.UTF8.GetString(loadBytes);
-            if (string.IsNullOrEmpty(loadJson)) return;
             object jsonData = obj is Object ? obj : new JsonMapper<T>(obj);
-            JsonUtility.FromJsonOverwrite(loadJson, jsonData);
+            JsonUtility.FromJsonOverwrite(Encoding.UTF8.GetString(loadBytes), jsonData);
         }
 
         private static string FilePath(string name)
