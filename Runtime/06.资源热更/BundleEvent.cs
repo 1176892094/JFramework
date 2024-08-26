@@ -1,20 +1,26 @@
 // *********************************************************************************
 // # Project: Forest
 // # Unity: 2022.3.5f1c1
-// # Author: Charlotte
+// # Author: jinyijie
 // # Version: 1.0.0
-// # History: 2024-08-25  03:08
-// # Copyright: 2024, Charlotte
+// # History: 2024-08-26  16:08
+// # Copyright: 2024, jinyijie
 // # Description: This is an automatically generated comment.
 // *********************************************************************************
 
+using JFramework.Interface;
+
 namespace JFramework
 {
-    internal enum InputType : byte
+    public struct OnBundleEntry : IEvent
     {
-        Key,
-        Axis,
-        Mouse,
-        Button
+    }
+
+    public struct OnBundleUpdate : IEvent
+    {
+    }
+
+    public struct OnBundleComplete : IEvent
+    {
     }
 }

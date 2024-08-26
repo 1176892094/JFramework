@@ -17,8 +17,10 @@ namespace JFramework.Core
 {
     public static partial class InputManager
     {
+        private static readonly Dictionary<InputType, Dictionary<InputMode, Action<InputData>>> actions = new();
         private static readonly Dictionary<Type, InputData> inputs = new();
-        private static readonly Dictionary<InputType, Dictionary<InputMode, Action<InputData>>> inputActions = new();
+        public static float vertical;
+        public static float horizontal;
 
         internal static void Register()
         {
@@ -48,10 +50,10 @@ namespace JFramework.Core
                 { InputMode.AxisRawX, GetAxisRawX },
                 { InputMode.AxisRawY, GetAxisRawY },
             };
-            inputActions.Add(InputType.Key, keyActions);
-            inputActions.Add(InputType.Axis, axisActions);
-            inputActions.Add(InputType.Mouse, mouseActions);
-            inputActions.Add(InputType.Button, buttonActions);
+            actions.Add(InputType.Key, keyActions);
+            actions.Add(InputType.Axis, axisActions);
+            actions.Add(InputType.Mouse, mouseActions);
+            actions.Add(InputType.Button, buttonActions);
         }
 
         private static void OnUpdate()
@@ -63,12 +65,14 @@ namespace JFramework.Core
                     continue;
                 }
 
-                if (inputActions.TryGetValue(input.type, out var action))
+                if (!actions.TryGetValue(input.type, out var action))
                 {
-                    if (action.TryGetValue(input.mode, out var method))
-                    {
-                        method.Invoke(input);
-                    }
+                    continue;
+                }
+
+                if (action.TryGetValue(input.mode, out var method))
+                {
+                    method.Invoke(input);
                 }
             }
         }
@@ -82,8 +86,8 @@ namespace JFramework.Core
                 input.Listen();
             }
 
-            input.key = key;
             input.mode = mode;
+            input.keyCode = key;
             input.type = InputType.Key;
         }
 
@@ -129,7 +133,102 @@ namespace JFramework.Core
             vertical = 0;
             horizontal = 0;
             inputs.Clear();
-            inputActions.Clear();
+            actions.Clear();
+        }
+    }
+
+    public static partial class InputManager
+    {
+        private static void GetAxisX(InputData input)
+        {
+            horizontal = Input.GetAxis(input.button);
+        }
+
+        private static void GetAxisY(InputData input)
+        {
+            vertical = Input.GetAxis(input.button);
+        }
+
+        private static void GetAxisRawX(InputData input)
+        {
+            horizontal = Input.GetAxisRaw(input.button);
+        }
+
+        private static void GetAxisRawY(InputData input)
+        {
+            vertical = Input.GetAxisRaw(input.button);
+        }
+
+        private static void GetKeyDown(InputData input)
+        {
+            if (Input.GetKeyDown(input.keyCode))
+            {
+                input.Invoke();
+            }
+        }
+
+        private static void GetKeyUp(InputData input)
+        {
+            if (Input.GetKeyUp(input.keyCode))
+            {
+                input.Invoke();
+            }
+        }
+
+        private static void GetKey(InputData input)
+        {
+            if (Input.GetKey(input.keyCode))
+            {
+                input.Invoke();
+            }
+        }
+
+        private static void GetMouseDown(InputData input)
+        {
+            if (Input.GetMouseButtonDown(input.mouse))
+            {
+                input.Invoke();
+            }
+        }
+
+        private static void GetMouseUp(InputData input)
+        {
+            if (Input.GetMouseButtonUp(input.mouse))
+            {
+                input.Invoke();
+            }
+        }
+
+        private static void GetMouse(InputData input)
+        {
+            if (Input.GetMouseButton(input.mouse))
+            {
+                input.Invoke();
+            }
+        }
+
+        private static void GetButtonDown(InputData input)
+        {
+            if (Input.GetButtonDown(input.button))
+            {
+                input.Invoke();
+            }
+        }
+
+        private static void GetButtonUp(InputData input)
+        {
+            if (Input.GetButtonUp(input.button))
+            {
+                input.Invoke();
+            }
+        }
+
+        private static void GetButton(InputData input)
+        {
+            if (Input.GetButton(input.button))
+            {
+                input.Invoke();
+            }
         }
     }
 }

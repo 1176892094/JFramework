@@ -30,13 +30,14 @@ namespace JFramework.Core
         public static void Load<T>(T obj, string name)
         {
             var filePath = FilePath(name);
+            object jsonData = obj is Object ? obj : new JsonMapper<T>(obj);
             if (!File.Exists(filePath))
             {
-                Save(obj, name);
+                var saveJson = JsonUtility.ToJson(jsonData);
+                File.WriteAllText(filePath, saveJson);
             }
 
             var loadJson = File.ReadAllText(filePath);
-            object jsonData = obj is Object ? obj : new JsonMapper<T>(obj);
             JsonUtility.FromJsonOverwrite(loadJson, jsonData);
         }
 
@@ -51,13 +52,14 @@ namespace JFramework.Core
         public static void Decrypt<T>(T obj, string name)
         {
             var filePath = FilePath(name);
+            object jsonData = obj is Object ? obj : new JsonMapper<T>(obj);
             if (!File.Exists(filePath))
             {
-                Encrypt(obj, name);
+                var saveBytes = Encoding.UTF8.GetBytes(JsonUtility.ToJson(jsonData));
+                File.WriteAllBytes(filePath, Obfuscator.Encrypt(saveBytes, AES_KEY));
             }
 
             var loadBytes = Obfuscator.Decrypt(File.ReadAllBytes(filePath), AES_KEY);
-            object jsonData = obj is Object ? obj : new JsonMapper<T>(obj);
             JsonUtility.FromJsonOverwrite(Encoding.UTF8.GetString(loadBytes), jsonData);
         }
 

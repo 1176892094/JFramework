@@ -23,7 +23,8 @@ namespace JFramework.Core
             if (!GlobalManager.Instance) return;
             if (!events.TryGetValue(typeof(T), out var @event))
             {
-                events.Add(typeof(T), @event = new Event<T>());
+                @event = new Event<T>();
+                events.Add(typeof(T), @event);
             }
 
             ((Event<T>)@event).Listen(obj);

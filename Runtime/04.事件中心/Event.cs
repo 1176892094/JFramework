@@ -9,6 +9,7 @@
 // *********************************************************************************
 
 using System;
+using System.Runtime.CompilerServices;
 using JFramework.Interface;
 
 namespace JFramework.Core
@@ -18,8 +19,13 @@ namespace JFramework.Core
         private class Event<T> : IEvent where T : struct, IEvent
         {
             private event Action<T> Execute;
+
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
             public void Listen(IEvent<T> obj) => Execute += obj.Execute;
+
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
             public void Remove(IEvent<T> obj) => Execute -= obj.Execute;
+
             public void Invoke(T obj) => Execute?.Invoke(obj);
         }
     }
