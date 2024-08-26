@@ -9,6 +9,7 @@
 // *********************************************************************************
 
 using System;
+using System.Runtime.CompilerServices;
 using JFramework.Interface;
 
 namespace JFramework.Core
@@ -19,8 +20,14 @@ namespace JFramework.Core
         private class InputEvent<T> : InputData where T : struct, IEvent
         {
             private event Action<T> Execute;
+
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
             public override void Listen() => Execute += EventManager.Invoke;
+
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
             public override void Remove() => Execute -= EventManager.Invoke;
+
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
             public override void Invoke() => Execute?.Invoke(default);
         }
     }

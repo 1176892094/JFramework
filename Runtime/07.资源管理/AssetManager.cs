@@ -28,9 +28,6 @@ namespace JFramework.Core
         private static readonly Dictionary<string, AssetData> assets = new();
         private static readonly Dictionary<string, AssetBundle> bundles = new();
         private static readonly Dictionary<string, Task<AssetBundle>> requests = new();
-        public static event Action<string[]> OnLoadEntry;
-        public static event Action<string> OnLoadUpdate;
-        public static event Action OnLoadComplete;
 
         public static async Task<T> Load<T>(string path) where T : Object
         {
@@ -79,7 +76,7 @@ namespace JFramework.Core
             {
                 mainAsset = await LoadAssetBundle(GlobalSetting.Instance.platform.ToString());
                 manifest = mainAsset.LoadAsset<AssetBundleManifest>(nameof(AssetBundleManifest));
-                OnLoadEntry?.Invoke(manifest.GetAllAssetBundles());
+                EventManager.Invoke(new OnAssetEntry(manifest.GetAllAssetBundles()));
             }
 
             var assetBundles = manifest.GetAllAssetBundles();
@@ -88,7 +85,7 @@ namespace JFramework.Core
                 await LoadAssetBundle(assetBundle);
             }
 
-            OnLoadComplete?.Invoke();
+            EventManager.Invoke<OnAssetComplete>();
         }
 
         private static async Task<T> LoadAsset<T>(string path, AssetMode mode) where T : Object
@@ -151,7 +148,7 @@ namespace JFramework.Core
             {
                 mainAsset = await LoadAssetBundle(GlobalSetting.Instance.platform.ToString());
                 manifest = mainAsset.LoadAsset<AssetBundleManifest>(nameof(AssetBundleManifest));
-                OnLoadEntry?.Invoke(manifest.GetAllAssetBundles());
+                EventManager.Invoke(new OnAssetEntry(manifest.GetAllAssetBundles()));
             }
 
             var dependencies = manifest.GetAllDependencies(assetData.bundle);
@@ -230,7 +227,7 @@ namespace JFramework.Core
             Debug.Log("解密AB包：" + bundle);
             var result = AssetBundle.LoadFromMemoryAsync(bytes);
             bundles.Add(bundle, result.assetBundle);
-            OnLoadUpdate?.Invoke(bundle);
+            EventManager.Invoke(new OnAssetUpdate(bundle));
             return result.assetBundle;
         }
 
@@ -242,9 +239,6 @@ namespace JFramework.Core
             requests.Clear();
             manifest = null;
             mainAsset = null;
-            OnLoadEntry = null;
-            OnLoadUpdate = null;
-            OnLoadComplete = null;
         }
     }
 }

@@ -8,7 +8,6 @@
 // # Description: This is an automatically generated comment.
 // *********************************************************************************
 
-using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -23,9 +22,6 @@ namespace JFramework.Core
         private static readonly List<string> updateBundles = new();
         private static Dictionary<string, BundleData> clientBundles = new();
         private static Dictionary<string, BundleData> remoteBundles = new();
-        public static event Action<List<long>> OnLoadEntry;
-        public static event Action<string, float> OnLoadUpdate;
-        public static event Action<bool> OnLoadComplete;
 
         public static async void UpdateAssetBundles()
         {
@@ -34,7 +30,7 @@ namespace JFramework.Core
             if (string.IsNullOrEmpty(remote))
             {
                 Debug.Log("更新失败。");
-                OnLoadComplete?.Invoke(false);
+                EventManager.Invoke(new OnBundleComplete(false));
                 return;
             }
 
@@ -47,7 +43,7 @@ namespace JFramework.Core
                 bundles = JsonManager.Read<List<BundleData>>(client);
                 clientBundles = bundles.ToDictionary(bundle => bundle.name);
             }
-            
+
             updateBundles.Clear();
             foreach (var key in remoteBundles.Keys)
             {
@@ -78,7 +74,7 @@ namespace JFramework.Core
             if (await GetAssetBundles())
             {
                 await File.WriteAllTextAsync(GlobalSetting.clientInfoPath, remote);
-                OnLoadComplete?.Invoke(true);
+                EventManager.Invoke(new OnBundleComplete(true));
             }
         }
 
@@ -123,7 +119,7 @@ namespace JFramework.Core
             }
 
 #if UNITY_ANDROID && !UNITY_EDITOR
-            using var request = UnityWebRequest.Get(SettingManager.streamingInfoPath);
+            using var request = UnityWebRequest.Get(GlobalSetting.streamingInfoPath);
             await request.SendWebRequest();
             if (request.result == UnityWebRequest.Result.Success)
             {
@@ -144,7 +140,7 @@ namespace JFramework.Core
             var bundles = updateBundles.ToList();
             while (updateBundles.Count > 0 && reloads-- > 0)
             {
-                var sizeList = new List<long>();
+                var sizes = new List<long>();
                 foreach (var bundle in bundles)
                 {
                     var fileUri = GlobalSetting.GetRemoteFilePath(bundle);
@@ -158,11 +154,11 @@ namespace JFramework.Core
                             continue;
                         }
 
-                        sizeList.Add(long.Parse(request.GetResponseHeader("Content-Length")));
+                        sizes.Add(long.Parse(request.GetResponseHeader("Content-Length")));
                     }
                 }
 
-                OnLoadEntry?.Invoke(sizeList);
+                EventManager.Invoke(new OnBundleEntry(sizes));
                 foreach (var bundle in bundles)
                 {
                     var fileUri = GlobalSetting.GetRemoteFilePath(bundle);
@@ -171,11 +167,11 @@ namespace JFramework.Core
                         var result = request.SendWebRequest();
                         while (!result.isDone && GlobalManager.Instance)
                         {
-                            OnLoadUpdate?.Invoke(bundle, request.downloadProgress);
+                            EventManager.Invoke(new OnBundleUpdate(bundle, request.downloadProgress));
                             await Task.Yield();
                         }
 
-                        OnLoadUpdate?.Invoke(bundle, 1);
+                        EventManager.Invoke(new OnBundleUpdate(bundle, 1));
                         if (request.result != UnityWebRequest.Result.Success)
                         {
                             Debug.Log($"下载 {bundle} 文件失败\n");
@@ -191,15 +187,12 @@ namespace JFramework.Core
                     }
                 }
             }
-            
+
             return updateBundles.Count == 0;
         }
 
         internal static void UnRegister()
         {
-            OnLoadEntry = null;
-            OnLoadUpdate = null;
-            OnLoadComplete = null;
             clientBundles.Clear();
             remoteBundles.Clear();
         }

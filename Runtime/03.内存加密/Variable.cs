@@ -25,7 +25,7 @@ namespace JFramework
         {
             get
             {
-                if (offset == 0)
+                if (offset == 0 || buffer == null)
                 {
                     Value = origin;
                     return origin;

@@ -26,6 +26,7 @@ namespace JFramework.Core
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             public void Remove(IEvent<T> obj) => Execute -= obj.Execute;
 
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
             public void Invoke(T obj) => Execute?.Invoke(obj);
         }
     }
