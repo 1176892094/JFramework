@@ -22,16 +22,8 @@ namespace JFramework.Core
             {
                 if (assetBundle != null)
                 {
-                    if (typeof(T).IsSubclassOf(typeof(MonoBehaviour)))
-                    {
-                        var request = assetBundle.LoadAssetAsync<GameObject>(assetName);
-                        return ((GameObject)Object.Instantiate(request.asset)).GetComponent<T>();
-                    }
-                    else
-                    {
-                        var request = assetBundle.LoadAssetAsync<T>(assetName);
-                        return request.asset is GameObject ? (T)Object.Instantiate(request.asset) : (T)request.asset;
-                    }
+                    var request = assetBundle.LoadAssetAsync<T>(assetName);
+                    return request.asset is GameObject ? (T)Object.Instantiate(request.asset) : (T)request.asset;
                 }
 
                 return null;
@@ -42,16 +34,8 @@ namespace JFramework.Core
         {
             public static async Task<T> LoadAsync<T>(string assetPath) where T : Object
             {
-                if (typeof(T).IsSubclassOf(typeof(MonoBehaviour)))
-                {
-                    var request = await Resources.LoadAsync<GameObject>(assetPath);
-                    return ((GameObject)Object.Instantiate(request.asset)).GetComponent<T>();
-                }
-                else
-                {
-                    var request = await Resources.LoadAsync<T>(assetPath);
-                    return request.asset is GameObject ? (T)Object.Instantiate(request.asset) : (T)request.asset;
-                }
+                var request = await Resources.LoadAsync<T>(assetPath);
+                return request.asset is GameObject ? (T)Object.Instantiate(request.asset) : (T)request.asset;
             }
         }
 
@@ -62,16 +46,8 @@ namespace JFramework.Core
             {
                 if (GlobalSetting.objects.TryGetValue(char.ToUpper(assetPath[0]) + assetPath.Substring(1), out var editorPath))
                 {
-                    if (typeof(T).IsSubclassOf(typeof(MonoBehaviour)))
-                    {
-                        var request = UnityEditor.AssetDatabase.LoadAssetAtPath<GameObject>(editorPath);
-                        return Object.Instantiate(request).GetComponent<T>();
-                    }
-                    else
-                    {
-                        var request = UnityEditor.AssetDatabase.LoadAssetAtPath<T>(editorPath);
-                        return request is GameObject ? Object.Instantiate(request) : request;
-                    }
+                    var request = UnityEditor.AssetDatabase.LoadAssetAtPath<T>(editorPath);
+                    return request is GameObject ? Object.Instantiate(request) : request;
                 }
 
                 return null;
