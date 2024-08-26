@@ -10,7 +10,7 @@
 
 namespace JFramework
 {
-    public enum AssetPlatform : byte
+    internal enum AssetPlatform : byte
     {
         StandaloneOSX = 2,
         StandaloneWindows = 5,

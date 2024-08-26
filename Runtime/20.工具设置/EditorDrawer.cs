@@ -86,7 +86,7 @@ namespace JFramework
     }
     
     [CustomPropertyDrawer(typeof(Variable<>))]
-    public class VariableDrawer : PropertyDrawer
+    internal class VariableDrawer : PropertyDrawer
     {
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
         {

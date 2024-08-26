@@ -9,12 +9,11 @@
 // *********************************************************************************
 
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.Networking;
+using System.Threading.Tasks;
+using System.Collections.Generic;
 using Debug = UnityEngine.Debug;
 using Object = UnityEngine.Object;
 
@@ -33,36 +32,41 @@ namespace JFramework.Core
         {
             try
             {
-                if (!GlobalManager.Instance) return null;
-                var asset = await LoadAsset<T>(path, GlobalManager.mode);
-                if (asset == null)
+                if (GlobalManager.Instance)
                 {
-                    Debug.LogWarning($"加载 {path} 资源为空！");
-                    return null;
-                }
+                    var asset = await LoadAsset<T>(path);
+                    if (asset == null)
+                    {
+                        Debug.LogWarning($"加载 {path} 资源为空！");
+                        return null;
+                    }
 
-                return asset;
+                    return asset;
+                }
             }
             catch (Exception e)
             {
                 Debug.LogWarning(e);
-                return null;
             }
+
+            return null;
         }
 
         public static async void Load<T>(string path, Action<T> action) where T : Object
         {
             try
             {
-                if (!GlobalManager.Instance) return;
-                var asset = await LoadAsset<T>(path, GlobalManager.mode);
-                if (asset == null)
+                if (GlobalManager.Instance)
                 {
-                    Debug.LogWarning($"加载 {path} 资源为空！");
-                    return;
-                }
+                    var asset = await LoadAsset<T>(path);
+                    if (asset == null)
+                    {
+                        Debug.LogWarning($"加载 {path} 资源为空！");
+                        return;
+                    }
 
-                action?.Invoke(asset);
+                    action?.Invoke(asset);
+                }
             }
             catch (Exception e)
             {
@@ -70,27 +74,9 @@ namespace JFramework.Core
             }
         }
 
-        public static async void LoadAssetBundles()
+        private static async Task<T> LoadAsset<T>(string path) where T : Object
         {
-            if (mainAsset == null)
-            {
-                mainAsset = await LoadAssetBundle(GlobalSetting.Instance.platform.ToString());
-                manifest = mainAsset.LoadAsset<AssetBundleManifest>(nameof(AssetBundleManifest));
-                EventManager.Invoke(new OnAssetEntry(manifest.GetAllAssetBundles()));
-            }
-
-            var assetBundles = manifest.GetAllAssetBundles();
-            foreach (var assetBundle in assetBundles)
-            {
-                await LoadAssetBundle(assetBundle);
-            }
-
-            EventManager.Invoke<OnAssetComplete>();
-        }
-
-        private static async Task<T> LoadAsset<T>(string path, AssetMode mode) where T : Object
-        {
-            if (mode == AssetMode.AssetBundle)
+            if (GlobalManager.mode == AssetMode.AssetBundle)
             {
                 var data = await LoadAssetData(path);
                 var bundle = await LoadAssetBundle(data.bundle);
@@ -119,8 +105,7 @@ namespace JFramework.Core
                 {
                     var data = await LoadAssetData(path);
                     var bundle = await LoadAssetBundle(data.bundle);
-                    var scenes = bundle.GetAllScenePaths();
-                    if (scenes.Any(scene => Path.GetFileNameWithoutExtension(scene) == data.asset))
+                    if (bundle.GetAllScenePaths().Length > 0)
                     {
                         return data.asset;
                     }
@@ -158,6 +143,24 @@ namespace JFramework.Core
             }
 
             return assetData;
+        }
+
+        public static async void LoadAssetBundles()
+        {
+            if (mainAsset == null)
+            {
+                mainAsset = await LoadAssetBundle(GlobalSetting.Instance.platform.ToString());
+                manifest = mainAsset.LoadAsset<AssetBundleManifest>(nameof(AssetBundleManifest));
+                EventManager.Invoke(new OnAssetEntry(manifest.GetAllAssetBundles()));
+            }
+
+            var assetBundles = manifest.GetAllAssetBundles();
+            foreach (var assetBundle in assetBundles)
+            {
+                await LoadAssetBundle(assetBundle);
+            }
+
+            EventManager.Invoke<OnAssetComplete>();
         }
 
         private static async Task<AssetBundle> LoadAssetBundle(string bundle)
@@ -221,14 +224,20 @@ namespace JFramework.Core
 
         private static async Task<AssetBundle> LoadAssetRequest(string bundle, byte[] bytes)
         {
-            if (!GlobalManager.Instance) return null;
-            bytes = await Obfuscator.DecryptAsync(bytes, AES_KEY);
-            if (!GlobalManager.Instance) return null;
-            Debug.Log("解密AB包：" + bundle);
-            var result = AssetBundle.LoadFromMemoryAsync(bytes);
-            bundles.Add(bundle, result.assetBundle);
-            EventManager.Invoke(new OnAssetUpdate(bundle));
-            return result.assetBundle;
+            if (GlobalManager.Instance)
+            {
+                bytes = await Obfuscator.DecryptAsync(bytes, AES_KEY);
+                if (GlobalManager.Instance)
+                {
+                    Debug.Log("解密AB包：" + bundle);
+                    EventManager.Invoke(new OnAssetUpdate(bundle));
+                    var result = AssetBundle.LoadFromMemoryAsync(bytes);
+                    bundles.Add(bundle, result.assetBundle);
+                    return result.assetBundle;
+                }
+            }
+
+            return null;
         }
 
         internal static void UnRegister()

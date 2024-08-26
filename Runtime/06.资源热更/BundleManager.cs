@@ -25,56 +25,58 @@ namespace JFramework.Core
 
         public static async void UpdateAssetBundles()
         {
-            if (!GlobalManager.Instance) return;
-            var remote = await GetRemoteBundle();
-            if (string.IsNullOrEmpty(remote))
+            if (GlobalManager.Instance)
             {
-                Debug.Log("更新失败。");
-                EventManager.Invoke(new OnBundleComplete(false));
-                return;
-            }
-
-            var bundles = JsonManager.Read<List<BundleData>>(remote);
-            remoteBundles = bundles.ToDictionary(bundle => bundle.name);
-
-            var client = await GetClientBundle();
-            if (!string.IsNullOrEmpty(client))
-            {
-                bundles = JsonManager.Read<List<BundleData>>(client);
-                clientBundles = bundles.ToDictionary(bundle => bundle.name);
-            }
-
-            updateBundles.Clear();
-            foreach (var key in remoteBundles.Keys)
-            {
-                if (clientBundles.TryGetValue(key, out var bundle))
+                var remote = await GetRemoteBundle();
+                if (string.IsNullOrEmpty(remote))
                 {
-                    if (bundle != remoteBundles[key])
+                    Debug.Log("更新失败。");
+                    EventManager.Invoke(new OnBundleComplete(false));
+                    return;
+                }
+
+                var bundles = JsonManager.Read<List<BundleData>>(remote);
+                remoteBundles = bundles.ToDictionary(bundle => bundle.name);
+
+                var client = await GetClientBundle();
+                if (!string.IsNullOrEmpty(client))
+                {
+                    bundles = JsonManager.Read<List<BundleData>>(client);
+                    clientBundles = bundles.ToDictionary(bundle => bundle.name);
+                }
+
+                updateBundles.Clear();
+                foreach (var key in remoteBundles.Keys)
+                {
+                    if (clientBundles.TryGetValue(key, out var bundle))
+                    {
+                        if (bundle != remoteBundles[key])
+                        {
+                            updateBundles.Add(key);
+                        }
+
+                        clientBundles.Remove(key);
+                    }
+                    else
                     {
                         updateBundles.Add(key);
                     }
-
-                    clientBundles.Remove(key);
                 }
-                else
+
+                foreach (var key in clientBundles.Keys)
                 {
-                    updateBundles.Add(key);
+                    var path = GlobalSetting.GetPersistentPath(key);
+                    if (File.Exists(path))
+                    {
+                        File.Delete(path);
+                    }
                 }
-            }
 
-            foreach (var key in clientBundles.Keys)
-            {
-                var path = GlobalSetting.GetPersistentPath(key);
-                if (File.Exists(path))
+                if (await GetAssetBundles())
                 {
-                    File.Delete(path);
+                    await File.WriteAllTextAsync(GlobalSetting.clientInfoPath, remote);
+                    EventManager.Invoke(new OnBundleComplete(true));
                 }
-            }
-
-            if (await GetAssetBundles())
-            {
-                await File.WriteAllTextAsync(GlobalSetting.clientInfoPath, remote);
-                EventManager.Invoke(new OnBundleComplete(true));
             }
         }
 
@@ -170,16 +172,15 @@ namespace JFramework.Core
                             EventManager.Invoke(new OnBundleUpdate(bundle, request.downloadProgress));
                             await Task.Yield();
                         }
-
+                        
                         EventManager.Invoke(new OnBundleUpdate(bundle, 1));
                         if (request.result != UnityWebRequest.Result.Success)
                         {
                             Debug.Log($"下载 {bundle} 文件失败\n");
                             continue;
                         }
-
-                        var contents = request.downloadHandler.data;
-                        await File.WriteAllBytesAsync(GlobalSetting.GetPersistentPath(bundle), contents);
+                        
+                        await File.WriteAllBytesAsync(GlobalSetting.GetPersistentPath(bundle), request.downloadHandler.data);
                         if (updateBundles.Contains(bundle))
                         {
                             updateBundles.Remove(bundle);
