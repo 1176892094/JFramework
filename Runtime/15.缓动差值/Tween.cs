@@ -75,7 +75,7 @@ namespace JFramework
             catch (Exception e)
             {
                 Dispose();
-                Debug.Log("缓动控制无法执行方法：\n" + e);
+                Debug.Log("缓动差值无法执行方法：\n" + e);
             }
         }
     }
