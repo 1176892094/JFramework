@@ -20,31 +20,37 @@ namespace JFramework.Core
 
         public static void Listen<T>(IEvent<T> obj) where T : struct, IEvent
         {
-            if (!GlobalManager.Instance) return;
-            if (!events.TryGetValue(typeof(T), out var @event))
+            if (GlobalManager.Instance)
             {
-                @event = new Event<T>();
-                events.Add(typeof(T), @event);
-            }
+                if (!events.TryGetValue(typeof(T), out var @event))
+                {
+                    @event = new Event<T>();
+                    events.Add(typeof(T), @event);
+                }
 
-            ((Event<T>)@event).Listen(obj);
+                ((Event<T>)@event).Listen(obj);
+            }
         }
 
         public static void Remove<T>(IEvent<T> obj) where T : struct, IEvent
         {
-            if (!GlobalManager.Instance) return;
-            if (events.TryGetValue(typeof(T), out var @event))
+            if (GlobalManager.Instance)
             {
-                ((Event<T>)@event).Remove(obj);
+                if (events.TryGetValue(typeof(T), out var @event))
+                {
+                    ((Event<T>)@event).Remove(obj);
+                }
             }
         }
 
         public static void Invoke<T>(T obj = default) where T : struct, IEvent
         {
-            if (!GlobalManager.Instance) return;
-            if (events.TryGetValue(typeof(T), out var @event))
+            if (GlobalManager.Instance)
             {
-                ((Event<T>)@event).Invoke(obj);
+                if (events.TryGetValue(typeof(T), out var @event))
+                {
+                    ((Event<T>)@event).Invoke(obj);
+                }
             }
         }
 

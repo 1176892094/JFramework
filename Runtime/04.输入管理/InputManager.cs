@@ -17,7 +17,7 @@ namespace JFramework.Core
 {
     public static partial class InputManager
     {
-        private static readonly Dictionary<InputType, Dictionary<InputMode, Action<InputData>>> actions = new();
+        private static readonly Dictionary<InputOption, Dictionary<InputMode, Action<InputData>>> actions = new();
         private static readonly Dictionary<Type, InputData> inputs = new();
         public static float vertical;
         public static float horizontal;
@@ -50,10 +50,10 @@ namespace JFramework.Core
                 { InputMode.AxisRawX, GetAxisRawX },
                 { InputMode.AxisRawY, GetAxisRawY },
             };
-            actions.Add(InputType.Key, keyActions);
-            actions.Add(InputType.Axis, axisActions);
-            actions.Add(InputType.Mouse, mouseActions);
-            actions.Add(InputType.Button, buttonActions);
+            actions.Add(InputOption.Key, keyActions);
+            actions.Add(InputOption.Axis, axisActions);
+            actions.Add(InputOption.Mouse, mouseActions);
+            actions.Add(InputOption.Button, buttonActions);
         }
 
         private static void OnUpdate()
@@ -65,7 +65,7 @@ namespace JFramework.Core
                     continue;
                 }
 
-                if (!actions.TryGetValue(input.type, out var action))
+                if (!actions.TryGetValue(input.option, out var action))
                 {
                     continue;
                 }
@@ -77,7 +77,7 @@ namespace JFramework.Core
             }
         }
 
-        public static void Add<T>(KeyCode key, InputMode mode) where T : struct, IEvent
+        public static void Add<T>(KeyCode board, InputMode mode) where T : struct, IEvent
         {
             if (!inputs.TryGetValue(typeof(T), out var input))
             {
@@ -87,8 +87,8 @@ namespace JFramework.Core
             }
 
             input.mode = mode;
-            input.keyCode = key;
-            input.type = InputType.Key;
+            input.key = board;
+            input.option = InputOption.Key;
         }
 
         public static void Add<T>(string button, InputMode mode) where T : struct, IEvent
@@ -102,7 +102,7 @@ namespace JFramework.Core
 
             input.mode = mode;
             input.button = button;
-            input.type = mode > InputMode.Down ? InputType.Axis : InputType.Button;
+            input.option = mode > InputMode.Down ? InputOption.Axis : InputOption.Button;
         }
 
         public static void Add<T>(int mouse, InputMode mode) where T : struct, IEvent
@@ -116,7 +116,7 @@ namespace JFramework.Core
 
             input.mode = mode;
             input.mouse = mouse;
-            input.type = InputType.Mouse;
+            input.option = InputOption.Mouse;
         }
 
         public static void Remove<T>() where T : struct, IEvent
@@ -161,7 +161,7 @@ namespace JFramework.Core
 
         private static void GetKeyDown(InputData input)
         {
-            if (Input.GetKeyDown(input.keyCode))
+            if (Input.GetKeyDown(input.key))
             {
                 input.Invoke();
             }
@@ -169,7 +169,7 @@ namespace JFramework.Core
 
         private static void GetKeyUp(InputData input)
         {
-            if (Input.GetKeyUp(input.keyCode))
+            if (Input.GetKeyUp(input.key))
             {
                 input.Invoke();
             }
@@ -177,7 +177,7 @@ namespace JFramework.Core
 
         private static void GetKey(InputData input)
         {
-            if (Input.GetKey(input.keyCode))
+            if (Input.GetKey(input.key))
             {
                 input.Invoke();
             }

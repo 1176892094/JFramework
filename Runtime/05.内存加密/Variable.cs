@@ -39,7 +39,7 @@ namespace JFramework
 
                 if (!origin.Equals(Serialization.Read<T>(target)))
                 {
-                    GlobalManager.Cheat();
+                    EventManager.Invoke<OnAntiCheat>();
                 }
 
                 return origin;

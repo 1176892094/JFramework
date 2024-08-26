@@ -27,8 +27,6 @@ namespace JFramework.Core
 
         public static event Action OnLateUpdate;
 
-        public static event Action OnCheat;
-
         private void Awake()
         {
             Instance = this;
@@ -102,17 +100,10 @@ namespace JFramework.Core
 
         private void OnDestroy()
         {
-            OnCheat = null;
             OnUpdate = null;
             OnLateUpdate = null;
             OnFixedUpdate = null;
             GC.Collect();
-        }
-
-        public static void Cheat()
-        {
-            Debug.LogWarning("检查到作弊！");
-            OnCheat?.Invoke();
         }
     }
 

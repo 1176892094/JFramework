@@ -10,7 +10,7 @@
 
 namespace JFramework
 {
-    internal enum InputType : byte
+    internal enum InputOption : byte
     {
         Key,
         Axis,

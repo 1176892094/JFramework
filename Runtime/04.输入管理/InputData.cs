@@ -16,9 +16,9 @@ namespace JFramework
     {
         public int mouse;
         public string button;
-        public KeyCode keyCode;
-        public InputType type;
+        public KeyCode key;
         public InputMode mode;
+        public InputOption option;
         public abstract void Listen();
         public abstract void Remove();
         public abstract void Invoke();

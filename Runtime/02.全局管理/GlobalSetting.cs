@@ -13,13 +13,10 @@ using System.Linq;
 using System.Collections.Generic;
 using Sirenix.OdinInspector;
 using UnityEngine;
-#if UNITY_EDITOR
-using UnityEditor;
-#endif
 
 namespace JFramework
 {
-    internal class GlobalSetting : ScriptableObject
+    internal partial class GlobalSetting : ScriptableObject
     {
         private static GlobalSetting instance;
         public static GlobalSetting Instance => instance ??= Resources.Load<GlobalSetting>(nameof(GlobalSetting));
@@ -27,8 +24,6 @@ namespace JFramework
         public AssetPlatform platform = AssetPlatform.StandaloneWindows;
 
         [OnValueChanged("UpdateSceneSetting")] public AssetMode assetMode;
-
-        public BundleMode assetBuild = BundleMode.StreamingAssets;
 
         public string assetInfo = "AssetBundleInfo";
 
@@ -53,42 +48,52 @@ namespace JFramework
         public static string GetScenePath(string assetName) => "Scenes/" + assetName;
 
         public static string GetTablePath(string assetName) => "DataTable/" + assetName;
+        
+        private static string GetPlatform(string fileName) => Path.Combine(Instance.platform.ToString(), fileName);
 
         public static string GetPersistentPath(string fileName) => Path.Combine(Application.persistentDataPath, fileName);
 
         public static string GetStreamingPath(string fileName) => Path.Combine(Application.streamingAssetsPath, GetPlatform(fileName));
 
         public static string GetRemoteFilePath(string fileName) => Path.Combine(Instance.remotePath, GetPlatform(fileName));
-
-        private static string GetPlatform(string fileName) => Path.Combine(Instance.platform.ToString(), fileName);
+    }
 
 #if UNITY_EDITOR
+    internal partial class GlobalSetting
+    {
         [ShowInInspector]
         public string EditorPath
         {
-            get => EditorPrefs.GetString(nameof(EditorPath), "Assets/Editor/Resources");
-            set => EditorPrefs.SetString(nameof(EditorPath), value);
+            get => UnityEditor.EditorPrefs.GetString(nameof(EditorPath), "Assets/Editor/Resources");
+            set => UnityEditor.EditorPrefs.SetString(nameof(EditorPath), value);
         }
 
         [ShowInInspector]
         public static string ScriptPath
         {
-            get => EditorPrefs.GetString(nameof(ScriptPath), "Assets/Template/DataTable");
-            set => EditorPrefs.SetString(nameof(ScriptPath), value);
+            get => UnityEditor.EditorPrefs.GetString(nameof(ScriptPath), "Assets/Template/DataTable");
+            set => UnityEditor.EditorPrefs.SetString(nameof(ScriptPath), value);
         }
 
         [ShowInInspector]
         public static string DataTablePath
         {
-            get => EditorPrefs.GetString(nameof(DataTablePath), "Assets/Scripts/DataTable");
-            set => EditorPrefs.SetString(nameof(DataTablePath), value);
+            get => UnityEditor.EditorPrefs.GetString(nameof(DataTablePath), "Assets/Scripts/DataTable");
+            set => UnityEditor.EditorPrefs.SetString(nameof(DataTablePath), value);
+        }
+
+        [ShowInInspector]
+        public static BundleMode AssetBuild
+        {
+            get => (BundleMode)UnityEditor.EditorPrefs.GetInt(nameof(AssetBuild), (int)BundleMode.StreamingAssets);
+            set => UnityEditor.EditorPrefs.SetInt(nameof(AssetBuild), (int)value);
         }
 
         [HideInInspector] public List<string> sceneAssets = new List<string>();
 
         public static readonly Dictionary<string, string> objects = new Dictionary<string, string>();
 
-        private static string remoteBuildPath => Instance.assetBuild == BundleMode.BuildPath ? Instance.buildPath : Application.streamingAssetsPath;
+        private static string remoteBuildPath => AssetBuild == BundleMode.BuildPath ? Instance.buildPath : Application.streamingAssetsPath;
 
         public static string platformPath => Path.Combine(remoteBuildPath, Instance.platform.ToString());
 
@@ -96,24 +101,24 @@ namespace JFramework
 
         public void UpdateSceneSetting()
         {
-            var assets = EditorBuildSettings.scenes.Select(scene => scene.path).ToList();
+            var assets = UnityEditor.EditorBuildSettings.scenes.Select(scene => scene.path).ToList();
             foreach (var scenePath in sceneAssets)
             {
                 if (assets.Contains(scenePath))
                 {
                     if (assetMode == AssetMode.Simulate) continue;
-                    var scenes = EditorBuildSettings.scenes.Where(scene => scene.path != scenePath);
-                    EditorBuildSettings.scenes = scenes.ToArray();
+                    var scenes = UnityEditor.EditorBuildSettings.scenes.Where(scene => scene.path != scenePath);
+                    UnityEditor.EditorBuildSettings.scenes = scenes.ToArray();
                 }
                 else
                 {
                     if (assetMode == AssetMode.AssetBundle) continue;
-                    var scenes = EditorBuildSettings.scenes.ToList();
-                    scenes.Add(new EditorBuildSettingsScene(scenePath, true));
-                    EditorBuildSettings.scenes = scenes.ToArray();
+                    var scenes = UnityEditor.EditorBuildSettings.scenes.ToList();
+                    scenes.Add(new UnityEditor.EditorBuildSettingsScene(scenePath, true));
+                    UnityEditor.EditorBuildSettings.scenes = scenes.ToArray();
                 }
             }
         }
-#endif
     }
+#endif
 }
