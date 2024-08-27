@@ -14,7 +14,7 @@ using JFramework.Interface;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
-namespace JFramework.Core
+namespace JFramework
 {
     [AddComponentMenu(""), DefaultExecutionOrder(-10)]
     public sealed partial class GlobalManager : MonoBehaviour, IEntity

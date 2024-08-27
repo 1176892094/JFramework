@@ -10,7 +10,7 @@
 
 using JFramework.Interface;
 
-namespace JFramework
+namespace JFramework.Event
 {
     public struct OnAntiCheat : IEvent
     {

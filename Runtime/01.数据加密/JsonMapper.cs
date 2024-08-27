@@ -11,7 +11,7 @@
 using System;
 using UnityEngine;
 
-namespace JFramework.Core
+namespace JFramework
 {
     public static partial class JsonManager
     {

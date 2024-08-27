@@ -14,10 +14,11 @@ using UnityEngine;
 using UnityEngine.Networking;
 using System.Threading.Tasks;
 using System.Collections.Generic;
+using JFramework.Event;
 using Debug = UnityEngine.Debug;
 using Object = UnityEngine.Object;
 
-namespace JFramework.Core
+namespace JFramework
 {
     public static partial class AssetManager
     {

@@ -12,7 +12,7 @@ using System;
 using System.Collections.Generic;
 using JFramework.Interface;
 
-namespace JFramework.Core
+namespace JFramework
 {
     public static partial class EventManager
     {
@@ -43,13 +43,24 @@ namespace JFramework.Core
             }
         }
 
-        public static void Invoke<T>(T obj = default) where T : struct, IEvent
+        public static void Invoke<T>(T obj) where T : struct, IEvent
         {
             if (GlobalManager.Instance)
             {
                 if (events.TryGetValue(typeof(T), out var @event))
                 {
                     ((Event<T>)@event).Invoke(obj);
+                }
+            }
+        }
+        
+        public static void Invoke<T>() where T : struct, IEvent
+        {
+            if (GlobalManager.Instance)
+            {
+                if (events.TryGetValue(typeof(T), out var @event))
+                {
+                    ((Event<T>)@event).Invoke();
                 }
             }
         }

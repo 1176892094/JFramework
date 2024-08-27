@@ -12,7 +12,7 @@ using System;
 using System.Collections.Generic;
 using JFramework.Interface;
 
-namespace JFramework.Core
+namespace JFramework
 {
     public static partial class PoolManager
     {

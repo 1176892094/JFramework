@@ -9,7 +9,8 @@
 // *********************************************************************************
 
 using System;
-using JFramework.Core;
+using JFramework;
+using JFramework.Event;
 using Random = UnityEngine.Random;
 
 namespace JFramework

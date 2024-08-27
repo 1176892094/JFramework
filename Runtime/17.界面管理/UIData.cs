@@ -10,7 +10,7 @@
 
 using System;
 
-namespace JFramework.Core
+namespace JFramework
 {
     public static partial class UIManager
     {

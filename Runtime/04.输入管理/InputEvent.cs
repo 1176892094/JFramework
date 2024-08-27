@@ -12,7 +12,7 @@ using System;
 using System.Runtime.CompilerServices;
 using JFramework.Interface;
 
-namespace JFramework.Core
+namespace JFramework
 {
     public static partial class InputManager
     {

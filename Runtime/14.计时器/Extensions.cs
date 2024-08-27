@@ -8,7 +8,7 @@
 // # Description: This is an automatically generated comment.
 // *********************************************************************************
 
-using JFramework.Core;
+using JFramework;
 using JFramework.Interface;
 
 namespace JFramework

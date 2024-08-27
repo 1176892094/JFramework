@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
-namespace JFramework.Core
+namespace JFramework
 {
     public static partial class AssetManager
     {

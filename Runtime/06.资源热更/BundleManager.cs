@@ -12,10 +12,11 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using JFramework.Event;
 using UnityEngine.Networking;
 using Debug = UnityEngine.Debug;
 
-namespace JFramework.Core
+namespace JFramework
 {
     public static class BundleManager
     {

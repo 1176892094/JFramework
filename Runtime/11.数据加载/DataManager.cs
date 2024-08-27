@@ -16,7 +16,7 @@ using System.Threading.Tasks;
 using JFramework.Interface;
 using UnityEngine;
 
-namespace JFramework.Core
+namespace JFramework
 {
     public static class DataManager
     {

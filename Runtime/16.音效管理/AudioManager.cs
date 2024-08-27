@@ -13,7 +13,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using UnityEngine;
 
-namespace JFramework.Core
+namespace JFramework
 {
     public static partial class AudioManager
     {

@@ -13,7 +13,7 @@ using System.Collections.Generic;
 using JFramework.Interface;
 using UnityEngine;
 
-namespace JFramework.Core
+namespace JFramework
 {
     public static partial class InputManager
     {

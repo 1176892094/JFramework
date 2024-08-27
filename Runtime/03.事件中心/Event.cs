@@ -12,7 +12,7 @@ using System;
 using System.Runtime.CompilerServices;
 using JFramework.Interface;
 
-namespace JFramework.Core
+namespace JFramework
 {
     public static partial class EventManager
     {
@@ -28,6 +28,9 @@ namespace JFramework.Core
 
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             public void Invoke(T obj) => Execute?.Invoke(obj);
+            
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            public void Invoke() => Execute?.Invoke(default);
         }
     }
 }

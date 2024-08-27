@@ -11,7 +11,7 @@
 using System.Collections.Generic;
 using JFramework.Interface;
 
-namespace JFramework
+namespace JFramework.Event
 {
     public struct OnBundleEntry : IEvent
     {
