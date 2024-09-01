@@ -10,7 +10,6 @@
 
 using System;
 using System.Collections.Generic;
-using JFramework;
 using JFramework.Interface;
 using UnityEngine;
 

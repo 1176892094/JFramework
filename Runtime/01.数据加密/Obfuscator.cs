@@ -17,6 +17,8 @@ namespace JFramework
 {
     public static class Obfuscator
     {
+        public const string AES_KEY = "ABCDEFGHIJKLMNOP";
+
         public static byte[] Encrypt(byte[] data, string key)
         {
             using var aes = Aes.Create();

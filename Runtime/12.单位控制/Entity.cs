@@ -9,7 +9,6 @@
 // *********************************************************************************
 
 using System;
-using JFramework;
 using JFramework.Interface;
 using UnityEngine;
 

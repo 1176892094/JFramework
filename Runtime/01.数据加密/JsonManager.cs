@@ -17,8 +17,6 @@ namespace JFramework
 {
     public static partial class JsonManager
     {
-        private const string AES_KEY = "0123456789ABCDEF";
-
         public static void Save<T>(T obj, string name)
         {
             var filePath = FilePath(name);
@@ -46,7 +44,7 @@ namespace JFramework
             var filePath = FilePath(name);
             object jsonData = obj is Object ? obj : new JsonMapper<T>(obj);
             var saveBytes = Encoding.UTF8.GetBytes(JsonUtility.ToJson(jsonData));
-            File.WriteAllBytes(filePath, Obfuscator.Encrypt(saveBytes, AES_KEY));
+            File.WriteAllBytes(filePath, Obfuscator.Encrypt(saveBytes, Obfuscator.AES_KEY));
         }
 
         public static void Decrypt<T>(T obj, string name)
@@ -56,10 +54,10 @@ namespace JFramework
             if (!File.Exists(filePath))
             {
                 var saveBytes = Encoding.UTF8.GetBytes(JsonUtility.ToJson(jsonData));
-                File.WriteAllBytes(filePath, Obfuscator.Encrypt(saveBytes, AES_KEY));
+                File.WriteAllBytes(filePath, Obfuscator.Encrypt(saveBytes, Obfuscator.AES_KEY));
             }
 
-            var loadBytes = Obfuscator.Decrypt(File.ReadAllBytes(filePath), AES_KEY);
+            var loadBytes = Obfuscator.Decrypt(File.ReadAllBytes(filePath), Obfuscator.AES_KEY);
             JsonUtility.FromJsonOverwrite(Encoding.UTF8.GetString(loadBytes), jsonData);
         }
 

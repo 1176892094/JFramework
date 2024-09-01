@@ -20,7 +20,6 @@ namespace JFramework
 {
     public static partial class AssetManager
     {
-        internal const string AES_KEY = "ABCDEFGHIJKLMNOP";
         private static AssetBundle mainAsset;
         private static AssetBundleManifest manifest;
         private static readonly Dictionary<string, AssetData> assets = new();
@@ -228,7 +227,7 @@ namespace JFramework
         {
             if (GlobalManager.Instance)
             {
-                bytes = await Obfuscator.DecryptAsync(bytes, AES_KEY);
+                bytes = await Obfuscator.DecryptAsync(bytes, Obfuscator.AES_KEY);
                 if (GlobalManager.Instance)
                 {
                     Debug.Log("解密AB包：" + bundle);

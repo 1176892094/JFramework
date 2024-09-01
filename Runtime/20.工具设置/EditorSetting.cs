@@ -16,7 +16,6 @@ using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
-using JFramework;
 using Sirenix.OdinInspector.Editor;
 using Sirenix.Utilities;
 using Sirenix.Utilities.Editor;
@@ -160,7 +159,7 @@ namespace JFramework
                     {
                         Debug.Log("加密AB包：" + file.FullName);
                         var loadBytes = await File.ReadAllBytesAsync(file.FullName);
-                        var saveBytes = await Obfuscator.EncryptAsync(loadBytes, AssetManager.AES_KEY);
+                        var saveBytes = await Obfuscator.EncryptAsync(loadBytes, Obfuscator.AES_KEY);
                         await File.WriteAllBytesAsync(file.FullName, saveBytes);
                     }
 
@@ -173,7 +172,7 @@ namespace JFramework
                 {
                     Debug.Log("加密AB包：" + file.FullName);
                     var loadBytes = await File.ReadAllBytesAsync(file.FullName);
-                    var saveBytes = await Obfuscator.EncryptAsync(loadBytes, AssetManager.AES_KEY);
+                    var saveBytes = await Obfuscator.EncryptAsync(loadBytes, Obfuscator.AES_KEY);
                     await File.WriteAllBytesAsync(file.FullName, saveBytes);
                     dataInfos.Add(new BundleData(GetHashValue(file.FullName), file.Name, file.Length.ToString()));
                 }
