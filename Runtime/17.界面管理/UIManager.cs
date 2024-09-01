@@ -20,7 +20,6 @@ namespace JFramework
     public static partial class UIManager
     {
         public static Canvas canvas { get; private set; }
-        private static readonly Dictionary<string, string> paths = new();
         private static readonly Dictionary<string, UIPanel> panels = new();
         private static readonly Dictionary<Type, List<UIPanel>> groups = new();
         private static readonly Dictionary<UILayer, Transform> layers = new();
@@ -37,29 +36,14 @@ namespace JFramework
         
         private static async Task<UIPanel> LoadAsync(Type type)
         {
-            if (!paths.TryGetValue(type.Name, out var path))
-            {
-                path = GlobalSetting.GetUIPath(type.Name);
-            }
-
-            var obj = await AssetManager.Load<GameObject>(path);
+            var obj = await AssetManager.Load<GameObject>(GlobalSetting.GetUIPath(type.Name));
             var panel = obj.GetComponent<UIPanel>() ?? (UIPanel)obj.AddComponent(type);
             panel.transform.SetParent(layers[panel.layer], false);
             panels.Add(type.Name, panel);
             panel.name = type.Name;
             return panel;
         }
-
-        public static async void LoadPath(string path)
-        {
-            var asset = await AssetManager.Load<TextAsset>(path);
-            var copies = JsonManager.Read<List<UIData>>(asset.text);
-            foreach (var data in copies)
-            {
-                paths.Add(data.name, data.path);
-            }
-        }
-
+        
         public static Transform Layer(UILayer layer)
         {
             return layers.GetValueOrDefault(layer);
@@ -84,7 +68,6 @@ namespace JFramework
         internal static void UnRegister()
         {
             canvas = null;
-            paths.Clear();
             panels.Clear();
             layers.Clear();
             groups.Clear();
