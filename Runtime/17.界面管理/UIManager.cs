@@ -23,7 +23,6 @@ namespace JFramework
         private static readonly Dictionary<string, string> paths = new();
         private static readonly Dictionary<string, UIPanel> panels = new();
         private static readonly Dictionary<Type, List<UIPanel>> groups = new();
-        private static readonly Dictionary<Type, Task<UIPanel>> requests = new();
         private static readonly Dictionary<UILayer, Transform> layers = new();
 
         internal static void Register()
@@ -35,26 +34,7 @@ namespace JFramework
             layers[UILayer.Height] = canvas.transform.Find("Layer4");
             layers[UILayer.Ignore] = canvas.transform.Find("Layer5");
         }
-
-        private static async Task<UIPanel> Load(Type type)
-        {
-            if (requests.TryGetValue(type, out var request))
-            {
-                return await request;
-            }
-
-            request = LoadAsync(type);
-            requests.Add(type, request);
-            try
-            {
-                return await request;
-            }
-            finally
-            {
-                requests.Remove(type);
-            }
-        }
-
+        
         private static async Task<UIPanel> LoadAsync(Type type)
         {
             if (!paths.TryGetValue(type.Name, out var path))
@@ -183,7 +163,7 @@ namespace JFramework
             if (!GlobalManager.Instance) return;
             if (!panels.TryGetValue(typeof(TPanel).Name, out var panel))
             {
-                panel = await Load(typeof(TPanel));
+                panel = await LoadAsync(typeof(TPanel));
             }
 
             ShowInGroup(panel);
@@ -194,7 +174,7 @@ namespace JFramework
             if (!GlobalManager.Instance) return;
             if (!panels.TryGetValue(typeof(TPanel).Name, out var panel))
             {
-                panel = await Load(typeof(TPanel));
+                panel = await LoadAsync(typeof(TPanel));
             }
 
             ShowInGroup(panel);
@@ -206,7 +186,7 @@ namespace JFramework
             if (!GlobalManager.Instance) return;
             if (!panels.TryGetValue(typeof(TPanel).Name, out var panel))
             {
-                panel = await Load(typeof(TPanel));
+                panel = await LoadAsync(typeof(TPanel));
             }
 
             ShowInGroup(panel);
