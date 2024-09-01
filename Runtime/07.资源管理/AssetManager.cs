@@ -11,10 +11,8 @@
 using System;
 using System.IO;
 using UnityEngine;
-using UnityEngine.Networking;
 using System.Threading.Tasks;
 using System.Collections.Generic;
-using JFramework.Event;
 using Debug = UnityEngine.Debug;
 using Object = UnityEngine.Object;
 
@@ -28,6 +26,9 @@ namespace JFramework
         private static readonly Dictionary<string, AssetData> assets = new();
         private static readonly Dictionary<string, AssetBundle> bundles = new();
         private static readonly Dictionary<string, Task<AssetBundle>> requests = new();
+        public static event Action<string[]> OnLoadEntry;
+        public static event Action<string> OnLoadUpdate;
+        public static event Action OnLoadComplete;
 
         public static async Task<T> Load<T>(string path) where T : Object
         {
@@ -134,7 +135,7 @@ namespace JFramework
             {
                 mainAsset = await LoadAssetBundle(GlobalSetting.Instance.platform.ToString());
                 manifest = mainAsset.LoadAsset<AssetBundleManifest>(nameof(AssetBundleManifest));
-                EventManager.Invoke(new OnAssetEntry(manifest.GetAllAssetBundles()));
+                OnLoadEntry?.Invoke(manifest.GetAllAssetBundles());
             }
 
             var dependencies = manifest.GetAllDependencies(assetData.bundle);
@@ -152,7 +153,7 @@ namespace JFramework
             {
                 mainAsset = await LoadAssetBundle(GlobalSetting.Instance.platform.ToString());
                 manifest = mainAsset.LoadAsset<AssetBundleManifest>(nameof(AssetBundleManifest));
-                EventManager.Invoke(new OnAssetEntry(manifest.GetAllAssetBundles()));
+                OnLoadEntry?.Invoke(manifest.GetAllAssetBundles());
             }
 
             var assetBundles = manifest.GetAllAssetBundles();
@@ -161,7 +162,7 @@ namespace JFramework
                 await LoadAssetBundle(assetBundle);
             }
 
-            EventManager.Invoke<OnAssetComplete>();
+            OnLoadComplete?.Invoke();
         }
 
         private static async Task<AssetBundle> LoadAssetBundle(string bundle)
@@ -231,7 +232,7 @@ namespace JFramework
                 if (GlobalManager.Instance)
                 {
                     Debug.Log("解密AB包：" + bundle);
-                    EventManager.Invoke(new OnAssetUpdate(bundle));
+                    OnLoadUpdate?.Invoke(bundle);
                     var result = AssetBundle.LoadFromMemoryAsync(bytes);
                     bundles.Add(bundle, result.assetBundle);
                     return result.assetBundle;
@@ -249,6 +250,9 @@ namespace JFramework
             requests.Clear();
             manifest = null;
             mainAsset = null;
+            OnLoadEntry = null;
+            OnLoadUpdate = null;
+            OnLoadComplete = null;
         }
     }
 }

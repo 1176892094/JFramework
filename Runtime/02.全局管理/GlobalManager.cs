@@ -27,6 +27,8 @@ namespace JFramework
 
         public static event Action OnLateUpdate;
 
+        public static event Action OnCheat;
+
         private void Awake()
         {
             Instance = this;
@@ -100,10 +102,16 @@ namespace JFramework
 
         private void OnDestroy()
         {
+            OnCheat = null;
             OnUpdate = null;
             OnLateUpdate = null;
             OnFixedUpdate = null;
             GC.Collect();
+        }
+
+        internal static void OnAntiCheat()
+        {
+            OnCheat?.Invoke();
         }
     }
 

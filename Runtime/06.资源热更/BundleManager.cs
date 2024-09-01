@@ -8,11 +8,11 @@
 // # Description: This is an automatically generated comment.
 // *********************************************************************************
 
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using JFramework.Event;
 using UnityEngine.Networking;
 using Debug = UnityEngine.Debug;
 
@@ -23,6 +23,10 @@ namespace JFramework
         private static readonly List<string> updateBundles = new();
         private static Dictionary<string, BundleData> clientBundles = new();
         private static Dictionary<string, BundleData> remoteBundles = new();
+        public static event Action<List<long>> OnLoadEntry;
+        public static event Action<string, float> OnLoadUpdate;
+        public static event Action<bool> OnLoadComplete;
+
 
         public static async void UpdateAssetBundles()
         {
@@ -32,7 +36,7 @@ namespace JFramework
                 if (string.IsNullOrEmpty(remote))
                 {
                     Debug.Log("更新失败。");
-                    EventManager.Invoke(new OnBundleComplete(false));
+                    OnLoadComplete?.Invoke(false);
                     return;
                 }
 
@@ -76,7 +80,7 @@ namespace JFramework
                 if (await GetAssetBundles())
                 {
                     await File.WriteAllTextAsync(GlobalSetting.clientInfoPath, remote);
-                    EventManager.Invoke(new OnBundleComplete(true));
+                    OnLoadComplete?.Invoke(true);
                 }
             }
         }
@@ -161,7 +165,7 @@ namespace JFramework
                     }
                 }
 
-                EventManager.Invoke(new OnBundleEntry(sizes));
+                OnLoadEntry?.Invoke(sizes);
                 foreach (var bundle in bundles)
                 {
                     var fileUri = GlobalSetting.GetRemoteFilePath(bundle);
@@ -170,17 +174,17 @@ namespace JFramework
                         var result = request.SendWebRequest();
                         while (!result.isDone && GlobalManager.Instance)
                         {
-                            EventManager.Invoke(new OnBundleUpdate(bundle, request.downloadProgress));
+                            OnLoadUpdate?.Invoke(bundle, request.downloadProgress);
                             await Task.Yield();
                         }
-                        
-                        EventManager.Invoke(new OnBundleUpdate(bundle, 1));
+
+                        OnLoadUpdate?.Invoke(bundle, 1);
                         if (request.result != UnityWebRequest.Result.Success)
                         {
                             Debug.Log($"下载 {bundle} 文件失败\n");
                             continue;
                         }
-                        
+
                         await File.WriteAllBytesAsync(GlobalSetting.GetPersistentPath(bundle), request.downloadHandler.data);
                         if (updateBundles.Contains(bundle))
                         {
@@ -195,6 +199,9 @@ namespace JFramework
 
         internal static void UnRegister()
         {
+            OnLoadEntry = null;
+            OnLoadUpdate = null;
+            OnLoadComplete = null;
             clientBundles.Clear();
             remoteBundles.Clear();
         }

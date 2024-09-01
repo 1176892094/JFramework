@@ -9,9 +9,6 @@
 // *********************************************************************************
 
 using System;
-using JFramework;
-using JFramework.Event;
-using Random = UnityEngine.Random;
 
 namespace JFramework
 {
@@ -19,51 +16,40 @@ namespace JFramework
     public struct Variable<T>
     {
         public T origin;
+        public int buffer;
         public int offset;
-        public byte[] buffer;
-        private bool enable;
 
         public T Value
         {
             get
             {
-                if (!enable)
+                if (offset == 0)
                 {
-                    enable = true;
-                    Value = origin;
+                    this = new Variable<T>(origin);
                     return origin;
                 }
 
-                var target = new byte[buffer.Length];
-                for (int i = 0; i < buffer.Length; i++)
+                var target = unchecked(buffer - offset);
+                if (!target.Equals(origin.GetHashCode()))
                 {
-                    target[i] = (byte)(buffer[i] - offset);
-                }
-
-                if (!origin.Equals(Serialization.Read<T>(target)))
-                {
-                    EventManager.Invoke<OnAntiCheat>();
+                    GlobalManager.OnAntiCheat();
                 }
 
                 return origin;
             }
             set
             {
-                buffer = Serialization.Write(value);
-                origin = Serialization.Read<T>(buffer);
-                offset = Random.Range(1, byte.MaxValue);
-                for (int i = 0; i < buffer.Length; i++)
-                {
-                    buffer[i] = (byte)(buffer[i] + offset);
-                }
+                var target = Serialization.Write(value);
+                origin = Serialization.Read<T>(target);
+                offset = UnityEngine.Random.Range(1, ushort.MaxValue);
+                buffer = unchecked(origin.GetHashCode() + offset);
             }
         }
 
         public Variable(T value = default)
         {
             offset = 0;
-            buffer = null;
-            enable = false;
+            buffer = 0;
             origin = default;
             Value = value;
         }
