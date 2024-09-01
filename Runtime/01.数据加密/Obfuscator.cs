@@ -15,7 +15,7 @@ using System.Security.Cryptography;
 
 namespace JFramework
 {
-    internal static class Obfuscator
+    public static class Obfuscator
     {
         public static byte[] Encrypt(byte[] data, string key)
         {
