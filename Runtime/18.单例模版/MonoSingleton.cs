@@ -43,13 +43,13 @@ namespace JFramework
 
         protected virtual void Awake()
         {
+            if (this is IDontDestroy singleton)
+            {
+                singleton.DontDestroy(gameObject);
+            }
+
             if (instance == null)
             {
-                if (this is IDontDestroy singleton)
-                {
-                    singleton.DontDestroy(gameObject);
-                }
-
                 instance = (T)this;
             }
             else if (instance != this)
