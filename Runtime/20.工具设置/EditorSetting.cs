@@ -157,10 +157,10 @@ namespace JFramework
                 {
                     if (!readInfos.Contains(GetHashValue(file.FullName)))
                     {
-                        Debug.Log("加密AB包：" + file.FullName);
-                        var loadBytes = await File.ReadAllBytesAsync(file.FullName);
-                        var saveBytes = await Obfuscator.EncryptAsync(loadBytes, Obfuscator.AES_KEY);
-                        await File.WriteAllBytesAsync(file.FullName, saveBytes);
+                        Debug.Log("压缩加密AB包：" + file.FullName);
+                        var readBytes = await File.ReadAllBytesAsync(file.FullName);
+                        readBytes = await Obfuscator.EncryptAsync(readBytes, Obfuscator.AES_KEY);
+                        await File.WriteAllBytesAsync(file.FullName, readBytes);
                     }
 
                     dataInfos.Add(new BundleData(GetHashValue(file.FullName), file.Name, file.Length.ToString()));
@@ -170,10 +170,10 @@ namespace JFramework
             {
                 foreach (var file in dataFiles)
                 {
-                    Debug.Log("加密AB包：" + file.FullName);
-                    var loadBytes = await File.ReadAllBytesAsync(file.FullName);
-                    var saveBytes = await Obfuscator.EncryptAsync(loadBytes, Obfuscator.AES_KEY);
-                    await File.WriteAllBytesAsync(file.FullName, saveBytes);
+                    Debug.Log("压缩加密AB包：" + file.FullName);
+                    var readBytes = await File.ReadAllBytesAsync(file.FullName);
+                    readBytes = await Obfuscator.EncryptAsync(readBytes, Obfuscator.AES_KEY);
+                    await File.WriteAllBytesAsync(file.FullName, readBytes);
                     dataInfos.Add(new BundleData(GetHashValue(file.FullName), file.Name, file.Length.ToString()));
                 }
             }

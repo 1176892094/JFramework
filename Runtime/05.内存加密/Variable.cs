@@ -26,25 +26,25 @@ namespace JFramework
                 if (offset == 0)
                 {
                     this = new Variable<T>(origin);
-                    return origin;
                 }
 
-                var target = unchecked(buffer - offset);
-                if (!target.Equals(origin.GetHashCode()))
+                if (buffer != unchecked(target + offset))
                 {
                     GlobalManager.OnAntiCheat();
+                    return default;
                 }
 
                 return origin;
             }
             set
             {
-                var target = Serialization.Write(value);
-                origin = Serialization.Read<T>(target);
+                origin = value;
                 offset = UnityEngine.Random.Range(1, ushort.MaxValue);
-                buffer = unchecked(origin.GetHashCode() + offset);
+                buffer = unchecked(target + offset);
             }
         }
+
+        private int target => origin != null ? origin.GetHashCode() : 0;
 
         public Variable(T value = default)
         {

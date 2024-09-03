@@ -65,7 +65,7 @@ namespace JFramework
             RandomNumberGenerator.Fill(iv);
             aes.IV = iv;
 
-            await using var ms = new MemoryStream();
+            using var ms = new MemoryStream();
             await ms.WriteAsync(iv);
 
             await using var cs = new CryptoStream(ms, aes.CreateEncryptor(), CryptoStreamMode.Write);
@@ -80,14 +80,14 @@ namespace JFramework
             using var aes = Aes.Create();
             aes.Key = Encoding.UTF8.GetBytes(key);
 
-            await using var ms = new MemoryStream(data);
+            using var ms = new MemoryStream(data);
 
             var iv = new byte[16];
             await ms.ReadAsync(iv);
             aes.IV = iv;
 
             await using var cs = new CryptoStream(ms, aes.CreateDecryptor(), CryptoStreamMode.Read);
-            await using var rs = new MemoryStream();
+            using var rs = new MemoryStream();
             await cs.CopyToAsync(rs);
 
             return rs.ToArray();
