@@ -159,7 +159,7 @@ namespace JFramework
                     {
                         Debug.Log("压缩加密AB包：" + file.FullName);
                         var readBytes = await File.ReadAllBytesAsync(file.FullName);
-                        readBytes = await Obfuscator.EncryptAsync(readBytes, Obfuscator.AES_KEY);
+                        readBytes = await Obfuscator.EncryptAsync(readBytes);
                         await File.WriteAllBytesAsync(file.FullName, readBytes);
                     }
 
@@ -172,7 +172,7 @@ namespace JFramework
                 {
                     Debug.Log("压缩加密AB包：" + file.FullName);
                     var readBytes = await File.ReadAllBytesAsync(file.FullName);
-                    readBytes = await Obfuscator.EncryptAsync(readBytes, Obfuscator.AES_KEY);
+                    readBytes = await Obfuscator.EncryptAsync(readBytes);
                     await File.WriteAllBytesAsync(file.FullName, readBytes);
                     dataInfos.Add(new BundleData(GetHashValue(file.FullName), file.Name, file.Length.ToString()));
                 }

@@ -228,7 +228,7 @@ namespace JFramework
         {
             if (GlobalManager.Instance)
             {
-                bytes = await Obfuscator.DecryptAsync(bytes, Obfuscator.AES_KEY);
+                bytes = await Obfuscator.DecryptAsync(bytes);
                 if (GlobalManager.Instance)
                 {
                     Debug.Log("解密AB包：" + bundle);

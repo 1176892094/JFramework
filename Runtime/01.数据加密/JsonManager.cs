@@ -29,36 +29,41 @@ namespace JFramework
         {
             var filePath = FilePath(name);
             object jsonData = obj is Object ? obj : new JsonMapper<T>(obj);
+            string readJson;
             if (!File.Exists(filePath))
             {
-                var saveJson = JsonUtility.ToJson(jsonData);
-                File.WriteAllText(filePath, saveJson);
+                readJson = JsonUtility.ToJson(jsonData);
+                File.WriteAllText(filePath, readJson);
             }
 
-            var loadJson = File.ReadAllText(filePath);
-            JsonUtility.FromJsonOverwrite(loadJson, jsonData);
+            readJson = File.ReadAllText(filePath);
+            JsonUtility.FromJsonOverwrite(readJson, jsonData);
         }
 
-        public static void Encrypt<T>(T obj, string name)
+        public static void Encrypt<T>(T obj, string name, string key = Obfuscator.AES_KEY)
         {
             var filePath = FilePath(name);
             object jsonData = obj is Object ? obj : new JsonMapper<T>(obj);
             var saveBytes = Encoding.UTF8.GetBytes(JsonUtility.ToJson(jsonData));
-            File.WriteAllBytes(filePath, Obfuscator.Encrypt(saveBytes, Obfuscator.AES_KEY));
+            saveBytes = Obfuscator.Encrypt(saveBytes, key);
+            File.WriteAllBytes(filePath, saveBytes);
         }
 
-        public static void Decrypt<T>(T obj, string name)
+        public static void Decrypt<T>(T obj, string name, string key = Obfuscator.AES_KEY)
         {
             var filePath = FilePath(name);
             object jsonData = obj is Object ? obj : new JsonMapper<T>(obj);
+            byte[] readBytes;
             if (!File.Exists(filePath))
             {
-                var saveBytes = Encoding.UTF8.GetBytes(JsonUtility.ToJson(jsonData));
-                File.WriteAllBytes(filePath, Obfuscator.Encrypt(saveBytes, Obfuscator.AES_KEY));
+                readBytes = Encoding.UTF8.GetBytes(JsonUtility.ToJson(jsonData));
+                readBytes = Obfuscator.Encrypt(readBytes, key);
+                File.WriteAllBytes(filePath, readBytes);
             }
 
-            var loadBytes = Obfuscator.Decrypt(File.ReadAllBytes(filePath), Obfuscator.AES_KEY);
-            JsonUtility.FromJsonOverwrite(Encoding.UTF8.GetString(loadBytes), jsonData);
+            readBytes = File.ReadAllBytes(filePath);
+            readBytes = Obfuscator.Decrypt(readBytes, key);
+            JsonUtility.FromJsonOverwrite(Encoding.UTF8.GetString(readBytes), jsonData);
         }
 
         private static string FilePath(string name)

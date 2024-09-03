@@ -19,7 +19,7 @@ namespace JFramework
     {
         public const string AES_KEY = "ABCDEFGHIJKLMNOP";
 
-        public static byte[] Encrypt(byte[] data, string key)
+        public static byte[] Encrypt(byte[] data, string key = AES_KEY)
         {
             using var aes = Aes.Create();
             aes.Key = Encoding.UTF8.GetBytes(key);
@@ -38,7 +38,7 @@ namespace JFramework
             return ms.ToArray();
         }
 
-        public static byte[] Decrypt(byte[] data, string key)
+        public static byte[] Decrypt(byte[] data, string key = AES_KEY)
         {
             using var aes = Aes.Create();
             aes.Key = Encoding.UTF8.GetBytes(key);
@@ -56,7 +56,7 @@ namespace JFramework
             return rs.ToArray();
         }
 
-        public static async Task<byte[]> EncryptAsync(byte[] data, string key)
+        public static async Task<byte[]> EncryptAsync(byte[] data, string key = AES_KEY)
         {
             using var aes = Aes.Create();
             aes.Key = Encoding.UTF8.GetBytes(key);
@@ -75,7 +75,7 @@ namespace JFramework
             return ms.ToArray();
         }
 
-        public static async Task<byte[]> DecryptAsync(byte[] data, string key)
+        public static async Task<byte[]> DecryptAsync(byte[] data, string key = AES_KEY)
         {
             using var aes = Aes.Create();
             aes.Key = Encoding.UTF8.GetBytes(key);
