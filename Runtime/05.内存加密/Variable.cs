@@ -45,10 +45,9 @@ namespace JFramework
 
         public Variable(T value = default)
         {
-            offset = 0;
-            buffer = 0;
-            origin = default;
-            Value = value;
+            origin = value == null ? (T)(object)"" : value;
+            offset = UnityEngine.Random.Range(1, ushort.MaxValue);
+            buffer = unchecked(origin.GetHashCode() + offset);
         }
 
         public static implicit operator T(Variable<T> secret)
