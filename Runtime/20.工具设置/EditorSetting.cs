@@ -30,6 +30,7 @@ namespace JFramework
     internal partial class EditorSetting : OdinMenuEditorWindow
     {
         public static readonly SortedDictionary<string, object> editors = new SortedDictionary<string, object>();
+        private static readonly List<Task> writeTasks = new List<Task>();
 
         protected override OdinMenuTree BuildMenuTree()
         {
@@ -72,6 +73,20 @@ namespace JFramework
             }
 
             return builder.ToString();
+        }
+
+        private static async void LoadBundleTask(List<BundleData> dataInfos, FileInfo fileInfo)
+        {
+            var writeTask = Task.Run(() =>
+            {
+                var readBytes = File.ReadAllBytes(fileInfo.FullName);
+                readBytes = Obfuscator.Encrypt(readBytes);
+                File.WriteAllBytes(fileInfo.FullName, readBytes);
+            });
+            writeTasks.Add(writeTask);
+            await writeTask;
+            dataInfos.Add(new BundleData(GetHashValue(fileInfo.FullName), fileInfo.Name, fileInfo.Length.ToString()));
+            Debug.Log("加密AB包：" + fileInfo.FullName);
         }
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
@@ -146,23 +161,21 @@ namespace JFramework
             var directory = Directory.CreateDirectory(GlobalSetting.platformPath);
             var platform = (BuildTarget)GlobalSetting.Instance.platform;
             BuildPipeline.BuildAssetBundles(GlobalSetting.platformPath, BuildAssetBundleOptions.None, platform);
+            var elapseTime = EditorApplication.timeSinceStartup;
             var fileInfos = directory.GetFiles().Where(info => info.Extension == "").ToList();
             var dataInfos = new List<BundleData>();
+            writeTasks.Clear();
             if (File.Exists(GlobalSetting.assetBundleInfo))
             {
                 var json = await File.ReadAllTextAsync(GlobalSetting.assetBundleInfo);
                 var readFiles = JsonManager.Read<List<BundleData>>(json);
                 var readInfos = readFiles.Select(data => data.code).ToList();
-            
+
                 foreach (var fileInfo in fileInfos)
                 {
                     if (!readInfos.Contains(GetHashValue(fileInfo.FullName)))
                     {
-                        var readBytes = await File.ReadAllBytesAsync(fileInfo.FullName);
-                        readBytes = await Obfuscator.EncryptAsync(readBytes);
-                        await File.WriteAllBytesAsync(fileInfo.FullName, readBytes);
-                        dataInfos.Add(new BundleData(GetHashValue(fileInfo.FullName), fileInfo.Name, fileInfo.Length.ToString()));
-                        Debug.Log("压缩加密AB包：" + fileInfo.FullName);
+                        LoadBundleTask(dataInfos, fileInfo);
                     }
                     else
                     {
@@ -174,17 +187,16 @@ namespace JFramework
             {
                 foreach (var fileInfo in fileInfos)
                 {
-                    var readBytes = await File.ReadAllBytesAsync(fileInfo.FullName);
-                    readBytes = await Obfuscator.EncryptAsync(readBytes);
-                    await File.WriteAllBytesAsync(fileInfo.FullName, readBytes);
-                    dataInfos.Add(new BundleData(GetHashValue(fileInfo.FullName), fileInfo.Name, fileInfo.Length.ToString()));
-                    Debug.Log("压缩加密AB包：" + fileInfo.FullName);
+                    LoadBundleTask(dataInfos, fileInfo);
                 }
             }
-            
+
+            await Task.WhenAll(writeTasks);
+            await Task.Yield();
             var contents = JsonManager.Write(dataInfos);
             await File.WriteAllTextAsync(GlobalSetting.assetBundleInfo, contents);
-            Debug.Log("构建 AssetBundles 成功!".Green());
+            elapseTime = EditorApplication.timeSinceStartup - elapseTime;
+            Debug.Log("加密 AssetBundle 完成。耗时:<color=#00FF00> " + elapseTime.ToString("F") + " </color>秒");
             AssetDatabase.Refresh();
         }
 
