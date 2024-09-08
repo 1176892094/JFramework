@@ -38,7 +38,7 @@ namespace JFramework
             set
             {
                 origin = value == null ? (T)(object)"" : value;
-                offset = UnityEngine.Random.Range(1, ushort.MaxValue);
+                offset = Random.Range(1, ushort.MaxValue);
                 buffer = unchecked(origin.GetHashCode() + offset);
             }
         }
@@ -46,7 +46,7 @@ namespace JFramework
         public Variable(T value = default)
         {
             origin = value == null ? (T)(object)"" : value;
-            offset = UnityEngine.Random.Range(1, ushort.MaxValue);
+            offset = Random.Range(1, ushort.MaxValue);
             buffer = unchecked(origin.GetHashCode() + offset);
         }
 

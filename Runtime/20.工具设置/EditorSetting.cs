@@ -16,6 +16,7 @@ using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
+using System.Threading.Tasks;
 using Sirenix.OdinInspector.Editor;
 using Sirenix.Utilities;
 using Sirenix.Utilities.Editor;
@@ -145,39 +146,42 @@ namespace JFramework
             var directory = Directory.CreateDirectory(GlobalSetting.platformPath);
             var platform = (BuildTarget)GlobalSetting.Instance.platform;
             BuildPipeline.BuildAssetBundles(GlobalSetting.platformPath, BuildAssetBundleOptions.None, platform);
-            var dataFiles = directory.GetFiles().Where(info => info.Extension == "").ToList();
+            var fileInfos = directory.GetFiles().Where(info => info.Extension == "").ToList();
             var dataInfos = new List<BundleData>();
             if (File.Exists(GlobalSetting.assetBundleInfo))
             {
                 var json = await File.ReadAllTextAsync(GlobalSetting.assetBundleInfo);
                 var readFiles = JsonManager.Read<List<BundleData>>(json);
                 var readInfos = readFiles.Select(data => data.code).ToList();
-
-                foreach (var file in dataFiles)
+            
+                foreach (var fileInfo in fileInfos)
                 {
-                    if (!readInfos.Contains(GetHashValue(file.FullName)))
+                    if (!readInfos.Contains(GetHashValue(fileInfo.FullName)))
                     {
-                        Debug.Log("压缩加密AB包：" + file.FullName);
-                        var readBytes = await File.ReadAllBytesAsync(file.FullName);
+                        var readBytes = await File.ReadAllBytesAsync(fileInfo.FullName);
                         readBytes = await Obfuscator.EncryptAsync(readBytes);
-                        await File.WriteAllBytesAsync(file.FullName, readBytes);
+                        await File.WriteAllBytesAsync(fileInfo.FullName, readBytes);
+                        dataInfos.Add(new BundleData(GetHashValue(fileInfo.FullName), fileInfo.Name, fileInfo.Length.ToString()));
+                        Debug.Log("压缩加密AB包：" + fileInfo.FullName);
                     }
-
-                    dataInfos.Add(new BundleData(GetHashValue(file.FullName), file.Name, file.Length.ToString()));
+                    else
+                    {
+                        dataInfos.Add(new BundleData(GetHashValue(fileInfo.FullName), fileInfo.Name, fileInfo.Length.ToString()));
+                    }
                 }
             }
             else
             {
-                foreach (var file in dataFiles)
+                foreach (var fileInfo in fileInfos)
                 {
-                    Debug.Log("压缩加密AB包：" + file.FullName);
-                    var readBytes = await File.ReadAllBytesAsync(file.FullName);
+                    var readBytes = await File.ReadAllBytesAsync(fileInfo.FullName);
                     readBytes = await Obfuscator.EncryptAsync(readBytes);
-                    await File.WriteAllBytesAsync(file.FullName, readBytes);
-                    dataInfos.Add(new BundleData(GetHashValue(file.FullName), file.Name, file.Length.ToString()));
+                    await File.WriteAllBytesAsync(fileInfo.FullName, readBytes);
+                    dataInfos.Add(new BundleData(GetHashValue(fileInfo.FullName), fileInfo.Name, fileInfo.Length.ToString()));
+                    Debug.Log("压缩加密AB包：" + fileInfo.FullName);
                 }
             }
-
+            
             var contents = JsonManager.Write(dataInfos);
             await File.WriteAllTextAsync(GlobalSetting.assetBundleInfo, contents);
             Debug.Log("构建 AssetBundles 成功!".Green());
@@ -189,7 +193,7 @@ namespace JFramework
         {
             var assembly = Reflection.GetAssembly("JFramework.Editor");
             if (assembly == null) return;
-            var type = assembly.GetType("JFramework.Editor.ExcelHelper");
+            var type = assembly.GetType("JFramework.Editor.ExcelManager");
             var method = type?.GetMethod("ExcelToScripts", Reflection.Static);
             method?.Invoke(null, null);
         }
