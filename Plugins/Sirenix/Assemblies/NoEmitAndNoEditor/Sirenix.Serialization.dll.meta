@@ -1,12 +1,22 @@
 fileFormatVersion: 2
 guid: d2a8f0021d6b47c5923d8972dfb81ef1
-timeCreated: 1488828285
-PluginImporter:
+AssetOrigin:
   serializedVersion: 1
+  productId: 89041
+  packageName: Odin Inspector and Serializer
+  packageVersion: 3.3.1.7
+  assetPath: Assets/Plugins/Sirenix/Assemblies/NoEmitAndNoEditor/Sirenix.Serialization.dll
+  uploadId: 681820
+PluginImporter:
+  externalObjects: {}
+  serializedVersion: 3
   iconMap: {}
   executionOrder: {}
+  defineConstraints: []
   isPreloaded: 0
   isOverridable: 0
+  isExplicitlyReferenced: 0
+  validateReferences: 1
   platformData:
     Android:
       enabled: 1
@@ -40,44 +50,29 @@ PluginImporter:
       enabled: 0
       settings:
         DefaultValueInitialized: true
-    Linux:
-      enabled: 1
-      settings: {}
     Linux64:
       enabled: 1
-      settings: {}
-    LinuxUniversal:
-      enabled: 1
-      settings: {}
-    OSXIntel:
-      enabled: 1
-      settings: {}
-    OSXIntel64:
-      enabled: 1
-      settings: {}
+      settings:
+        CPU: 
     OSXUniversal:
       enabled: 1
-      settings: {}
-    PSM:
-      enabled: 0
-      settings: {}
+      settings:
+        CPU: 
     Win:
       enabled: 1
-      settings: {}
+      settings:
+        CPU: 
     Win64:
       enabled: 1
-      settings: {}
+      settings:
+        CPU: 
     WindowsStoreApps:
       enabled: 0
       settings:
         CPU: AnyCPU
+    iOS:
+      enabled: 1
+      settings: {}
   userData: 
   assetBundleName: 
   assetBundleVariant: 
-AssetOrigin:
-  serializedVersion: 1
-  productId: 89041
-  packageName: Odin Inspector and Serializer
-  packageVersion: 3.3.1.7
-  assetPath: Assets/Plugins/Sirenix/Assemblies/NoEmitAndNoEditor/Sirenix.Serialization.dll
-  uploadId: 681820
