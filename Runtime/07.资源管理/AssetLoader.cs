@@ -44,7 +44,7 @@ namespace JFramework
         {
             public static T LoadAsync<T>(string assetPath) where T : Object
             {
-                if (GlobalSetting.objects.TryGetValue(char.ToUpper(assetPath[0]) + assetPath.Substring(1), out var editorPath))
+                if (EditorSetting.objects.TryGetValue(char.ToUpper(assetPath[0]) + assetPath.Substring(1), out var editorPath))
                 {
                     var request = UnityEditor.AssetDatabase.LoadAssetAtPath<T>(editorPath);
                     return request is GameObject ? Object.Instantiate(request) : request;

@@ -26,8 +26,7 @@ namespace JFramework
         public static event Action<List<long>> OnLoadEntry;
         public static event Action<string, float> OnLoadUpdate;
         public static event Action<bool> OnLoadComplete;
-
-
+        
         public static async void UpdateAssetBundles()
         {
             if (GlobalManager.Instance)

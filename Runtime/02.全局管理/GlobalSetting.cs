@@ -61,6 +61,8 @@ namespace JFramework
 #if UNITY_EDITOR
     internal partial class GlobalSetting
     {
+        [HideInInspector] public List<string> sceneAssets = new List<string>();
+        
         [ShowInInspector]
         public static string EditorPath
         {
@@ -88,10 +90,6 @@ namespace JFramework
             get => (BundleMode)UnityEditor.EditorPrefs.GetInt(nameof(AssetBuild), (int)BundleMode.StreamingAssets);
             set => UnityEditor.EditorPrefs.SetInt(nameof(AssetBuild), (int)value);
         }
-
-        [HideInInspector] public List<string> sceneAssets = new List<string>();
-
-        public static readonly Dictionary<string, string> objects = new Dictionary<string, string>();
 
         private static string remoteBuildPath => AssetBuild == BundleMode.BuildPath ? Instance.buildPath : Application.streamingAssetsPath;
 

@@ -30,6 +30,7 @@ namespace JFramework
     internal partial class EditorSetting : OdinMenuEditorWindow
     {
         public static readonly SortedDictionary<string, object> editors = new SortedDictionary<string, object>();
+        public static readonly Dictionary<string, string> objects = new Dictionary<string, string>();
         private static readonly List<Task> writeTasks = new List<Task>();
 
         protected override OdinMenuTree BuildMenuTree()
@@ -145,7 +146,7 @@ namespace JFramework
                                 GlobalSetting.Instance.sceneAssets.Add(path);
                             }
 
-                            GlobalSetting.objects[$"{name}/{asset.name}"] = path;
+                            objects[$"{name}/{asset.name}"] = path;
                         }
                     }
                 }
