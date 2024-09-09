@@ -1,7 +1,8 @@
 fileFormatVersion: 2
-guid: 3fdc67fad3e362e47b5dd365a0bbdd7f
+guid: e957a9e8b4f4bce4b8a34e504a8c39d7
+timeCreated: 1533815770
+licenseType: Store
 TextScriptImporter:
-  externalObjects: {}
   userData: 
   assetBundleName: 
   assetBundleVariant: 
@@ -10,5 +11,5 @@ AssetOrigin:
   productId: 89041
   packageName: Odin Inspector and Serializer
   packageVersion: 3.3.1.7
-  assetPath: Assets/Plugins/Sirenix/Odin Inspector/Assets/Editor/Bootstrap License.txt
+  assetPath: Assets/Plugins/Sirenix/Readme.txt
   uploadId: 681820
