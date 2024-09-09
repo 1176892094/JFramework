@@ -31,7 +31,6 @@ namespace JFramework
     {
         public static readonly SortedDictionary<string, object> editors = new SortedDictionary<string, object>();
         public static readonly Dictionary<string, string> objects = new Dictionary<string, string>();
-        private static readonly List<Task> writeTasks = new List<Task>();
 
         protected override OdinMenuTree BuildMenuTree()
         {
@@ -76,19 +75,6 @@ namespace JFramework
             return builder.ToString();
         }
 
-        private static async void LoadBundleTask(List<BundleData> dataInfos, FileInfo fileInfo)
-        {
-            var writeTask = Task.Run(() =>
-            {
-                var readBytes = File.ReadAllBytes(fileInfo.FullName);
-                readBytes = Obfuscator.Encrypt(readBytes);
-                File.WriteAllBytes(fileInfo.FullName, readBytes);
-            });
-            writeTasks.Add(writeTask);
-            await writeTask;
-            dataInfos.Add(new BundleData(GetHashValue(fileInfo.FullName), fileInfo.Name, fileInfo.Length.ToString()));
-            Debug.Log("加密AB包：" + fileInfo.FullName);
-        }
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
         private static void RuntimeInitializeOnLoad() => UpdateAsset();
@@ -165,30 +151,38 @@ namespace JFramework
             var elapseTime = EditorApplication.timeSinceStartup;
             var fileInfos = directory.GetFiles().Where(info => info.Extension == "").ToList();
             var dataInfos = new List<BundleData>();
-            writeTasks.Clear();
-            if (File.Exists(GlobalSetting.assetBundleInfo))
+            var readInfos = new List<string>();
+            var isExists = File.Exists(GlobalSetting.assetBundleInfo);
+            if (isExists)
             {
                 var json = await File.ReadAllTextAsync(GlobalSetting.assetBundleInfo);
                 var readFiles = JsonManager.Read<List<BundleData>>(json);
-                var readInfos = readFiles.Select(data => data.code).ToList();
-
-                foreach (var fileInfo in fileInfos)
-                {
-                    if (!readInfos.Contains(GetHashValue(fileInfo.FullName)))
-                    {
-                        LoadBundleTask(dataInfos, fileInfo);
-                    }
-                    else
-                    {
-                        dataInfos.Add(new BundleData(GetHashValue(fileInfo.FullName), fileInfo.Name, fileInfo.Length.ToString()));
-                    }
-                }
+                readInfos = readFiles.Select(data => data.code).ToList();
             }
-            else
+
+            var writeTasks = new List<Task>();
+            foreach (var fileInfo in fileInfos)
             {
-                foreach (var fileInfo in fileInfos)
+                if (isExists && readInfos.Contains(GetHashValue(fileInfo.FullName)))
                 {
-                    LoadBundleTask(dataInfos, fileInfo);
+                    dataInfos.Add(new BundleData(GetHashValue(fileInfo.FullName), fileInfo.Name, fileInfo.Length.ToString()));
+                    continue;
+                }
+
+                var writeTask = Task.Run(() =>
+                {
+                    var readBytes = File.ReadAllBytes(fileInfo.FullName);
+                    readBytes = Obfuscator.Encrypt(readBytes);
+                    File.WriteAllBytes(fileInfo.FullName, readBytes);
+                });
+                writeTasks.Add(writeTask);
+                WaitBundleTask();
+
+                async void WaitBundleTask()
+                {
+                    await writeTask;
+                    Debug.Log("加密AB包：" + fileInfo.FullName);
+                    dataInfos.Add(new BundleData(GetHashValue(fileInfo.FullName), fileInfo.Name, fileInfo.Length.ToString()));
                 }
             }
 
