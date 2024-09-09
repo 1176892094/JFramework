@@ -62,7 +62,7 @@ namespace JFramework
     internal partial class GlobalSetting
     {
         [ShowInInspector]
-        public string EditorPath
+        public static string EditorPath
         {
             get => UnityEditor.EditorPrefs.GetString(nameof(EditorPath), "Assets/Editor/Resources");
             set => UnityEditor.EditorPrefs.SetString(nameof(EditorPath), value);
