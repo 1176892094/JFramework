@@ -1,22 +1,12 @@
 fileFormatVersion: 2
 guid: 5978f8f3dd274e848fbb7a123bde1fb9
-AssetOrigin:
-  serializedVersion: 1
-  productId: 89041
-  packageName: Odin Inspector and Serializer
-  packageVersion: 3.3.1.3
-  assetPath: Assets/JFramework/Plugins/Sirenix/Assemblies/NoEditor/Sirenix.Utilities.dll
-  uploadId: 669372
+timeCreated: 1488828285
 PluginImporter:
-  externalObjects: {}
-  serializedVersion: 3
+  serializedVersion: 1
   iconMap: {}
   executionOrder: {}
-  defineConstraints: []
   isPreloaded: 0
   isOverridable: 0
-  isExplicitlyReferenced: 0
-  validateReferences: 1
   platformData:
     Any:
       enabled: 0
@@ -47,10 +37,28 @@ PluginImporter:
       enabled: 0
       settings:
         DefaultValueInitialized: true
+    N3DS:
+      enabled: 1
+      settings: {}
     PS4:
       enabled: 1
       settings: {}
+    PSM:
+      enabled: 1
+      settings: {}
+    PSP2:
+      enabled: 1
+      settings: {}
+    SamsungTV:
+      enabled: 1
+      settings: {}
+    Tizen:
+      enabled: 1
+      settings: {}
     WebGL:
+      enabled: 1
+      settings: {}
+    WiiU:
       enabled: 1
       settings: {}
     WindowsStoreApps:
@@ -61,7 +69,7 @@ PluginImporter:
       enabled: 1
       settings: {}
     iOS:
-      enabled: 0
+      enabled: 1
       settings: {}
     tvOS:
       enabled: 1
@@ -69,3 +77,10 @@ PluginImporter:
   userData: 
   assetBundleName: 
   assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 89041
+  packageName: Odin Inspector and Serializer
+  packageVersion: 3.3.1.7
+  assetPath: Assets/Plugins/Sirenix/Assemblies/NoEditor/Sirenix.Utilities.dll
+  uploadId: 681820
