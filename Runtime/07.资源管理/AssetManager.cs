@@ -13,6 +13,7 @@ using System.IO;
 using UnityEngine;
 using System.Threading.Tasks;
 using System.Collections.Generic;
+using System.Net;
 using UnityEngine.Networking;
 using Debug = UnityEngine.Debug;
 using Object = UnityEngine.Object;
@@ -147,7 +148,7 @@ namespace JFramework
             return assetData;
         }
 
-        public static async void LoadAssetBundles()
+        public static async Task LoadAssetBundles()
         {
             if (mainAsset == null)
             {
@@ -157,11 +158,14 @@ namespace JFramework
             }
 
             var assetBundles = manifest.GetAllAssetBundles();
+            var writeTasks = new List<Task>();
             foreach (var assetBundle in assetBundles)
             {
-                await LoadAssetBundle(assetBundle);
+                writeTasks.Add(LoadAssetBundleTask(assetBundle));
             }
 
+            await Task.WhenAll(writeTasks);
+            await Task.Yield();
             OnLoadComplete?.Invoke();
         }
 
@@ -196,50 +200,103 @@ namespace JFramework
 
         private static async Task<AssetBundle> LoadAssetRequest(string bundle)
         {
-            var path = GlobalSetting.GetPersistentPath(bundle);
-            if (File.Exists(path))
+            var (code, path) = await GetBundlePath(bundle);
+            if (code == 0)
             {
                 var bytes = await File.ReadAllBytesAsync(path);
                 return await LoadAssetRequest(bundle, bytes);
             }
 
-            path = GlobalSetting.GetStreamingPath(bundle);
-#if UNITY_ANDROID && !UNITY_EDITOR
-            using (var request = UnityWebRequest.Get(path))
+            if (code == 1)
             {
+                using var request = UnityWebRequest.Get(path);
                 await request.SendWebRequest();
                 if (request.result == UnityWebRequest.Result.Success)
                 {
                     return await LoadAssetRequest(bundle, request.downloadHandler.data);
                 }
             }
-#else
-            if (File.Exists(path))
-            {
-                var bytes = await File.ReadAllBytesAsync(path);
-                return await LoadAssetRequest(bundle, bytes);
-            }
 
-#endif
             return null;
         }
 
-        private static async Task<AssetBundle> LoadAssetRequest(string bundle, byte[] bytes)
+        private static async Task<(int, string)> GetBundlePath(string bundle)
         {
+            var path = GlobalSetting.GetPersistentPath(bundle);
+            if (File.Exists(path))
+            {
+                return (0, path);
+            }
+
+            path = GlobalSetting.GetStreamingPath(bundle);
+#if UNITY_ANDROID && !UNITY_EDITOR
+            using var request = UnityWebRequest.Head(path);
+            await request.SendWebRequest();
+            if (request.result == UnityWebRequest.Result.Success)
+            {
+                return (1, path);
+            }
+#else
+            if (File.Exists(path))
+            {
+                return (0, path);
+            }
+
+#endif
+            return (2, null);
+        }
+
+        private static Task<AssetBundle> LoadAssetRequest(string bundle, byte[] bytes)
+        {
+            bytes = Obfuscator.Decrypt(bytes);
             if (GlobalManager.Instance)
             {
-                bytes = await Obfuscator.DecryptAsync(bytes);
-                if (GlobalManager.Instance)
-                {
-                    Debug.Log("解密AB包：" + bundle);
-                    OnLoadUpdate?.Invoke(bundle);
-                    var result = AssetBundle.LoadFromMemoryAsync(bytes);
-                    bundles.Add(bundle, result.assetBundle);
-                    return result.assetBundle;
-                }
+                OnLoadUpdate?.Invoke(bundle);
+                Debug.Log("解密AB包：" + bundle);
+                var result = AssetBundle.LoadFromMemory(bytes);
+                bundles.Add(bundle, result);
+                return Task.FromResult(result);
             }
 
             return null;
+        }
+
+        private static async Task<Task> LoadAssetBundleTask(string bundle)
+        {
+            var (code, path) = await GetBundlePath(bundle);
+            if (code == 0)
+            {
+                var writeTask = Task.Run(() => Obfuscator.Decrypt(File.ReadAllBytes(path)));
+                WriteTask(writeTask);
+                return writeTask;
+            }
+
+            if (code == 1)
+            {
+                using var request = UnityWebRequest.Get(path);
+                await request.SendWebRequest();
+                if (request.result == UnityWebRequest.Result.Success)
+                {
+                    var bytes = request.downloadHandler.data;
+                    var writeTask = Task.Run(() => Obfuscator.Decrypt(bytes));
+                    WriteTask(writeTask);
+                    return writeTask;
+                }
+            }
+
+            return Task.CompletedTask;
+
+            async void WriteTask(Task<byte[]> writeTask)
+            {
+                var bytes = await writeTask;
+                if (GlobalManager.Instance)
+                {
+                    OnLoadUpdate?.Invoke(bundle);
+                    Debug.Log("解密AB包：" + bundle);
+                    var result = AssetBundle.LoadFromMemory(bytes);
+                    bundles.Add(bundle, result);
+                }
+            }
         }
 
         internal static void UnRegister()
