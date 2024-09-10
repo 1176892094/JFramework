@@ -102,35 +102,6 @@ namespace JFramework
             return assetPath.Substring(assetPath.LastIndexOf('/') + 1);
         }
 
-        private static async Task<AssetBundle> LoadAssetBundle(string bundle)
-        {
-            if (string.IsNullOrEmpty(bundle))
-            {
-                return null;
-            }
-
-            if (bundles.TryGetValue(bundle, out var result))
-            {
-                return result;
-            }
-
-            if (requests.TryGetValue(bundle, out var request))
-            {
-                return await request;
-            }
-
-            request = LoadAssetRequest(bundle);
-            requests.Add(bundle, request);
-            try
-            {
-                return await request;
-            }
-            finally
-            {
-                requests.Remove(bundle);
-            }
-        }
-
         private static async Task<AssetData> LoadDependency(string assetPath)
         {
             if (mainAsset == null)
@@ -149,13 +120,13 @@ namespace JFramework
             var dependencies = manifest.GetAllDependencies(assetData.bundle);
             foreach (var dependency in dependencies)
             {
-                _ = LoadAssetBundle(dependency);
+                LoadAssetBundleTask(dependency);
             }
 
             return assetData;
         }
 
-        public static async Task LoadAssetBundles()
+        public static async void LoadAssetBundles()
         {
             if (mainAsset == null)
             {
@@ -167,39 +138,104 @@ namespace JFramework
             var assetBundles = manifest.GetAllAssetBundles();
             foreach (var assetBundle in assetBundles)
             {
-                _ = LoadAssetBundle(assetBundle);
+                LoadAssetBundleTask(assetBundle);
             }
 
             await Task.WhenAll(requests.Values);
             OnLoadComplete?.Invoke();
         }
 
-        private static async Task<AssetBundle> LoadAssetRequest(string bundle)
+        private static async Task<AssetBundle> LoadAssetBundle(string assetPath)
         {
-            var fileInfo = await BundleManager.GetRequest(bundle);
-            if (fileInfo.Key == 0)
+            if (string.IsNullOrEmpty(assetPath))
             {
-                var bytes = await Task.Run(() => Obfuscator.Decrypt(File.ReadAllBytes(fileInfo.Value)));
-                var assetBundle = AssetBundle.LoadFromMemory(bytes);
-                Debug.Log("解密AB包：" + bundle);
-                bundles.Add(bundle, assetBundle);
-                OnLoadUpdate?.Invoke(bundle);
+                return null;
+            }
+
+            if (bundles.TryGetValue(assetPath, out var assetBundle))
+            {
                 return assetBundle;
             }
 
-            if (fileInfo.Key == 1)
+            if (requests.TryGetValue(assetPath, out var request))
             {
-                using var request = UnityWebRequest.Get(fileInfo.Value);
+                return await request;
+            }
+
+            request = LoadAssetRequest(assetPath);
+            requests.Add(assetPath, request);
+            try
+            {
+                return await request;
+            }
+            finally
+            {
+                requests.Remove(assetPath);
+            }
+        }
+
+        private static async void LoadAssetBundleTask(string assetPath)
+        {
+            if (string.IsNullOrEmpty(assetPath))
+            {
+                return;
+            }
+
+            if (bundles.ContainsKey(assetPath))
+            {
+                return;
+            }
+
+            if (requests.TryGetValue(assetPath, out var request))
+            {
+                await request;
+                return;
+            }
+
+            request = LoadAssetRequest(assetPath);
+            requests.Add(assetPath, request);
+            try
+            {
+                await request;
+            }
+            finally
+            {
+                requests.Remove(assetPath);
+            }
+        }
+
+        private static async Task<AssetBundle> LoadAssetRequest(string assetPath)
+        {
+            var assetData = await BundleManager.GetRequest(assetPath);
+            if (assetData.Key == 0)
+            {
+                var bytes = await Task.Run(() => Obfuscator.Decrypt(File.ReadAllBytes(assetData.Value)));
+                if (GlobalManager.Instance)
+                {
+                    var assetBundle = AssetBundle.LoadFromMemory(bytes);
+                    Debug.Log("解密AB包：" + assetPath);
+                    bundles.Add(assetPath, assetBundle);
+                    OnLoadUpdate?.Invoke(assetPath);
+                    return assetBundle;
+                }
+            }
+
+            if (assetData.Key == 1)
+            {
+                using var request = UnityWebRequest.Get(assetData.Value);
                 await request.SendWebRequest();
                 if (request.result == UnityWebRequest.Result.Success)
                 {
                     var bytes = request.downloadHandler.data;
                     bytes = await Task.Run(() => Obfuscator.Decrypt(bytes));
-                    var assetBundle = AssetBundle.LoadFromMemory(bytes);
-                    Debug.Log("解密AB包：" + bundle);
-                    bundles.Add(bundle, assetBundle);
-                    OnLoadUpdate?.Invoke(bundle);
-                    return assetBundle;
+                    if (GlobalManager.Instance)
+                    {
+                        var assetBundle = AssetBundle.LoadFromMemory(bytes);
+                        Debug.Log("解密AB包：" + assetPath);
+                        bundles.Add(assetPath, assetBundle);
+                        OnLoadUpdate?.Invoke(assetPath);
+                        return assetBundle;
+                    }
                 }
             }
 
