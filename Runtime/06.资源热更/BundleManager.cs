@@ -165,6 +165,7 @@ namespace JFramework
             }
 
 #endif
+            await Task.CompletedTask;
             return new KeyValuePair<int, string>(2, filePath);
         }
 
