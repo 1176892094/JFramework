@@ -20,74 +20,78 @@ namespace JFramework
 {
     public static class BundleManager
     {
-        private static readonly List<string> updateBundles = new();
+        private static readonly HashSet<string> updateBundles = new();
         private static Dictionary<string, BundleData> clientBundles = new();
-        private static Dictionary<string, BundleData> remoteBundles = new();
+        private static Dictionary<string, BundleData> serverBundles = new();
         public static event Action<List<long>> OnLoadEntry;
         public static event Action<string, float> OnLoadUpdate;
         public static event Action<bool> OnLoadComplete;
-        
+
         public static async void UpdateAssetBundles()
         {
             if (GlobalManager.Instance)
             {
-                var remote = await GetRemoteBundle();
-                if (string.IsNullOrEmpty(remote))
+                var serverFile = await GetServerRequest();
+                if (!string.IsNullOrEmpty(serverFile))
                 {
-                    Debug.Log("更新失败。");
+                    var assetBundles = JsonManager.Read<List<BundleData>>(serverFile);
+                    serverBundles = assetBundles.ToDictionary(bundle => bundle.name);
+                }
+
+                if (string.IsNullOrEmpty(serverFile))
+                {
                     OnLoadComplete?.Invoke(false);
+                    Debug.Log("更新失败。");
                     return;
                 }
 
-                var bundles = JsonManager.Read<List<BundleData>>(remote);
-                remoteBundles = bundles.ToDictionary(bundle => bundle.name);
-
-                var client = await GetClientBundle();
-                if (!string.IsNullOrEmpty(client))
+                var clientFile = await GetClientRequest();
+                if (!string.IsNullOrEmpty(clientFile))
                 {
-                    bundles = JsonManager.Read<List<BundleData>>(client);
-                    clientBundles = bundles.ToDictionary(bundle => bundle.name);
+                    var assetBundles = JsonManager.Read<List<BundleData>>(clientFile);
+                    clientBundles = assetBundles.ToDictionary(bundle => bundle.name);
                 }
 
                 updateBundles.Clear();
-                foreach (var key in remoteBundles.Keys)
+                foreach (var fileName in serverBundles.Keys)
                 {
-                    if (clientBundles.TryGetValue(key, out var bundle))
+                    if (clientBundles.TryGetValue(fileName, out var assetBundle))
                     {
-                        if (bundle != remoteBundles[key])
+                        if (assetBundle != serverBundles[fileName])
                         {
-                            updateBundles.Add(key);
+                            updateBundles.Add(fileName);
                         }
 
-                        clientBundles.Remove(key);
+                        clientBundles.Remove(fileName);
                     }
                     else
                     {
-                        updateBundles.Add(key);
+                        updateBundles.Add(fileName);
                     }
                 }
 
-                foreach (var key in clientBundles.Keys)
+                foreach (var filePath in clientBundles.Keys.Select(GlobalSetting.GetPersistentPath).Where(File.Exists))
                 {
-                    var path = GlobalSetting.GetPersistentPath(key);
-                    if (File.Exists(path))
-                    {
-                        File.Delete(path);
-                    }
+                    File.Delete(filePath);
                 }
 
                 if (await GetAssetBundles())
                 {
-                    await File.WriteAllTextAsync(GlobalSetting.clientInfoPath, remote);
+                    var filePath = GlobalSetting.GetPersistentPath(GlobalSetting.clientInfoName);
+                    await File.WriteAllTextAsync(filePath, serverFile);
                     OnLoadComplete?.Invoke(true);
+                }
+                else
+                {
+                    OnLoadComplete?.Invoke(false);
+                    Debug.Log("更新失败。");
                 }
             }
         }
 
-        private static async Task<string> GetRemoteBundle()
+        private static async Task<string> GetServerRequest()
         {
-            var reloads = 5;
-            while (reloads-- > 0)
+            for (int i = 0; i < 5; i++)
             {
                 var fileUri = GlobalSetting.GetRemoteFilePath(GlobalSetting.clientInfoName);
                 using (var request = UnityWebRequest.Head(fileUri))
@@ -117,79 +121,110 @@ namespace JFramework
             return null;
         }
 
-        private static async Task<string> GetClientBundle()
+        private static async Task<string> GetClientRequest()
         {
-            if (File.Exists(GlobalSetting.clientInfoPath))
+            var fileInfo = await GetRequest(GlobalSetting.clientInfoName);
+            if (fileInfo.Key == 0)
             {
-                return await File.ReadAllTextAsync(GlobalSetting.clientInfoPath);
+                return await File.ReadAllTextAsync(fileInfo.Value);
             }
 
+            if (fileInfo.Key == 1)
+            {
+                using var request = UnityWebRequest.Get(fileInfo.Value);
+                await request.SendWebRequest();
+                if (request.result == UnityWebRequest.Result.Success)
+                {
+                    return request.downloadHandler.text;
+                }
+            }
+
+            return null;
+        }
+
+        internal static async Task<KeyValuePair<int, string>> GetRequest(string fileName)
+        {
+            var filePath = GlobalSetting.GetPersistentPath(fileName);
+            if (File.Exists(filePath))
+            {
+                return new KeyValuePair<int, string>(0, filePath);
+            }
+
+            filePath = GlobalSetting.GetStreamingPath(fileName);
 #if UNITY_ANDROID && !UNITY_EDITOR
-            using var request = UnityWebRequest.Get(GlobalSetting.streamingInfoPath);
+            using var request = UnityWebRequest.Head(filePath);
             await request.SendWebRequest();
             if (request.result == UnityWebRequest.Result.Success)
             {
-                return request.downloadHandler.text;
+                 return new KeyValuePair<int, string>(1, filePath);
             }
 #else
-            if (File.Exists(GlobalSetting.streamingInfoPath))
+            if (File.Exists(filePath))
             {
-                return await File.ReadAllTextAsync(GlobalSetting.streamingInfoPath);
+                return new KeyValuePair<int, string>(0, filePath);
             }
+
 #endif
-            return null;
+            return new KeyValuePair<int, string>(2, filePath);
         }
 
         private static async Task<bool> GetAssetBundles()
         {
-            var reloads = 5;
-            var bundles = updateBundles.ToList();
-            while (updateBundles.Count > 0 && reloads-- > 0)
+            var assetSizes = new List<long>();
+            var assetBundles = updateBundles.ToList();
+            for (int i = 0; i < 5; i++)
             {
-                var sizes = new List<long>();
-                foreach (var bundle in bundles)
+                assetSizes.Clear();
+                foreach (var assetBundle in assetBundles)
                 {
-                    var fileUri = GlobalSetting.GetRemoteFilePath(bundle);
-                    using (var request = UnityWebRequest.Head(fileUri))
+                    var fileUri = GlobalSetting.GetRemoteFilePath(assetBundle);
+                    using var request = UnityWebRequest.Head(fileUri);
+                    request.timeout = 1;
+                    await request.SendWebRequest();
+                    if (request.result != UnityWebRequest.Result.Success)
                     {
-                        request.timeout = 1;
-                        await request.SendWebRequest();
-                        if (request.result != UnityWebRequest.Result.Success)
-                        {
-                            Debug.Log($"获取 {bundle} 文件失败\n");
-                            continue;
-                        }
+                        Debug.Log($"获取 {assetBundle} 文件失败\n");
+                        continue;
+                    }
 
-                        sizes.Add(long.Parse(request.GetResponseHeader("Content-Length")));
+                    var assetLength = request.GetResponseHeader("Content-Length");
+                    if (long.TryParse(assetLength, out var assetSize))
+                    {
+                        assetSizes.Add(assetSize);
                     }
                 }
 
-                OnLoadEntry?.Invoke(sizes);
-                foreach (var bundle in bundles)
+                OnLoadEntry?.Invoke(assetSizes);
+
+                foreach (var assetBundle in assetBundles)
                 {
-                    var fileUri = GlobalSetting.GetRemoteFilePath(bundle);
-                    using (var request = UnityWebRequest.Get(fileUri))
+                    var fileUri = GlobalSetting.GetRemoteFilePath(assetBundle);
+                    using var request = UnityWebRequest.Get(fileUri);
+                    var result = request.SendWebRequest();
+                    while (!result.isDone && GlobalManager.Instance)
                     {
-                        var result = request.SendWebRequest();
-                        while (!result.isDone && GlobalManager.Instance)
-                        {
-                            OnLoadUpdate?.Invoke(bundle, request.downloadProgress);
-                            await Task.Yield();
-                        }
-
-                        OnLoadUpdate?.Invoke(bundle, 1);
-                        if (request.result != UnityWebRequest.Result.Success)
-                        {
-                            Debug.Log($"下载 {bundle} 文件失败\n");
-                            continue;
-                        }
-
-                        await File.WriteAllBytesAsync(GlobalSetting.GetPersistentPath(bundle), request.downloadHandler.data);
-                        if (updateBundles.Contains(bundle))
-                        {
-                            updateBundles.Remove(bundle);
-                        }
+                        OnLoadUpdate?.Invoke(assetBundle, request.downloadProgress);
+                        await Task.Yield();
                     }
+
+                    OnLoadUpdate?.Invoke(assetBundle, 1);
+                    if (request.result != UnityWebRequest.Result.Success)
+                    {
+                        Debug.Log($"下载 {assetBundle} 文件失败\n");
+                        continue;
+                    }
+
+                    var filePath = GlobalSetting.GetPersistentPath(assetBundle);
+                    await File.WriteAllBytesAsync(filePath, request.downloadHandler.data);
+                    if (updateBundles.Contains(assetBundle))
+                    {
+                        updateBundles.Remove(assetBundle);
+                    }
+                }
+
+                if (updateBundles.Count == 0)
+                {
+                    break;
                 }
             }
 
@@ -202,7 +237,7 @@ namespace JFramework
             OnLoadUpdate = null;
             OnLoadComplete = null;
             clientBundles.Clear();
-            remoteBundles.Clear();
+            serverBundles.Clear();
         }
     }
 }

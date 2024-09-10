@@ -37,10 +37,6 @@ namespace JFramework
 
         public static string clientInfoName => Instance.assetInfo + ".json";
 
-        public static string clientInfoPath => GetPersistentPath(clientInfoName);
-
-        public static string streamingInfoPath => GetStreamingPath(clientInfoName);
-
         public static string GetUIPath(string assetName) => "Prefabs/" + assetName;
 
         public static string GetAudioPath(string assetName) => "Audios/" + assetName;
@@ -50,12 +46,13 @@ namespace JFramework
         public static string GetTablePath(string assetName) => "DataTable/" + assetName;
         
         private static string GetPlatform(string fileName) => Path.Combine(Instance.platform.ToString(), fileName);
+        
+        public static string GetRemoteFilePath(string fileName) => Path.Combine(Instance.remotePath, GetPlatform(fileName));
 
         public static string GetPersistentPath(string fileName) => Path.Combine(Application.persistentDataPath, fileName);
 
         public static string GetStreamingPath(string fileName) => Path.Combine(Application.streamingAssetsPath, GetPlatform(fileName));
-
-        public static string GetRemoteFilePath(string fileName) => Path.Combine(Instance.remotePath, GetPlatform(fileName));
+        
     }
 
 #if UNITY_EDITOR
