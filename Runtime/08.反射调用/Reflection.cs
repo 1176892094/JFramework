@@ -28,7 +28,7 @@ namespace JFramework
         public static Type[] GetTypes<T>(Assembly assembly)
         {
             var types = assembly.GetTypes();
-            return Array.FindAll(types, type => typeof(T).IsAssignableFrom(type));
+            return types.Where(type => typeof(T).IsAssignableFrom(type)).ToArray();
         }
 
         public static PropertyInfo GetProperty<T>(Type type) where T : Attribute
