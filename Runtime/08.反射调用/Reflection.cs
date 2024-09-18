@@ -24,17 +24,5 @@ namespace JFramework
             var assemblies = AppDomain.CurrentDomain.GetAssemblies();
             return assemblies.FirstOrDefault(assembly => assembly.GetName().Name == name);
         }
-
-        public static Type[] GetTypes<T>(Assembly assembly)
-        {
-            var types = assembly.GetTypes();
-            return types.Where(type => typeof(T).IsAssignableFrom(type)).ToArray();
-        }
-
-        public static PropertyInfo GetProperty<T>(Type type) where T : Attribute
-        {
-            var properties = type.GetProperties(Instance);
-            return properties.FirstOrDefault(field => field.GetCustomAttributes(typeof(T), false).Length > 0);
-        }
     }
 }
