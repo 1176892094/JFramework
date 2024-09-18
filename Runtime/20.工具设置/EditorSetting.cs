@@ -61,7 +61,7 @@ namespace JFramework
             return tree;
         }
 
-        private static string GetHashValue(string filePath)
+        private static string GetUniqueCode(string filePath)
         {
             using var provider = MD5.Create();
             using var stream = File.OpenRead(filePath);
@@ -163,9 +163,9 @@ namespace JFramework
             var writeTasks = new List<Task>();
             foreach (var fileInfo in fileInfos)
             {
-                if (isExists && readInfos.Contains(GetHashValue(fileInfo.FullName)))
+                if (isExists && readInfos.Contains(GetUniqueCode(fileInfo.FullName)))
                 {
-                    dataInfos.Add(new BundleData(GetHashValue(fileInfo.FullName), fileInfo.Name, fileInfo.Length.ToString()));
+                    dataInfos.Add(new BundleData(GetUniqueCode(fileInfo.FullName), fileInfo.Name, fileInfo.Length.ToString()));
                     continue;
                 }
 
@@ -182,7 +182,7 @@ namespace JFramework
                 {
                     await writeTask;
                     Debug.Log("加密AB包：" + fileInfo.FullName);
-                    dataInfos.Add(new BundleData(GetHashValue(fileInfo.FullName), fileInfo.Name, fileInfo.Length.ToString()));
+                    dataInfos.Add(new BundleData(GetUniqueCode(fileInfo.FullName), fileInfo.Name, fileInfo.Length.ToString()));
                 }
             }
 
@@ -217,10 +217,10 @@ namespace JFramework
             if (!Directory.Exists(Application.streamingAssetsPath))
             {
                 Directory.CreateDirectory(Application.dataPath + "/StreamingAssets");
+                AssetDatabase.Refresh();
             }
 
             Process.Start(Application.streamingAssetsPath);
-            AssetDatabase.Refresh();
         }
     }
 }
