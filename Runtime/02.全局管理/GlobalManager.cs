@@ -11,7 +11,6 @@
 using System;
 using System.Collections.Generic;
 using JFramework.Interface;
-using Sirenix.OdinInspector;
 using UnityEngine;
 
 namespace JFramework
@@ -20,6 +19,8 @@ namespace JFramework
     public sealed partial class GlobalManager : MonoBehaviour, IEntity
     {
         public static GlobalManager Instance { get; private set; }
+        
+        public static AssetMode mode => GlobalSetting.Instance.assetMode;
 
         public static event Action OnUpdate;
 
@@ -117,23 +118,51 @@ namespace JFramework
 
     public sealed partial class GlobalManager
     {
-        public static AssetMode mode => GlobalSetting.Instance.assetMode;
-#if UNITY_EDITOR
-        [ShowInInspector] private static Dictionary<IEntity, Dictionary<Type, IComponent>> entities = new();
-        [ShowInInspector] private static Dictionary<string, IPool<GameObject>> pools = new();
-        [ShowInInspector] private static Dictionary<Type, IPool> streams = new();
-        [ShowInInspector] private static Dictionary<Type, IEvent> events = new();
-        [ShowInInspector] private static Dictionary<string, UIPanel> panels = new();
-        [ShowInInspector] private static Dictionary<Type, List<UIPanel>> groups = new();
-        [ShowInInspector] private static Dictionary<Type, InputData> inputs = new();
-        [ShowInInspector] private static Dictionary<Type, Dictionary<int, IData>> intData = new();
-        [ShowInInspector] private static Dictionary<Type, Dictionary<Enum, IData>> enumData = new();
-        [ShowInInspector] private static Dictionary<Type, Dictionary<string, IData>> stringData = new();
-        [ShowInInspector] private static Dictionary<int, List<Timer>> timers = new();
-        [ShowInInspector] private static Dictionary<int, List<Tween>> motions = new();
-        [ShowInInspector] private static List<AudioSource> audios = new();
-        [ShowInInspector] private static Vector2 audioManager => new Vector2(AudioManager.mainVolume, AudioManager.audioVolume);
-        [ShowInInspector] private static Vector2 inputManager => new Vector2(InputManager.horizontal, InputManager.vertical);
+#if UNITY_EDITOR && ODIN_INSPECTOR
+        [Sirenix.OdinInspector.ShowInInspector]
+        private static Dictionary<IEntity, Dictionary<Type, IComponent>> entities = new();
+
+        [Sirenix.OdinInspector.ShowInInspector]
+        private static Dictionary<string, IPool<GameObject>> pools = new();
+
+        [Sirenix.OdinInspector.ShowInInspector]
+        private static Dictionary<Type, IPool> streams = new();
+
+        [Sirenix.OdinInspector.ShowInInspector]
+        private static Dictionary<Type, IEvent> events = new();
+
+        [Sirenix.OdinInspector.ShowInInspector]
+        private static Dictionary<string, UIPanel> panels = new();
+
+        [Sirenix.OdinInspector.ShowInInspector]
+        private static Dictionary<Type, List<UIPanel>> groups = new();
+
+        [Sirenix.OdinInspector.ShowInInspector]
+        private static Dictionary<Type, InputData> inputs = new();
+
+        [Sirenix.OdinInspector.ShowInInspector]
+        private static Dictionary<Type, Dictionary<int, IData>> intData = new();
+
+        [Sirenix.OdinInspector.ShowInInspector]
+        private static Dictionary<Type, Dictionary<Enum, IData>> enumData = new();
+
+        [Sirenix.OdinInspector.ShowInInspector]
+        private static Dictionary<Type, Dictionary<string, IData>> stringData = new();
+
+        [Sirenix.OdinInspector.ShowInInspector]
+        private static Dictionary<int, List<Timer>> timers = new();
+
+        [Sirenix.OdinInspector.ShowInInspector]
+        private static Dictionary<int, List<Tween>> motions = new();
+
+        [Sirenix.OdinInspector.ShowInInspector]
+        private static List<AudioSource> audios = new();
+
+        [Sirenix.OdinInspector.ShowInInspector]
+        private static Vector2 audioManager => new Vector2(AudioManager.mainVolume, AudioManager.audioVolume);
+
+        [Sirenix.OdinInspector.ShowInInspector]
+        private static Vector2 inputManager => new Vector2(InputManager.horizontal, InputManager.vertical);
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
         private static void RuntimeInitializeOnLoad()

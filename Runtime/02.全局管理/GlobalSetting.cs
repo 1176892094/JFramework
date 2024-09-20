@@ -11,7 +11,6 @@
 using System.IO;
 using System.Linq;
 using System.Collections.Generic;
-using Sirenix.OdinInspector;
 using UnityEngine;
 
 namespace JFramework
@@ -23,7 +22,10 @@ namespace JFramework
 
         public AssetPlatform platform = AssetPlatform.StandaloneWindows;
 
-        [OnValueChanged("UpdateSceneSetting")] public AssetMode assetMode;
+#if ODIN_INSPECTOR
+        [Sirenix.OdinInspector.OnValueChanged("UpdateSceneSetting")]
+#endif
+        public AssetMode assetMode;
 
         public string assetInfo = "AssetBundleInfo";
 
@@ -44,44 +46,51 @@ namespace JFramework
         public static string GetScenePath(string assetName) => "Scenes/" + assetName;
 
         public static string GetTablePath(string assetName) => "DataTable/" + assetName;
-        
+
         private static string GetPlatform(string fileName) => Path.Combine(Instance.platform.ToString(), fileName);
-        
+
         public static string GetRemoteFilePath(string fileName) => Path.Combine(Instance.remotePath, GetPlatform(fileName));
 
         public static string GetPersistentPath(string fileName) => Path.Combine(Application.persistentDataPath, fileName);
 
         public static string GetStreamingPath(string fileName) => Path.Combine(Application.streamingAssetsPath, GetPlatform(fileName));
-        
     }
 
 #if UNITY_EDITOR
     internal partial class GlobalSetting
     {
         [HideInInspector] public List<string> sceneAssets = new List<string>();
-        
-        [ShowInInspector]
+
+#if ODIN_INSPECTOR
+        [Sirenix.OdinInspector.ShowInInspector]
+#endif
         public static string EditorPath
         {
             get => UnityEditor.EditorPrefs.GetString(nameof(EditorPath), "Assets/Editor/Resources");
             set => UnityEditor.EditorPrefs.SetString(nameof(EditorPath), value);
         }
 
-        [ShowInInspector]
+#if ODIN_INSPECTOR
+        [Sirenix.OdinInspector.ShowInInspector]
+#endif
         public static string ScriptPath
         {
             get => UnityEditor.EditorPrefs.GetString(nameof(ScriptPath), "Assets/Template/DataTable");
             set => UnityEditor.EditorPrefs.SetString(nameof(ScriptPath), value);
         }
 
-        [ShowInInspector]
+#if ODIN_INSPECTOR
+        [Sirenix.OdinInspector.ShowInInspector]
+#endif
         public static string DataTablePath
         {
             get => UnityEditor.EditorPrefs.GetString(nameof(DataTablePath), "Assets/Scripts/DataTable");
             set => UnityEditor.EditorPrefs.SetString(nameof(DataTablePath), value);
         }
 
-        [ShowInInspector]
+#if ODIN_INSPECTOR
+        [Sirenix.OdinInspector.ShowInInspector]
+#endif
         public static BundleMode AssetBuild
         {
             get => (BundleMode)UnityEditor.EditorPrefs.GetInt(nameof(AssetBuild), (int)BundleMode.StreamingAssets);

@@ -17,9 +17,6 @@ using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
-using Sirenix.OdinInspector.Editor;
-using Sirenix.Utilities;
-using Sirenix.Utilities.Editor;
 using Debug = UnityEngine.Debug;
 using UnityEditor;
 using UnityEngine;
@@ -27,39 +24,9 @@ using Object = UnityEngine.Object;
 
 namespace JFramework
 {
-    internal partial class EditorSetting : OdinMenuEditorWindow
+    internal partial class EditorSetting
     {
-        public static readonly SortedDictionary<string, object> editors = new SortedDictionary<string, object>();
         public static readonly Dictionary<string, string> objects = new Dictionary<string, string>();
-
-        protected override OdinMenuTree BuildMenuTree()
-        {
-            var tree = new OdinMenuTree
-            {
-                { "主页", GlobalSetting.Instance, EditorIcons.House },
-            };
-
-            var icon = 0;
-            foreach (var editor in editors)
-            {
-                switch (icon)
-                {
-                    case 0:
-                        tree.Add(editor.Key, editor.Value, EditorIcons.SettingsCog);
-                        break;
-                    case 1:
-                        tree.Add(editor.Key, editor.Value, EditorIcons.Bell);
-                        break;
-                    default:
-                        tree.Add(editor.Key, editor.Value, EditorIcons.Folder);
-                        break;
-                }
-
-                icon++;
-            }
-
-            return tree;
-        }
 
         private static string GetUniqueCode(string filePath)
         {
@@ -78,16 +45,6 @@ namespace JFramework
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
         private static void RuntimeInitializeOnLoad() => UpdateAsset();
-    }
-
-    internal partial class EditorSetting
-    {
-        [MenuItem("Tools/JFramework/Editor Window _F1", priority = 1)]
-        protected static void ShowEditorWindow()
-        {
-            var window = GetWindow<EditorSetting>();
-            window.position = GUIHelper.GetEditorWindowRect().AlignCenter(800, 600);
-        }
 
         [MenuItem("Tools/JFramework/Update Assets", priority = 2)]
         public static void UpdateAsset()
@@ -223,5 +180,57 @@ namespace JFramework
             Process.Start(Application.streamingAssetsPath);
         }
     }
+#if ODIN_INSPECTOR
+    internal partial class EditorSetting : Sirenix.OdinInspector.Editor.OdinMenuEditorWindow
+    {
+        public static readonly SortedDictionary<string, object> editors = new SortedDictionary<string, object>();
+
+        [MenuItem("Tools/JFramework/Editor Window _F1", priority = 1)]
+        protected static void ShowEditorWindow()
+        {
+            var window = GetWindow<EditorSetting>();
+            window.position = Sirenix.Utilities.Editor.GUIHelper.GetEditorWindowRect();
+            window.position = AlignCenter(window.position, 800, 600);
+        }
+
+        public static Rect AlignCenter(Rect rect, float width, float height)
+        {
+            rect.x = (float)(rect.x + rect.width * 0.5 - width * 0.5);
+            rect.y = (float)(rect.y + rect.height * 0.5 - height * 0.5);
+            rect.width = width;
+            rect.height = height;
+            return rect;
+        }
+
+        protected override Sirenix.OdinInspector.Editor.OdinMenuTree BuildMenuTree()
+        {
+            var tree = new Sirenix.OdinInspector.Editor.OdinMenuTree
+            {
+                { "主页", GlobalSetting.Instance, Sirenix.Utilities.Editor.EditorIcons.House },
+            };
+
+            var icon = 0;
+            foreach (var editor in editors)
+            {
+                switch (icon)
+                {
+                    case 0:
+                        tree.Add(editor.Key, editor.Value, Sirenix.Utilities.Editor.EditorIcons.SettingsCog);
+                        break;
+                    case 1:
+                        tree.Add(editor.Key, editor.Value, Sirenix.Utilities.Editor.EditorIcons.Bell);
+                        break;
+                    default:
+                        tree.Add(editor.Key, editor.Value, Sirenix.Utilities.Editor.EditorIcons.Folder);
+                        break;
+                }
+
+                icon++;
+            }
+
+            return tree;
+        }
+    }
+#endif
 }
 #endif

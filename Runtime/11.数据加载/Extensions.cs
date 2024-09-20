@@ -11,6 +11,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using UnityEngine;
 
 namespace JFramework
@@ -31,22 +32,23 @@ namespace JFramework
             { typeof(Vector3Int[]), new Func<string, Vector3Int[]>(InputVector3IntArray) },
         };
 
-        public static T Parse<T>(this Variable<string> reason)
+        public static T Parse<T>(this byte[] reason)
         {
+            var value = Encoding.UTF8.GetString(reason);
             if (parsers.TryGetValue(typeof(T), out var func))
             {
-                return ((Func<string, T>)func).Invoke(reason.Value);
+                return ((Func<string, T>)func).Invoke(value);
             }
 
-            return reason.Value.InputGeneric<T>();
+            return value.InputGeneric<T>();
         }
 
-        public static string InputString(this string reason)
+        private static string InputString(this string reason)
         {
             return reason ?? string.Empty;
         }
 
-        public static Vector2 InputVector2(this string reason)
+        private static Vector2 InputVector2(this string reason)
         {
             var points = reason.Split(',');
             var x = float.Parse(points[0]);
@@ -54,7 +56,7 @@ namespace JFramework
             return new Vector2(x, y);
         }
 
-        public static Vector3 InputVector3(this string reason)
+        private static Vector3 InputVector3(this string reason)
         {
             var points = reason.Split(',');
             var x = float.Parse(points[0]);
@@ -63,7 +65,7 @@ namespace JFramework
             return new Vector3(x, y, z);
         }
 
-        public static Vector2Int InputVector2Int(this string reason)
+        private static Vector2Int InputVector2Int(this string reason)
         {
             var points = reason.Split(',');
             var x = int.Parse(points[0]);
@@ -71,7 +73,7 @@ namespace JFramework
             return new Vector2Int(x, y);
         }
 
-        public static Vector3Int InputVector3Int(this string reason)
+        private static Vector3Int InputVector3Int(this string reason)
         {
             var points = reason.Split(',');
             var x = int.Parse(points[0]);
@@ -96,32 +98,32 @@ namespace JFramework
             return result;
         }
 
-        public static string[] InputStringArray(this string reason)
+        private static string[] InputStringArray(this string reason)
         {
             return reason.InputArray().Select(InputString).ToArray();
         }
 
-        public static Vector2[] InputVector2Array(this string reason)
+        private static Vector2[] InputVector2Array(this string reason)
         {
             return reason.InputArray().Select(InputVector2).ToArray();
         }
 
-        public static Vector3[] InputVector3Array(this string reason)
+        private static Vector3[] InputVector3Array(this string reason)
         {
             return reason.InputArray().Select(InputVector3).ToArray();
         }
 
-        public static Vector2Int[] InputVector2IntArray(this string reason)
+        private static Vector2Int[] InputVector2IntArray(this string reason)
         {
             return reason.InputArray().Select(InputVector2Int).ToArray();
         }
 
-        public static Vector3Int[] InputVector3IntArray(this string reason)
+        private static Vector3Int[] InputVector3IntArray(this string reason)
         {
             return reason.InputArray().Select(InputVector3Int).ToArray();
         }
 
-        public static T InputGeneric<T>(this string reason)
+        private static T InputGeneric<T>(this string reason)
         {
             if (!typeof(T).IsArray)
             {
@@ -161,7 +163,7 @@ namespace JFramework
             return default;
         }
 
-        public static object InputGeneric(this string reason, Type type)
+        private static object InputGeneric(this string reason, Type type)
         {
             if (!string.IsNullOrEmpty(reason))
             {
@@ -180,7 +182,7 @@ namespace JFramework
                 var fields = type.GetFields(Reflection.Instance);
                 for (int i = 0; i < fields.Length; i++)
                 {
-                    fields[i].SetValue(result, new Variable<string>(member[i]));
+                    fields[i].SetValue(result, Encoding.UTF8.GetBytes(member[i]));
                 }
 
                 return result;

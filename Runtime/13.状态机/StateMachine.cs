@@ -11,15 +11,14 @@
 using System;
 using System.Collections.Generic;
 using JFramework.Interface;
-using Sirenix.OdinInspector;
 
 namespace JFramework
 {
     [Serializable]
     public abstract class StateMachine<T1> : Component<T1> where T1 : IEntity
     {
-        [ShowInInspector] private readonly Dictionary<Type, IState> states = new Dictionary<Type, IState>();
-        [ShowInInspector] private IState state;
+        private readonly Dictionary<Type, IState> states = new Dictionary<Type, IState>();
+        private IState state;
 
         public void OnUpdate() => state?.OnUpdate();
 
