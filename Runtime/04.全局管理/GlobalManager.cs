@@ -88,7 +88,6 @@ namespace JFramework
                 InputManager.UnRegister();
                 AssetManager.UnRegister();
                 AudioManager.UnRegister();
-                SceneManager.UnRegister();
                 TweenManager.UnRegister();
                 TimerManager.UnRegister();
                 EventManager.UnRegister();
