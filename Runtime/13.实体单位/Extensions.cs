@@ -16,7 +16,7 @@ namespace JFramework
 {
     public static partial class Extensions
     {
-        public static T Search<T>(this IEntity entity) where T : ScriptableObject, IComponent
+        public static T Control<T>(this IEntity entity) where T : ScriptableObject, IComponent
         {
             return (T)EntityManager.GetComponent(entity, typeof(T));
         }
