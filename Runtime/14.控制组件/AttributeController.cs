@@ -15,7 +15,7 @@ using JFramework.Interface;
 namespace JFramework
 {
     [Serializable]
-    public abstract class AttributeComponent<T1, T2> : Component<T1> where T1 : IEntity where T2 : Enum
+    public abstract class AttributeController<T1, T2> : Controller<T1> where T1 : IEntity where T2 : Enum
     {
         private readonly Dictionary<T2, Variable<float>> attributes = new Dictionary<T2, Variable<float>>();
 

@@ -119,7 +119,7 @@ namespace JFramework
     {
 #if UNITY_EDITOR && ODIN_INSPECTOR
         [Sirenix.OdinInspector.ShowInInspector]
-        private static Dictionary<IEntity, Dictionary<Type, IComponent>> entities = new();
+        private static Dictionary<IEntity, Dictionary<Type, IController>> entities = new();
 
         [Sirenix.OdinInspector.ShowInInspector]
         private static Dictionary<string, IPool<GameObject>> pools = new();
@@ -171,7 +171,7 @@ namespace JFramework
             field = typeof(PoolManager).GetField("pools", Reflection.Static)?.GetValue(null);
             pools = (Dictionary<string, IPool<GameObject>>)field;
             field = typeof(EntityManager).GetField("entities", Reflection.Static)?.GetValue(null);
-            entities = (Dictionary<IEntity, Dictionary<Type, IComponent>>)field;
+            entities = (Dictionary<IEntity, Dictionary<Type, IController>>)field;
             field = typeof(EventManager).GetField("events", Reflection.Static)?.GetValue(null);
             events = (Dictionary<Type, IEvent>)field;
             field = typeof(UIManager).GetField("panels", Reflection.Static)?.GetValue(null);

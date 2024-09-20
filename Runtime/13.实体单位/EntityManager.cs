@@ -19,22 +19,22 @@ namespace JFramework
 {
     internal static class EntityManager
     {
-        private static readonly Dictionary<IEntity, Dictionary<Type, IComponent>> entities = new();
+        private static readonly Dictionary<IEntity, Dictionary<Type, IController>> entities = new();
         public static IEntity instance { get; private set; }
 
-        public static IComponent GetComponent(IEntity entity, Type type)
+        public static IController GetComponent(IEntity entity, Type type)
         {
             if (!GlobalManager.Instance) return default;
             if (!entities.TryGetValue(entity, out var components))
             {
-                components = new Dictionary<Type, IComponent>();
+                components = new Dictionary<Type, IController>();
                 entities.Add(entity, components);
             }
 
             if (!components.TryGetValue(type, out var component))
             {
                 instance = entity;
-                component = (IComponent)ScriptableObject.CreateInstance(type);
+                component = (IController)ScriptableObject.CreateInstance(type);
                 ((ScriptableObject)component).name = type.Name;
                 components.Add(type, component);
                 component.OnAwake(instance);

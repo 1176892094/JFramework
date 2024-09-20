@@ -8,10 +8,19 @@
 // # Description: This is an automatically generated comment.
 // *********************************************************************************
 
-namespace JFramework.Interface
+using System;
+using JFramework.Interface;
+using UnityEngine;
+
+namespace JFramework
 {
-    public interface IComponent
+    [Serializable]
+    public abstract class Controller<T> : ScriptableObject, IController where T : IEntity
     {
-        void OnAwake(IEntity owner);
+        [SerializeField] private T instance;
+
+        public T owner => instance ??= (T)EntityManager.instance;
+
+        void IController.OnAwake(IEntity instance) => this.instance ??= (T)instance;
     }
 }

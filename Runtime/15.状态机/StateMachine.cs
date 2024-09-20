@@ -15,7 +15,7 @@ using JFramework.Interface;
 namespace JFramework
 {
     [Serializable]
-    public abstract class StateMachine<T1> : Component<T1> where T1 : IEntity
+    public abstract class StateMachine<T1> : Controller<T1> where T1 : IEntity
     {
         private readonly Dictionary<Type, IState> states = new Dictionary<Type, IState>();
         private IState state;
@@ -43,14 +43,11 @@ namespace JFramework
 
         public void ChangeState<T2>() where T2 : IState
         {
-            if (!SceneManager.isLoading)
+            if (owner.gameObject.activeInHierarchy)
             {
-                if (owner.gameObject.activeInHierarchy)
-                {
-                    state?.OnExit();
-                    state = states[typeof(T2)];
-                    state?.OnEnter();
-                }
+                state?.OnExit();
+                state = states[typeof(T2)];
+                state?.OnEnter();
             }
         }
 

@@ -31,7 +31,7 @@ namespace JFramework
                     continue;
                 }
 
-                if (typeof(IComponent).IsAssignableFrom(field.FieldType))
+                if (typeof(IController).IsAssignableFrom(field.FieldType))
                 {
                     var component = EntityManager.GetComponent(inject, field.FieldType);
                     field.SetValue(inject, component);
