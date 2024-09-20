@@ -17,19 +17,15 @@ namespace JFramework
 {
     public static class SceneManager
     {
-        public static bool isLoading { get; private set; }
-        public static Scene current => UnitySceneManager.GetActiveScene();
-        public static string name => current.name;
+        public static string name => UnitySceneManager.GetActiveScene().name;
 
         public static async void Load(string name)
         {
-            if (!GlobalManager.Instance) return;
             try
             {
-                isLoading = true;
+                if (!GlobalManager.Instance) return;
                 var newScene = await AssetManager.LoadScene(GlobalSetting.GetScenePath(name));
                 await UnitySceneManager.LoadSceneAsync(newScene, LoadSceneMode.Single);
-                isLoading = false;
             }
             catch (Exception e)
             {
@@ -39,13 +35,11 @@ namespace JFramework
 
         public static async void Load(string name, Action action)
         {
-            if (!GlobalManager.Instance) return;
             try
             {
-                isLoading = true;
+                if (!GlobalManager.Instance) return;
                 var newScene = await AssetManager.LoadScene(GlobalSetting.GetScenePath(name));
                 await UnitySceneManager.LoadSceneAsync(newScene, LoadSceneMode.Single);
-                isLoading = false;
                 action?.Invoke();
             }
             catch (Exception e)
@@ -56,25 +50,18 @@ namespace JFramework
 
         public static async void Load(string name, Action<AsyncOperation> action)
         {
-            if (!GlobalManager.Instance) return;
             try
             {
-                isLoading = true;
+                if (!GlobalManager.Instance) return;
                 var newScene = await AssetManager.LoadScene(GlobalSetting.GetScenePath(name));
                 var operation = UnitySceneManager.LoadSceneAsync(newScene, LoadSceneMode.Single);
                 action?.Invoke(operation);
                 await operation;
-                isLoading = false;
             }
             catch (Exception e)
             {
                 Debug.LogWarning($"异步加载 {name.Red()} 场景失败\n{e}");
             }
-        }
-
-        internal static void UnRegister()
-        {
-            isLoading = false;
         }
     }
 }
