@@ -35,7 +35,6 @@ namespace JFramework
             Instance = this;
             UIManager.Register();
             PoolManager.Register();
-            InputManager.Register();
             AudioManager.Register();
             TimerManager.Register();
             TweenManager.Register();
@@ -85,7 +84,6 @@ namespace JFramework
                 UIManager.UnRegister();
                 DataManager.UnRegister();
                 PoolManager.UnRegister();
-                InputManager.UnRegister();
                 AssetManager.UnRegister();
                 AudioManager.UnRegister();
                 TweenManager.UnRegister();
@@ -137,9 +135,6 @@ namespace JFramework
         private static Dictionary<Type, List<UIPanel>> groups = new();
 
         [Sirenix.OdinInspector.ShowInInspector]
-        private static Dictionary<Type, InputData> inputs = new();
-
-        [Sirenix.OdinInspector.ShowInInspector]
         private static Dictionary<Type, Dictionary<int, IData>> intData = new();
 
         [Sirenix.OdinInspector.ShowInInspector]
@@ -160,9 +155,6 @@ namespace JFramework
         [Sirenix.OdinInspector.ShowInInspector]
         private static Vector2 audioManager => new Vector2(AudioManager.mainVolume, AudioManager.audioVolume);
 
-        [Sirenix.OdinInspector.ShowInInspector]
-        private static Vector2 inputManager => new Vector2(InputManager.horizontal, InputManager.vertical);
-
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
         private static void RuntimeInitializeOnLoad()
         {
@@ -178,8 +170,6 @@ namespace JFramework
             panels = (Dictionary<string, UIPanel>)field;
             field = typeof(UIManager).GetField("groups", Reflection.Static)?.GetValue(null);
             groups = (Dictionary<Type, List<UIPanel>>)field;
-            field = typeof(InputManager).GetField("inputs", Reflection.Static)?.GetValue(null);
-            inputs = (Dictionary<Type, InputData>)field;
             field = typeof(DataManager).GetField("intData", Reflection.Static)?.GetValue(null);
             intData = (Dictionary<Type, Dictionary<int, IData>>)field;
             field = typeof(DataManager).GetField("enumData", Reflection.Static)?.GetValue(null);
