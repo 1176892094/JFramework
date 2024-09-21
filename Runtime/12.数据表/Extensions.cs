@@ -34,6 +34,7 @@ namespace JFramework
 
         public static T Parse<T>(this byte[] reason)
         {
+            reason ??= Array.Empty<byte>();
             var value = Encoding.UTF8.GetString(reason);
             if (parsers.TryGetValue(typeof(T), out var func))
             {
