@@ -142,12 +142,12 @@ namespace JFramework
 
         [Sirenix.OdinInspector.ShowInInspector]
         private static Dictionary<Type, Dictionary<string, IData>> stringData = new();
+        
+        [Sirenix.OdinInspector.ShowInInspector]
+        private static Dictionary<int, List<Tween>> motions = new();
 
         [Sirenix.OdinInspector.ShowInInspector]
         private static Dictionary<int, List<Timer>> timers = new();
-
-        [Sirenix.OdinInspector.ShowInInspector]
-        private static Dictionary<int, List<Tween>> motions = new();
 
         [Sirenix.OdinInspector.ShowInInspector]
         private static List<AudioSource> audios = new();
@@ -176,12 +176,12 @@ namespace JFramework
             enumData = (Dictionary<Type, Dictionary<Enum, IData>>)field;
             field = typeof(DataManager).GetField("stringData", Reflection.Static)?.GetValue(null);
             stringData = (Dictionary<Type, Dictionary<string, IData>>)field;
-            field = typeof(AudioManager).GetField("audios", Reflection.Static)?.GetValue(null);
-            audios = (List<AudioSource>)field;
-            field = typeof(TimerManager).GetField("timers", Reflection.Static)?.GetValue(null);
-            timers = (Dictionary<int, List<Timer>>)field;
             field = typeof(TweenManager).GetField("motions", Reflection.Static)?.GetValue(null);
             motions = (Dictionary<int, List<Tween>>)field;
+            field = typeof(TimerManager).GetField("timers", Reflection.Static)?.GetValue(null);
+            timers = (Dictionary<int, List<Timer>>)field;
+            field = typeof(AudioManager).GetField("audios", Reflection.Static)?.GetValue(null);
+            audios = (List<AudioSource>)field;
         }
 
         public static void EditorWindow(string path, object editor) => EditorSetting.editors[path] = editor;
