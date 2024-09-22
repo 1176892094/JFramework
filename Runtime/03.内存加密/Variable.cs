@@ -30,14 +30,15 @@ namespace JFramework
 
                 if (buffer != unchecked(origin.GetHashCode() + offset))
                 {
-                    GlobalManager.OnAntiCheat();
+                    EventManager.Invoke<OnAntiCheatEvent>();
                 }
 
                 return origin;
             }
             set
             {
-                origin = value == null ? (T)(object)"" : value;
+                origin = value;
+                origin ??= (T)(object)string.Empty;
                 offset = Random.Range(1, ushort.MaxValue);
                 buffer = unchecked(origin.GetHashCode() + offset);
             }
@@ -45,7 +46,8 @@ namespace JFramework
 
         public Variable(T value = default)
         {
-            origin = value == null ? (T)(object)"" : value;
+            origin = value;
+            origin ??= (T)(object)string.Empty;
             offset = Random.Range(1, ushort.MaxValue);
             buffer = unchecked(origin.GetHashCode() + offset);
         }

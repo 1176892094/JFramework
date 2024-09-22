@@ -111,7 +111,13 @@ namespace JFramework
                         var x = index % column * width + width / 2;
                         var y = -(index / column) * height - height / 2;
                         obj.transform.localPosition = new Vector3(x, y, 0);
-                        var grid = obj.GetComponent<TGrid>() ?? obj.AddComponent<TGrid>();
+                        
+                        var grid = obj.GetComponent<TGrid>();
+                        if (grid == null)
+                        {
+                            grid = obj.AddComponent<TGrid>();
+                        }
+
                         if (!grids.ContainsKey(index))
                         {
                             grid.Dispose();

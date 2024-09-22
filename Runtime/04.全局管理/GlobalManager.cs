@@ -19,7 +19,7 @@ namespace JFramework
     public sealed partial class GlobalManager : MonoBehaviour, IEntity
     {
         public static GlobalManager Instance { get; private set; }
-        
+
         public static AssetMode mode => GlobalSetting.Instance.assetMode;
 
         public static event Action OnUpdate;
@@ -28,11 +28,8 @@ namespace JFramework
 
         public static event Action OnLateUpdate;
 
-        public static event Action OnCheat;
-
         private void Awake()
         {
-            Instance = this;
             UIManager.Register();
             PoolManager.Register();
             AudioManager.Register();
@@ -100,16 +97,23 @@ namespace JFramework
 
         private void OnDestroy()
         {
-            OnCheat = null;
             OnUpdate = null;
             OnLateUpdate = null;
             OnFixedUpdate = null;
             GC.Collect();
         }
 
-        internal static void OnAntiCheat()
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
+        private static void RuntimeInitializeOnLoad()
         {
-            OnCheat?.Invoke();
+            var manager = new GameObject(nameof(GlobalManager));
+            Instance = manager.AddComponent<GlobalManager>();
+            var assembly = Reflection.GetAssembly("JFramework.Log");
+            var debugger = assembly.GetType("JFramework.DebugManager");
+            DontDestroyOnLoad(manager.AddComponent(debugger).gameObject);
+#if UNITY_EDITOR && ODIN_INSPECTOR
+            ShowInspector();
+#endif
         }
     }
 
@@ -142,7 +146,7 @@ namespace JFramework
 
         [Sirenix.OdinInspector.ShowInInspector]
         private static Dictionary<Type, Dictionary<string, IData>> stringData = new();
-        
+
         [Sirenix.OdinInspector.ShowInInspector]
         private static Dictionary<int, List<Tween>> motions = new();
 
@@ -155,8 +159,9 @@ namespace JFramework
         [Sirenix.OdinInspector.ShowInInspector]
         private static Vector2 audioManager => new Vector2(AudioManager.mainVolume, AudioManager.audioVolume);
 
-        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
-        private static void RuntimeInitializeOnLoad()
+        public static void EditorWindow(string path, object editor) => EditorSetting.editors[path] = editor;
+
+        private static void ShowInspector()
         {
             var field = typeof(PoolManager).GetField("streams", Reflection.Static)?.GetValue(null);
             streams = (Dictionary<Type, IPool>)field;
@@ -183,8 +188,6 @@ namespace JFramework
             field = typeof(AudioManager).GetField("audios", Reflection.Static)?.GetValue(null);
             audios = (List<AudioSource>)field;
         }
-
-        public static void EditorWindow(string path, object editor) => EditorSetting.editors[path] = editor;
 #endif
     }
 }

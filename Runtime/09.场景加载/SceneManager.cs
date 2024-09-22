@@ -56,7 +56,6 @@ namespace JFramework
                 var newScene = await AssetManager.LoadScene(GlobalSetting.GetScenePath(name));
                 var operation = UnitySceneManager.LoadSceneAsync(newScene, LoadSceneMode.Single);
                 action?.Invoke(operation);
-                await operation;
             }
             catch (Exception e)
             {

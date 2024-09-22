@@ -9,10 +9,11 @@
 // *********************************************************************************
 
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 using Object = UnityEngine.Object;
 
 namespace JFramework
@@ -26,14 +27,39 @@ namespace JFramework
 
         internal static void Register()
         {
-            canvas = GlobalManager.Instance.GetComponentInChildren<Canvas>();
-            layers[UILayer.Bottom] = canvas.transform.Find("Layer1");
-            layers[UILayer.Normal] = canvas.transform.Find("Layer2");
-            layers[UILayer.Middle] = canvas.transform.Find("Layer3");
-            layers[UILayer.Height] = canvas.transform.Find("Layer4");
-            layers[UILayer.Ignore] = canvas.transform.Find("Layer5");
+            var manager = new GameObject("UIManager");
+            canvas = manager.AddComponent<Canvas>();
+            canvas.renderMode = RenderMode.ScreenSpaceCamera;
+            Object.DontDestroyOnLoad(manager);
+            
+            var scale = manager.AddComponent<CanvasScaler>();
+            scale.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
+            scale.referenceResolution = new Vector2(1920, 1080);
+            scale.screenMatchMode = CanvasScaler.ScreenMatchMode.MatchWidthOrHeight;
+            scale.matchWidthOrHeight = 0.5f;
+            
+            for (var i = UILayer.Bottom; i <= UILayer.Ignore; i++)
+            {
+                var layer = new GameObject("Layer-" + (int)i);
+                layer.transform.SetParent(canvas.transform);
+                var child = layer.AddComponent<Canvas>();
+                child.overrideSorting = true;
+                child.sortingOrder = (int)i;
+                if (i != UILayer.Ignore)
+                {
+                    layer.AddComponent<GraphicRaycaster>();
+                }
+
+                var transform = layer.GetComponent<RectTransform>();
+                transform.anchorMin = Vector2.zero;
+                transform.anchorMax = Vector2.one;
+                transform.offsetMin = Vector2.zero;
+                transform.offsetMax = Vector2.zero;
+                layers.Add(i, transform);
+            }
         }
-        
+
+
         private static async Task<UIPanel> LoadAsync(Type type)
         {
             var obj = await AssetManager.Load<GameObject>(GlobalSetting.GetUIPath(type.Name));
@@ -43,7 +69,7 @@ namespace JFramework
             panel.name = type.Name;
             return panel;
         }
-        
+
         public static Transform Layer(UILayer layer)
         {
             return layers.GetValueOrDefault(layer);

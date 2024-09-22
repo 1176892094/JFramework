@@ -8,6 +8,8 @@
 // # Description: This is an automatically generated comment.
 // *********************************************************************************
 
+using JFramework.Interface;
+
 namespace JFramework
 {
     internal static class Random
@@ -18,5 +20,9 @@ namespace JFramework
         {
             return random.Next(min, max);
         }
+    }
+
+    public struct OnAntiCheatEvent : IEvent
+    {
     }
 }

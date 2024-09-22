@@ -18,27 +18,6 @@ namespace JFramework
 {
     public static class Compression
     {
-        public static async Task<string> CompressAsync(string message)
-        {
-            var bytes = Encoding.UTF8.GetBytes(message);
-            using var output = new MemoryStream();
-            await using (var gzip = new GZipStream(output, CompressionMode.Compress, true))
-            {
-                await gzip.WriteAsync(bytes, 0, bytes.Length);
-            }
-
-            return Convert.ToBase64String(output.ToArray());
-        }
-
-        public static async Task<string> DecompressAsync(string message)
-        {
-            var bytes = Convert.FromBase64String(message);
-            using var input = new MemoryStream(bytes);
-            await using var gzip = new GZipStream(input, CompressionMode.Decompress);
-            using var reader = new StreamReader(gzip, Encoding.UTF8);
-            return await reader.ReadToEndAsync();
-        }
-
         public static string Compress(string message)
         {
             var bytes = Encoding.UTF8.GetBytes(message);
@@ -58,6 +37,27 @@ namespace JFramework
             using var gzip = new GZipStream(input, CompressionMode.Decompress);
             using var reader = new StreamReader(gzip, Encoding.UTF8);
             return reader.ReadToEnd();
+        }
+        
+        public static async Task<string> CompressAsync(string message)
+        {
+            var bytes = Encoding.UTF8.GetBytes(message);
+            using var output = new MemoryStream();
+            await using (var gzip = new GZipStream(output, CompressionMode.Compress, true))
+            {
+                await gzip.WriteAsync(bytes, 0, bytes.Length);
+            }
+
+            return Convert.ToBase64String(output.ToArray());
+        }
+
+        public static async Task<string> DecompressAsync(string message)
+        {
+            var bytes = Convert.FromBase64String(message);
+            using var input = new MemoryStream(bytes);
+            await using var gzip = new GZipStream(input, CompressionMode.Decompress);
+            using var reader = new StreamReader(gzip, Encoding.UTF8);
+            return await reader.ReadToEndAsync();
         }
     }
 }
