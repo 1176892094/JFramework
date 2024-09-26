@@ -44,7 +44,9 @@ namespace JFramework
         {
             var filePath = FilePath(name);
             object jsonData = obj is Object ? obj : new JsonMapper<T>(obj);
-            var saveBytes = Encoding.UTF8.GetBytes(JsonUtility.ToJson(jsonData));
+            var saveJson = JsonUtility.ToJson(jsonData);
+            saveJson = Compression.Compress(saveJson);
+            var saveBytes = Encoding.UTF8.GetBytes(saveJson);
             saveBytes = Obfuscator.Encrypt(saveBytes, key);
             File.WriteAllBytes(filePath, saveBytes);
         }
@@ -54,16 +56,21 @@ namespace JFramework
             var filePath = FilePath(name);
             object jsonData = obj is Object ? obj : new JsonMapper<T>(obj);
             byte[] readBytes;
+            string saveJson;
             if (!File.Exists(filePath))
             {
-                readBytes = Encoding.UTF8.GetBytes(JsonUtility.ToJson(jsonData));
+                saveJson = JsonUtility.ToJson(jsonData);
+                saveJson = Compression.Compress(saveJson);
+                readBytes = Encoding.UTF8.GetBytes(saveJson);
                 readBytes = Obfuscator.Encrypt(readBytes, key);
                 File.WriteAllBytes(filePath, readBytes);
             }
 
             readBytes = File.ReadAllBytes(filePath);
             readBytes = Obfuscator.Decrypt(readBytes, key);
-            JsonUtility.FromJsonOverwrite(Encoding.UTF8.GetString(readBytes), jsonData);
+            saveJson = Encoding.UTF8.GetString(readBytes);
+            saveJson = Compression.Decompress(saveJson);
+            JsonUtility.FromJsonOverwrite(saveJson, jsonData);
         }
 
         private static string FilePath(string name)
