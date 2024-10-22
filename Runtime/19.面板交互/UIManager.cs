@@ -22,7 +22,7 @@ namespace JFramework
     {
         public static Canvas canvas { get; private set; }
         private static readonly Dictionary<string, UIPanel> panels = new();
-        private static readonly Dictionary<Type, List<UIPanel>> groups = new();
+        private static readonly Dictionary<string, List<UIPanel>> groups = new();
         private static readonly Dictionary<UILayer, Transform> layers = new();
 
         internal static void Register()
@@ -31,13 +31,13 @@ namespace JFramework
             canvas = manager.AddComponent<Canvas>();
             canvas.renderMode = RenderMode.ScreenSpaceCamera;
             Object.DontDestroyOnLoad(manager);
-            
+
             var scale = manager.AddComponent<CanvasScaler>();
             scale.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
             scale.referenceResolution = new Vector2(1920, 1080);
             scale.screenMatchMode = CanvasScaler.ScreenMatchMode.MatchWidthOrHeight;
             scale.matchWidthOrHeight = 0.5f;
-            
+
             for (var i = UILayer.Bottom; i <= UILayer.Ignore; i++)
             {
                 var layer = new GameObject("Layer-" + (int)i);
@@ -102,38 +102,38 @@ namespace JFramework
 
     public static partial class UIManager
     {
-        public static void AddGroup<TGroup>(UIPanel panel)
+        public static void AddGroup(string key, UIPanel panel)
         {
-            if (!groups.TryGetValue(typeof(TGroup), out var group))
+            if (!groups.TryGetValue(key, out var group))
             {
                 group = new List<UIPanel>();
-                groups.Add(typeof(TGroup), group);
+                groups.Add(key, group);
             }
 
             if (!group.Contains(panel))
             {
-                panel.group = typeof(TGroup);
+                panel.group = key;
                 group.Add(panel);
             }
         }
 
-        public static void RemoveGroup<TGroup>(UIPanel panel)
+        public static void RemoveGroup(string key, UIPanel panel)
         {
-            if (!groups.TryGetValue(typeof(TGroup), out var group))
+            if (!groups.TryGetValue(key, out var group))
             {
                 return;
             }
 
             if (group.Contains(panel))
             {
-                panel.group = null;
+                panel.group = string.Empty;
                 group.Remove(panel);
             }
         }
 
-        public static void HideGroup<TGroup>()
+        public static void HideGroup(string key)
         {
-            if (groups.TryGetValue(typeof(TGroup), out var group))
+            if (groups.TryGetValue(key, out var group))
             {
                 foreach (var target in group)
                 {

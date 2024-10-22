@@ -17,7 +17,7 @@ namespace JFramework
     [Serializable]
     public abstract class UIPanel : MonoBehaviour, IEntity
     {
-        public Type group;
+        public string group;
 
         public UILayer layer = UILayer.Normal;
 
