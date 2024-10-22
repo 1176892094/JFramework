@@ -136,7 +136,7 @@ namespace JFramework
         private static Dictionary<string, UIPanel> panels = new();
 
         [Sirenix.OdinInspector.ShowInInspector]
-        private static Dictionary<Type, List<UIPanel>> groups = new();
+        private static Dictionary<string, List<UIPanel>> groups = new();
 
         [Sirenix.OdinInspector.ShowInInspector]
         private static Dictionary<Type, Dictionary<int, IData>> intData = new();
@@ -174,7 +174,7 @@ namespace JFramework
             field = typeof(UIManager).GetField("panels", Reflection.Static)?.GetValue(null);
             panels = (Dictionary<string, UIPanel>)field;
             field = typeof(UIManager).GetField("groups", Reflection.Static)?.GetValue(null);
-            groups = (Dictionary<Type, List<UIPanel>>)field;
+            groups = (Dictionary<string, List<UIPanel>>)field;
             field = typeof(DataManager).GetField("intData", Reflection.Static)?.GetValue(null);
             intData = (Dictionary<Type, Dictionary<int, IData>>)field;
             field = typeof(DataManager).GetField("enumData", Reflection.Static)?.GetValue(null);
