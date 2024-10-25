@@ -37,24 +37,23 @@ namespace JFramework
                     if (type.FullName == null) continue;
                     var children = assembly.GetType(type.FullName[..^5]);
                     var properties = children.GetProperties(Reflection.Instance);
-                    var property = properties.FirstOrDefault(info => info.GetCustomAttributes(typeof(KeyAttribute), false).Length > 0);
-                    if (property == null)
+                    foreach (var property in properties)
                     {
-                        Debug.LogWarning($"{children.Name.Red()} 缺少主键。");
-                        return;
-                    }
-
-                    if (property.PropertyType.IsEnum)
-                    {
-                        enumData.Add(children, Add<Enum>(property, (IDataTable)table));
-                    }
-                    else if (property.PropertyType == typeof(int))
-                    {
-                        intData.Add(children, Add<int>(property, (IDataTable)table));
-                    }
-                    else if (property.PropertyType == typeof(string))
-                    {
-                        stringData.Add(children, Add<string>(property, (IDataTable)table));
+                        if (property.GetCustomAttributes(typeof(KeyAttribute), false).Length > 0)
+                        {
+                            if (property.PropertyType.IsEnum)
+                            {
+                                enumData.Add(children, Add<Enum>(property, (IDataTable)table));
+                            }
+                            else if (property.PropertyType == typeof(int))
+                            {
+                                intData.Add(children, Add<int>(property, (IDataTable)table));
+                            }
+                            else if (property.PropertyType == typeof(string))
+                            {
+                                stringData.Add(children, Add<string>(property, (IDataTable)table));
+                            }
+                        }
                     }
                 }
                 catch (Exception e)
