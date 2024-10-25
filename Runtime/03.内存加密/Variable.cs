@@ -9,11 +9,12 @@
 // *********************************************************************************
 
 using System;
+using System.Collections.Generic;
 
 namespace JFramework
 {
     [Serializable]
-    public struct Variable<T>
+    public struct Variable<T> : IEquatable<Variable<T>>
     {
         public T origin;
         public int buffer;
@@ -60,6 +61,21 @@ namespace JFramework
         public static implicit operator Variable<T>(T value)
         {
             return new Variable<T>(value);
+        }
+        
+        public bool Equals(Variable<T> other)
+        {
+            return EqualityComparer<T>.Default.Equals(origin, other.origin) && buffer == other.buffer && offset == other.offset;
+        }
+
+        public override bool Equals(object obj)
+        {
+            return obj is Variable<T> other && Equals(other);
+        }
+
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(origin, buffer, offset);
         }
 
         public override string ToString()
