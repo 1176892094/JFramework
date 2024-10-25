@@ -13,12 +13,12 @@ MonoBehaviour:
   m_Name: GlobalSetting
   m_EditorClassIdentifier: 
   platform: 9
-  assetMode: 0
+  assetMode: 1
   assetInfo: AssetBundleInfo
   buildPath: AssetBundles
   dataAssembly: HotUpdate.Data
   assetPath: Assets/Template
-  remotePath: http://192.168.0.3:8000/Files/Unity/Forest/AssetBundles
+  remotePath: http://192.168.0.2:8000/Files/Unity/Forest/AssetBundles
   sceneAssets:
   - Assets/Template/Scenes/GameScene.unity
   - Assets/Template/Scenes/LevelScene1.unity

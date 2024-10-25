@@ -39,6 +39,8 @@ namespace JFramework
 
         public static string clientInfoName => Instance.assetInfo + ".json";
 
+        public static string assetBundlePath => Path.Combine(Application.persistentDataPath, Instance.buildPath);
+
         public static string GetUIPath(string assetName) => "Prefabs/" + assetName;
 
         public static string GetAudioPath(string assetName) => "Audios/" + assetName;
@@ -46,12 +48,12 @@ namespace JFramework
         public static string GetScenePath(string assetName) => "Scenes/" + assetName;
 
         public static string GetTablePath(string assetName) => "DataTable/" + assetName;
+        
+        public static string GetAssetBundles(string fileName) => Path.Combine(assetBundlePath, fileName);
 
         private static string GetPlatform(string fileName) => Path.Combine(Instance.platform.ToString(), fileName);
 
         public static string GetRemoteFilePath(string fileName) => Path.Combine(Instance.remotePath, GetPlatform(fileName));
-
-        public static string GetPersistentPath(string fileName) => Path.Combine(Application.persistentDataPath, fileName);
 
         public static string GetStreamingPath(string fileName) => Path.Combine(Application.streamingAssetsPath, GetPlatform(fileName));
     }

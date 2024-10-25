@@ -31,6 +31,11 @@ namespace JFramework
         {
             if (GlobalManager.Instance)
             {
+                if (!Directory.Exists(GlobalSetting.assetBundlePath))
+                {
+                    Directory.CreateDirectory(GlobalSetting.assetBundlePath);
+                }
+
                 var serverFile = await GetServerRequest();
                 if (!string.IsNullOrEmpty(serverFile))
                 {
@@ -70,14 +75,14 @@ namespace JFramework
                     }
                 }
 
-                foreach (var filePath in clientBundles.Keys.Select(GlobalSetting.GetPersistentPath).Where(File.Exists))
+                foreach (var filePath in clientBundles.Keys.Select(GlobalSetting.GetAssetBundles).Where(File.Exists))
                 {
                     File.Delete(filePath);
                 }
 
                 if (await GetAssetBundles())
                 {
-                    var filePath = GlobalSetting.GetPersistentPath(GlobalSetting.clientInfoName);
+                    var filePath = GlobalSetting.GetAssetBundles(GlobalSetting.clientInfoName);
                     await File.WriteAllTextAsync(filePath, serverFile);
                     OnLoadComplete?.Invoke(true);
                 }
@@ -144,7 +149,7 @@ namespace JFramework
 
         internal static async Task<KeyValuePair<int, string>> GetRequest(string fileName)
         {
-            var filePath = GlobalSetting.GetPersistentPath(fileName);
+            var filePath = GlobalSetting.GetAssetBundles(fileName);
             if (File.Exists(filePath))
             {
                 return new KeyValuePair<int, string>(0, filePath);
@@ -215,7 +220,7 @@ namespace JFramework
                         continue;
                     }
 
-                    var filePath = GlobalSetting.GetPersistentPath(assetBundle);
+                    var filePath = GlobalSetting.GetAssetBundles(assetBundle);
                     await File.WriteAllBytesAsync(filePath, request.downloadHandler.data);
                     if (updateBundles.Contains(assetBundle))
                     {
