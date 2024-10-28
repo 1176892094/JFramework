@@ -131,5 +131,12 @@ namespace JFramework
                 }
             }
         }
+
+        public void Dispose()
+        {
+            items = null;
+            grids.Clear();
+            content = null;
+        }
     }
 }
