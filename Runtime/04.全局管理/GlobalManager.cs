@@ -108,9 +108,7 @@ namespace JFramework
         {
             var manager = new GameObject(nameof(GlobalManager));
             Instance = manager.AddComponent<GlobalManager>();
-            var assembly = Reflection.GetAssembly("JFramework.Log");
-            var debugger = assembly.GetType("JFramework.DebugManager");
-            DontDestroyOnLoad(manager.AddComponent(debugger).gameObject);
+            DontDestroyOnLoad(manager);
 #if UNITY_EDITOR && ODIN_INSPECTOR
             ShowInspector();
 #endif
