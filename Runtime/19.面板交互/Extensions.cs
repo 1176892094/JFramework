@@ -80,13 +80,13 @@ namespace JFramework
                 return;
             }
 
-            if (component is Button button)
+            if (component.TryGetComponent(out Button button))
             {
                 inject.SetButton(name, button);
                 return;
             }
 
-            if (component is Toggle toggle)
+            if (component.TryGetComponent(out Toggle toggle))
             {
                 inject.SetToggle(name, toggle);
             }
