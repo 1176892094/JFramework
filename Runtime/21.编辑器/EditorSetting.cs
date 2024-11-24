@@ -71,19 +71,18 @@ namespace JFramework
                     var path = AssetDatabase.GUIDToAssetPath(guid);
                     if (!AssetDatabase.IsValidFolder(path))
                     {
-                        var importer = AssetImporter.GetAtPath(path);
-                        if (importer == null) continue;
-
-                        if (importer.assetBundleName != name.ToLower())
-                        {
-                            Debug.Log($"增加 AssetBundles 资源: {path.Green()}");
-                            importer.assetBundleName = name;
-                            importer.SaveAndReimport();
-                        }
-
                         var asset = AssetDatabase.LoadAssetAtPath<Object>(path);
-                        if (asset != null)
+                        if (asset != null && asset is not DefaultAsset)
                         {
+                            var importer = AssetImporter.GetAtPath(path);
+                            
+                            if (importer.assetBundleName != name.ToLower())
+                            {
+                                Debug.Log($"增加 AssetBundles 资源: {path.Green()}");
+                                importer.assetBundleName = name;
+                                importer.SaveAndReimport();
+                            }
+
                             if (asset is SceneAsset)
                             {
                                 GlobalSetting.Instance.sceneAssets.Add(path);
