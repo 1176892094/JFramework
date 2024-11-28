@@ -22,6 +22,7 @@ namespace JFramework
 
         public AssetPlatform platform = AssetPlatform.StandaloneWindows;
 
+        public DebugMode debugMode = DebugMode.Disable;
 #if ODIN_INSPECTOR
         [Sirenix.OdinInspector.OnValueChanged("UpdateSceneSetting")]
 #endif
@@ -48,7 +49,7 @@ namespace JFramework
         public static string GetScenePath(string assetName) => "Scenes/" + assetName;
 
         public static string GetTablePath(string assetName) => "DataTable/" + assetName;
-        
+
         public static string GetAssetBundles(string fileName) => Path.Combine(assetBundlePath, fileName);
 
         private static string GetPlatform(string fileName) => Path.Combine(Instance.platform.ToString(), fileName);

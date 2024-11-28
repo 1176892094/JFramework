@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: GlobalSetting
   m_EditorClassIdentifier: 
   platform: 9
+  debugMode: 1
   assetMode: 0
   assetInfo: AssetBundleInfo
   buildPath: AssetBundles
