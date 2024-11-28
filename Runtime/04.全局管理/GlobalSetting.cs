@@ -21,13 +21,10 @@ namespace JFramework
         public static GlobalSetting Instance => instance ??= Resources.Load<GlobalSetting>(nameof(GlobalSetting));
 
         public AssetPlatform platform = AssetPlatform.StandaloneWindows;
-
-        public DebugMode debugMode = DebugMode.Disable;
+        
 #if ODIN_INSPECTOR
         [Sirenix.OdinInspector.OnValueChanged("UpdateSceneSetting")]
 #endif
-        public AssetMode assetMode;
-
         public string assetInfo = "AssetBundleInfo";
 
         public string buildPath = "AssetBundles";
@@ -37,6 +34,18 @@ namespace JFramework
         public string assetPath = "Assets/Template";
 
         public string remotePath = "http://192.168.0.3:8000/AssetBundles";
+        
+        public AssetMode assetMode;
+        
+        public string smtpServer = "smtp.qq.com";
+        
+        public int smtpPort = 587;
+        
+        public string senderAddress;
+        
+        public string senderPassword;
+        
+        public DebugMode debugMode = DebugMode.Disable;
 
         public static string clientInfoName => Instance.assetInfo + ".json";
 
