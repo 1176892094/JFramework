@@ -178,17 +178,6 @@ namespace JFramework
             ShowInGroup(panel);
         }
 
-        public static async void Show<TPanel>(Action action) where TPanel : UIPanel
-        {
-            if (!GlobalManager.Instance) return;
-            if (!panels.TryGetValue(typeof(TPanel).Name, out var panel))
-            {
-                panel = await LoadAsync(typeof(TPanel));
-            }
-
-            ShowInGroup(panel);
-            action?.Invoke();
-        }
 
         public static async void Show<TPanel>(Action<TPanel> action) where TPanel : UIPanel
         {
@@ -213,8 +202,8 @@ namespace JFramework
                 }
             }
         }
-
-        public static TPanel Get<TPanel>() where TPanel : UIPanel
+        
+         public static TPanel Get<TPanel>() where TPanel : UIPanel
         {
             return (TPanel)panels.GetValueOrDefault(typeof(TPanel).Name);
         }
@@ -222,6 +211,41 @@ namespace JFramework
         public static bool IsActive<TPanel>() where TPanel : UIPanel
         {
             return panels.TryGetValue(typeof(TPanel).Name, out var panel) && panel.gameObject.activeInHierarchy;
+        }
+
+        public static async void Show(Type type)
+        {
+            if (!GlobalManager.Instance) return;
+            if (!panels.TryGetValue(type.Name, out var panel))
+            {
+                panel = await LoadAsync(type);
+            }
+
+            ShowInGroup(panel);
+        }
+
+        public static async void Show(Type type, Action<UIPanel> action)
+        {
+            if (!GlobalManager.Instance) return;
+            if (!panels.TryGetValue(type.Name, out var panel))
+            {
+                panel = await LoadAsync(type);
+            }
+
+            ShowInGroup(panel);
+            action?.Invoke(panel);
+        }
+
+        public static void Hide(Type type)
+        {
+            if (!GlobalManager.Instance) return;
+            if (panels.TryGetValue(type.Name, out var panel))
+            {
+                if (panel.gameObject.activeInHierarchy)
+                {
+                    panel.Hide();
+                }
+            }
         }
     }
 }

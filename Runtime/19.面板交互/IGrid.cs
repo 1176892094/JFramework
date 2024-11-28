@@ -12,12 +12,12 @@ using System;
 
 namespace JFramework.Interface
 {
-    public interface IGrid
+    public interface IGrid: IEntity
     {
         void Select();
     }
 
-    public interface IGrid<T> : IGrid, IEntity, IDisposable
+    public interface IGrid<T> : IGrid, IDisposable
     {
         T item { get; }
 
