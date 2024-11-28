@@ -39,7 +39,7 @@ namespace JFramework
                     var properties = children.GetProperties(Reflection.Instance);
                     foreach (var property in properties)
                     {
-                        if (property.GetCustomAttributes(typeof(KeyAttribute), false).Length > 0)
+                        if (property.GetCustomAttribute(typeof(KeyAttribute)) != null)
                         {
                             if (property.PropertyType.IsEnum)
                             {
