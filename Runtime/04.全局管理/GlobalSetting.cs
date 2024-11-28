@@ -21,33 +21,32 @@ namespace JFramework
         public static GlobalSetting Instance => instance ??= Resources.Load<GlobalSetting>(nameof(GlobalSetting));
 
         public AssetPlatform platform = AssetPlatform.StandaloneWindows;
-        
-#if ODIN_INSPECTOR
-        [Sirenix.OdinInspector.OnValueChanged("UpdateSceneSetting")]
-#endif
-        public string assetInfo = "AssetBundleInfo";
-
-        public string buildPath = "AssetBundles";
-
-        public string dataAssembly = "HotUpdate.Data";
-
-        public string assetPath = "Assets/Template";
-
-        public string remotePath = "http://192.168.0.3:8000/AssetBundles";
-        
-        public AssetMode assetMode;
-        
+                
         public string smtpServer = "smtp.qq.com";
         
         public int smtpPort = 587;
-        
-        public string senderAddress;
+
+        public string senderAddress = "1176892094@qq.com";
         
         public string senderPassword;
         
         public DebugMode debugMode = DebugMode.Disable;
+#if ODIN_INSPECTOR
+        [Sirenix.OdinInspector.OnValueChanged("UpdateSceneSetting")]
+#endif
+        public string assetBundle = "AssetBundle";
 
-        public static string clientInfoName => Instance.assetInfo + ".json";
+        public string dataAssembly = "HotUpdate.Data";
+        
+        public string buildPath = "Assets/StreamingAssets";
+
+        public string assetPath = "Assets/Template";
+
+        public string remotePath = "http://192.168.0.3:8000/AssetBundles";
+
+        public AssetMode assetMode = AssetMode.Simulate;
+
+        public static string clientInfoName => Instance.assetBundle + ".json";
 
         public static string assetBundlePath => Path.Combine(Application.persistentDataPath, Instance.buildPath);
 

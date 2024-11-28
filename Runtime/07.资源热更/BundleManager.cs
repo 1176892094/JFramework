@@ -105,7 +105,7 @@ namespace JFramework
                     await request.SendWebRequest();
                     if (request.result != UnityWebRequest.Result.Success)
                     {
-                        Debug.Log($"校验 {GlobalSetting.Instance.assetInfo} 失败\n");
+                        Debug.Log($"校验 {GlobalSetting.Instance.assetBundle} 失败\n");
                         continue;
                     }
                 }
@@ -115,7 +115,7 @@ namespace JFramework
                     await request.SendWebRequest();
                     if (request.result != UnityWebRequest.Result.Success)
                     {
-                        Debug.Log($"下载 {GlobalSetting.Instance.assetInfo} 失败\n");
+                        Debug.Log($"下载 {GlobalSetting.Instance.assetBundle} 失败\n");
                         continue;
                     }
 
