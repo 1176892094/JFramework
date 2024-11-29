@@ -31,9 +31,7 @@ namespace JFramework
         public string senderPassword;
         
         public DebugMode debugMode = DebugMode.Disable;
-#if ODIN_INSPECTOR
-        [Sirenix.OdinInspector.OnValueChanged("UpdateSceneSetting")]
-#endif
+
         public string assetBundle = "AssetBundle";
 
         public string dataAssembly = "HotUpdate.Data";
@@ -43,7 +41,9 @@ namespace JFramework
         public string assetPath = "Assets/Template";
 
         public string remotePath = "http://192.168.0.3:8000/AssetBundles";
-
+#if ODIN_INSPECTOR
+        [Sirenix.OdinInspector.OnValueChanged("UpdateSceneSetting")]
+#endif
         public AssetMode assetMode = AssetMode.Simulate;
 
         public static string clientInfoName => Instance.assetBundle + ".json";
