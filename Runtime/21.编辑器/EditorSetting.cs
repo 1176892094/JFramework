@@ -72,10 +72,20 @@ namespace JFramework
                     if (!AssetDatabase.IsValidFolder(path))
                     {
                         var asset = AssetDatabase.LoadAssetAtPath<Object>(path);
-                        if (asset != null && asset is not DefaultAsset)
+                        if (asset != null)
                         {
+                            if (asset is DefaultAsset)
+                            {
+                                continue;
+                            }
+
+                            if (GlobalSetting.Instance.ignoreAssets.Contains(asset))
+                            {
+                                continue;
+                            }
+
                             var importer = AssetImporter.GetAtPath(path);
-                            
+
                             if (importer.assetBundleName != name.ToLower())
                             {
                                 Debug.Log($"增加 AssetBundles 资源: {path.Green()}");

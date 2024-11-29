@@ -71,6 +71,11 @@ namespace JFramework
     internal partial class GlobalSetting
     {
         [HideInInspector] public List<string> sceneAssets = new List<string>();
+        
+#if ODIN_INSPECTOR
+        [Sirenix.OdinInspector.PropertyOrder(1)]
+#endif
+        public List<Object> ignoreAssets = new List<Object>();
 
 #if ODIN_INSPECTOR
         [Sirenix.OdinInspector.ShowInInspector]
