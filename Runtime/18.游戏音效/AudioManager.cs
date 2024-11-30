@@ -69,7 +69,7 @@ namespace JFramework
             action?.Invoke(audio);
         }
 
-        public static async Task<AudioSource> LoadSource(AudioClip clip)
+        private static async Task<AudioSource> LoadSource(AudioClip clip)
         {
             GameObject obj;
             if (audios.Count == 0)

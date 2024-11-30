@@ -8,10 +8,10 @@
 // # Description: This is an automatically generated comment.
 // *********************************************************************************
 
-using System;
 using System.Reflection;
 using JFramework.Interface;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using EventEntry = UnityEngine.EventSystems.EventTrigger.Entry;
@@ -146,12 +146,12 @@ namespace JFramework
             });
         }
 
-        public static void AddListener(this UIBehaviour target, EventTriggerType eventID, Action<PointerEventData> action)
+        public static void AddListener(this UIBehaviour target, EventTriggerType eventID, UnityAction<BaseEventData> OnUpdate)
         {
-            var trigger = target.GetComponent<EventTrigger>();
-            trigger ??= target.gameObject.AddComponent<EventTrigger>();
+            var obj = target.gameObject;
+            var trigger = obj.GetComponent<EventTrigger>() ?? obj.AddComponent<EventTrigger>();
             var entry = new EventEntry { eventID = eventID };
-            entry.callback.AddListener(data => action?.Invoke((PointerEventData)data));
+            entry.callback.AddListener(OnUpdate);
             trigger.triggers.Add(entry);
         }
     }

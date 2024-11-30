@@ -8,18 +8,9 @@
 // # Description: This is an automatically generated comment.
 // *********************************************************************************
 
-using UnityEngine;
-
 namespace JFramework.Interface
 {
     public interface IDontDestroy
     {
-        void DontDestroy(GameObject obj)
-        {
-            if (Application.isPlaying)
-            {
-                Object.DontDestroyOnLoad(obj);
-            }
-        }
     }
 }

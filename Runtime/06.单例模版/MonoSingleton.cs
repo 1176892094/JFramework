@@ -43,11 +43,6 @@ namespace JFramework
 
         protected virtual void Awake()
         {
-            if (this is IDontDestroy singleton)
-            {
-                singleton.DontDestroy(gameObject);
-            }
-
             if (instance == null)
             {
                 instance = (T)this;
@@ -56,6 +51,11 @@ namespace JFramework
             {
                 Debug.LogWarning(typeof(T) + "单例重复！");
                 Destroy(this);
+            }
+
+            if (this is IDontDestroy)
+            {
+                DontDestroyOnLoad(gameObject);
             }
         }
 
