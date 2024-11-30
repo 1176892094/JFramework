@@ -13,7 +13,6 @@ using System.IO;
 using UnityEngine;
 using System.Threading.Tasks;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine.Networking;
 using Debug = UnityEngine.Debug;
 using Object = UnityEngine.Object;
@@ -43,7 +42,7 @@ namespace JFramework
             }
             catch (Exception e)
             {
-                Debug.LogWarning($"加载资源 {assetPath} 失败!\n" + e);
+                Debug.LogWarning($"加载资源 {assetPath.Red()} 失败!\n" + e);
             }
 
             return null;
@@ -61,7 +60,7 @@ namespace JFramework
             }
             catch (Exception e)
             {
-                Debug.LogWarning($"加载资源 {assetPath} 失败!\n" + e);
+                Debug.LogWarning($"加载资源 {assetPath.Red()} 失败!\n" + e);
             }
         }
 
@@ -85,21 +84,6 @@ namespace JFramework
 #endif
                 return assetData;
             }
-        }
-
-        internal static async Task<string> LoadScene(string assetPath)
-        {
-            if (GlobalManager.mode == AssetMode.AssetBundle)
-            {
-                var assetInfo = await LoadDependency(assetPath);
-                var assetBundle = await LoadAssetBundle(assetInfo.bundle);
-                if (assetBundle.GetAllScenePaths().Any(sceneData => sceneData == assetInfo.asset))
-                {
-                    return assetInfo.asset;
-                }
-            }
-
-            return assetPath.Substring(assetPath.LastIndexOf('/') + 1);
         }
 
         private static async Task LoadBundleManifest()

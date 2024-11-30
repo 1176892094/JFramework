@@ -9,58 +9,59 @@
 // *********************************************************************************
 
 using System;
+using System.Linq;
+using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using UnitySceneManager = UnityEngine.SceneManagement.SceneManager;
 
 namespace JFramework
 {
-    public static class SceneManager
+    public static partial class AssetManager
     {
-        public static string name => UnitySceneManager.GetActiveScene().name;
-
-        public static async void Load(string name)
+        public static async Task LoadScene(string assetPath)
         {
             try
             {
-                if (!GlobalManager.Instance) return;
-                var newScene = await AssetManager.LoadScene(GlobalSetting.GetScenePath(name));
-                await UnitySceneManager.LoadSceneAsync(newScene, LoadSceneMode.Single);
+                if (GlobalManager.Instance)
+                {
+                    var assetData = await LoadSceneAsset(GlobalSetting.GetScenePath(assetPath));
+                    await SceneManager.LoadSceneAsync(assetData, LoadSceneMode.Single);
+                }
             }
             catch (Exception e)
             {
-                Debug.LogWarning($"异步加载 {name.Red()} 场景失败\n{e}");
+                Debug.LogWarning($"加载场景 {assetPath.Red()} 失败\n" + e);
             }
         }
 
-        public static async void Load(string name, Action action)
+        public static async void LoadScene(string assetPath, Action<AsyncOperation> action)
         {
             try
             {
-                if (!GlobalManager.Instance) return;
-                var newScene = await AssetManager.LoadScene(GlobalSetting.GetScenePath(name));
-                await UnitySceneManager.LoadSceneAsync(newScene, LoadSceneMode.Single);
-                action?.Invoke();
+                if (GlobalManager.Instance)
+                {
+                    var assetData = await LoadSceneAsset(GlobalSetting.GetScenePath(assetPath));
+                    var operation = SceneManager.LoadSceneAsync(assetData, LoadSceneMode.Single);
+                    action?.Invoke(operation);
+                }
             }
             catch (Exception e)
             {
-                Debug.LogWarning($"异步加载 {name.Red()} 场景失败\n{e}");
+                Debug.LogWarning($"加载场景 {assetPath.Red()} 失败\n" + e);
             }
         }
 
-        public static async void Load(string name, Action<AsyncOperation> action)
+        private static async Task<string> LoadSceneAsset(string assetPath)
         {
-            try
+            if (GlobalManager.mode == AssetMode.AssetBundle)
             {
-                if (!GlobalManager.Instance) return;
-                var newScene = await AssetManager.LoadScene(GlobalSetting.GetScenePath(name));
-                var operation = UnitySceneManager.LoadSceneAsync(newScene, LoadSceneMode.Single);
-                action?.Invoke(operation);
+                var assetInfo = await LoadDependency(assetPath);
+                var assetBundle = await LoadAssetBundle(assetInfo.bundle);
+                var assetData = assetBundle.GetAllScenePaths();
+                return assetData.FirstOrDefault(data => data == assetInfo.asset);
             }
-            catch (Exception e)
-            {
-                Debug.LogWarning($"异步加载 {name.Red()} 场景失败\n{e}");
-            }
+
+            return assetPath.Substring(assetPath.LastIndexOf('/') + 1);
         }
     }
 }
