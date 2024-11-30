@@ -41,6 +41,7 @@ namespace JFramework
                 {
                     var assetBundles = JsonManager.Read<List<BundleData>>(serverFile);
                     serverBundles = assetBundles.ToDictionary(bundle => bundle.name);
+                    OnLoadEntry?.Invoke(assetBundles.Select(bundle => long.Parse(bundle.size)).ToList());
                 }
 
                 if (string.IsNullOrEmpty(serverFile))
@@ -176,55 +177,44 @@ namespace JFramework
 
         private static async Task<bool> GetAssetBundles()
         {
-            var assetSizes = new List<long>();
             var assetBundles = updateBundles.ToList();
             for (int i = 0; i < 5; i++)
             {
-                assetSizes.Clear();
                 foreach (var assetBundle in assetBundles)
                 {
                     var fileUri = GlobalSetting.GetRemoteFilePath(assetBundle);
-                    using var request = UnityWebRequest.Head(fileUri);
-                    request.timeout = 1;
-                    await request.SendWebRequest();
-                    if (request.result != UnityWebRequest.Result.Success)
+                    using (var request = UnityWebRequest.Head(fileUri))
                     {
-                        Debug.Log($"获取 {assetBundle} 文件失败\n");
-                        continue;
+                        request.timeout = 1;
+                        await request.SendWebRequest();
+                        if (request.result != UnityWebRequest.Result.Success)
+                        {
+                            Debug.Log($"获取 {assetBundle} 文件失败\n");
+                        }
                     }
 
-                    var assetLength = request.GetResponseHeader("Content-Length");
-                    if (long.TryParse(assetLength, out var assetSize))
+                    using (var request = UnityWebRequest.Get(fileUri))
                     {
-                        assetSizes.Add(assetSize);
-                    }
-                }
+                        var result = request.SendWebRequest();
+                        while (!result.isDone && GlobalManager.Instance)
+                        {
+                            OnLoadUpdate?.Invoke(assetBundle, request.downloadProgress);
+                            await Task.Yield();
+                        }
 
-                OnLoadEntry?.Invoke(assetSizes);
+                        OnLoadUpdate?.Invoke(assetBundle, 1);
+                        if (request.result != UnityWebRequest.Result.Success)
+                        {
+                            Debug.Log($"下载 {assetBundle} 文件失败\n");
+                            continue;
+                        }
 
-                foreach (var assetBundle in assetBundles)
-                {
-                    var fileUri = GlobalSetting.GetRemoteFilePath(assetBundle);
-                    using var request = UnityWebRequest.Get(fileUri);
-                    var result = request.SendWebRequest();
-                    while (!result.isDone && GlobalManager.Instance)
-                    {
-                        OnLoadUpdate?.Invoke(assetBundle, request.downloadProgress);
-                        await Task.Yield();
-                    }
-
-                    OnLoadUpdate?.Invoke(assetBundle, 1);
-                    if (request.result != UnityWebRequest.Result.Success)
-                    {
-                        Debug.Log($"下载 {assetBundle} 文件失败\n");
-                        continue;
-                    }
-
-                    var filePath = GlobalSetting.GetAssetBundles(assetBundle);
-                    await File.WriteAllBytesAsync(filePath, request.downloadHandler.data);
-                    if (updateBundles.Contains(assetBundle))
-                    {
-                        updateBundles.Remove(assetBundle);
+                        var filePath = GlobalSetting.GetAssetBundles(assetBundle);
+                        await File.WriteAllBytesAsync(filePath, request.downloadHandler.data);
+                        if (updateBundles.Contains(assetBundle))
+                        {
+                            updateBundles.Remove(assetBundle);
+                        }
                     }
                 }
 
