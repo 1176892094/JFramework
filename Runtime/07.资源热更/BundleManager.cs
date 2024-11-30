@@ -81,17 +81,18 @@ namespace JFramework
                     File.Delete(filePath);
                 }
 
-                if (await GetAssetBundles())
+                var completed = await GetAssetBundles();
+                if (completed)
                 {
                     var filePath = GlobalSetting.GetAssetBundles(GlobalSetting.clientInfoName);
                     await File.WriteAllTextAsync(filePath, serverFile);
-                    OnLoadComplete?.Invoke(true);
                 }
                 else
                 {
-                    OnLoadComplete?.Invoke(false);
                     Debug.Log("更新失败。");
                 }
+
+                OnLoadComplete?.Invoke(completed);
             }
         }
 
@@ -130,12 +131,12 @@ namespace JFramework
         private static async Task<string> GetClientRequest()
         {
             var fileInfo = await GetRequest(GlobalSetting.clientInfoName);
-            if (fileInfo.Key == 0)
+            if (fileInfo.Key == BundlePlatform.Default)
             {
                 return await File.ReadAllTextAsync(fileInfo.Value);
             }
 
-            if (fileInfo.Key == 1)
+            if (fileInfo.Key == BundlePlatform.Android)
             {
                 using var request = UnityWebRequest.Get(fileInfo.Value);
                 await request.SendWebRequest();
@@ -148,12 +149,12 @@ namespace JFramework
             return null;
         }
 
-        internal static async Task<KeyValuePair<int, string>> GetRequest(string fileName)
+        internal static async Task<KeyValuePair<BundlePlatform, string>> GetRequest(string fileName)
         {
             var filePath = GlobalSetting.GetAssetBundles(fileName);
             if (File.Exists(filePath))
             {
-                return new KeyValuePair<int, string>(0, filePath);
+                return new KeyValuePair<BundlePlatform, string>(BundlePlatform.Default, filePath);
             }
 
             filePath = GlobalSetting.GetStreamingPath(fileName);
@@ -162,17 +163,17 @@ namespace JFramework
             await request.SendWebRequest();
             if (request.result == UnityWebRequest.Result.Success)
             {
-                 return new KeyValuePair<int, string>(1, filePath);
+                 return new KeyValuePair<BundlePlatform, string>(BundlePlatform.Android, filePath);
             }
 #else
             if (File.Exists(filePath))
             {
-                return new KeyValuePair<int, string>(0, filePath);
+                return new KeyValuePair<BundlePlatform, string>(BundlePlatform.Default, filePath);
             }
 
 #endif
             await Task.CompletedTask;
-            return new KeyValuePair<int, string>(2, filePath);
+            return new KeyValuePair<BundlePlatform, string>(BundlePlatform.Unknown, filePath);
         }
 
         private static async Task<bool> GetAssetBundles()

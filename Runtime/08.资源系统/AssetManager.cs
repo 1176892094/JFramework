@@ -207,7 +207,7 @@ namespace JFramework
         private static async Task<AssetBundle> LoadAssetRequest(string assetPath)
         {
             var assetData = await BundleManager.GetRequest(assetPath);
-            if (assetData.Key == 0)
+            if (assetData.Key == BundlePlatform.Default)
             {
                 var bytes = await Task.Run(() => Obfuscator.Decrypt(File.ReadAllBytes(assetData.Value)));
                 if (GlobalManager.Instance)
@@ -220,7 +220,7 @@ namespace JFramework
                 }
             }
 
-            if (assetData.Key == 1)
+            if (assetData.Key == BundlePlatform.Android)
             {
                 using var request = UnityWebRequest.Get(assetData.Value);
                 await request.SendWebRequest();
