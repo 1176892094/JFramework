@@ -17,25 +17,31 @@ namespace JFramework
 {
     internal partial class GlobalSetting : ScriptableObject
     {
+        public enum DebugMode
+        {
+            Enable,
+            Disable,
+        }
+
         private static GlobalSetting instance;
         public static GlobalSetting Instance => instance ??= Resources.Load<GlobalSetting>(nameof(GlobalSetting));
 
         public AssetPlatform platform = AssetPlatform.StandaloneWindows;
-                
+
         public string smtpServer = "smtp.qq.com";
-        
+
         public int smtpPort = 587;
 
         public string senderAddress = "1176892094@qq.com";
-        
+
         public string senderPassword;
-        
+
         public DebugMode debugMode = DebugMode.Disable;
 
         public string assetBundle = "AssetBundle";
 
         public string dataAssembly = "HotUpdate.Data";
-        
+
         public string buildPath = "Assets/StreamingAssets";
 
         public string assetPath = "Assets/Template";
@@ -71,7 +77,7 @@ namespace JFramework
     internal partial class GlobalSetting
     {
         [HideInInspector] public List<string> sceneAssets = new List<string>();
-        
+
 #if ODIN_INSPECTOR
         [Sirenix.OdinInspector.PropertyOrder(1)]
 #endif
