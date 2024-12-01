@@ -9,6 +9,7 @@
 // *********************************************************************************
 
 using System;
+using System.Linq;
 
 namespace JFramework
 {
@@ -28,6 +29,13 @@ namespace JFramework
             var currIndex = Array.IndexOf(enumArray, current);
             var lastIndex = (currIndex - 1 + enumArray.Length) % enumArray.Length;
             return enumArray[lastIndex];
+        }
+
+        public static T ToRandom<T>(this T current) where T : Enum
+        {
+            var enumArray = (T[])Enum.GetValues(typeof(T));
+            var enumFlags = enumArray.Where(item => current.HasFlag(item)).ToList();
+            return enumFlags.Count > 0 ? enumFlags[VariableUtils.Next(0, enumFlags.Count)] : default;
         }
     }
 }
