@@ -9,6 +9,7 @@
 // *********************************************************************************
 
 using System;
+using System.Collections.Generic;
 using JFramework.Interface;
 using UnityEngine;
 
@@ -17,7 +18,7 @@ namespace JFramework
     [Serializable]
     public abstract class UIPanel : MonoBehaviour, IEntity
     {
-        public string group;
+        public HashSet<string> groups = new HashSet<string>();
 
         public UILayer layer = UILayer.Normal;
 
@@ -28,5 +29,7 @@ namespace JFramework
         public virtual void Show() => gameObject.SetActive(true);
 
         public virtual void Hide() => gameObject.SetActive(false);
+
+        protected virtual void OnDestroy() => groups.Clear();
     }
 }

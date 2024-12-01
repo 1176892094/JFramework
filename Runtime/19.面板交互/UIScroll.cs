@@ -16,7 +16,7 @@ using UnityEngine;
 namespace JFramework
 {
     [Serializable]
-    public class UIScroll<TItem, TGrid> where TGrid : Component, IGrid<TItem> where TItem : new()
+    public class UIScroll<TItem, TGrid> where TGrid : Component, IGrid<TItem>
     {
         private readonly Dictionary<int, TGrid> grids = new Dictionary<int, TGrid>();
         private int oldMinIndex = -1;

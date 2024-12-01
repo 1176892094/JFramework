@@ -112,7 +112,7 @@ namespace JFramework
 
             if (!group.Contains(panel))
             {
-                panel.group = key;
+                panel.groups.Add(key);
                 group.Add(panel);
             }
         }
@@ -126,7 +126,7 @@ namespace JFramework
 
             if (group.Contains(panel))
             {
-                panel.group = string.Empty;
+                panel.groups.Remove(key);
                 group.Remove(panel);
             }
         }
@@ -147,9 +147,9 @@ namespace JFramework
 
         private static void ShowInGroup(UIPanel panel)
         {
-            if (panel.group != null)
+            foreach (var key in panel.groups)
             {
-                if (groups.TryGetValue(panel.group, out var group))
+                if (groups.TryGetValue(key, out var group))
                 {
                     foreach (var target in group.Where(target => target != panel))
                     {
