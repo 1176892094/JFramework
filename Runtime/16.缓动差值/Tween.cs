@@ -21,7 +21,6 @@ namespace JFramework
         private float progress;
         private GameObject owner;
         private event Action<float> OnUpdate;
-        private event Action OnDispose;
         private event Action OnFinish;
 
         public Tween Invoke(Action<float> OnUpdate)
@@ -32,25 +31,24 @@ namespace JFramework
 
         public void OnComplete(Action OnFinish)
         {
-            this.OnFinish = OnFinish;
+            this.OnFinish += OnFinish;
         }
 
         public void Dispose()
         {
             owner = null;
-            OnFinish = null;
             OnUpdate = null;
-            OnDispose?.Invoke();
-            OnDispose = null;
+            OnFinish?.Invoke();
+            OnFinish = null;
         }
 
-        internal void Start(GameObject owner, float duration, Action OnDispose)
+        internal void Start(GameObject owner, float duration, Action OnFinish)
         {
             fadeTime = 0;
             progress = 0;
             this.owner = owner;
             this.duration = duration;
-            this.OnDispose = OnDispose;
+            this.OnFinish = OnFinish;
         }
 
         internal void LateUpdate()
@@ -74,7 +72,6 @@ namespace JFramework
                 OnUpdate?.Invoke(progress);
                 if (progress >= 1)
                 {
-                    OnFinish?.Invoke();
                     Dispose();
                 }
             }

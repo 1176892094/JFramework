@@ -22,13 +22,24 @@ namespace JFramework
         private float duration;
         private GameObject owner;
         private event Action OnUpdate;
-        private event Action OnDispose;
+        private event Action OnFinish;
         private float seconds => unscale ? Time.fixedUnscaledTime : Time.fixedTime;
 
         public Timer Invoke(Action OnUpdate)
         {
             this.OnUpdate = OnUpdate;
             return this;
+        }
+
+        public void Finish(Action OnFinish = null)
+        {
+            if (OnFinish == null)
+            {
+                this.OnFinish += OnUpdate;
+                return;
+            }
+
+            this.OnFinish += OnFinish;
         }
 
         public Timer Set(float duration)
@@ -61,18 +72,18 @@ namespace JFramework
         {
             owner = null;
             OnUpdate = null;
-            OnDispose?.Invoke();
-            OnDispose = null;
+            OnFinish?.Invoke();
+            OnFinish = null;
         }
 
-        internal void Start(GameObject owner, float duration, Action OnDispose)
+        internal void Start(GameObject owner, float duration, Action OnFinish)
         {
             count = 1;
             unscale = false;
             this.owner = owner;
             this.duration = duration;
             interval = seconds + duration;
-            this.OnDispose = OnDispose;
+            this.OnFinish = OnFinish;
         }
 
         internal void FixedUpdate()
