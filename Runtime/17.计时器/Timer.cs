@@ -85,6 +85,12 @@ namespace JFramework
                     return;
                 }
 
+                if (!owner.activeInHierarchy)
+                {
+                    Dispose();
+                    return;
+                }
+
                 if (seconds <= interval)
                 {
                     return;

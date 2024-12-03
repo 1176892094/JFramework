@@ -63,6 +63,12 @@ namespace JFramework
                     return;
                 }
 
+                if (!owner.activeInHierarchy)
+                {
+                    Dispose();
+                    return;
+                }
+
                 fadeTime += Time.deltaTime;
                 progress = Math.Clamp(fadeTime / duration, 0, 1);
                 OnUpdate?.Invoke(progress);
