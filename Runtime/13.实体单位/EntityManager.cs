@@ -35,7 +35,7 @@ namespace JFramework
             {
                 instance = entity;
                 component = (IController)ScriptableObject.CreateInstance(type);
-                ((ScriptableObject)component).name = type.Name;
+                ((ScriptableObject)component).name = entity.gameObject.name;
                 components.Add(type, component);
                 component.OnAwake(instance);
             }
