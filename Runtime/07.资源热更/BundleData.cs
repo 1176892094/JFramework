@@ -13,7 +13,7 @@ using System;
 namespace JFramework
 {
     [Serializable]
-    internal struct BundleData
+    internal struct BundleData : IEquatable<BundleData>
     {
         public string code;
         public string name;
@@ -31,5 +31,15 @@ namespace JFramework
         public static bool operator !=(BundleData a, BundleData b) => a.code != b.code;
 
         public bool Equals(BundleData other) => size == other.size && code == other.code && name == other.name;
+
+        public override bool Equals(object obj)
+        {
+            return obj is BundleData other && Equals(other);
+        }
+
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(code, name, size);
+        }
     }
 }
