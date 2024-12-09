@@ -23,9 +23,9 @@ namespace JFramework
     {
         private static AssetBundle mainAsset;
         private static AssetBundleManifest manifest;
-        private static readonly Dictionary<string, AssetData> assets = new();
         private static readonly Dictionary<string, AssetBundle> bundles = new();
         private static readonly Dictionary<string, Task<AssetBundle>> requests = new();
+        private static readonly Dictionary<string, KeyValuePair<string, string>> assets = new();
         public static event Action<string[]> OnLoadEntry;
         public static event Action<string> OnLoadUpdate;
         public static event Action OnLoadComplete;
@@ -36,8 +36,8 @@ namespace JFramework
             {
                 if (GlobalManager.Instance)
                 {
-                    var assetData = await LoadAsset<T>(assetPath);
-                    return assetData;
+                    var assetData = await LoadAsset(assetPath, typeof(T));
+                    return (T)assetData;
                 }
             }
             catch (Exception e)
@@ -54,8 +54,8 @@ namespace JFramework
             {
                 if (GlobalManager.Instance)
                 {
-                    var assetData = await LoadAsset<T>(assetPath);
-                    action?.Invoke(assetData);
+                    var assetData = await LoadAsset(assetPath, typeof(T));
+                    action?.Invoke((T)assetData);
                 }
             }
             catch (Exception e)
@@ -64,25 +64,26 @@ namespace JFramework
             }
         }
 
-        private static async Task<T> LoadAsset<T>(string assetPath) where T : Object
+        private static async Task<Object> LoadAsset(string assetPath, Type assetType)
         {
             if (GlobalManager.mode == AssetMode.AssetBundle)
             {
-                var assetInfo = await LoadDependency(assetPath);
-                var assetBundle = await LoadAssetBundle(assetInfo.bundle);
-                var assetData = AssetBundleLoader.LoadAsync<T>(assetBundle, assetInfo.asset);
-                assetData ??= await ResourcesLoader.LoadAsync<T>(assetPath);
+                var dependency = await LoadDependency(assetPath);
+                var assetBundle = await LoadAssetBundle(dependency.Key);
+                var assetData = AssetBundleLoader.Load(assetBundle, dependency.Value, assetType);
+                assetData ??= ResourcesLoader.Load(assetPath, assetType);
                 return assetData;
             }
             else
             {
 #if UNITY_EDITOR
-                var assetData = SimulateLoader.LoadAsync<T>(assetPath);
-                assetData ??= await ResourcesLoader.LoadAsync<T>(assetPath);
-#else
-                var assetData = await ResourcesLoader.LoadAsync<T>(assetPath);
-#endif
+                var assetData = SimulateLoader.Load(assetPath, assetType);
+                assetData ??= ResourcesLoader.Load(assetPath, assetType);
                 return assetData;
+#else
+                var assetData = ResourcesLoader.LoadAsync<T>(assetPath, assetType);
+                return assetData;
+#endif
             }
         }
 
@@ -94,16 +95,26 @@ namespace JFramework
             OnLoadEntry?.Invoke(manifest.GetAllAssetBundles());
         }
 
-        private static async Task<AssetData> LoadDependency(string assetPath)
+        private static async Task<KeyValuePair<string, string>> LoadDependency(string assetPath)
         {
             await LoadBundleManifest();
             if (!assets.TryGetValue(assetPath, out var assetData))
             {
-                assetData = new AssetData(assetPath);
+                var index = assetPath.LastIndexOf('/');
+                if (index < 0)
+                {
+                    assetData = new KeyValuePair<string, string>(string.Empty, assetPath);
+                }
+                else
+                {
+                    var assetBundle = assetPath.Substring(0, index).ToLower();
+                    assetData = new KeyValuePair<string, string>(assetBundle, assetPath.Substring(index + 1));
+                }
+
                 assets.Add(assetPath, assetData);
             }
 
-            var dependencies = manifest.GetAllDependencies(assetData.bundle);
+            var dependencies = manifest.GetAllDependencies(assetData.Key);
             foreach (var dependency in dependencies)
             {
                 _ = LoadAssetBundle(dependency);

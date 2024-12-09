@@ -8,7 +8,7 @@
 // # Description: This is an automatically generated comment.
 // *********************************************************************************
 
-using System.Threading.Tasks;
+using System;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
@@ -18,12 +18,12 @@ namespace JFramework
     {
         private static class AssetBundleLoader
         {
-            public static T LoadAsync<T>(AssetBundle assetBundle, string assetName) where T : Object
+            public static Object Load(AssetBundle assetBundle, string assetName, Type assetType)
             {
                 if (assetBundle != null)
                 {
-                    var request = assetBundle.LoadAssetAsync<T>(assetName);
-                    return request.asset is GameObject ? (T)Object.Instantiate(request.asset) : (T)request.asset;
+                    var request = assetBundle.LoadAssetAsync(assetName, assetType);
+                    return request.asset is GameObject ? Object.Instantiate(request.asset) : request.asset;
                 }
 
                 return null;
@@ -32,21 +32,21 @@ namespace JFramework
 
         private static class ResourcesLoader
         {
-            public static async Task<T> LoadAsync<T>(string assetPath) where T : Object
+            public static Object Load(string assetPath, Type assetType)
             {
-                var request = await Resources.LoadAsync<T>(assetPath);
-                return request.asset is GameObject ? (T)Object.Instantiate(request.asset) : (T)request.asset;
+                var request = Resources.Load(assetPath, assetType);
+                return request is GameObject ? Object.Instantiate(request) : request;
             }
         }
 
 #if UNITY_EDITOR
         private static class SimulateLoader
         {
-            public static T LoadAsync<T>(string assetPath) where T : Object
+            public static Object Load(string assetPath, Type assetType)
             {
-                if (EditorSetting.objects.TryGetValue(char.ToUpper(assetPath[0]) + assetPath.Substring(1), out var editorPath))
+                if (EditorSetting.objects.TryGetValue(char.ToUpper(assetPath[0]) + assetPath.Substring(1), out assetPath))
                 {
-                    var request = UnityEditor.AssetDatabase.LoadAssetAtPath<T>(editorPath);
+                    var request = UnityEditor.AssetDatabase.LoadAssetAtPath(assetPath, assetType);
                     return request is GameObject ? Object.Instantiate(request) : request;
                 }
 

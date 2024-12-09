@@ -55,10 +55,10 @@ namespace JFramework
         {
             if (GlobalManager.mode == AssetMode.AssetBundle)
             {
-                var assetInfo = await LoadDependency(assetPath);
-                var assetBundle = await LoadAssetBundle(assetInfo.bundle);
+                var dependency = await LoadDependency(assetPath);
+                var assetBundle = await LoadAssetBundle(dependency.Key);
                 var assetData = assetBundle.GetAllScenePaths();
-                return assetData.FirstOrDefault(data => data == assetInfo.asset);
+                return assetData.FirstOrDefault(data => data == dependency.Value);
             }
 
             return assetPath.Substring(assetPath.LastIndexOf('/') + 1);
