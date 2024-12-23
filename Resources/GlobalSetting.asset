@@ -9,24 +9,20 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 44ad09f1d6a94a539d03bf46ca54214f, type: 3}
+  m_Script: {fileID: 11500000, guid: ebfb891ca3524fb19fbed5292286f491, type: 3}
   m_Name: GlobalSetting
   m_EditorClassIdentifier: 
-  platform: 9
-  debugMode: 1
-  assetMode: 0
-  assetInfo: AssetBundleInfo
-  buildPath: AssetBundles
-  dataAssembly: HotUpdate.Data
-  assetPath: Assets/Template
-  remotePath: http://192.168.0.2:8000/Files/Unity/Forest/AssetBundles
-  sceneAssets:
-  - Assets/Template/Scenes/GameScene.unity
-  - Assets/Template/Scenes/LevelScene1.unity
-  - Assets/Template/Scenes/LevelScene2.unity
-  - Assets/Template/Scenes/LevelScene3.unity
-  - Assets/Template/Scenes/LevelScene4.unity
-  - Assets/Template/Scenes/LevelScene5.unity
-  - Assets/Template/Scenes/LevelScene6.unity
-  - Assets/Template/Scenes/LoginScene.unity
-  - Assets/Template/Scenes/TechScene.unity
+  sceneAssets: []
+  ignoreAssets: []
+  assetPlatform: 5
+  smtpServer: smtp.qq.com
+  smtpPort: 587
+  smtpUsername: 1176892094@qq.com
+  smtpPassword: 
+  assetPackMode: 0
+  assetAssembly: HotUpdate.Data
+  assetPackName: AssetPacket
+  assetPackPath: Assets/StreamingAssets
+  assetCachePath: Assets/Template
+  assetRemotePath: http://192.168.0.3:8000/AssetPackets
+  debugWindow: 1
