@@ -59,8 +59,6 @@ namespace JFramework
 
         public AssetPackMode assetPackMode = AssetPackMode.Simulate;
 
-        public string assetAssembly = "HotUpdate.Data";
-
         public string assetPackName = "AssetPacket";
 
         public string assetPackPath = "Assets/StreamingAssets";

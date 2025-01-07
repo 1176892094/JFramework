@@ -80,7 +80,7 @@ namespace JFramework
                     {
                         importer.assetBundleName = folderName;
                         importer.SaveAndReimport();
-                        Debug.Log(Service.Text.Format("增加AB资源: {0}", assetPath));
+                        Debug.Log(Service.Text.Format("增加AB资源: {0}", assetPath.Color("00FF00")));
                     }
 
                     objects[Service.Text.Format("{0}/{1}", folderName, assetData.name)] = assetPath;

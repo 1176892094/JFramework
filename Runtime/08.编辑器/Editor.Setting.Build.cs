@@ -38,7 +38,7 @@ namespace JFramework
             if (isExists)
             {
                 var readJson = await File.ReadAllTextAsync(GlobalSetting.remoteAssetPack);
-                fileHash = GlobalManager.helper.FromJson<List<PackData>>(readJson).Select(data => data.code).ToHashSet();
+                fileHash = JsonUtility.FromJson<JsonMapper<PackData>>(readJson).value.Select(data => data.code).ToHashSet();
             }
 
             var filePacks = new List<PackData>();
@@ -66,7 +66,7 @@ namespace JFramework
                 Debug.Log(Service.Text.Format("加密AB包: {0}", fileInfo.FullName));
             }
 
-            var saveJson = GlobalManager.helper.ToJson(filePacks);
+            var saveJson = JsonUtility.ToJson(new JsonMapper<PackData>(filePacks));
             await File.WriteAllTextAsync(GlobalSetting.remoteAssetPack, saveJson);
             elapseTime = EditorApplication.timeSinceStartup - elapseTime;
             Debug.Log(Service.Text.Format("加密 AssetBundle 完成。耗时:<color=#00FF00> {0:F} </color>秒", elapseTime));
@@ -88,6 +88,17 @@ namespace JFramework
         }
 
         [Serializable]
+        private class JsonMapper<T>
+        {
+            public List<T> value;
+
+            public JsonMapper(List<T> value)
+            {
+                this.value = value;
+            }
+        }
+
+        [Serializable]
         private struct PackData : IEquatable<PackData>
         {
             public string code;
@@ -105,7 +116,10 @@ namespace JFramework
 
             public static bool operator !=(PackData a, PackData b) => a.code != b.code;
 
-            public bool Equals(PackData other) => size == other.size && code == other.code && name == other.name;
+            public bool Equals(PackData other)
+            {
+                return size == other.size && code == other.code && name == other.name;
+            }
 
             public override bool Equals(object obj)
             {
@@ -114,7 +128,13 @@ namespace JFramework
 
             public override int GetHashCode()
             {
-                return HashCode.Combine(code, name, size);
+                unchecked
+                {
+                    var hashCode = (code != null ? code.GetHashCode() : 0);
+                    hashCode = (hashCode * 397) ^ (name != null ? name.GetHashCode() : 0);
+                    hashCode = (hashCode * 397) ^ size;
+                    return hashCode;
+                }
             }
         }
     }

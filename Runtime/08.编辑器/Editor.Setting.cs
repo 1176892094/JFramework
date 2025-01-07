@@ -15,20 +15,14 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using UnityEditor;
+using UnityEditor.Callbacks;
 using UnityEngine;
+using Debug = UnityEngine.Debug;
 
 namespace JFramework
 {
     internal static partial class EditorSetting
     {
-        [MenuItem("Tools/JFramework/框架配置窗口 _F1", priority = 2)]
-        public static void ShowWindow()
-        {
-            var window = EditorWindow.GetWindow<GlobalSetting.EditorWindow>(nameof(GlobalSetting));
-            window.position = new Rect(400, 300, 800, 600);
-            window.Show();
-        }
-
         public static void UpdateSceneSetting(GlobalSetting.AssetPackMode assetPackMode)
         {
             var assets = EditorBuildSettings.scenes.Select(scene => scene.path).ToList();
@@ -50,28 +44,75 @@ namespace JFramework
             }
         }
 
-        [MenuItem("Tools/JFramework/转化表格数据", priority = 5)]
-        private static void ExcelToScripts()
+        [InitializeOnLoadMethod]
+        private static void InitializeOnLoadMethod()
         {
-            var assembly = Service.Depend.GetAssembly("JFramework.Editor");
-            if (assembly == null)
+            Service.Entry.Register(new DefaultHelper());
+        }
+
+        [MenuItem("Tools/JFramework/框架配置窗口 _F1", priority = 2)]
+        public static void ShowWindow()
+        {
+            var window = EditorWindow.GetWindow<GlobalSetting.EditorWindow>(nameof(GlobalSetting));
+            window.position = new Rect(400, 300, 800, 600);
+            window.Show();
+        }
+
+        [MenuItem("Tools/JFramework/转化表格数据", priority = 5)]
+        private static async void ExcelToScripts()
+        {
+            var folderPath = GlobalSetting.ExcelPathKey;
+            if (string.IsNullOrEmpty(folderPath))
             {
-                return;
+                folderPath = Environment.CurrentDirectory;
             }
 
-            var assetType = assembly.GetType("JFramework.Editor.ExcelManager");
-            if (assetType == null)
+            folderPath = EditorUtility.OpenFolderPanel("选择文件夹", folderPath, "");
+            if (!string.IsNullOrEmpty(folderPath))
             {
-                return;
-            }
+                try
+                {
+                    GlobalSetting.AssetLoadKey = false;
+                    GlobalSetting.ExcelPathKey = folderPath;
+                    var sinceTime = EditorApplication.timeSinceStartup;
+                    EditorUtility.DisplayProgressBar("", "", 0);
+                    GlobalSetting.AssetLoadKey = await Service.Form.WriteScripts(folderPath);
+                    if (!GlobalSetting.AssetLoadKey)
+                    {
+                        UpdateAsset();
+                    }
 
-            var assetData = assetType.GetMethod("ExcelToScripts", Service.Depend.Static);
-            if (assetData == null)
+                    var elapsedTime = EditorApplication.timeSinceStartup - sinceTime;
+                    Debug.Log(Service.Text.Format("自动生成脚本完成。耗时: {0}秒", elapsedTime.ToString("F").Color("00FF00")));
+                }
+                finally
+                {
+                    AssetDatabase.Refresh();
+                    EditorUtility.ClearProgressBar();
+                }
+            }
+        }
+
+        [DidReloadScripts]
+        private static async void CompileScripts()
+        {
+            if (GlobalSetting.AssetLoadKey)
             {
-                return;
+                try
+                {
+                    var sinceTime = EditorApplication.timeSinceStartup;
+                    GlobalSetting.AssetLoadKey = false;
+                    await Service.Form.WriteAssets(GlobalSetting.ExcelPathKey);
+                    UpdateAsset();
+                    var elapsedTime = EditorApplication.timeSinceStartup - sinceTime;
+                    Debug.Log(Service.Text.Format("自动生成资源完成。耗时: {0}秒", elapsedTime.ToString("F").Color("00FF00")));
+                }
+                finally
+                {
+                    AssetDatabase.Refresh();
+                    EditorUtility.ClearProgressBar();
+                }
             }
-
-            assetData.Invoke(null, null);
         }
 
         [MenuItem("Tools/JFramework/项目工程路径", priority = 6)]

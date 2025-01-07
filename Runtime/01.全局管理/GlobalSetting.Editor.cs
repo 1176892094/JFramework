@@ -10,6 +10,7 @@
 // *********************************************************************************
 
 #if UNITY_EDITOR
+using System;
 using System.Collections.Generic;
 using System.IO;
 using UnityEditor;
@@ -23,6 +24,18 @@ namespace JFramework
         [HideInInspector] public List<string> sceneAssets = new List<string>();
         [HideInInspector] public List<Object> ignoreAssets = new List<Object>();
 
+        public static bool AssetLoadKey
+        {
+            get => EditorPrefs.GetBool(nameof(AssetLoadKey), false);
+            set => EditorPrefs.SetBool(nameof(AssetLoadKey), value);
+        }
+
+        public static string ExcelPathKey
+        {
+            get => EditorPrefs.GetString(nameof(ExcelPathKey), Environment.CurrentDirectory);
+            set => EditorPrefs.SetString(nameof(ExcelPathKey), value);
+        }
+        
         public static string EditorPath
         {
             get => EditorPrefs.GetString(nameof(EditorPath), "Assets/Editor/Resources");
@@ -85,7 +98,6 @@ namespace JFramework
                 setting.smtpUsername = EditorGUILayout.TextField("Smtp 邮箱", setting.smtpUsername);
                 setting.smtpPassword = EditorGUILayout.TextField("Smtp 密钥", setting.smtpPassword);
                 AssetLoadMode = (AssetPackMode)EditorGUILayout.EnumPopup("资源加载模式", AssetLoadMode);
-                setting.assetAssembly = EditorGUILayout.TextField("数据表程序集", setting.assetAssembly);
                 setting.assetPackName = EditorGUILayout.TextField("资源信息名称", setting.assetPackName);
                 setting.assetCachePath = EditorGUILayout.TextField("资源存放路径", setting.assetCachePath);
                 setting.assetRemotePath = EditorGUILayout.TextField("资源服务器", setting.assetRemotePath);

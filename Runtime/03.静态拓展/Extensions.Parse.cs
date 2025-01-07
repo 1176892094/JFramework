@@ -23,17 +23,19 @@ namespace JFramework
         {
             { typeof(Vector2), new Func<string, Vector2>(InputVector2) },
             { typeof(Vector3), new Func<string, Vector3>(InputVector3) },
+            { typeof(Vector4), new Func<string, Vector4>(InputVector4) },
             { typeof(Vector2Int), new Func<string, Vector2Int>(InputVector2Int) },
             { typeof(Vector3Int), new Func<string, Vector3Int>(InputVector3Int) },
             { typeof(Vector2[]), new Func<string, Vector2[]>(InputVector2Array) },
             { typeof(Vector3[]), new Func<string, Vector3[]>(InputVector3Array) },
+            { typeof(Vector4[]), new Func<string, Vector4[]>(InputVector4Array) },
             { typeof(Vector2Int[]), new Func<string, Vector2Int[]>(InputVector2IntArray) },
             { typeof(Vector3Int[]), new Func<string, Vector3Int[]>(InputVector3IntArray) },
         };
 
         public static T Parse<T>(this byte[] reason)
         {
-            reason ??= Array.Empty<byte>();
+            if (reason == null) return default;
             var value = Encoding.UTF8.GetString(reason);
             if (parsers.TryGetValue(typeof(T), out var func))
             {
@@ -58,6 +60,16 @@ namespace JFramework
             var y = float.Parse(points[1]);
             var z = float.Parse(points[2]);
             return new Vector3(x, y, z);
+        }
+
+        private static Vector4 InputVector4(this string reason)
+        {
+            var points = reason.Split(',');
+            var x = float.Parse(points[0]);
+            var y = float.Parse(points[1]);
+            var z = float.Parse(points[2]);
+            var a = float.Parse(points[3]);
+            return new Vector4(x, y, z, a);
         }
 
         private static Vector2Int InputVector2Int(this string reason)
@@ -101,6 +113,11 @@ namespace JFramework
         private static Vector3[] InputVector3Array(this string reason)
         {
             return reason.InputArray().Select(InputVector3).ToArray();
+        }
+        
+        private static Vector4[] InputVector4Array(this string reason)
+        {
+            return reason.InputArray().Select(InputVector4).ToArray();
         }
 
         private static Vector2Int[] InputVector2IntArray(this string reason)

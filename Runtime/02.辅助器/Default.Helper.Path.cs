@@ -19,7 +19,6 @@ namespace JFramework
     {
         string IPathHelper.assetPlatform => GlobalSetting.Instance.assetPlatform.ToString();
         bool IPathHelper.assetPackMode => GlobalSetting.Instance.assetPackMode == GlobalSetting.AssetPackMode.Authentic;
-        string IPathHelper.assetAssembly => GlobalSetting.Instance.assetAssembly;
         string IPathHelper.assetPackPath => GlobalSetting.Instance.assetPackPath;
         string IPathHelper.assetPackName => GlobalSetting.Instance.assetPackName;
         string IPathHelper.assetRemotePath => GlobalSetting.Instance.assetRemotePath;

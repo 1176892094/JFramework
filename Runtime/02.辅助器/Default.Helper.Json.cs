@@ -17,7 +17,7 @@ namespace JFramework
 {
     internal sealed partial class DefaultHelper : IJsonHelper
     {
-        public string ToJson<T>(T data)
+        string IJsonHelper.ToJson<T>(T data)
         {
             if (typeof(T).IsSubclassOf(typeof(Object)))
             {
@@ -27,7 +27,7 @@ namespace JFramework
             return JsonUtility.ToJson(new JsonMapper<T>(data));
         }
 
-        public void FromJson<T>(string json, T data)
+        void IJsonHelper.FromJson<T>(string json, T data)
         {
             if (typeof(T).IsSubclassOf(typeof(Object)))
             {
@@ -38,7 +38,7 @@ namespace JFramework
             JsonUtility.FromJsonOverwrite(json, new JsonMapper<T>(data));
         }
 
-        public T FromJson<T>(string json)
+        T IJsonHelper.FromJson<T>(string json)
         {
             if (typeof(T).IsSubclassOf(typeof(Object)))
             {

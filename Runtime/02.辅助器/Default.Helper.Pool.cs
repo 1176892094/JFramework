@@ -37,12 +37,7 @@ namespace JFramework
 
             return false;
         }
-
-        async Task<object> IPoolHelper.Instantiate(string assetPath)
-        {
-            return await Service.Asset.Load<ScriptableObject>(assetPath);
-        }
-
+        
         async Task<object> IPoolHelper.Instantiate(string assetPath, Type assetType)
         {
             var assetData = await Service.Asset.Load<GameObject>(assetPath);

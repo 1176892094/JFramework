@@ -16,14 +16,13 @@ namespace JFramework
 {
     internal class GlobalManager : MonoBehaviour, IEntity
     {
-        public static readonly DefaultHelper helper = new DefaultHelper();
         public static GlobalManager Instance;
 
         private void Awake()
         {
             Instance = this;
             DontDestroyOnLoad(gameObject);
-            Service.Entry.Register(helper);
+            Service.Entry.Register(new DefaultHelper());
         }
 
         private void Update()
