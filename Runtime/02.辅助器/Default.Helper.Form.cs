@@ -17,8 +17,19 @@ namespace JFramework
 {
     internal sealed partial class DefaultHelper : IFormHelper
     {
+        async Task<IDataTable> IFormHelper.Instantiate(string assetPath)
+        {
+            return (IDataTable)await Service.Asset.Load<ScriptableObject>(assetPath);
+        }
+
+        IDataTable IFormHelper.CreateInstance(string assetPath)
+        {
+            return (IDataTable)ScriptableObject.CreateInstance(assetPath);
+        }
+
         string IFormHelper.Path(string objectText, FileAccess fileAccess)
         {
+#if UNITY_EDITOR
             switch (fileAccess)
             {
                 case FileAccess.Write when objectText == "Assembly":
@@ -40,18 +51,8 @@ namespace JFramework
                 case FileAccess.Read when objectText == "Table":
                     return Resources.LoadAll<TextAsset>(nameof(GlobalSetting))[3].text;
             }
-
+#endif
             return string.Empty;
-        }
-
-        async Task<IDataTable> IFormHelper.Instantiate(string assetPath)
-        {
-            return (IDataTable)await Service.Asset.Load<ScriptableObject>(assetPath);
-        }
-
-        IDataTable IFormHelper.CreateInstance(string assetPath)
-        {
-            return (IDataTable)ScriptableObject.CreateInstance(assetPath);
         }
 
         void IFormHelper.CreateAsset(IDataTable assetData, string assetPath)
