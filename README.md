@@ -91,6 +91,13 @@ JFramework是基于Unity的游戏框架，封装了一些常用的Unity功能。
                 // Asset: Monster
                 Service.Asset.Load<GameObject>("Prefabs/Monster"); // 从 prefabs 中 加载 Monster
             }
+
+            if (Input.GetMouseButtonDown(1))
+            {
+                // AssetBundle: scenes
+                // Asset: StartScene
+                Service.Asset.LoadScene("StartScene"); // 从 scenes 中 加载 StartScene
+            }
         }
     }
 ```
