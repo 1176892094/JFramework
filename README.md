@@ -38,6 +38,55 @@ JFramework是基于Unity的游戏框架，封装了一些常用的Unity功能。
         }
     }
 ```
+3.引用池
+```c#
+    public class Example
+    {
+        public void Test()
+        {
+            for (int i = 0; i < 1000; i++)
+            {
+                var builder = Service.Heap.Dequeue<StringBuilder>(); // 从引用池取出
+                builder.AppendLine("Example"); // 添加字符串
+                Service.Heap.Enqueue(builder); // 放入引用池
+                builder.Length = 0; // 重置对象
+            }
+        }
+    }
+```
+3.引用池
+```c#
+    public class Example : MonoBehaviour, IEvent<StartGameEvent>, IEntity
+    {
+        private void Awake()
+        {
+            this.Watch(5).Invoke(() =>
+            {
+                Service.Event.Invoke(new StartGameEvent()); // 等待5秒后触发事件
+            });
+        }
+
+        private void OnEnable()
+        {
+            Service.Event.Listen(this); // 添加进事件池
+        }
+
+        private void OnDisable()
+        {
+            Service.Event.Remove(this); // 从事件池移除
+        }
+
+        public void Execute(StartGameEvent message)
+        {
+            Debug.Log("触发事件");
+        }
+    }
+    
+    public struct StartGameEvent : IEvent
+    {
+    }
+
+```
 7.贡献者
 
 * [龙傲天](https://github.com/Molth)
