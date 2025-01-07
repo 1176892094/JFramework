@@ -54,38 +54,68 @@ JFramework是基于Unity的游戏框架，封装了一些常用的Unity功能。
         }
     }
 ```
-3.引用池
+4.事件池
 ```c#
-    public class Example : MonoBehaviour, IEvent<StartGameEvent>, IEntity
+    public class Example : MonoBehaviour, IEvent<PackCompleteEvent>
     {
         private void Awake()
         {
-            this.Watch(5).Invoke(() =>
-            {
-                Service.Event.Invoke(new StartGameEvent()); // 等待5秒后触发事件
-            });
+            Service.Pack.LoadAssetData(); // 从服务器更新并下载 AssetBundle
         }
 
         private void OnEnable()
         {
-            Service.Event.Listen(this); // 添加进事件池
+            Service.Event.Listen(this); // 添加下载完成事件
         }
 
         private void OnDisable()
         {
-            Service.Event.Remove(this); // 从事件池移除
+            Service.Event.Remove(this);// 移除下载完成事件
         }
 
-        public void Execute(StartGameEvent message)
+        public void Execute(PackCompleteEvent message)
         {
-            Debug.Log("触发事件");
+            Service.Asset.LoadAssetData(); // 当 AssetBundle 更新下载完成后 加载 AssetBundle 到内存中
         }
     }
-    
-    public struct StartGameEvent : IEvent
+```
+5.资源加载
+```c#
+    public class Example : MonoBehaviour
+    {
+        private void Update()
+        {
+            if (Input.GetMouseButtonDown(0))
+            {
+                // AssetBundle: prefabs
+                // Asset: Monster
+                Service.Asset.Load<GameObject>("Prefabs/Monster"); // 从 prefabs 中 加载 Monster
+            }
+        }
+    }
+```
+6.对象池
+```c#
+    public class Example : MonoBehaviour
+    {
+        private void Update()
+        {
+            if (Input.GetMouseButtonDown(0))
+            {
+                Service.Pool.Show<Monster>("Prefabs/Monster", monster => // 从对象池中 取出 或 生成
+                {
+                    monster.Watch(5).Invoke(() =>
+                    {
+                        Service.Pool.Hide(monster); // 等待5秒后 放入对象池
+                    });
+                });
+            }
+        }
+    }
+
+    public class Monster : MonoBehaviour, IEntity
     {
     }
-
 ```
 7.贡献者
 
