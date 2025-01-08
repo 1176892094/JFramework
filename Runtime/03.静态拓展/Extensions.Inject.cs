@@ -12,7 +12,6 @@
 using System.Reflection;
 using UnityEngine;
 using UnityEngine.UI;
-using Component = System.ComponentModel.Component;
 
 namespace JFramework
 {
@@ -34,7 +33,7 @@ namespace JFramework
                     field.SetValue(entity, component);
                     continue;
                 }
-
+                
                 if (!field.FieldType.IsSubclassOf(typeof(Component)))
                 {
                     continue;
