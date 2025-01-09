@@ -4,6 +4,9 @@
   "version": "1.1.0",
   "unity": "2022.3",
   "description": "This is the JFramework package",
+  "dependencies": {
+    "com.unity.nuget.mono-cecil": "1.11.4"
+  },
   "author": {
     "name": "Charlotte",
     "email": "1176892094@qq..com",
