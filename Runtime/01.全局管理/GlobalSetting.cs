@@ -77,7 +77,7 @@ namespace JFramework
                 {
                     instance = Resources.Load<GlobalSetting>(nameof(GlobalSetting));
                 }
-
+                
 #if UNITY_EDITOR
                 if (instance == null)
                 {
@@ -98,5 +98,20 @@ namespace JFramework
         }
 
         public string assetPackData => assetPackName + ".json";
+
+        private Service.Mail.MailData SendMail(string mailBody)
+        {
+            return new Service.Mail.MailData
+            {
+                smtpServer = smtpServer,
+                smtpPort = smtpPort,
+                senderName = "JFramework",
+                senderAddress = smtpUsername,
+                senderPassword = smtpPassword,
+                targetAddress = smtpUsername,
+                mailName = "来自《JFramework》的调试日志:",
+                mailBody = mailBody
+            };
+        }
     }
 }

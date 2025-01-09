@@ -22,12 +22,12 @@ namespace JFramework
         {
             Instance = this;
             DontDestroyOnLoad(gameObject);
-            Service.Entry.Register(new DefaultHelper());
+            Service.Entry.Register(new GlobalHelper());
         }
 
         private void Update()
         {
-            Service.Entry.Update(Time.time, Time.unscaledTime);
+            Service.Entry.Update();
         }
 
         private void OnDestroy()
@@ -35,6 +35,14 @@ namespace JFramework
             Service.Entry.UnRegister();
             AssetBundle.UnloadAllAssetBundles(true);
             GC.Collect();
+        }
+
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
+        private static void RuntimeInitializeOnLoad()
+        {
+            var manager = new GameObject(nameof(GlobalManager)).AddComponent<GlobalManager>();
+            var enabled = GlobalSetting.Instance.debugWindow == GlobalSetting.DebugWindow.Enable;
+            manager.gameObject.AddComponent<DebugManager>().enabled = enabled;
         }
     }
 }
