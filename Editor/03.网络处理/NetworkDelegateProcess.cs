@@ -83,7 +83,7 @@ namespace JFramework.Editor
 
             worker.Emit(OpCodes.Ldarg_0);
             worker.Emit(OpCodes.Ldstr, md.FullName);
-            worker.Emit(OpCodes.Ldc_I4, (int)Utility.Hash.Id(md.FullName));
+            worker.Emit(OpCodes.Ldc_I4, (int)Service.Hash.Id(md.FullName));
             worker.Emit(OpCodes.Ldloc_0);
             worker.Emit(OpCodes.Ldc_I4, ca.GetFieldType<int>());
             worker.Emit(OpCodes.Callvirt, models.sendClientRpcInternal);
@@ -161,7 +161,7 @@ namespace JFramework.Editor
 
             worker.Emit(OpCodes.Ldarg_0);
             worker.Emit(OpCodes.Ldstr, md.FullName);
-            worker.Emit(OpCodes.Ldc_I4, (int)Utility.Hash.Id(md.FullName));
+            worker.Emit(OpCodes.Ldc_I4, (int)Service.Hash.Id(md.FullName));
             worker.Emit(OpCodes.Ldloc_0);
             worker.Emit(OpCodes.Ldc_I4, ca.GetFieldType<int>());
             worker.Emit(OpCodes.Call, models.sendServerRpcInternal);
@@ -238,7 +238,7 @@ namespace JFramework.Editor
             worker.Emit(OpCodes.Ldarg_0);
             worker.Emit(HasNetworkClient(md) ? OpCodes.Ldarg_1 : OpCodes.Ldnull);
             worker.Emit(OpCodes.Ldstr, md.FullName);
-            worker.Emit(OpCodes.Ldc_I4, (int)Utility.Hash.Id(md.FullName));
+            worker.Emit(OpCodes.Ldc_I4, (int)Service.Hash.Id(md.FullName));
             worker.Emit(OpCodes.Ldloc_0);
             worker.Emit(OpCodes.Ldc_I4, ca.GetFieldType<int>());
             worker.Emit(OpCodes.Callvirt, models.sendTargetRpcInternal);

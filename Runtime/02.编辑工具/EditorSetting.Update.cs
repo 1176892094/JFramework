@@ -80,10 +80,10 @@ internal static partial class EditorSetting
                 {
                     importer.assetBundleName = folderName;
                     importer.SaveAndReimport();
-                    Debug.Log(Utility.Text.Format("增加AB资源: {0}", assetPath.Color("00FF00")));
+                    Debug.Log(Service.Text.Format("增加AB资源: {0}", assetPath.Color("00FF00")));
                 }
 
-                objects[Utility.Text.Format("{0}/{1}", folderName, assetData.name)] = assetPath;
+                objects[Service.Text.Format("{0}/{1}", folderName, assetData.name)] = assetPath;
             }
         }
 

@@ -13,7 +13,6 @@
 using System;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
 using JFramework;
 using UnityEditor;
 using UnityEditor.Callbacks;
@@ -67,7 +66,7 @@ internal static partial class EditorSetting
                 }
 
                 var elapsedTime = EditorApplication.timeSinceStartup - sinceTime;
-                Debug.Log(Utility.Text.Format("自动生成脚本完成。耗时: {0}秒", elapsedTime.ToString("F").Color("00FF00")));
+                Debug.Log(Service.Text.Format("自动生成脚本完成。耗时: {0}秒", elapsedTime.ToString("F").Color("00FF00")));
             }
             finally
             {
@@ -89,7 +88,7 @@ internal static partial class EditorSetting
                 await FormManager.WriteAssets(ExcelPathKey);
                 UpdateAsset();
                 var elapsedTime = EditorApplication.timeSinceStartup - sinceTime;
-                Debug.Log(Utility.Text.Format("自动生成资源完成。耗时: {0}秒", elapsedTime.ToString("F").Color("00FF00")));
+                Debug.Log(Service.Text.Format("自动生成资源完成。耗时: {0}秒", elapsedTime.ToString("F").Color("00FF00")));
             }
             finally
             {

@@ -57,17 +57,17 @@ internal static partial class EditorSetting
             await Task.Run(() =>
             {
                 var readBytes = File.ReadAllBytes(fileInfo.FullName);
-                readBytes = Utility.Xor.Encrypt(readBytes);
+                readBytes = Service.Xor.Encrypt(readBytes);
                 File.WriteAllBytes(fileInfo.FullName, readBytes);
             });
             filePacks.Add(new PackData(GetHashCode(fileInfo.FullName), fileInfo.Name, (int)fileInfo.Length));
-            Debug.Log(Utility.Text.Format("加密AB包: {0}", fileInfo.FullName));
+            Debug.Log(Service.Text.Format("加密AB包: {0}", fileInfo.FullName));
         }
 
         var saveJson = JsonManager.ToJson(filePacks);
         await File.WriteAllTextAsync(GlobalSetting.remoteAssetPack, saveJson);
         elapseTime = EditorApplication.timeSinceStartup - elapseTime;
-        Debug.Log(Utility.Text.Format("加密 AssetBundle 完成。耗时:<color=#00FF00> {0:F} </color>秒", elapseTime));
+        Debug.Log(Service.Text.Format("加密 AssetBundle 完成。耗时:<color=#00FF00> {0:F} </color>秒", elapseTime));
         AssetDatabase.Refresh();
     }
 

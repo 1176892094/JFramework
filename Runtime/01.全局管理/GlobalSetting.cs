@@ -31,14 +31,14 @@ internal partial class GlobalSetting : JFramework.GlobalSetting
 #if UNITY_EDITOR
             if (instance == null)
             {
-                var assetPath = Utility.Text.Format("Assets/{0}", nameof(Resources));
+                var assetPath = Service.Text.Format("Assets/{0}", nameof(Resources));
                 instance = CreateInstance<GlobalSetting>();
                 if (!Directory.Exists(assetPath))
                 {
                     Directory.CreateDirectory(assetPath);
                 }
 
-                assetPath = Utility.Text.Format("{0}/{1}.asset", assetPath, nameof(GlobalSetting));
+                assetPath = Service.Text.Format("{0}/{1}.asset", assetPath, nameof(GlobalSetting));
                 UnityEditor.AssetDatabase.CreateAsset(instance, assetPath);
                 UnityEditor.AssetDatabase.SaveAssets();
             }

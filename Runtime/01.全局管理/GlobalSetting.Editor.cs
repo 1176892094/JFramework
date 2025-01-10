@@ -84,7 +84,7 @@ internal sealed partial class GlobalSetting
 
     public static string remoteAssetPath => Path.Combine(remotePackPath, Instance.assetPlatform.ToString());
 
-    public static string remoteAssetPack => Utility.Text.Format("{0}/{1}.json", remoteAssetPath, Instance.assetPackName);
+    public static string remoteAssetPack => Service.Text.Format("{0}/{1}.json", remoteAssetPath, Instance.assetPackName);
 
     public sealed class EditorWindow : UnityEditor.EditorWindow
     {
