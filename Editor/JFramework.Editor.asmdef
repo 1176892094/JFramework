@@ -12,8 +12,8 @@
     "overrideReferences": true,
     "precompiledReferences": [
         "Mono.Cecil.dll",
-        "JFramework.Net.dll",
-        "JFramework.Ray.dll"
+        "JFramework.dll",
+        "JFramework.Net.dll"
     ],
     "autoReferenced": false,
     "defineConstraints": [],

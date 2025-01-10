@@ -1,19 +1,20 @@
 // *********************************************************************************
-// # Project: JFramework
+// # Project: Forest
 // # Unity: 6000.3.5f1
 // # Author: 云谷千羽
 // # Version: 1.0.0
-// # History: 2024-12-14 16:12:46
-// # Recently: 2024-12-22 20:12:44
+// # History: 2025-01-11 02:01:46
+// # Recently: 2025-01-11 02:01:46
 // # Copyright: 2024, 云谷千羽
 // # Description: This is an automatically generated comment.
 // *********************************************************************************
 
+#if UNITY_EDITOR
 using UnityEditor;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
-namespace JFramework.Editor
+namespace JFramework
 {
     [CustomPropertyDrawer(typeof(FolderAttribute))]
     internal class FolderDrawer : PropertyDrawer
@@ -88,3 +89,4 @@ namespace JFramework.Editor
         }
     }
 }
+#endif

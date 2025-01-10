@@ -14,41 +14,38 @@ using System.IO;
 using UnityEditor;
 using UnityEngine;
 
-namespace JFramework
+public abstract class EditorSingleton<T> : ScriptableObject where T : EditorSingleton<T>
 {
-    public abstract class EditorSingleton<T> : ScriptableObject where T : EditorSingleton<T>
+    private static T instance;
+
+    private static string fileName => typeof(T).Name;
+
+    private static string filePath => GlobalSetting.EditorPath + "/" + fileName + ".asset";
+
+    public static T Instance
     {
-        private static T instance;
-
-        private static string fileName => typeof(T).Name;
-
-        private static string filePath => GlobalSetting.EditorPath + "/" + fileName + ".asset";
-
-        public static T Instance
+        get
         {
-            get
+            if (instance != null)
             {
-                if (instance != null)
-                {
-                    return instance;
-                }
-
-                instance = AssetDatabase.LoadAssetAtPath<T>(filePath);
-                if (instance != null)
-                {
-                    return instance;
-                }
-
-                if (!Directory.Exists(GlobalSetting.EditorPath))
-                {
-                    Directory.CreateDirectory(GlobalSetting.EditorPath);
-                }
-
-                instance = CreateInstance<T>();
-                AssetDatabase.CreateAsset(instance, filePath);
-                AssetDatabase.Refresh();
                 return instance;
             }
+
+            instance = AssetDatabase.LoadAssetAtPath<T>(filePath);
+            if (instance != null)
+            {
+                return instance;
+            }
+
+            if (!Directory.Exists(GlobalSetting.EditorPath))
+            {
+                Directory.CreateDirectory(GlobalSetting.EditorPath);
+            }
+
+            instance = CreateInstance<T>();
+            AssetDatabase.CreateAsset(instance, filePath);
+            AssetDatabase.Refresh();
+            return instance;
         }
     }
 }
