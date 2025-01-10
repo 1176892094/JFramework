@@ -81,14 +81,14 @@ namespace JFramework
 #if UNITY_EDITOR
                 if (instance == null)
                 {
-                    var assetPath = Service.Text.Format("Assets/{0}", nameof(Resources));
+                    var assetPath = Utility.Text.Format("Assets/{0}", nameof(Resources));
                     instance = CreateInstance<GlobalSetting>();
                     if (!Directory.Exists(assetPath))
                     {
                         Directory.CreateDirectory(assetPath);
                     }
 
-                    assetPath = Service.Text.Format("{0}/{1}.asset", assetPath, nameof(GlobalSetting));
+                    assetPath = Utility.Text.Format("{0}/{1}.asset", assetPath, nameof(GlobalSetting));
                     UnityEditor.AssetDatabase.CreateAsset(instance, assetPath);
                     UnityEditor.AssetDatabase.SaveAssets();
                 }
@@ -97,9 +97,9 @@ namespace JFramework
             }
         }
 
-        private Service.Mail.MailData SendMail(string mailBody)
+        private Utility.MailData SendMail(string mailBody)
         {
-            return new Service.Mail.MailData
+            return new Utility.MailData
             {
                 smtpServer = smtpServer,
                 smtpPort = smtpPort,

@@ -53,7 +53,7 @@ namespace JFramework.Editor
                 }
 
                 itemRect = new Rect(position.x, position.y + height * (i + 1), position.width, height);
-                DrawField(itemRect, element, new GUIContent(Service.Text.Format("Element {0}", i)));
+                DrawField(itemRect, element, new GUIContent(Utility.Text.Format("Element {0}", i)));
             }
 
             EditorGUI.indentLevel = indentLevel;

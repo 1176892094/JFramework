@@ -81,7 +81,7 @@ namespace JFramework
                 return true;
             }
 
-            Debug.LogError(Service.Text.Format("找不到场景对象的预制父物体。对象名称: {0}", assetData.name));
+            Debug.LogError(Utility.Text.Format("找不到场景对象的预制父物体。对象名称: {0}", assetData.name));
             return false;
         }
 
@@ -99,7 +99,7 @@ namespace JFramework
 
                 Undo.RecordObject(assetData, "生成场景Id");
 
-                Service.Random.NextBytes(sourceBuffer);
+                Utility.Random.NextBytes(sourceBuffer);
                 var randomId = MemoryMarshal.Read<uint>(sourceBuffer);
 
                 duplicate = caches.TryGetValue(randomId, out @object) && @object != null && @object != assetData;

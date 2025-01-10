@@ -215,7 +215,7 @@ namespace JFramework.Editor
 
         private MethodDefinition AddMethod(TypeReference tr)
         {
-            var md = new MethodDefinition($"Write{NetworkManager.GetStableId(tr.FullName)}", Const.RAW_ATTRS, models.Import(typeof(void)));
+            var md = new MethodDefinition($"Write{Utility.Hash.Id(tr.FullName)}", Const.RAW_ATTRS, models.Import(typeof(void)));
             md.Parameters.Add(new ParameterDefinition("writer", ParameterAttributes.None, models.Import<MemoryWriter>()));
             md.Parameters.Add(new ParameterDefinition("value", ParameterAttributes.None, tr));
             md.Body.InitLocals = true;
