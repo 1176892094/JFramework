@@ -24,18 +24,6 @@ namespace JFramework
         [HideInInspector] public List<string> sceneAssets = new List<string>();
         [HideInInspector] public List<Object> ignoreAssets = new List<Object>();
 
-        public static bool AssetLoadKey
-        {
-            get => EditorPrefs.GetBool(nameof(AssetLoadKey), false);
-            set => EditorPrefs.SetBool(nameof(AssetLoadKey), value);
-        }
-
-        public static string ExcelPathKey
-        {
-            get => EditorPrefs.GetString(nameof(ExcelPathKey), Environment.CurrentDirectory);
-            set => EditorPrefs.SetString(nameof(ExcelPathKey), value);
-        }
-        
         public static string EditorPath
         {
             get => EditorPrefs.GetString(nameof(EditorPath), "Assets/Editor/Resources");

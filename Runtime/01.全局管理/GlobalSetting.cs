@@ -77,7 +77,7 @@ namespace JFramework
                 {
                     instance = Resources.Load<GlobalSetting>(nameof(GlobalSetting));
                 }
-                
+
 #if UNITY_EDITOR
                 if (instance == null)
                 {
@@ -113,5 +113,27 @@ namespace JFramework
                 mailBody = mailBody
             };
         }
+
+#if UNITY_ANDROID
+        private bool multicast;
+        private AndroidJavaObject multicastLock;
+
+        private void BeginMulticastLock()
+        {
+            if (multicast) return;
+            using var activity = new AndroidJavaClass("com.unity3d.player.UnityPlayer").GetStatic<AndroidJavaObject>("currentActivity");
+            using var wifiManager = activity.Call<AndroidJavaObject>("getSystemService", "wifi");
+            multicastLock = wifiManager.Call<AndroidJavaObject>("createMulticastLock", "lock");
+            multicastLock.Call("acquire");
+            multicast = true;
+        }
+
+        private void EndMulticastLock()
+        {
+            if (!multicast) return;
+            multicastLock?.Call("release");
+            multicast = false;
+        }
+#endif
     }
 }

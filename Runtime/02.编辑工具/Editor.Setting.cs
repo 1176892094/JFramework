@@ -23,6 +23,18 @@ namespace JFramework
 {
     internal static partial class EditorSetting
     {
+        public static bool AssetLoadKey
+        {
+            get => EditorPrefs.GetBool(nameof(AssetLoadKey), false);
+            set => EditorPrefs.SetBool(nameof(AssetLoadKey), value);
+        }
+
+        public static string ExcelPathKey
+        {
+            get => EditorPrefs.GetString(nameof(ExcelPathKey), Environment.CurrentDirectory);
+            set => EditorPrefs.SetString(nameof(ExcelPathKey), value);
+        }
+
         public static void UpdateSceneSetting(GlobalSetting.AssetPackMode assetPackMode)
         {
             var assets = EditorBuildSettings.scenes.Select(scene => scene.path).ToList();
@@ -55,7 +67,7 @@ namespace JFramework
         [MenuItem("Tools/JFramework/转化表格数据", priority = 5)]
         private static async void ExcelToScripts()
         {
-            var folderPath = GlobalSetting.ExcelPathKey;
+            var folderPath = ExcelPathKey;
             if (string.IsNullOrEmpty(folderPath))
             {
                 folderPath = Environment.CurrentDirectory;
@@ -66,12 +78,12 @@ namespace JFramework
             {
                 try
                 {
-                    GlobalSetting.AssetLoadKey = false;
-                    GlobalSetting.ExcelPathKey = folderPath;
+                    AssetLoadKey = false;
+                    ExcelPathKey = folderPath;
                     var sinceTime = EditorApplication.timeSinceStartup;
                     EditorUtility.DisplayProgressBar("", "", 0);
-                    GlobalSetting.AssetLoadKey = await Service.Form.WriteScripts(folderPath);
-                    if (!GlobalSetting.AssetLoadKey)
+                    AssetLoadKey = await Service.Form.WriteScripts(folderPath);
+                    if (!AssetLoadKey)
                     {
                         UpdateAsset();
                     }
@@ -90,13 +102,13 @@ namespace JFramework
         [DidReloadScripts]
         private static async void CompileScripts()
         {
-            if (GlobalSetting.AssetLoadKey)
+            if (AssetLoadKey)
             {
                 try
                 {
                     var sinceTime = EditorApplication.timeSinceStartup;
-                    GlobalSetting.AssetLoadKey = false;
-                    await Service.Form.WriteAssets(GlobalSetting.ExcelPathKey);
+                    AssetLoadKey = false;
+                    await Service.Form.WriteAssets(ExcelPathKey);
                     UpdateAsset();
                     var elapsedTime = EditorApplication.timeSinceStartup - sinceTime;
                     Debug.Log(Service.Text.Format("自动生成资源完成。耗时: {0}秒", elapsedTime.ToString("F").Color("00FF00")));
