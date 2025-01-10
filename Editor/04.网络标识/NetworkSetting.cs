@@ -9,7 +9,6 @@
 // # Description: This is an automatically generated comment.
 // *********************************************************************************
 
-#if UNITY_EDITOR
 using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
@@ -19,7 +18,7 @@ using UnityEngine;
 
 namespace JFramework
 {
-    internal static partial class EditorSetting
+    internal static class NetworkSetting
     {
         private static readonly Dictionary<ulong, GameObject> caches = new Dictionary<ulong, GameObject>();
         private static readonly byte[] sourceBuffer = new byte[4];
@@ -115,4 +114,3 @@ namespace JFramework
         }
     }
 }
-#endif

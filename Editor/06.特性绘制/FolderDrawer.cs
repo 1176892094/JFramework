@@ -9,7 +9,6 @@
 // # Description: This is an automatically generated comment.
 // *********************************************************************************
 
-#if UNITY_EDITOR
 using UnityEditor;
 using UnityEngine;
 using Object = UnityEngine.Object;
@@ -89,4 +88,3 @@ namespace JFramework
         }
     }
 }
-#endif
