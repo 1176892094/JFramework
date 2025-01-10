@@ -17,110 +17,112 @@ using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
-using JFramework;
 using UnityEditor;
 using UnityEngine;
 
-internal static partial class EditorSetting
+namespace JFramework.Common
 {
-    [MenuItem("Tools/JFramework/构建 AB 资源", priority = 3)]
-    private static async void BuildAsset()
+    internal static partial class EditorSetting
     {
-        UpdateAsset();
-        var folderPath = Directory.CreateDirectory(GlobalSetting.remoteAssetPath);
-        BuildPipeline.BuildAssetBundles(GlobalSetting.remoteAssetPath, BuildAssetBundleOptions.None, GlobalSetting.BuildTarget);
-        var elapseTime = EditorApplication.timeSinceStartup;
-
-        var fileHash = new HashSet<string>();
-        var isExists = File.Exists(GlobalSetting.remoteAssetPack);
-        if (isExists)
+        [MenuItem("Tools/JFramework/构建 AB 资源", priority = 3)]
+        private static async void BuildAsset()
         {
-            var readJson = await File.ReadAllTextAsync(GlobalSetting.remoteAssetPack);
-            fileHash = JsonManager.FromJson<List<PackData>>(readJson).Select(data => data.code).ToHashSet();
-        }
+            UpdateAsset();
+            var folderPath = Directory.CreateDirectory(GlobalSetting.remoteAssetPath);
+            BuildPipeline.BuildAssetBundles(GlobalSetting.remoteAssetPath, BuildAssetBundleOptions.None, GlobalSetting.BuildTarget);
+            var elapseTime = EditorApplication.timeSinceStartup;
 
-        var filePacks = new List<PackData>();
-        var fileInfos = folderPath.GetFiles();
-        foreach (var fileInfo in fileInfos)
-        {
-            if (fileInfo.Extension != "")
+            var fileHash = new HashSet<string>();
+            var isExists = File.Exists(GlobalSetting.remoteAssetPack);
+            if (isExists)
             {
-                continue;
+                var readJson = await File.ReadAllTextAsync(GlobalSetting.remoteAssetPack);
+                fileHash = JsonManager.FromJson<List<PackData>>(readJson).Select(data => data.code).ToHashSet();
             }
 
-            if (isExists && fileHash.Contains(GetHashCode(fileInfo.FullName)))
+            var filePacks = new List<PackData>();
+            var fileInfos = folderPath.GetFiles();
+            foreach (var fileInfo in fileInfos)
             {
+                if (fileInfo.Extension != "")
+                {
+                    continue;
+                }
+
+                if (isExists && fileHash.Contains(GetHashCode(fileInfo.FullName)))
+                {
+                    filePacks.Add(new PackData(GetHashCode(fileInfo.FullName), fileInfo.Name, (int)fileInfo.Length));
+                    continue;
+                }
+
+                await Task.Run(() =>
+                {
+                    var readBytes = File.ReadAllBytes(fileInfo.FullName);
+                    readBytes = Service.Xor.Encrypt(readBytes);
+                    File.WriteAllBytes(fileInfo.FullName, readBytes);
+                });
                 filePacks.Add(new PackData(GetHashCode(fileInfo.FullName), fileInfo.Name, (int)fileInfo.Length));
-                continue;
+                Debug.Log(Service.Text.Format("加密AB包: {0}", fileInfo.FullName));
             }
 
-            await Task.Run(() =>
+            var saveJson = JsonManager.ToJson(filePacks);
+            await File.WriteAllTextAsync(GlobalSetting.remoteAssetPack, saveJson);
+            elapseTime = EditorApplication.timeSinceStartup - elapseTime;
+            Debug.Log(Service.Text.Format("加密 AssetBundle 完成。耗时:<color=#00FF00> {0:F} </color>秒", elapseTime));
+            AssetDatabase.Refresh();
+        }
+
+        private static string GetHashCode(string filePath)
+        {
+            using var provider = MD5.Create();
+            using var fileStream = File.OpenRead(filePath);
+            var computeHash = provider.ComputeHash(fileStream);
+            var builder = new StringBuilder();
+            foreach (var buffer in computeHash)
             {
-                var readBytes = File.ReadAllBytes(fileInfo.FullName);
-                readBytes = Service.Xor.Encrypt(readBytes);
-                File.WriteAllBytes(fileInfo.FullName, readBytes);
-            });
-            filePacks.Add(new PackData(GetHashCode(fileInfo.FullName), fileInfo.Name, (int)fileInfo.Length));
-            Debug.Log(Service.Text.Format("加密AB包: {0}", fileInfo.FullName));
+                builder.Append(buffer.ToString("x2"));
+            }
+
+            return builder.ToString();
         }
 
-        var saveJson = JsonManager.ToJson(filePacks);
-        await File.WriteAllTextAsync(GlobalSetting.remoteAssetPack, saveJson);
-        elapseTime = EditorApplication.timeSinceStartup - elapseTime;
-        Debug.Log(Service.Text.Format("加密 AssetBundle 完成。耗时:<color=#00FF00> {0:F} </color>秒", elapseTime));
-        AssetDatabase.Refresh();
-    }
-
-    private static string GetHashCode(string filePath)
-    {
-        using var provider = MD5.Create();
-        using var fileStream = File.OpenRead(filePath);
-        var computeHash = provider.ComputeHash(fileStream);
-        var builder = new StringBuilder();
-        foreach (var buffer in computeHash)
+        [Serializable]
+        private struct PackData : IEquatable<PackData>
         {
-            builder.Append(buffer.ToString("x2"));
-        }
+            public string code;
+            public string name;
+            public int size;
 
-        return builder.ToString();
-    }
-
-    [Serializable]
-    private struct PackData : IEquatable<PackData>
-    {
-        public string code;
-        public string name;
-        public int size;
-
-        public PackData(string code, string name, int size)
-        {
-            this.code = code;
-            this.name = name;
-            this.size = size;
-        }
-
-        public static bool operator ==(PackData a, PackData b) => a.code == b.code;
-
-        public static bool operator !=(PackData a, PackData b) => a.code != b.code;
-
-        public bool Equals(PackData other)
-        {
-            return size == other.size && code == other.code && name == other.name;
-        }
-
-        public override bool Equals(object obj)
-        {
-            return obj is PackData other && Equals(other);
-        }
-
-        public override int GetHashCode()
-        {
-            unchecked
+            public PackData(string code, string name, int size)
             {
-                var hashCode = (code != null ? code.GetHashCode() : 0);
-                hashCode = (hashCode * 397) ^ (name != null ? name.GetHashCode() : 0);
-                hashCode = (hashCode * 397) ^ size;
-                return hashCode;
+                this.code = code;
+                this.name = name;
+                this.size = size;
+            }
+
+            public static bool operator ==(PackData a, PackData b) => a.code == b.code;
+
+            public static bool operator !=(PackData a, PackData b) => a.code != b.code;
+
+            public bool Equals(PackData other)
+            {
+                return size == other.size && code == other.code && name == other.name;
+            }
+
+            public override bool Equals(object obj)
+            {
+                return obj is PackData other && Equals(other);
+            }
+
+            public override int GetHashCode()
+            {
+                unchecked
+                {
+                    var hashCode = (code != null ? code.GetHashCode() : 0);
+                    hashCode = (hashCode * 397) ^ (name != null ? name.GetHashCode() : 0);
+                    hashCode = (hashCode * 397) ^ size;
+                    return hashCode;
+                }
             }
         }
     }

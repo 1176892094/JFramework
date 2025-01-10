@@ -16,117 +16,121 @@ using System.Threading.Tasks;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
-internal partial class GlobalSetting
+namespace JFramework.Common
 {
-    protected override string scriptDataPath
+    internal partial class GlobalSetting
     {
-        get
+        protected override string scriptDataPath
         {
+            get
+            {
 #if UNITY_EDITOR
-            return ScriptPath;
+                return ScriptPath;
 #else
-            return string.Empty;
+                return string.Empty;
 #endif
+            }
         }
-    }
 
-    protected override string assetDataPath
-    {
-        get
+        protected override string assetDataPath
         {
+            get
+            {
 #if UNITY_EDITOR
-            return DataTablePath;
+                return DataTablePath;
 #else
-            return string.Empty;
+                return string.Empty;
 #endif
+            }
         }
-    }
 
 #if UNITY_ANDROID
-    private bool multicast;
-    private AndroidJavaObject multicastLock;
+        private bool multicast;
+        private AndroidJavaObject multicastLock;
 #endif
 
-    public override void MulticastLock(bool enable)
-    {
+        public override void MulticastLock(bool enabled)
+        {
 #if UNITY_ANDROID
-        if (enable)
-        {
-            if (multicast) return;
-            using var activity = new AndroidJavaClass("com.unity3d.player.UnityPlayer").GetStatic<AndroidJavaObject>("currentActivity");
-            using var wifiManager = activity.Call<AndroidJavaObject>("getSystemService", "wifi");
-            multicastLock = wifiManager.Call<AndroidJavaObject>("createMulticastLock", "lock");
-            multicastLock.Call("acquire");
-            multicast = true;
+            if (enabled)
+            {
+                if (multicast) return;
+                using var activity = new AndroidJavaClass("com.unity3d.player.UnityPlayer").GetStatic<AndroidJavaObject>("currentActivity");
+                using var wifiManager = activity.Call<AndroidJavaObject>("getSystemService", "wifi");
+                multicastLock = wifiManager.Call<AndroidJavaObject>("createMulticastLock", "lock");
+                multicastLock.Call("acquire");
+                multicast = true;
+            }
+            else
+            {
+                if (!multicast) return;
+                multicastLock?.Call("release");
+                multicast = false;
+            }
+
+#endif
         }
-        else
+
+        public override void CreateAsset(Object assetData, string assetPath)
         {
-            if (!multicast) return;
-            multicastLock?.Call("release");
-            multicast = false;
+#if UNITY_EDITOR
+            UnityEditor.AssetDatabase.CreateAsset((ScriptableObject)assetData, assetPath);
+#endif
         }
-#endif
-    }
 
-    public override void CreateAsset(Object assetData, string assetPath)
-    {
+        public override void CreateProgress(string assetPath, float progress)
+        {
 #if UNITY_EDITOR
-        UnityEditor.AssetDatabase.CreateAsset((ScriptableObject)assetData, assetPath);
+            UnityEditor.EditorUtility.DisplayProgressBar(assetPath, "", progress);
 #endif
-    }
+        }
 
-    public override void CreateProgress(string assetPath, float progress)
-    {
+        public override Object LoadByAssetPack(string assetPath, Type assetType, AssetBundle assetPack)
+        {
+            if (assetPack == null) return null;
+            var request = assetPack.LoadAssetAsync(assetPath, assetType);
+            return request.asset is GameObject ? Instantiate(request.asset) : request.asset;
+        }
+
+        public override Object LoadByResources(string assetPath, Type assetType)
+        {
+            var request = Resources.Load(assetPath, assetType);
+            return request is GameObject ? Instantiate(request) : request;
+        }
+
+        public override Object LoadBySimulates(string assetPath, Type assetType)
+        {
 #if UNITY_EDITOR
-        UnityEditor.EditorUtility.DisplayProgressBar(assetPath, "", progress);
-#endif
-    }
-
-    public override Object LoadByAssetPack(string assetPath, Type assetType, AssetBundle assetPack)
-    {
-        if (assetPack == null) return null;
-        var request = assetPack.LoadAssetAsync(assetPath, assetType);
-        return request.asset is GameObject ? Instantiate(request.asset) : request.asset;
-    }
-
-    public override Object LoadByResources(string assetPath, Type assetType)
-    {
-        var request = Resources.Load(assetPath, assetType);
-        return request is GameObject ? Instantiate(request) : request;
-    }
-
-    public override Object LoadBySimulates(string assetPath, Type assetType)
-    {
-#if UNITY_EDITOR
-        if (!EditorSetting.objects.TryGetValue(assetPath, out var assetData)) return null;
-        var request = UnityEditor.AssetDatabase.LoadAssetAtPath(assetData, assetType);
-        return request is GameObject ? Instantiate(request) : request;
+            if (!EditorSetting.objects.TryGetValue(assetPath, out var assetData)) return null;
+            var request = UnityEditor.AssetDatabase.LoadAssetAtPath(assetData, assetType);
+            return request is GameObject ? Instantiate(request) : request;
 #else
-        return null;
+            return null;
 #endif
-    }
-
-    public override async Task<KeyValuePair<int, string>> LoadRequest(string persistentData, string streamingAssets)
-    {
-        if (File.Exists(persistentData))
-        {
-            return new KeyValuePair<int, string>(1, persistentData);
         }
+
+        public override async Task<KeyValuePair<int, string>> LoadRequest(string persistentData, string streamingAssets)
+        {
+            if (File.Exists(persistentData))
+            {
+                return new KeyValuePair<int, string>(1, persistentData);
+            }
 
 #if UNITY_ANDROID && !UNITY_EDITOR
-        using var request = UnityWebRequest.Head(streamingAssets);
-        await request.SendWebRequest();
-        if (request.result == UnityWebRequest.Result.Success)
-        {
-            return new KeyValuePair<int, string>(2, streamingAssets);
-        }
+            using var request = UnityWebRequest.Head(streamingAssets);
+            await request.SendWebRequest();
+            if (request.result == UnityWebRequest.Result.Success)
+            {
+                return new KeyValuePair<int, string>(2, streamingAssets);
+            }
 #else
-        if (File.Exists(streamingAssets))
-        {
-            return new KeyValuePair<int, string>(1, streamingAssets);
-        }
+            if (File.Exists(streamingAssets))
+            {
+                return new KeyValuePair<int, string>(1, streamingAssets);
+            }
 #endif
-        await Task.CompletedTask;
-        return new KeyValuePair<int, string>(0, string.Empty);
+            await Task.CompletedTask;
+            return new KeyValuePair<int, string>(0, string.Empty);
+        }
     }
 }

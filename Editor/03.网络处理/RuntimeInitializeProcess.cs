@@ -10,6 +10,7 @@
 
 using System.Linq;
 using System.Runtime.CompilerServices;
+using JFramework.Common;
 using JFramework.Net;
 using Mono.Cecil;
 using Mono.Cecil.Cil;

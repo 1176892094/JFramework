@@ -10,60 +10,62 @@
 // *********************************************************************************
 
 using System.IO;
-using JFramework;
 using UnityEngine;
+using UnityEngine.UI;
 
-internal partial class GlobalSetting : JFramework.GlobalSetting
+namespace JFramework.Common
 {
-    private static GlobalSetting instance;
-    public string assetCachePath = "Assets/Template";
-    public DebugMode debugWindow = DebugMode.Disable;
-    
-    public static GlobalSetting Instance
+    internal partial class GlobalSetting : JFramework.GlobalSetting
     {
-        get
+        public static GlobalSetting singleton
         {
-            if (instance == null)
+            get
             {
-                instance = Resources.Load<GlobalSetting>(nameof(GlobalSetting));
-            }
-
-#if UNITY_EDITOR
-            if (instance == null)
-            {
-                var assetPath = Service.Text.Format("Assets/{0}", nameof(Resources));
-                instance = CreateInstance<GlobalSetting>();
-                if (!Directory.Exists(assetPath))
+                if (instance == null)
                 {
-                    Directory.CreateDirectory(assetPath);
+                    instance = Resources.Load<GlobalSetting>(nameof(GlobalSetting));
                 }
 
-                assetPath = Service.Text.Format("{0}/{1}.asset", assetPath, nameof(GlobalSetting));
-                UnityEditor.AssetDatabase.CreateAsset(instance, assetPath);
-                UnityEditor.AssetDatabase.SaveAssets();
-            }
+#if UNITY_EDITOR
+                if (instance == null)
+                {
+                    var assetPath = Service.Text.Format("Assets/{0}", nameof(Resources));
+                    instance = CreateInstance<GlobalSetting>();
+                    if (!Directory.Exists(assetPath))
+                    {
+                        Directory.CreateDirectory(assetPath);
+                    }
+
+                    assetPath = Service.Text.Format("{0}/{1}.asset", assetPath, nameof(GlobalSetting));
+                    UnityEditor.AssetDatabase.CreateAsset(instance, assetPath);
+                    UnityEditor.AssetDatabase.SaveAssets();
+                }
 #endif
-            return instance;
+                return (GlobalSetting)instance;
+            }
         }
-    }
 
-    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
-    private static void RuntimeInitializeOnLoad()
-    {
-        var manager = new GameObject(nameof(GlobalManager)).AddComponent<GlobalManager>();
-        var enabled = Instance.debugWindow == DebugMode.Enable;
-        manager.gameObject.AddComponent<DebugManager>().enabled = enabled;
-    }
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
+        private static void RuntimeInitializeOnLoad()
+        {
+            var obj = new GameObject(nameof(PoolManager));
+            obj.AddComponent<AudioListener>();
+            GlobalManager.audioSource = obj.AddComponent<AudioSource>();
+            obj.AddComponent<GlobalManager>();
 
-    public enum DebugMode
-    {
-        Enable,
-        Disable,
-    }
+            var window = obj.AddComponent<DebugManager>();
+            window.enabled = singleton.debugWindow == DebugWindow.Enable;
 
-    public enum BuildMode : byte
-    {
-        StreamingAssets,
-        BuildPath,
+            obj = new GameObject(nameof(UIManager));
+            GlobalManager.canvas = obj.AddComponent<Canvas>();
+            GlobalManager.canvas.renderMode = RenderMode.ScreenSpaceCamera;
+            DontDestroyOnLoad(obj);
+            
+            var scaler = obj.AddComponent<CanvasScaler>();
+            scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
+            scaler.referenceResolution = new Vector2(1920, 1080);
+            scaler.screenMatchMode = CanvasScaler.ScreenMatchMode.MatchWidthOrHeight;
+            scaler.matchWidthOrHeight = 0.5f;
+        }
     }
 }

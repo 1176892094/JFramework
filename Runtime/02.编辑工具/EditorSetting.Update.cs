@@ -12,82 +12,85 @@
 #if UNITY_EDITOR
 using System.Collections.Generic;
 using System.IO;
-using JFramework;
 using UnityEditor;
 using UnityEngine;
 
-
-internal static partial class EditorSetting
+namespace JFramework.Common
 {
-    public static readonly Dictionary<string, string> objects = new Dictionary<string, string>();
-
-    [MenuItem("Tools/JFramework/更新 AB 资源", priority = 4)]
-    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
-    public static void UpdateAsset()
+    internal static partial class EditorSetting
     {
-        var assetBundles = AssetDatabase.GetAllAssetBundleNames();
-        foreach (var assetBundle in assetBundles)
+        public static readonly Dictionary<string, string> objects = new Dictionary<string, string>();
+
+        [MenuItem("Tools/JFramework/更新 AB 资源", priority = 4)]
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
+        public static void UpdateAsset()
         {
-            if (AssetDatabase.GetAssetPathsFromAssetBundle(assetBundle).Length == 0)
+            var assetBundles = AssetDatabase.GetAllAssetBundleNames();
+            foreach (var assetBundle in assetBundles)
             {
-                AssetDatabase.RemoveAssetBundleName(assetBundle, true);
+                if (AssetDatabase.GetAssetPathsFromAssetBundle(assetBundle).Length == 0)
+                {
+                    AssetDatabase.RemoveAssetBundleName(assetBundle, true);
+                }
             }
+
+            GlobalSetting.singleton.sceneAssets.Clear();
+            var folderPaths = GlobalSetting.FolderPaths;
+            foreach (var folderPath in folderPaths)
+            {
+                if (string.IsNullOrEmpty(folderPath))
+                {
+                    continue;
+                }
+
+                var folderName = Path.GetFileNameWithoutExtension(folderPath);
+                var assetGuids = AssetDatabase.FindAssets("t:Object", new[] { folderPath });
+
+                foreach (var assetGuid in assetGuids)
+                {
+                    var assetPath = AssetDatabase.GUIDToAssetPath(assetGuid);
+                    if (AssetDatabase.IsValidFolder(assetPath))
+                    {
+                        continue;
+                    }
+
+                    var assetData = AssetDatabase.LoadAssetAtPath<Object>(assetPath);
+                    if (assetData == null)
+                    {
+                        continue;
+                    }
+
+                    if (assetData is DefaultAsset)
+                    {
+                        continue;
+                    }
+
+                    if (GlobalSetting.singleton.ignoreAssets.Contains(assetData))
+                    {
+                        continue;
+                    }
+
+                    if (assetData is SceneAsset)
+                    {
+                        GlobalSetting.singleton.sceneAssets.Add(assetPath);
+                    }
+
+                    var importer = AssetImporter.GetAtPath(assetPath);
+                    if (importer.assetBundleName != folderName.ToLower())
+                    {
+                        importer.assetBundleName = folderName;
+                        importer.SaveAndReimport();
+                        Debug.Log(Service.Text.Format("增加AB资源: {0}", assetPath.Color("00FF00")));
+                    }
+
+                    objects[Service.Text.Format("{0}/{1}", folderName, assetData.name)] = assetPath;
+                }
+            }
+
+            AssetDatabase.Refresh();
         }
-
-        GlobalSetting.Instance.sceneAssets.Clear();
-        var folderPaths = AssetDatabase.GetSubFolders(GlobalSetting.Instance.assetCachePath);
-        foreach (var folderPath in folderPaths)
-        {
-            if (string.IsNullOrEmpty(folderPath))
-            {
-                continue;
-            }
-
-            var folderName = Path.GetFileNameWithoutExtension(folderPath);
-            var assetGuids = AssetDatabase.FindAssets("t:Object", new[] { folderPath });
-
-            foreach (var assetGuid in assetGuids)
-            {
-                var assetPath = AssetDatabase.GUIDToAssetPath(assetGuid);
-                if (AssetDatabase.IsValidFolder(assetPath))
-                {
-                    continue;
-                }
-
-                var assetData = AssetDatabase.LoadAssetAtPath<Object>(assetPath);
-                if (assetData == null)
-                {
-                    continue;
-                }
-
-                if (assetData is DefaultAsset)
-                {
-                    continue;
-                }
-
-                if (GlobalSetting.Instance.ignoreAssets.Contains(assetData))
-                {
-                    continue;
-                }
-
-                if (assetData is SceneAsset)
-                {
-                    GlobalSetting.Instance.sceneAssets.Add(assetPath);
-                }
-
-                var importer = AssetImporter.GetAtPath(assetPath);
-                if (importer.assetBundleName != folderName.ToLower())
-                {
-                    importer.assetBundleName = folderName;
-                    importer.SaveAndReimport();
-                    Debug.Log(Service.Text.Format("增加AB资源: {0}", assetPath.Color("00FF00")));
-                }
-
-                objects[Service.Text.Format("{0}/{1}", folderName, assetData.name)] = assetPath;
-            }
-        }
-
-        AssetDatabase.Refresh();
     }
 }
+
+
 #endif
