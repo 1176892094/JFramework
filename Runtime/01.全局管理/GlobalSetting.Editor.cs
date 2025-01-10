@@ -41,26 +41,13 @@ namespace JFramework
             set => EditorPrefs.SetString(nameof(DataTablePath), value);
         }
 
-        public static PackBuildMode PackBuildPath
+        public static BuildMode BuildPath
         {
-            get => (PackBuildMode)EditorPrefs.GetInt(nameof(PackBuildPath), (int)PackBuildMode.StreamingAssets);
-            set => EditorPrefs.SetInt(nameof(PackBuildPath), (int)value);
-        }
-
-        private static string remotePackPath
-        {
-            get
-            {
-                if (PackBuildPath == PackBuildMode.BuildPath)
-                {
-                    return Instance.assetPackPath;
-                }
-
-                return Application.streamingAssetsPath;
-            }
+            get => (BuildMode)EditorPrefs.GetInt(nameof(BuildPath), (int)BuildMode.StreamingAssets);
+            set => EditorPrefs.SetInt(nameof(BuildPath), (int)value);
         }
         
-        private static AssetPackMode assetLoadMode
+        private static AssetMode AssetData
         {
             get => Instance.assetPackMode;
             set
@@ -69,12 +56,13 @@ namespace JFramework
                 EditorSetting.UpdateSceneSetting(value);
             }
         }
+        public static string remotePackPath => BuildPath == BuildMode.BuildPath ? Instance.assetPackPath : Application.streamingAssetsPath;
 
         public static string remoteAssetPath => Path.Combine(remotePackPath, Instance.assetPlatform.ToString());
-        
+
         public static string remoteAssetPack => Service.Text.Format("{0}/{1}.json", remoteAssetPath, Instance.assetPackName);
 
-        internal sealed class EditorWindow : UnityEditor.EditorWindow
+        public sealed class EditorWindow : UnityEditor.EditorWindow
         {
             private void OnGUI()
             {
@@ -84,15 +72,15 @@ namespace JFramework
                 setting.smtpPort = EditorGUILayout.IntField("Smtp 端口号", setting.smtpPort);
                 setting.smtpUsername = EditorGUILayout.TextField("Smtp 邮箱", setting.smtpUsername);
                 setting.smtpPassword = EditorGUILayout.TextField("Smtp 密钥", setting.smtpPassword);
-                assetLoadMode = (AssetPackMode)EditorGUILayout.EnumPopup("资源加载模式", assetLoadMode);
+                AssetData = (AssetMode)EditorGUILayout.EnumPopup("资源加载模式", AssetData);
                 setting.assetPackName = EditorGUILayout.TextField("资源信息名称", setting.assetPackName);
                 setting.assetCachePath = EditorGUILayout.TextField("资源存放路径", setting.assetCachePath);
                 setting.assetRemotePath = EditorGUILayout.TextField("资源服务器", setting.assetRemotePath);
-                setting.debugWindow = (DebugWindow)EditorGUILayout.EnumPopup("调试器窗口", setting.debugWindow);
+                setting.debugWindow = (DebugMode)EditorGUILayout.EnumPopup("调试器窗口", setting.debugWindow);
                 EditorPath = EditorGUILayout.TextField("编辑器文件", EditorPath);
                 ScriptPath = EditorGUILayout.TextField("数据表脚本", ScriptPath);
                 DataTablePath = EditorGUILayout.TextField("数据表文件", DataTablePath);
-                PackBuildPath = (PackBuildMode)EditorGUILayout.EnumPopup("AB包构建选项", PackBuildPath);
+                BuildPath = (BuildMode)EditorGUILayout.EnumPopup("AB包构建选项", BuildPath);
                 setting.assetPackPath = EditorGUILayout.TextField("AB包构建路径", setting.assetPackPath);
                 GUI.enabled = false;
                 EditorGUILayout.TextField("AB包生成路径", remotePackPath);

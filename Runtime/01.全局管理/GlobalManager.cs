@@ -16,13 +16,10 @@ namespace JFramework
 {
     internal class GlobalManager : MonoBehaviour, IEntity
     {
-        public static GlobalManager Instance;
-
         private void Awake()
         {
-            Instance = this;
             DontDestroyOnLoad(gameObject);
-            Service.Entry.Register(new GlobalHelper());
+            Service.Entry.Register(new DefaultHelper());
         }
 
         private void Update()
@@ -41,7 +38,7 @@ namespace JFramework
         private static void RuntimeInitializeOnLoad()
         {
             var manager = new GameObject(nameof(GlobalManager)).AddComponent<GlobalManager>();
-            var enabled = GlobalSetting.Instance.debugWindow == GlobalSetting.DebugWindow.Enable;
+            var enabled = GlobalSetting.Instance.debugWindow == GlobalSetting.DebugMode.Enable;
             manager.gameObject.AddComponent<DebugManager>().enabled = enabled;
         }
     }

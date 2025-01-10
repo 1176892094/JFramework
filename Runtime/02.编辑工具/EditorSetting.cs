@@ -35,20 +35,20 @@ namespace JFramework
             set => EditorPrefs.SetString(nameof(ExcelPathKey), value);
         }
 
-        public static void UpdateSceneSetting(GlobalSetting.AssetPackMode assetPackMode)
+        public static void UpdateSceneSetting(GlobalSetting.AssetMode assetPackMode)
         {
             var assets = EditorBuildSettings.scenes.Select(scene => scene.path).ToList();
             foreach (var scenePath in GlobalSetting.Instance.sceneAssets)
             {
                 if (assets.Contains(scenePath))
                 {
-                    if (assetPackMode == GlobalSetting.AssetPackMode.Simulate) continue;
+                    if (assetPackMode == GlobalSetting.AssetMode.Simulate) continue;
                     var scenes = EditorBuildSettings.scenes.Where(scene => scene.path != scenePath);
                     EditorBuildSettings.scenes = scenes.ToArray();
                 }
                 else
                 {
-                    if (assetPackMode == GlobalSetting.AssetPackMode.Authentic) continue;
+                    if (assetPackMode == GlobalSetting.AssetMode.Authentic) continue;
                     var scenes = EditorBuildSettings.scenes.ToList();
                     scenes.Add(new EditorBuildSettingsScene(scenePath, true));
                     EditorBuildSettings.scenes = scenes.ToArray();

@@ -18,10 +18,10 @@ namespace JFramework
     [Serializable]
     internal partial class GlobalSetting : ScriptableObject
     {
-        public enum AssetPackMode : byte
+        public enum AssetMode : byte
         {
-            [InspectorName("模拟加载")] Simulate,
-            [InspectorName("真实加载")] Authentic
+            Simulate,
+            Authentic
         }
 
         public enum AssetPlatform : byte
@@ -33,16 +33,16 @@ namespace JFramework
             WebGL = 20
         }
 
-        public enum DebugWindow
+        public enum DebugMode
         {
-            [InspectorName("开启")] Enable,
-            [InspectorName("关闭")] Disable,
+            Enable,
+            Disable,
         }
 
-        public enum PackBuildMode : byte
+        public enum BuildMode : byte
         {
-            [InspectorName("默认路径")] StreamingAssets,
-            [InspectorName("指定路径")] BuildPath,
+            StreamingAssets,
+            BuildPath,
         }
 
         private static GlobalSetting instance;
@@ -57,7 +57,7 @@ namespace JFramework
 
         public string smtpPassword;
 
-        public AssetPackMode assetPackMode = AssetPackMode.Simulate;
+        public AssetMode assetPackMode = AssetMode.Simulate;
 
         public string assetPackName = "AssetPacket";
 
@@ -67,7 +67,7 @@ namespace JFramework
 
         public string assetRemotePath = "http://192.168.0.3:8000/AssetPackets";
 
-        public DebugWindow debugWindow = DebugWindow.Disable;
+        public DebugMode debugWindow = DebugMode.Disable;
 
         public static GlobalSetting Instance
         {

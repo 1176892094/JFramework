@@ -19,10 +19,10 @@ using Object = UnityEngine.Object;
 
 namespace JFramework
 {
-    internal sealed class GlobalHelper : Service.Helper
+    internal sealed class DefaultHelper : Service.Helper
     {
         string Service.Helper.assetPlatform => GlobalSetting.Instance.assetPlatform.ToString();
-        bool Service.Helper.assetPackMode => GlobalSetting.Instance.assetPackMode == GlobalSetting.AssetPackMode.Authentic;
+        bool Service.Helper.assetPackMode => GlobalSetting.Instance.assetPackMode == GlobalSetting.AssetMode.Authentic;
         string Service.Helper.assetPackPath => GlobalSetting.Instance.assetPackPath;
         string Service.Helper.assetPackName => GlobalSetting.Instance.assetPackName;
         string Service.Helper.assetRemotePath => GlobalSetting.Instance.assetRemotePath;
