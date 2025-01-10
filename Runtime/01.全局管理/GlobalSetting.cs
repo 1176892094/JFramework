@@ -97,8 +97,6 @@ namespace JFramework
             }
         }
 
-        public string assetPackData => assetPackName + ".json";
-
         private Service.Mail.MailData SendMail(string mailBody)
         {
             return new Service.Mail.MailData

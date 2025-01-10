@@ -13,7 +13,7 @@ using UnityEditor;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
-namespace JFramework
+namespace JFramework.Editor
 {
     [CustomPropertyDrawer(typeof(FolderAttribute))]
     internal class FolderDrawer : PropertyDrawer

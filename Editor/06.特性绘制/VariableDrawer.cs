@@ -12,7 +12,7 @@
 using UnityEditor;
 using UnityEngine;
 
-namespace JFramework
+namespace JFramework.Editor
 {
     [CustomPropertyDrawer(typeof(Variable<>))]
     internal class VariableDrawer : PropertyDrawer

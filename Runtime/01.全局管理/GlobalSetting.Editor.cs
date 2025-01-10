@@ -10,7 +10,6 @@
 // *********************************************************************************
 
 #if UNITY_EDITOR
-using System;
 using System.Collections.Generic;
 using System.IO;
 using UnityEditor;
@@ -60,10 +59,8 @@ namespace JFramework
                 return Application.streamingAssetsPath;
             }
         }
-
-        public static string remoteAssetPath => Path.Combine(remotePackPath, Instance.assetPlatform.ToString());
-
-        private static AssetPackMode AssetLoadMode
+        
+        private static AssetPackMode assetLoadMode
         {
             get => Instance.assetPackMode;
             set
@@ -73,7 +70,9 @@ namespace JFramework
             }
         }
 
-        public static string remoteAssetPack => Path.Combine(remoteAssetPath, Instance.assetPackData);
+        public static string remoteAssetPath => Path.Combine(remotePackPath, Instance.assetPlatform.ToString());
+        
+        public static string remoteAssetPack => Service.Text.Format("{0}/{1}.json", remoteAssetPath, Instance.assetPackName);
 
         internal sealed class EditorWindow : UnityEditor.EditorWindow
         {
@@ -85,7 +84,7 @@ namespace JFramework
                 setting.smtpPort = EditorGUILayout.IntField("Smtp 端口号", setting.smtpPort);
                 setting.smtpUsername = EditorGUILayout.TextField("Smtp 邮箱", setting.smtpUsername);
                 setting.smtpPassword = EditorGUILayout.TextField("Smtp 密钥", setting.smtpPassword);
-                AssetLoadMode = (AssetPackMode)EditorGUILayout.EnumPopup("资源加载模式", AssetLoadMode);
+                assetLoadMode = (AssetPackMode)EditorGUILayout.EnumPopup("资源加载模式", assetLoadMode);
                 setting.assetPackName = EditorGUILayout.TextField("资源信息名称", setting.assetPackName);
                 setting.assetCachePath = EditorGUILayout.TextField("资源存放路径", setting.assetCachePath);
                 setting.assetRemotePath = EditorGUILayout.TextField("资源服务器", setting.assetRemotePath);
