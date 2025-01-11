@@ -103,7 +103,6 @@ namespace JFramework.Common
                 setting.assetPackName = EditorGUILayout.TextField("资源信息名称", setting.assetPackName);
                 setting.assetCachePath = EditorGUILayout.TextField("资源存放路径", setting.assetCachePath);
                 setting.assetRemotePath = EditorGUILayout.TextField("资源服务器", setting.assetRemotePath);
-                setting.debugWindow = (DebugWindow)EditorGUILayout.EnumPopup("调试器窗口", setting.debugWindow);
                 EditorPath = EditorGUILayout.TextField("编辑器文件", EditorPath);
                 ScriptPath = EditorGUILayout.TextField("数据表脚本", ScriptPath);
                 DataTablePath = EditorGUILayout.TextField("数据表文件", DataTablePath);
