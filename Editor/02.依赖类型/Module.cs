@@ -1,10 +1,11 @@
 // *********************************************************************************
-// # Project: Test
-// # Unity: 2022.3.5f1c1
-// # Author: jinyijie
+// # Project: JFramework
+// # Unity: 6000.3.5f1
+// # Author: 云谷千羽
 // # Version: 1.0.0
-// # History: 2024-06-06  05:06
-// # Copyright: 2024, jinyijie
+// # History: 2024-12-19 03:12:36
+// # Recently: 2024-12-22 20:12:33
+// # Copyright: 2024, 云谷千羽
 // # Description: This is an automatically generated comment.
 // *********************************************************************************
 
@@ -16,7 +17,7 @@ using UnityEngine;
 
 namespace JFramework.Editor
 {
-    internal class Models
+    internal class Module
     {
         /// <summary>
         /// 注入的指定程序集
@@ -193,66 +194,66 @@ namespace JFramework.Editor
         /// <param name="assembly"></param>
         /// <param name="logger"></param>
         /// <param name="failed"></param>
-        public Models(AssemblyDefinition assembly, Logger logger, ref bool failed)
+        public Module(AssemblyDefinition assembly, Logger logger, ref bool failed)
         {
             this.assembly = assembly;
 
             var HookMethodType = Import(typeof(Action<,>));
-            HookMethodRef = Helper.GetMethod(HookMethodType, assembly, logger, ".ctor", ref failed);
+            HookMethodRef = Resolve.GetMethod(HookMethodType, assembly, logger, Const.CTOR, ref failed);
 
             var ArraySegmentType = Import(typeof(ArraySegment<>));
-            ArraySegmentRef = Helper.GetMethod(ArraySegmentType, assembly, logger, Const.CTOR, ref failed);
+            ArraySegmentRef = Resolve.GetMethod(ArraySegmentType, assembly, logger, Const.CTOR, ref failed);
             
             var NetworkClientType = Import(typeof(NetworkManager.Client));
-            NetworkClientActiveRef = Helper.GetMethod(NetworkClientType, assembly, logger, "get_isActive", ref failed);
+            NetworkClientActiveRef = Resolve.GetMethod(NetworkClientType, assembly, logger, "get_isActive", ref failed);
             var NetworkServerType = Import(typeof(NetworkManager.Server));
-            NetworkServerActiveRef = Helper.GetMethod(NetworkServerType, assembly, logger, "get_isActive", ref failed);
+            NetworkServerActiveRef = Resolve.GetMethod(NetworkServerType, assembly, logger, "get_isActive", ref failed);
 
             var StreamExtensionType = Import(typeof(Net.Extensions));
-            ReadNetworkBehaviourGeneric = Helper.GetMethod(StreamExtensionType, assembly, logger, method => method.Name == nameof(Net.Extensions.ReadNetworkBehaviour) && method.HasGenericParameters, ref failed);
+            ReadNetworkBehaviourGeneric = Resolve.GetMethod(StreamExtensionType, assembly, logger, method => method.Name == nameof(Net.Extensions.ReadNetworkBehaviour) && method.HasGenericParameters, ref failed);
 
             var NetworkBehaviourType = Import<NetworkBehaviour>();
-            NetworkBehaviourDirtyRef = Helper.ResolveProperty(NetworkBehaviourType, assembly, "syncVarDirty");
+            NetworkBehaviourDirtyRef = Resolve.GetProperty(NetworkBehaviourType, assembly, "syncVarDirty");
 
-            syncVarSetterGeneral = Helper.GetMethod(NetworkBehaviourType, assembly, logger, "SyncVarSetterGeneral", ref failed);
-            syncVarSetterGameObject = Helper.GetMethod(NetworkBehaviourType, assembly, logger, "SyncVarSetterGameObject", ref failed);
-            syncVarSetterNetworkObject = Helper.GetMethod(NetworkBehaviourType, assembly, logger, "SyncVarSetterNetworkObject", ref failed);
-            syncVarSetterNetworkBehaviour = Helper.GetMethod(NetworkBehaviourType, assembly, logger, "SyncVarSetterNetworkBehaviour", ref failed);
+            syncVarSetterGeneral = Resolve.GetMethod(NetworkBehaviourType, assembly, logger, "SyncVarSetterGeneral", ref failed);
+            syncVarSetterGameObject = Resolve.GetMethod(NetworkBehaviourType, assembly, logger, "SyncVarSetterGameObject", ref failed);
+            syncVarSetterNetworkObject = Resolve.GetMethod(NetworkBehaviourType, assembly, logger, "SyncVarSetterNetworkObject", ref failed);
+            syncVarSetterNetworkBehaviour = Resolve.GetMethod(NetworkBehaviourType, assembly, logger, "SyncVarSetterNetworkBehaviour", ref failed);
 
-            syncVarGetterGeneral = Helper.GetMethod(NetworkBehaviourType, assembly, logger, "SyncVarGetterGeneral", ref failed);
-            syncVarGetterGameObject = Helper.GetMethod(NetworkBehaviourType, assembly, logger, "SyncVarGetterGameObject", ref failed);
-            syncVarGetterNetworkObject = Helper.GetMethod(NetworkBehaviourType, assembly, logger, "SyncVarGetterNetworkObject", ref failed);
-            syncVarGetterNetworkBehaviour = Helper.GetMethod(NetworkBehaviourType, assembly, logger, "SyncVarGetterNetworkBehaviour", ref failed);
+            syncVarGetterGeneral = Resolve.GetMethod(NetworkBehaviourType, assembly, logger, "SyncVarGetterGeneral", ref failed);
+            syncVarGetterGameObject = Resolve.GetMethod(NetworkBehaviourType, assembly, logger, "SyncVarGetterGameObject", ref failed);
+            syncVarGetterNetworkObject = Resolve.GetMethod(NetworkBehaviourType, assembly, logger, "SyncVarGetterNetworkObject", ref failed);
+            syncVarGetterNetworkBehaviour = Resolve.GetMethod(NetworkBehaviourType, assembly, logger, "SyncVarGetterNetworkBehaviour", ref failed);
 
-            getSyncVarGameObject = Helper.GetMethod(NetworkBehaviourType, assembly, logger, "GetSyncVarGameObject", ref failed);
-            getSyncVarNetworkObject = Helper.GetMethod(NetworkBehaviourType, assembly, logger, "GetSyncVarNetworkObject", ref failed);
-            getSyncVarNetworkBehaviour = Helper.GetMethod(NetworkBehaviourType, assembly, logger, "GetSyncVarNetworkBehaviour", ref failed);
+            getSyncVarGameObject = Resolve.GetMethod(NetworkBehaviourType, assembly, logger, "GetSyncVarGameObject", ref failed);
+            getSyncVarNetworkObject = Resolve.GetMethod(NetworkBehaviourType, assembly, logger, "GetSyncVarNetworkObject", ref failed);
+            getSyncVarNetworkBehaviour = Resolve.GetMethod(NetworkBehaviourType, assembly, logger, "GetSyncVarNetworkBehaviour", ref failed);
 
-            sendServerRpcInternal = Helper.GetMethod(NetworkBehaviourType, assembly, logger, "SendServerRpcInternal", ref failed);
-            sendClientRpcInternal = Helper.GetMethod(NetworkBehaviourType, assembly, logger, "SendClientRpcInternal", ref failed);
-            sendTargetRpcInternal = Helper.GetMethod(NetworkBehaviourType, assembly, logger, "SendTargetRpcInternal", ref failed);
+            sendServerRpcInternal = Resolve.GetMethod(NetworkBehaviourType, assembly, logger, "SendServerRpcInternal", ref failed);
+            sendClientRpcInternal = Resolve.GetMethod(NetworkBehaviourType, assembly, logger, "SendClientRpcInternal", ref failed);
+            sendTargetRpcInternal = Resolve.GetMethod(NetworkBehaviourType, assembly, logger, "SendTargetRpcInternal", ref failed);
 
             var InvokeType = Import(typeof(NetworkDelegate));
-            registerServerRpcRef = Helper.GetMethod(InvokeType, assembly, logger, "RegisterServerRpc", ref failed);
-            registerClientRpcRef = Helper.GetMethod(InvokeType, assembly, logger, "RegisterClientRpc", ref failed);
+            registerServerRpcRef = Resolve.GetMethod(InvokeType, assembly, logger, "RegisterServerRpc", ref failed);
+            registerClientRpcRef = Resolve.GetMethod(InvokeType, assembly, logger, "RegisterClientRpc", ref failed);
 
             var RpcDelegateType = Import<InvokeDelegate>();
-            RpcDelegateRef = Helper.GetMethod(RpcDelegateType, assembly, logger, ".ctor", ref failed);
+            RpcDelegateRef = Resolve.GetMethod(RpcDelegateType, assembly, logger, Const.CTOR, ref failed);
 
             var ScriptableObjectType = Import<ScriptableObject>();
-            CreateInstanceMethodRef = Helper.GetMethod(ScriptableObjectType, assembly, logger, method => method.Name == "CreateInstance" && method.HasGenericParameters, ref failed);
+            CreateInstanceMethodRef = Resolve.GetMethod(ScriptableObjectType, assembly, logger, method => method.Name == "CreateInstance" && method.HasGenericParameters, ref failed);
 
             var DebugType = Import(typeof(Debug));
-            logErrorRef = Helper.GetMethod(DebugType, assembly, logger, method => method.Name == "LogError" && method.Parameters.Count == 1 && method.Parameters[0].ParameterType.FullName == typeof(object).FullName, ref failed);
+            logErrorRef = Resolve.GetMethod(DebugType, assembly, logger, method => method.Name == "LogError" && method.Parameters.Count == 1 && method.Parameters[0].ParameterType.FullName == typeof(object).FullName, ref failed);
 
             var Type = Import(typeof(Type));
-            getTypeFromHandleRef = Helper.GetMethod(Type, assembly, logger, "GetTypeFromHandle", ref failed);
+            getTypeFromHandleRef = Resolve.GetMethod(Type, assembly, logger, "GetTypeFromHandle", ref failed);
 
             var NetworkWriterType = Import(typeof(MemoryWriter));
-            PopWriterRef = Helper.GetMethod(NetworkWriterType, assembly, logger, "Pop", ref failed);
-            PushWriterRef = Helper.GetMethod(NetworkWriterType, assembly, logger, "Push", ref failed);
+            PopWriterRef = Resolve.GetMethod(NetworkWriterType, assembly, logger, "Pop", ref failed);
+            PushWriterRef = Resolve.GetMethod(NetworkWriterType, assembly, logger, "Push", ref failed);
 
-            if (Helper.IsEditorAssembly(assembly))
+            if (Resolve.IsEditor(assembly))
             {
                 var InitializeOnLoadMethodAttributeType = Import(typeof(InitializeOnLoadMethodAttribute));
                 InitializeOnLoadMethodAttribute = InitializeOnLoadMethodAttributeType.Resolve();

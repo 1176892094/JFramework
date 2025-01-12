@@ -1,10 +1,11 @@
 // *********************************************************************************
-// # Project: Test
-// # Unity: 2022.3.5f1c1
-// # Author: jinyijie
+// # Project: JFramework
+// # Unity: 6000.3.5f1
+// # Author: 云谷千羽
 // # Version: 1.0.0
-// # History: 2024-06-06  04:06
-// # Copyright: 2024, jinyijie
+// # History: 2024-12-19 03:12:36
+// # Recently: 2024-12-22 20:12:33
+// # Copyright: 2024, 云谷千羽
 // # Description: This is an automatically generated comment.
 // *********************************************************************************
 
@@ -28,7 +29,27 @@ namespace JFramework.Editor
         /// <summary>
         /// 日志列表
         /// </summary>
-        public List<DiagnosticMessage> logs = new List<DiagnosticMessage>();
+        public readonly List<DiagnosticMessage> logs = new List<DiagnosticMessage>();
+
+        /// <summary>
+        /// 警告日志
+        /// </summary>
+        /// <param name="message">日志信息</param>
+        /// <param name="member">成员参数</param>
+        public void Warn(string message, MemberReference member)
+        {
+            Info(message, member, DiagnosticType.Warning);
+        }
+
+        /// <summary>
+        /// 错误日志
+        /// </summary>
+        /// <param name="message">日志信息</param>
+        /// <param name="member">成员参数</param>
+        public void Error(string message, MemberReference member)
+        {
+            Info(message, member, DiagnosticType.Error);
+        }
 
         /// <summary>
         /// 添加日志信息
@@ -68,31 +89,11 @@ namespace JFramework.Editor
             }
             else
             {
-                foreach (string split in splits)
+                foreach (var split in splits)
                 {
                     Add(split, mode);
                 }
             }
-        }
-
-        /// <summary>
-        /// 警告日志
-        /// </summary>
-        /// <param name="message">日志信息</param>
-        /// <param name="member">成员参数</param>
-        public void Warn(string message, MemberReference member)
-        {
-            Info(message, member, DiagnosticType.Warning);
-        }
-
-        /// <summary>
-        /// 错误日志
-        /// </summary>
-        /// <param name="message">日志信息</param>
-        /// <param name="member">成员参数</param>
-        public void Error(string message, MemberReference member)
-        {
-            Info(message, member, DiagnosticType.Error);
         }
     }
 }

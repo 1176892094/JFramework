@@ -1,10 +1,11 @@
 // *********************************************************************************
-// # Project: Test
-// # Unity: 2022.3.5f1c1
-// # Author: jinyijie
+// # Project: Forest
+// # Unity: 6000.3.5f1
+// # Author: 云谷千羽
 // # Version: 1.0.0
-// # History: 2024-06-06  05:06
-// # Copyright: 2024, jinyijie
+// # History: 2025-01-12 15:01:52
+// # Recently: 2025-01-12 15:01:52
+// # Copyright: 2024, 云谷千羽
 // # Description: This is an automatically generated comment.
 // *********************************************************************************
 
@@ -21,15 +22,15 @@ namespace JFramework.Editor
     internal class Reader
     {
         private readonly Dictionary<TypeReference, MethodReference> methods = new Dictionary<TypeReference, MethodReference>(new Comparer());
-        private readonly Models models;
+        private readonly Module module;
         private readonly Logger logger;
         private readonly TypeDefinition generate;
         private readonly AssemblyDefinition assembly;
 
-        public Reader(AssemblyDefinition assembly, Models models, TypeDefinition generate, Logger logger)
+        public Reader(AssemblyDefinition assembly, Module module, TypeDefinition generate, Logger logger)
         {
             this.logger = logger;
-            this.models = models;
+            this.module = module;
             this.assembly = assembly;
             this.generate = generate;
         }
@@ -55,7 +56,7 @@ namespace JFramework.Editor
         {
             if (tr.IsArray)
             {
-                if (tr.IsMultidimensionalArray())
+                if (tr is ArrayType { Rank: > 1 })
                 {
                     logger.Error($"无法为多维数组 {tr.Name} 生成读取器", tr);
                     failed = true;
@@ -166,7 +167,7 @@ namespace JFramework.Editor
             var worker = md.Body.GetILProcessor();
             worker.Emit(OpCodes.Ldarg_0);
             worker.Emit(OpCodes.Call, GetFunction(new ArrayType(element), ref failed));
-            worker.Emit(OpCodes.Newobj, models.ArraySegmentRef.MakeHostInstanceGeneric(assembly.MainModule, generic));
+            worker.Emit(OpCodes.Newobj, module.ArraySegmentRef.MakeHostInstanceGeneric(assembly.MainModule, generic));
             worker.Emit(OpCodes.Ret);
             return md;
         }
@@ -184,7 +185,7 @@ namespace JFramework.Editor
             }
 
             var extensions = assembly.MainModule.ImportReference(typeof(Net.Extensions));
-            var mr = Helper.GetMethod(extensions, assembly, logger, name, ref failed);
+            var mr = Resolve.GetMethod(extensions, assembly, logger, name, ref failed);
 
             var method = new GenericInstanceMethod(mr);
             method.GenericArguments.Add(element);
@@ -197,8 +198,8 @@ namespace JFramework.Editor
 
         private MethodReference AddNetworkBehaviour(TypeReference tr)
         {
-            var generic = models.ReadNetworkBehaviourGeneric;
-            var mr = generic.MakeGeneric(assembly.MainModule, tr);
+            var generic = module.ReadNetworkBehaviourGeneric;
+            var mr = generic.MakeGenericInstanceType(assembly.MainModule, tr);
             Register(tr, mr);
             return mr;
         }
@@ -222,14 +223,14 @@ namespace JFramework.Editor
             }
             else if (td.IsDerivedFrom<ScriptableObject>())
             {
-                var generic = new GenericInstanceMethod(models.CreateInstanceMethodRef);
+                var generic = new GenericInstanceMethod(module.CreateInstanceMethodRef);
                 generic.GenericArguments.Add(tr);
                 worker.Emit(OpCodes.Call, generic);
                 worker.Emit(OpCodes.Stloc_0);
             }
             else
             {
-                var ctor = Helper.ResolveDefaultPublicCtor(tr);
+                var ctor = Resolve.GetConstructor(tr);
                 if (ctor == null)
                 {
                     logger.Error($"{tr.Name} 不能被反序列化，因为它没有默认的构造函数", tr);
@@ -251,7 +252,7 @@ namespace JFramework.Editor
         private MethodDefinition AddMethod(TypeReference tr)
         {
             var md = new MethodDefinition($"Read{Service.Hash.Id(tr.FullName)}", Const.RAW_ATTRS, tr);
-            md.Parameters.Add(new ParameterDefinition("reader", ParameterAttributes.None, models.Import<MemoryReader>()));
+            md.Parameters.Add(new ParameterDefinition("reader", ParameterAttributes.None, module.Import<MemoryReader>()));
             md.Body.InitLocals = true;
             Register(tr, md);
             generate.Methods.Add(md);
@@ -262,7 +263,7 @@ namespace JFramework.Editor
         {
             var nop = worker.Create(OpCodes.Nop);
             worker.Emit(OpCodes.Ldarg_0);
-            worker.Emit(OpCodes.Call, GetFunction(models.Import<bool>(), ref failed));
+            worker.Emit(OpCodes.Call, GetFunction(module.Import<bool>(), ref failed));
             worker.Emit(OpCodes.Brtrue, nop);
             worker.Emit(OpCodes.Ldnull);
             worker.Emit(OpCodes.Ret);
@@ -271,7 +272,7 @@ namespace JFramework.Editor
 
         private void AddFields(TypeReference tr, ILProcessor worker, ref bool failed)
         {
-            foreach (var field in tr.Resolve().FindAllPublicFields())
+            foreach (var field in tr.Resolve().FindPublicFields())
             {
                 worker.Emit(tr.IsValueType ? OpCodes.Ldloca : OpCodes.Ldloc, 0);
                 var mr = GetFunction(field.FieldType, ref failed);
@@ -292,12 +293,12 @@ namespace JFramework.Editor
 
         internal void InitializeReaders(ILProcessor worker)
         {
-            var module = assembly.MainModule;
-            var reader = module.ImportReference(typeof(Reader<>));
-            var func = module.ImportReference(typeof(Func<,>));
-            var tr = module.ImportReference(typeof(MemoryReader));
-            var fr = module.ImportReference(typeof(Reader<>).GetField(nameof(Reader<object>.read)));
-            var mr = module.ImportReference(typeof(Func<,>).GetConstructors()[0]);
+            var main = assembly.MainModule;
+            var reader = main.ImportReference(typeof(Reader<>));
+            var func = main.ImportReference(typeof(Func<,>));
+            var tr = main.ImportReference(typeof(MemoryReader));
+            var fr = main.ImportReference(typeof(Reader<>).GetField(nameof(Reader<object>.read)));
+            var mr = main.ImportReference(typeof(Func<,>).GetConstructors()[0]);
             foreach (var (type, method) in methods)
             {
                 worker.Emit(OpCodes.Ldnull);

@@ -1,10 +1,11 @@
 // *********************************************************************************
-// # Project: Test
-// # Unity: 2022.3.5f1c1
-// # Author: jinyijie
+// # Project: Forest
+// # Unity: 6000.3.5f1
+// # Author: 云谷千羽
 // # Version: 1.0.0
-// # History: 2024-06-06  05:06
-// # Copyright: 2024, jinyijie
+// # History: 2025-01-12 15:01:52
+// # Recently: 2025-01-12 15:01:52
+// # Copyright: 2024, 云谷千羽
 // # Description: This is an automatically generated comment.
 // *********************************************************************************
 
@@ -21,15 +22,15 @@ namespace JFramework.Editor
     internal class Writer
     {
         private readonly Dictionary<TypeReference, MethodReference> methods = new Dictionary<TypeReference, MethodReference>(new Comparer());
-        private readonly Models models;
+        private readonly Module module;
         private readonly Logger logger;
         private readonly TypeDefinition generate;
         private readonly AssemblyDefinition assembly;
 
-        public Writer(AssemblyDefinition assembly, Models models, TypeDefinition generate, Logger logger)
+        public Writer(AssemblyDefinition assembly, Module module, TypeDefinition generate, Logger logger)
         {
             this.logger = logger;
-            this.models = models;
+            this.module = module;
             this.assembly = assembly;
             this.generate = generate;
         }
@@ -55,7 +56,7 @@ namespace JFramework.Editor
         {
             if (tr.IsArray)
             {
-                if (tr.IsMultidimensionalArray())
+                if (tr is ArrayType { Rank: > 1 })
                 {
                     logger.Error($"无法为多维数组 {tr.Name} 生成写入器", tr);
                     return null;
@@ -170,7 +171,7 @@ namespace JFramework.Editor
             }
             
             var extensions = assembly.MainModule.ImportReference(typeof(Net.Extensions));
-            var mr = Helper.GetMethod(extensions, assembly, logger, name, ref failed);
+            var mr = Resolve.GetMethod(extensions, assembly, logger, name, ref failed);
 
             var method = new GenericInstanceMethod(mr);
             method.GenericArguments.Add(element);
@@ -184,7 +185,7 @@ namespace JFramework.Editor
 
         private MethodReference AddNetworkBehaviour(TypeReference tr)
         {
-            if (!methods.TryGetValue(models.Import<NetworkBehaviour>(), out var mr))
+            if (!methods.TryGetValue(module.Import<NetworkBehaviour>(), out var mr))
             {
                 throw new MissingMethodException("获取 NetworkBehaviour 方法丢失");
             }
@@ -215,8 +216,8 @@ namespace JFramework.Editor
 
         private MethodDefinition AddMethod(TypeReference tr)
         {
-            var md = new MethodDefinition($"Write{Service.Hash.Id(tr.FullName)}", Const.RAW_ATTRS, models.Import(typeof(void)));
-            md.Parameters.Add(new ParameterDefinition("writer", ParameterAttributes.None, models.Import<MemoryWriter>()));
+            var md = new MethodDefinition($"Write{Service.Hash.Id(tr.FullName)}", Const.RAW_ATTRS, module.Import(typeof(void)));
+            md.Parameters.Add(new ParameterDefinition("writer", ParameterAttributes.None, module.Import<MemoryWriter>()));
             md.Parameters.Add(new ParameterDefinition("value", ParameterAttributes.None, tr));
             md.Body.InitLocals = true;
             Register(tr, md);
@@ -231,18 +232,18 @@ namespace JFramework.Editor
             worker.Emit(OpCodes.Brtrue, nop);
             worker.Emit(OpCodes.Ldarg_0);
             worker.Emit(OpCodes.Ldc_I4_0);
-            worker.Emit(OpCodes.Call, GetFunction(models.Import<bool>(), ref failed));
+            worker.Emit(OpCodes.Call, GetFunction(module.Import<bool>(), ref failed));
             worker.Emit(OpCodes.Ret);
             worker.Append(nop);
 
             worker.Emit(OpCodes.Ldarg_0);
             worker.Emit(OpCodes.Ldc_I4_1);
-            worker.Emit(OpCodes.Call, GetFunction(models.Import<bool>(), ref failed));
+            worker.Emit(OpCodes.Call, GetFunction(module.Import<bool>(), ref failed));
         }
 
         private bool AddFields(TypeReference tr, ILProcessor worker, ref bool failed)
         {
-            foreach (var field in tr.Resolve().FindAllPublicFields())
+            foreach (var field in tr.Resolve().FindPublicFields())
             {
                 var mr = GetFunction(field.FieldType, ref failed);
                 if (mr == null)
@@ -261,12 +262,12 @@ namespace JFramework.Editor
 
         internal void InitializeWriters(ILProcessor worker)
         {
-            var module = assembly.MainModule;
-            var reader = module.ImportReference(typeof(Writer<>));
-            var func = module.ImportReference(typeof(Action<,>));
-            var tr = module.ImportReference(typeof(MemoryWriter));
-            var fr = module.ImportReference(typeof(Writer<>).GetField(nameof(Writer<object>.write)));
-            var mr = module.ImportReference(typeof(Action<,>).GetConstructors()[0]);
+            var main = assembly.MainModule;
+            var reader = main.ImportReference(typeof(Writer<>));
+            var func = main.ImportReference(typeof(Action<,>));
+            var tr = main.ImportReference(typeof(MemoryWriter));
+            var fr = main.ImportReference(typeof(Writer<>).GetField(nameof(Writer<object>.write)));
+            var mr = main.ImportReference(typeof(Action<,>).GetConstructors()[0]);
             foreach (var (type, method) in methods)
             {
                 worker.Emit(OpCodes.Ldnull);

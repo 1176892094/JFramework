@@ -1,10 +1,11 @@
 // *********************************************************************************
-// # Project: Test
-// # Unity: 2022.3.5f1c1
-// # Author: jinyijie
+// # Project: JFramework
+// # Unity: 6000.3.5f1
+// # Author: 云谷千羽
 // # Version: 1.0.0
-// # History: 2024-06-06  05:06
-// # Copyright: 2024, jinyijie
+// # History: 2024-12-19 03:12:36
+// # Recently: 2024-12-22 20:12:33
+// # Copyright: 2024, 云谷千羽
 // # Description: This is an automatically generated comment.
 // *********************************************************************************
 
@@ -18,23 +19,20 @@ using Unity.CompilationPipeline.Common.ILPostProcessing;
 namespace JFramework.Editor
 {
     [Serializable]
-    internal class GenPostProcessor : ILPostProcessor
+    internal class NetworkProcessor : ILPostProcessor
     {
-        /// <summary>
-        /// 后处理日志
-        /// </summary>
         private readonly Log logger = new Log();
 
         public override ILPostProcessor GetInstance() => this;
 
         public override bool WillProcess(ICompiledAssembly compiledAssembly)
         {
-            return compiledAssembly.Name == Const.ASSEMBLY_NAME || FindAssembly(compiledAssembly);
+            return compiledAssembly.Name == Const.ASSEMBLY || FindAssembly(compiledAssembly);
         }
 
         private static bool FindAssembly(ICompiledAssembly compiledAssembly)
         {
-            return compiledAssembly.References.Any(path => Path.GetFileNameWithoutExtension(path) == Const.ASSEMBLY_NAME);
+            return compiledAssembly.References.Any(path => Path.GetFileNameWithoutExtension(path) == Const.ASSEMBLY);
         }
 
         public override ILPostProcessResult Process(ICompiledAssembly compiledAssembly)

@@ -1,42 +1,42 @@
 // *********************************************************************************
-// # Project: Test
-// # Unity: 2022.3.5f1c1
-// # Author: jinyijie
+// # Project: Forest
+// # Unity: 6000.3.5f1
+// # Author: 云谷千羽
 // # Version: 1.0.0
-// # History: 2024-06-06  05:06
-// # Copyright: 2024, jinyijie
+// # History: 2025-01-12 15:01:52
+// # Recently: 2025-01-12 15:01:52
+// # Copyright: 2024, 云谷千羽
 // # Description: This is an automatically generated comment.
 // *********************************************************************************
 
 using System.Linq;
 using System.Runtime.CompilerServices;
 using JFramework.Common;
-using JFramework.Net;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
 using UnityEngine;
 
 namespace JFramework.Editor
 {
-    internal static class RuntimeInitialize
+    internal static class RuntimeAttribute
     {
           /// <summary>
         /// 初始化读写流
         /// </summary>
         /// <param name="assembly"></param>
-        /// <param name="models"></param>
+        /// <param name="module"></param>
         /// <param name="writers"></param>
         /// <param name="readers"></param>
         /// <param name="td"></param>
-        public static void RuntimeInitializeOnLoad(AssemblyDefinition assembly, Models models, Writer writers, Reader readers, TypeDefinition td)
+        public static void RuntimeInitializeOnLoad(AssemblyDefinition assembly, Module module, Writer writers, Reader readers, TypeDefinition td)
         {
-            var method = new MethodDefinition(nameof(RuntimeInitializeOnLoad), MethodAttributes.Public | MethodAttributes.Static, models.Import(typeof(void)));
+            var method = new MethodDefinition(nameof(RuntimeInitializeOnLoad), MethodAttributes.Public | MethodAttributes.Static, module.Import(typeof(void)));
 
-            AddRuntimeInitializeOnLoadAttribute(assembly, models, method);
+            AddRuntimeInitializeOnLoadAttribute(assembly, module, method);
 
-            if (Helper.IsEditorAssembly(assembly))
+            if (Resolve.IsEditor(assembly))
             {
-                AddInitializeOnLoadAttribute(assembly, models, method);
+                AddInitializeOnLoadAttribute(assembly, module, method);
             }
 
             var worker = method.Body.GetILProcessor();
@@ -50,13 +50,13 @@ namespace JFramework.Editor
         /// 添加 RuntimeInitializeLoad 属性类型
         /// </summary>
         /// <param name="assembly"></param>
-        /// <param name="models"></param>
+        /// <param name="module"></param>
         /// <param name="md"></param>
-        private static void AddRuntimeInitializeOnLoadAttribute(AssemblyDefinition assembly, Models models, MethodDefinition md)
+        private static void AddRuntimeInitializeOnLoadAttribute(AssemblyDefinition assembly, Module module, MethodDefinition md)
         {
-            var ctor = models.RuntimeInitializeOnLoadMethodAttribute.GetConstructors().Last();
+            var ctor = module.RuntimeInitializeOnLoadMethodAttribute.GetConstructors().Last();
             var attribute = new CustomAttribute(assembly.MainModule.ImportReference(ctor));
-            attribute.ConstructorArguments.Add(new CustomAttributeArgument(models.Import<RuntimeInitializeLoadType>(), RuntimeInitializeLoadType.BeforeSceneLoad));
+            attribute.ConstructorArguments.Add(new CustomAttributeArgument(module.Import<RuntimeInitializeLoadType>(), RuntimeInitializeLoadType.BeforeSceneLoad));
             md.CustomAttributes.Add(attribute);
         }
 
@@ -64,11 +64,11 @@ namespace JFramework.Editor
         /// 添加 RuntimeInitializeLoad 属性标记
         /// </summary>
         /// <param name="assembly"></param>
-        /// <param name="models"></param>
+        /// <param name="module"></param>
         /// <param name="md"></param>
-        private static void AddInitializeOnLoadAttribute(AssemblyDefinition assembly, Models models, MethodDefinition md)
+        private static void AddInitializeOnLoadAttribute(AssemblyDefinition assembly, Module module, MethodDefinition md)
         {
-            var ctor = models.InitializeOnLoadMethodAttribute.GetConstructors().First();
+            var ctor = module.InitializeOnLoadMethodAttribute.GetConstructors().First();
             var attribute = new CustomAttribute(assembly.MainModule.ImportReference(ctor));
             md.CustomAttributes.Add(attribute);
         }
@@ -100,7 +100,7 @@ namespace JFramework.Editor
         /// <param name="failed"></param>
         private static void ProcessAssembly(AssemblyDefinition assembly, IAssemblyResolver resolver, Logger logger, Writer writer, Reader reader, ref bool failed)
         {
-            var assemblyRef = assembly.MainModule.AssemblyReferences.FirstOrDefault(reference => reference.Name == Const.ASSEMBLY_NAME);
+            var assemblyRef = assembly.MainModule.AssemblyReferences.FirstOrDefault(reference => reference.Name == Const.ASSEMBLY);
             if (assemblyRef != null)
             {
                 var assemblyDef = resolver.Resolve(assemblyRef);
@@ -225,7 +225,7 @@ namespace JFramework.Editor
         private static bool ProcessMessage(ModuleDefinition module, Writer writer, Reader reader, TypeDefinition td, ref bool failed)
         {
             var change = false;
-            if (!td.IsAbstract && !td.IsInterface && td.ImplementsInterface<IMessage>())
+            if (!td.IsAbstract && !td.IsInterface && td.IsImplement<IMessage>())
             {
                 reader.GetFunction(module.ImportReference(td), ref failed);
                 writer.GetFunction(module.ImportReference(td), ref failed);

@@ -1,10 +1,11 @@
 // *********************************************************************************
-// # Project: Test
-// # Unity: 2022.3.5f1c1
-// # Author: jinyijie
+// # Project: JFramework
+// # Unity: 6000.3.5f1
+// # Author: 云谷千羽
 // # Version: 1.0.0
-// # History: 2024-06-06  05:06
-// # Copyright: 2024, jinyijie
+// # History: 2024-12-19 03:12:36
+// # Recently: 2024-12-22 20:12:33
+// # Copyright: 2024, 云谷千羽
 // # Description: This is an automatically generated comment.
 // *********************************************************************************
 
@@ -20,7 +21,7 @@ namespace JFramework.Editor
     internal class Process
     {
         private bool failed;
-        private Models models;
+        private Module module;
         private Writer writer;
         private Reader reader;
         private SyncVarAccess access;
@@ -41,17 +42,17 @@ namespace JFramework.Editor
             {
                 this.assembly = assembly;
                 
-                if (assembly.MainModule.GetTypes().Any(type => type.Namespace == Const.GEN_SPACE && type.Name == Const.GEN_NAME))
+                if (assembly.MainModule.GetTypes().Any(type => type.Namespace == Const.GEN_TYPE && type.Name == Const.GEN_NAME))
                 {
                     return true;
                 }
                 
                 access = new SyncVarAccess();
-                models = new Models(assembly, logger, ref failed);
-                process = new TypeDefinition(Const.GEN_SPACE, Const.GEN_NAME, Const.GEN_ATTRS, models.Import<object>());
-                writer = new Writer(assembly, models, process, logger);
-                reader = new Reader(assembly, models, process, logger);
-                change = RuntimeInitialize.Process(assembly, resolver, logger, writer, reader, ref failed);
+                module = new Module(assembly, logger, ref failed);
+                process = new TypeDefinition(Const.GEN_TYPE, Const.GEN_NAME, Const.GEN_ATTRS, module.Import<object>());
+                writer = new Writer(assembly, module, process, logger);
+                reader = new Reader(assembly, module, process, logger);
+                change = RuntimeAttribute.Process(assembly, resolver, logger, writer, reader, ref failed);
                 
                 var mainModule = assembly.MainModule;
                 
@@ -65,7 +66,7 @@ namespace JFramework.Editor
                 {
                     SyncVarReplace.Process(mainModule, access);
                     mainModule.Types.Add(process);
-                    RuntimeInitialize.RuntimeInitializeOnLoad(assembly, models, writer, reader, process);
+                    RuntimeAttribute.RuntimeInitializeOnLoad(assembly, module, writer, reader, process);
                 }
 
                 return true;
@@ -120,7 +121,7 @@ namespace JFramework.Editor
             bool changed = false;
             foreach (TypeDefinition behaviour in behaviours)
             {
-                changed |= new NetworkBehaviourProcess(assembly, access, models, writer, reader, logger, behaviour).Process(ref failed);
+                changed |= new NetworkBehaviourProcess(assembly, access, module, writer, reader, logger, behaviour).Process(ref failed);
             }
 
             return changed;
@@ -133,7 +134,16 @@ namespace JFramework.Editor
         /// <returns></returns>
         private bool ProcessModule(ModuleDefinition md)
         {
-            return md.Types.Where(td => td.IsClass && td.BaseType.CanResolve()).Aggregate(false, (current, td) => current | ProcessNetworkBehavior(td, ref failed));
+            bool result = false;
+            foreach (var td in md.Types)
+            {
+                if (td.IsClass && td.BaseType.IsResolve())
+                {
+                    result |= ProcessNetworkBehavior(td, ref failed);
+                }
+            }
+
+            return result;
         }
 
         /// <summary>

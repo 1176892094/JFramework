@@ -1,10 +1,11 @@
 // *********************************************************************************
-// # Project: Test
-// # Unity: 2022.3.5f1c1
-// # Author: jinyijie
+// # Project: Forest
+// # Unity: 6000.3.5f1
+// # Author: 云谷千羽
 // # Version: 1.0.0
-// # History: 2024-06-06  05:06
-// # Copyright: 2024, jinyijie
+// # History: 2025-01-12 15:01:52
+// # Recently: 2025-01-12 15:01:52
+// # Copyright: 2024, 云谷千羽
 // # Description: This is an automatically generated comment.
 // *********************************************************************************
 
@@ -21,15 +22,15 @@ namespace JFramework.Editor
     internal class SyncVarProcess
     {
         private readonly Logger logger;
-        private readonly Models models;
+        private readonly Module module;
         private readonly SyncVarAccess access;
         private readonly AssemblyDefinition assembly;
 
-        public SyncVarProcess(AssemblyDefinition assembly, SyncVarAccess access, Models models, Logger logger)
+        public SyncVarProcess(AssemblyDefinition assembly, SyncVarAccess access, Module module, Logger logger)
         {
             this.logger = logger;
             this.access = access;
-            this.models = models;
+            this.module = module;
             this.assembly = assembly;
         }
 
@@ -45,7 +46,9 @@ namespace JFramework.Editor
             MethodReference hookMethodRef;
             if (hookMethod.DeclaringType.HasGenericParameters)
             {
-                var instanceType = hookMethod.DeclaringType.MakeGenericInstanceType(hookMethod.DeclaringType.GenericParameters.Cast<TypeReference>().ToArray());
+                var instanceType =
+                    hookMethod.DeclaringType.MakeGenericInstanceType(hookMethod.DeclaringType.GenericParameters.Cast<TypeReference>()
+                        .ToArray());
                 hookMethodRef = hookMethod.MakeHostInstanceGeneric(hookMethod.Module, instanceType);
             }
             else
@@ -65,7 +68,7 @@ namespace JFramework.Editor
 
             var actionRef = assembly.MainModule.ImportReference(typeof(Action<,>));
             var genericInstance = actionRef.MakeGenericInstanceType(syncVar.FieldType, syncVar.FieldType);
-            worker.Emit(OpCodes.Newobj, models.HookMethodRef.MakeHostInstanceGeneric(assembly.MainModule, genericInstance));
+            worker.Emit(OpCodes.Newobj, module.HookMethodRef.MakeHostInstanceGeneric(assembly.MainModule, genericInstance));
         }
 
         /// <summary>
@@ -78,8 +81,13 @@ namespace JFramework.Editor
         public MethodDefinition GetHookMethod(TypeDefinition td, FieldDefinition syncVar, ref bool failed)
         {
             var attribute = syncVar.GetCustomAttribute<SyncVarAttribute>();
-            var hookMethod = attribute.GetFieldType<string>();
-            return hookMethod == null ? null : FindHookMethod(td, syncVar, hookMethod, ref failed);
+            var hookMethod = attribute.GetField<string>();
+            if (hookMethod != null)
+            {
+                return FindHookMethod(td, syncVar, hookMethod, ref failed);
+            }
+
+            return null;
         }
 
         /// <summary>
@@ -119,7 +127,8 @@ namespace JFramework.Editor
         /// <param name="name"></param>
         /// <param name="valueType"></param>
         /// <returns></returns>
-        private static string HookMethod(string name, TypeReference valueType) => $"void {name}({valueType} oldValue, {valueType} newValue)";
+        private static string HookMethod(string name, TypeReference valueType) =>
+            $"void {name}({valueType} oldValue, {valueType} newValue)";
 
         /// <summary>
         /// 参数配对
@@ -129,7 +138,8 @@ namespace JFramework.Editor
         /// <returns></returns>
         private static bool MatchesParameters(FieldDefinition syncVar, MethodDefinition md)
         {
-            return md.Parameters[0].ParameterType.FullName == syncVar.FieldType.FullName && md.Parameters[1].ParameterType.FullName == syncVar.FieldType.FullName;
+            return md.Parameters[0].ParameterType.FullName == syncVar.FieldType.FullName &&
+                   md.Parameters[1].ParameterType.FullName == syncVar.FieldType.FullName;
         }
 
         /// <summary>
@@ -138,7 +148,8 @@ namespace JFramework.Editor
         /// <param name="td"></param>
         /// <param name="failed"></param>
         /// <returns></returns>
-        public (List<FieldDefinition> syncVars, Dictionary<FieldDefinition, FieldDefinition> syncVarNetIds) ProcessSyncVars(TypeDefinition td, ref bool failed)
+        public (List<FieldDefinition> syncVars, Dictionary<FieldDefinition, FieldDefinition> syncVarNetIds) ProcessSyncVars(
+            TypeDefinition td, ref bool failed)
         {
             var syncVars = new List<FieldDefinition>();
             var syncVarIds = new Dictionary<FieldDefinition, FieldDefinition>();
@@ -197,20 +208,21 @@ namespace JFramework.Editor
         /// <param name="syncVarIds"></param>
         /// <param name="dirtyBits"></param>
         /// <param name="failed"></param>
-        private void ProcessSyncVar(TypeDefinition td, FieldDefinition fd, Dictionary<FieldDefinition, FieldDefinition> syncVarIds, long dirtyBits, ref bool failed)
+        private void ProcessSyncVar(TypeDefinition td, FieldDefinition fd, Dictionary<FieldDefinition, FieldDefinition> syncVarIds,
+            long dirtyBits, ref bool failed)
         {
             FieldDefinition objectId = null;
             if (fd.FieldType.IsDerivedFrom<NetworkBehaviour>() || fd.FieldType.Is<NetworkBehaviour>())
             {
-                objectId = new FieldDefinition($"{fd.Name}Id", FieldAttributes.Family, models.Import<NetworkVariable>())
+                objectId = new FieldDefinition($"{fd.Name}Id", FieldAttributes.Family, module.Import<NetworkVariable>())
                 {
                     DeclaringType = td
                 };
                 syncVarIds[fd] = objectId;
             }
-            else if (fd.FieldType.IsNetworkObjectField())
+            else if (fd.FieldType.IsNetworkObject())
             {
-                objectId = new FieldDefinition($"{fd.Name}Id", FieldAttributes.Family, models.Import<uint>())
+                objectId = new FieldDefinition($"{fd.Name}Id", FieldAttributes.Family, module.Import<uint>())
                 {
                     DeclaringType = td
                 };
@@ -232,7 +244,7 @@ namespace JFramework.Editor
 
             access.setter[fd] = set;
 
-            if (fd.FieldType.IsNetworkObjectField())
+            if (fd.FieldType.IsNetworkObject())
             {
                 access.getter[fd] = get;
             }
@@ -266,7 +278,7 @@ namespace JFramework.Editor
                 worker.Emit(OpCodes.Ldfld, netIdFieldReference);
                 worker.Emit(OpCodes.Ldarg_0);
                 worker.Emit(OpCodes.Ldflda, fr);
-                worker.Emit(OpCodes.Call, models.getSyncVarGameObject);
+                worker.Emit(OpCodes.Call, module.getSyncVarGameObject);
                 worker.Emit(OpCodes.Ret);
             }
             else if (fd.FieldType.Is<NetworkObject>())
@@ -276,7 +288,7 @@ namespace JFramework.Editor
                 worker.Emit(OpCodes.Ldfld, netIdFieldReference);
                 worker.Emit(OpCodes.Ldarg_0);
                 worker.Emit(OpCodes.Ldflda, fr);
-                worker.Emit(OpCodes.Call, models.getSyncVarNetworkObject);
+                worker.Emit(OpCodes.Call, module.getSyncVarNetworkObject);
                 worker.Emit(OpCodes.Ret);
             }
             else if (fd.FieldType.IsDerivedFrom<NetworkBehaviour>() || fd.FieldType.Is<NetworkBehaviour>())
@@ -286,7 +298,7 @@ namespace JFramework.Editor
                 worker.Emit(OpCodes.Ldfld, netIdFieldReference);
                 worker.Emit(OpCodes.Ldarg_0);
                 worker.Emit(OpCodes.Ldflda, fr);
-                var getFunc = models.getSyncVarNetworkBehaviour.MakeGeneric(assembly.MainModule, fd.FieldType);
+                var getFunc = module.getSyncVarNetworkBehaviour.MakeGenericInstanceType(assembly.MainModule, fd.FieldType);
                 worker.Emit(OpCodes.Call, getFunc);
                 worker.Emit(OpCodes.Ret);
             }
@@ -313,9 +325,10 @@ namespace JFramework.Editor
         /// <param name="netFieldId"></param>
         /// <param name="failed"></param>
         /// <returns></returns>
-        private MethodDefinition GenerateSyncVarSetter(TypeDefinition td, FieldDefinition fd, string originalName, long dirtyBit, FieldDefinition netFieldId, ref bool failed)
+        private MethodDefinition GenerateSyncVarSetter(TypeDefinition td, FieldDefinition fd, string originalName, long dirtyBit,
+            FieldDefinition netFieldId, ref bool failed)
         {
-            var set = new MethodDefinition($"set_Network{originalName}", Const.VAR_ATTRS, models.Import(typeof(void)));
+            var set = new MethodDefinition($"set_Network{originalName}", Const.VAR_ATTRS, module.Import(typeof(void)));
 
             var worker = set.Body.GetILProcessor();
             var fr = fd.DeclaringType.HasGenericParameters ? fd.MakeHostInstanceGeneric() : fd;
@@ -348,24 +361,24 @@ namespace JFramework.Editor
             {
                 worker.Emit(OpCodes.Ldarg_0);
                 worker.Emit(OpCodes.Ldflda, netIdFieldReference);
-                worker.Emit(OpCodes.Call, models.syncVarSetterGameObject);
+                worker.Emit(OpCodes.Call, module.syncVarSetterGameObject);
             }
             else if (fd.FieldType.Is<NetworkObject>())
             {
                 worker.Emit(OpCodes.Ldarg_0);
                 worker.Emit(OpCodes.Ldflda, netIdFieldReference);
-                worker.Emit(OpCodes.Call, models.syncVarSetterNetworkObject);
+                worker.Emit(OpCodes.Call, module.syncVarSetterNetworkObject);
             }
             else if (fd.FieldType.IsDerivedFrom<NetworkBehaviour>() || fd.FieldType.Is<NetworkBehaviour>())
             {
                 worker.Emit(OpCodes.Ldarg_0);
                 worker.Emit(OpCodes.Ldflda, netIdFieldReference);
-                var getFunc = models.syncVarSetterNetworkBehaviour.MakeGeneric(assembly.MainModule, fd.FieldType);
+                var getFunc = module.syncVarSetterNetworkBehaviour.MakeGenericInstanceType(assembly.MainModule, fd.FieldType);
                 worker.Emit(OpCodes.Call, getFunc);
             }
             else
             {
-                var generic = models.syncVarSetterGeneral.MakeGeneric(assembly.MainModule, fd.FieldType);
+                var generic = module.syncVarSetterGeneral.MakeGenericInstanceType(assembly.MainModule, fd.FieldType);
                 worker.Emit(OpCodes.Call, generic);
             }
 

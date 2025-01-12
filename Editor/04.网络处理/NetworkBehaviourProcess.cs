@@ -1,14 +1,14 @@
 // *********************************************************************************
-// # Project: Test
-// # Unity: 2022.3.5f1c1
-// # Author: jinyijie
+// # Project: Forest
+// # Unity: 6000.3.5f1
+// # Author: 云谷千羽
 // # Version: 1.0.0
-// # History: 2024-06-06  05:06
-// # Copyright: 2024, jinyijie
+// # History: 2025-01-12 15:01:52
+// # Recently: 2025-01-12 15:01:52
+// # Copyright: 2024, 云谷千羽
 // # Description: This is an automatically generated comment.
 // *********************************************************************************
 
-using System;
 using System.Collections.Generic;
 using JFramework.Net;
 using Mono.Cecil;
@@ -21,7 +21,7 @@ namespace JFramework.Editor
     {
         private Dictionary<FieldDefinition, FieldDefinition> syncVarIds = new Dictionary<FieldDefinition, FieldDefinition>();
         private List<FieldDefinition> syncVars = new List<FieldDefinition>();
-        private readonly Models models;
+        private readonly Module module;
         private readonly Logger logger;
         private readonly Writer writers;
         private readonly Reader readers;
@@ -37,18 +37,18 @@ namespace JFramework.Editor
         private readonly List<KeyValuePair<MethodDefinition, int>> targetRpcList = new List<KeyValuePair<MethodDefinition, int>>();
         private readonly List<MethodDefinition> targetRpcFuncList = new List<MethodDefinition>();
 
-        public NetworkBehaviourProcess(AssemblyDefinition assembly, SyncVarAccess access, Models models, Writer writers, Reader readers,
+        public NetworkBehaviourProcess(AssemblyDefinition assembly, SyncVarAccess access, Module module, Writer writers, Reader readers,
             Logger logger, TypeDefinition type)
         {
             generate = type;
             this.type = type;
-            this.models = models;
+            this.module = module;
             this.access = access;
             this.logger = logger;
             this.writers = writers;
             this.readers = readers;
             this.assembly = assembly;
-            process = new SyncVarProcess(assembly, access, models, logger);
+            process = new SyncVarProcess(assembly, access, module, logger);
         }
 
         public bool Process(ref bool failed)
@@ -84,35 +84,35 @@ namespace JFramework.Editor
 
         private void MarkAsProcessed(TypeDefinition td)
         {
-            var versionMethod = new MethodDefinition(Const.GEN_FUNC, MethodAttributes.Private, models.Import(typeof(void)));
+            var versionMethod = new MethodDefinition(Const.GEN_FUNC, MethodAttributes.Private, module.Import(typeof(void)));
             var worker = versionMethod.Body.GetILProcessor();
             worker.Emit(OpCodes.Ret);
             td.Methods.Add(versionMethod);
         }
 
-        public static void WriteInitLocals(ILProcessor worker, Models models)
+        public static void WriteInitLocals(ILProcessor worker, Module module)
         {
             worker.Body.InitLocals = true;
-            worker.Body.Variables.Add(new VariableDefinition(models.Import<MemoryWriter>()));
+            worker.Body.Variables.Add(new VariableDefinition(module.Import<MemoryWriter>()));
         }
 
-        public static void WritePopWriter(ILProcessor worker, Models models)
+        public static void WritePopWriter(ILProcessor worker, Module module)
         {
-            worker.Emit(OpCodes.Call, models.PopWriterRef);
+            worker.Emit(OpCodes.Call, module.PopWriterRef);
             worker.Emit(OpCodes.Stloc_0);
         }
 
-        public static void WritePushWriter(ILProcessor worker, Models models)
+        public static void WritePushWriter(ILProcessor worker, Module module)
         {
             worker.Emit(OpCodes.Ldloc_0);
-            worker.Emit(OpCodes.Call, models.PushWriterRef);
+            worker.Emit(OpCodes.Call, module.PushWriterRef);
         }
 
-        public static void AddInvokeParameters(Models models, ICollection<ParameterDefinition> collection)
+        public static void AddInvokeParameters(Module module, ICollection<ParameterDefinition> collection)
         {
-            collection.Add(new ParameterDefinition("obj", ParameterAttributes.None, models.Import<NetworkBehaviour>()));
-            collection.Add(new ParameterDefinition("reader", ParameterAttributes.None, models.Import<MemoryReader>()));
-            collection.Add(new ParameterDefinition("target", ParameterAttributes.None, models.Import<NetworkClient>()));
+            collection.Add(new ParameterDefinition("obj", ParameterAttributes.None, module.Import<NetworkBehaviour>()));
+            collection.Add(new ParameterDefinition("reader", ParameterAttributes.None, module.Import<MemoryReader>()));
+            collection.Add(new ParameterDefinition("target", ParameterAttributes.None, module.Import<NetworkClient>()));
         }
     }
 
@@ -176,9 +176,9 @@ namespace JFramework.Editor
             switch (mode)
             {
                 case InvokeMode.ServerRpc:
-                    serverRpcList.Add(new KeyValuePair<MethodDefinition, int>(md, rpc.GetFieldType<int>()));
-                    func = NetworkDelegateProcess.ProcessServerRpcInvoke(models, writers, logger, generate, md, rpc, ref failed);
-                    rpcFunc = NetworkDelegateProcess.ProcessServerRpc(models, readers, logger, generate, md, func, ref failed);
+                    serverRpcList.Add(new KeyValuePair<MethodDefinition, int>(md, rpc.GetField<int>()));
+                    func = NetworkDelegateProcess.ProcessServerRpcInvoke(module, writers, logger, generate, md, rpc, ref failed);
+                    rpcFunc = NetworkDelegateProcess.ProcessServerRpc(module, readers, logger, generate, md, func, ref failed);
                     if (rpcFunc != null)
                     {
                         serverRpcFuncList.Add(rpcFunc);
@@ -186,9 +186,9 @@ namespace JFramework.Editor
 
                     break;
                 case InvokeMode.ClientRpc:
-                    clientRpcList.Add(new KeyValuePair<MethodDefinition, int>(md, rpc.GetFieldType<int>()));
-                    func = NetworkDelegateProcess.ProcessClientRpcInvoke(models, writers, logger, generate, md, rpc, ref failed);
-                    rpcFunc = NetworkDelegateProcess.ProcessClientRpc(models, readers, logger, generate, md, func, ref failed);
+                    clientRpcList.Add(new KeyValuePair<MethodDefinition, int>(md, rpc.GetField<int>()));
+                    func = NetworkDelegateProcess.ProcessClientRpcInvoke(module, writers, logger, generate, md, rpc, ref failed);
+                    rpcFunc = NetworkDelegateProcess.ProcessClientRpc(module, readers, logger, generate, md, func, ref failed);
                     if (rpcFunc != null)
                     {
                         clientRpcFuncList.Add(rpcFunc);
@@ -196,9 +196,9 @@ namespace JFramework.Editor
 
                     break;
                 case InvokeMode.TargetRpc:
-                    targetRpcList.Add(new KeyValuePair<MethodDefinition, int>(md, rpc.GetFieldType<int>()));
-                    func = NetworkDelegateProcess.ProcessTargetRpcInvoke(models, writers, logger, generate, md, rpc, ref failed);
-                    rpcFunc = NetworkDelegateProcess.ProcessTargetRpc(models, readers, logger, generate, md, func, ref failed);
+                    targetRpcList.Add(new KeyValuePair<MethodDefinition, int>(md, rpc.GetField<int>()));
+                    func = NetworkDelegateProcess.ProcessTargetRpcInvoke(module, writers, logger, generate, md, rpc, ref failed);
+                    rpcFunc = NetworkDelegateProcess.ProcessTargetRpc(module, readers, logger, generate, md, func, ref failed);
                     if (rpcFunc != null)
                     {
                         targetRpcFuncList.Add(rpcFunc);
@@ -339,23 +339,23 @@ namespace JFramework.Editor
             }
             else
             {
-                cctor = new MethodDefinition(".cctor", Const.CTOR_ATTRS, models.Import(typeof(void)));
+                cctor = new MethodDefinition(".cctor", Const.CTOR_ATTRS, module.Import(typeof(void)));
             }
 
             ILProcessor worker = cctor.Body.GetILProcessor();
             for (int i = 0; i < serverRpcList.Count; ++i)
             {
-                GenerateDelegate(worker, models.registerServerRpcRef, serverRpcFuncList[i], serverRpcList[i]);
+                GenerateDelegate(worker, module.registerServerRpcRef, serverRpcFuncList[i], serverRpcList[i]);
             }
 
             for (int i = 0; i < clientRpcList.Count; ++i)
             {
-                GenerateDelegate(worker, models.registerClientRpcRef, clientRpcFuncList[i], clientRpcList[i]);
+                GenerateDelegate(worker, module.registerClientRpcRef, clientRpcFuncList[i], clientRpcList[i]);
             }
 
             for (int i = 0; i < targetRpcList.Count; ++i)
             {
-                GenerateDelegate(worker, models.registerClientRpcRef, targetRpcFuncList[i], targetRpcList[i]);
+                GenerateDelegate(worker, module.registerClientRpcRef, targetRpcFuncList[i], targetRpcList[i]);
             }
 
             worker.Append(worker.Create(OpCodes.Ret));
@@ -395,12 +395,12 @@ namespace JFramework.Editor
         private void GenerateDelegate(ILProcessor worker, MethodReference mr, MethodDefinition md, KeyValuePair<MethodDefinition, int> pair)
         {
             worker.Emit(OpCodes.Ldtoken, generate);
-            worker.Emit(OpCodes.Call, models.getTypeFromHandleRef);
+            worker.Emit(OpCodes.Call, module.getTypeFromHandleRef);
             worker.Emit(OpCodes.Ldc_I4, pair.Value);
             worker.Emit(OpCodes.Ldstr, pair.Key.FullName);
             worker.Emit(OpCodes.Ldnull);
             worker.Emit(OpCodes.Ldftn, md);
-            worker.Emit(OpCodes.Newobj, models.RpcDelegateRef);
+            worker.Emit(OpCodes.Newobj, module.RpcDelegateRef);
             worker.Emit(OpCodes.Call, mr);
         }
     }
@@ -414,13 +414,13 @@ namespace JFramework.Editor
         {
             if (generate.GetMethod(Const.SER_METHOD) != null) return;
             if (syncVars.Count == 0) return;
-            var serialize = new MethodDefinition(Const.SER_METHOD, Const.SER_ATTRS, models.Import(typeof(void)));
-            serialize.Parameters.Add(new ParameterDefinition("writer", ParameterAttributes.None, models.Import<MemoryWriter>()));
-            serialize.Parameters.Add(new ParameterDefinition("status", ParameterAttributes.None, models.Import<bool>()));
+            var serialize = new MethodDefinition(Const.SER_METHOD, Const.SER_ATTRS, module.Import(typeof(void)));
+            serialize.Parameters.Add(new ParameterDefinition("writer", ParameterAttributes.None, module.Import<MemoryWriter>()));
+            serialize.Parameters.Add(new ParameterDefinition("status", ParameterAttributes.None, module.Import<bool>()));
             var worker = serialize.Body.GetILProcessor();
 
             serialize.Body.InitLocals = true;
-            var baseSerialize = Helper.TryResolveMethodInParents(generate.BaseType, assembly, Const.SER_METHOD);
+            var baseSerialize = Resolve.GetMethodInParent(generate.BaseType, assembly, Const.SER_METHOD);
             if (baseSerialize != null)
             {
                 worker.Emit(OpCodes.Ldarg_0);
@@ -445,7 +445,7 @@ namespace JFramework.Editor
                 worker.Emit(OpCodes.Ldfld, syncVar);
                 var writeFunc =
                     writers.GetFunction(
-                        syncVar.FieldType.IsDerivedFrom<NetworkBehaviour>() ? models.Import<NetworkBehaviour>() : syncVar.FieldType,
+                        syncVar.FieldType.IsDerivedFrom<NetworkBehaviour>() ? module.Import<NetworkBehaviour>() : syncVar.FieldType,
                         ref failed);
 
                 if (writeFunc != null)
@@ -464,8 +464,8 @@ namespace JFramework.Editor
             worker.Append(status);
             worker.Emit(OpCodes.Ldarg_1);
             worker.Emit(OpCodes.Ldarg_0);
-            worker.Emit(OpCodes.Call, models.NetworkBehaviourDirtyRef);
-            var writeUint64Func = writers.GetFunction(models.Import<ulong>(), ref failed);
+            worker.Emit(OpCodes.Call, module.NetworkBehaviourDirtyRef);
+            var writeUint64Func = writers.GetFunction(module.Import<ulong>(), ref failed);
             worker.Emit(OpCodes.Call, writeUint64Func);
             int dirty = access.GetSyncVar(generate.BaseType.FullName);
             foreach (var syncVarDef in syncVars)
@@ -478,7 +478,7 @@ namespace JFramework.Editor
 
                 var varLabel = worker.Create(OpCodes.Nop);
                 worker.Emit(OpCodes.Ldarg_0);
-                worker.Emit(OpCodes.Call, models.NetworkBehaviourDirtyRef);
+                worker.Emit(OpCodes.Call, module.NetworkBehaviourDirtyRef);
                 worker.Emit(OpCodes.Ldc_I8, 1L << dirty);
                 worker.Emit(OpCodes.And);
                 worker.Emit(OpCodes.Brfalse, varLabel);
@@ -487,7 +487,7 @@ namespace JFramework.Editor
                 worker.Emit(OpCodes.Ldfld, syncVar);
 
                 var writeFunc = writers.GetFunction(
-                    syncVar.FieldType.IsDerivedFrom<NetworkBehaviour>() ? models.Import<NetworkBehaviour>() : syncVar.FieldType,
+                    syncVar.FieldType.IsDerivedFrom<NetworkBehaviour>() ? module.Import<NetworkBehaviour>() : syncVar.FieldType,
                     ref failed);
 
                 if (writeFunc != null)
@@ -516,16 +516,16 @@ namespace JFramework.Editor
         {
             if (generate.GetMethod(Const.DES_METHOD) != null) return;
             if (syncVars.Count == 0) return;
-            var serialize = new MethodDefinition(Const.DES_METHOD, Const.SER_ATTRS, models.Import(typeof(void)));
-            serialize.Parameters.Add(new ParameterDefinition("reader", ParameterAttributes.None, models.Import<MemoryReader>()));
-            serialize.Parameters.Add(new ParameterDefinition("status", ParameterAttributes.None, models.Import<bool>()));
+            var serialize = new MethodDefinition(Const.DES_METHOD, Const.SER_ATTRS, module.Import(typeof(void)));
+            serialize.Parameters.Add(new ParameterDefinition("reader", ParameterAttributes.None, module.Import<MemoryReader>()));
+            serialize.Parameters.Add(new ParameterDefinition("status", ParameterAttributes.None, module.Import<bool>()));
             var worker = serialize.Body.GetILProcessor();
 
             serialize.Body.InitLocals = true;
-            var dirtyBitsLocal = new VariableDefinition(models.Import<long>());
+            var dirtyBitsLocal = new VariableDefinition(module.Import<long>());
             serialize.Body.Variables.Add(dirtyBitsLocal);
 
-            var baseDeserialize = Helper.TryResolveMethodInParents(generate.BaseType, assembly, Const.DES_METHOD);
+            var baseDeserialize = Resolve.GetMethodInParent(generate.BaseType, assembly, Const.DES_METHOD);
             if (baseDeserialize != null)
             {
                 worker.Append(worker.Create(OpCodes.Ldarg_0));
@@ -547,7 +547,7 @@ namespace JFramework.Editor
             worker.Append(worker.Create(OpCodes.Ret));
             worker.Append(status);
             worker.Append(worker.Create(OpCodes.Ldarg_1));
-            worker.Append(worker.Create(OpCodes.Call, readers.GetFunction(models.Import<ulong>(), ref failed)));
+            worker.Append(worker.Create(OpCodes.Call, readers.GetFunction(module.Import<ulong>(), ref failed)));
             worker.Append(worker.Create(OpCodes.Stloc_0));
 
             int dirtyBits = access.GetSyncVar(generate.BaseType.FullName);
@@ -597,7 +597,7 @@ namespace JFramework.Editor
                 worker.Emit(OpCodes.Ldarg_1);
                 worker.Emit(OpCodes.Ldarg_0);
                 worker.Emit(OpCodes.Ldflda, objectId);
-                worker.Emit(OpCodes.Call, models.syncVarGetterGameObject);
+                worker.Emit(OpCodes.Call, module.syncVarGetterGameObject);
             }
             else if (syncVar.FieldType.Is<NetworkObject>())
             {
@@ -605,7 +605,7 @@ namespace JFramework.Editor
                 worker.Emit(OpCodes.Ldarg_1);
                 worker.Emit(OpCodes.Ldarg_0);
                 worker.Emit(OpCodes.Ldflda, objectId);
-                worker.Emit(OpCodes.Call, models.syncVarGetterNetworkObject);
+                worker.Emit(OpCodes.Call, module.syncVarGetterNetworkObject);
             }
             else if (syncVar.FieldType.IsDerivedFrom<NetworkBehaviour>() || syncVar.FieldType.Is<NetworkBehaviour>())
             {
@@ -613,7 +613,7 @@ namespace JFramework.Editor
                 worker.Emit(OpCodes.Ldarg_1);
                 worker.Emit(OpCodes.Ldarg_0);
                 worker.Emit(OpCodes.Ldflda, objectId);
-                var getFunc = models.syncVarGetterNetworkBehaviour.MakeGeneric(assembly.MainModule, syncVar.FieldType);
+                var getFunc = module.syncVarGetterNetworkBehaviour.MakeGenericInstanceType(assembly.MainModule, syncVar.FieldType);
                 worker.Emit(OpCodes.Call, getFunc);
             }
             else
@@ -628,7 +628,7 @@ namespace JFramework.Editor
 
                 worker.Emit(OpCodes.Ldarg_1);
                 worker.Emit(OpCodes.Call, readFunc);
-                MethodReference generic = models.syncVarGetterGeneral.MakeGeneric(assembly.MainModule, syncVar.FieldType);
+                MethodReference generic = module.syncVarGetterGeneral.MakeGenericInstanceType(assembly.MainModule, syncVar.FieldType);
                 worker.Emit(OpCodes.Call, generic);
             }
         }

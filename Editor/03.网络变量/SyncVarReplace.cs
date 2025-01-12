@@ -1,59 +1,38 @@
 // *********************************************************************************
-// # Project: Test
-// # Unity: 2022.3.5f1c1
-// # Author: jinyijie
+// # Project: Forest
+// # Unity: 6000.3.5f1
+// # Author: 云谷千羽
 // # Version: 1.0.0
-// # History: 2024-06-09  17:06
-// # Copyright: 2024, jinyijie
+// # History: 2025-01-12 15:01:03
+// # Recently: 2025-01-12 15:01:03
+// # Copyright: 2024, 云谷千羽
 // # Description: This is an automatically generated comment.
 // *********************************************************************************
 
-using System.Collections.Generic;
-using System.Linq;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
 
 namespace JFramework.Editor
 {
-    internal class SyncVarAccess
-    {
-        private readonly Dictionary<string, int> syncVars = new Dictionary<string, int>();
-
-        public readonly Dictionary<FieldDefinition, MethodDefinition> setter = new Dictionary<FieldDefinition, MethodDefinition>();
-
-        public readonly Dictionary<FieldDefinition, MethodDefinition> getter = new Dictionary<FieldDefinition, MethodDefinition>();
-
-        public int GetSyncVar(string className) => syncVars.TryGetValue(className, out int value) ? value : 0;
-        public void SetSyncVar(string className, int index) => syncVars[className] = index;
-
-        public void Clear()
-        {
-            setter.Clear();
-            getter.Clear();
-            syncVars.Clear();
-        }
-    }
-
     internal static class SyncVarReplace
     {
         /// <summary>
-        /// 用于NetworkBehaviour注入后，修正SyncVar
+        /// 修正SyncVar
         /// </summary>
-        /// <param name="md"></param>
-        /// <param name="access"></param>
         public static void Process(ModuleDefinition md, SyncVarAccess access)
         {
-            foreach (var td in md.Types.Where(td => td.IsClass))
+            foreach (var td in md.Types)
             {
-                ProcessClass(td, access);
+                if (td.IsClass)
+                {
+                    ProcessClass(td, access);
+                }
             }
         }
 
         /// <summary>
         /// 处理类
         /// </summary>
-        /// <param name="td"></param>
-        /// <param name="access"></param>
         private static void ProcessClass(TypeDefinition td, SyncVarAccess access)
         {
             foreach (var md in td.Methods)
@@ -70,8 +49,6 @@ namespace JFramework.Editor
         /// <summary>
         /// 处理方法
         /// </summary>
-        /// <param name="md"></param>
-        /// <param name="access"></param>
         private static void ProcessMethod(MethodDefinition md, SyncVarAccess access)
         {
             if (md.Name == ".cctor" || md.Name == Const.GEN_FUNC || md.Name.StartsWith(Const.INV_METHOD))
@@ -84,9 +61,9 @@ namespace JFramework.Editor
                 return;
             }
 
-            if (md.Body is { Instructions: not null })
+            if (md.Body?.Instructions != null)
             {
-                for (int i = 0; i < md.Body.Instructions.Count;)
+                for (var i = 0; i < md.Body.Instructions.Count;)
                 {
                     var instr = md.Body.Instructions[i];
                     i += ProcessInstruction(md, instr, i, access);
@@ -97,26 +74,21 @@ namespace JFramework.Editor
         /// <summary>
         /// 处理指令
         /// </summary>
-        /// <param name="md"></param>
-        /// <param name="instr"></param>
-        /// <param name="index"></param>
-        /// <param name="access"></param>
-        /// <returns></returns>
         private static int ProcessInstruction(MethodDefinition md, Instruction instr, int index, SyncVarAccess access)
         {
             if (instr.OpCode == OpCodes.Stfld && instr.Operand is FieldDefinition OpStfLd)
             {
-                ProcessSetInstruction(md, instr, OpStfLd, access);
+                ProcessSetter(md, instr, OpStfLd, access);
             }
 
             if (instr.OpCode == OpCodes.Ldfld && instr.Operand is FieldDefinition OpLdfLd)
             {
-                ProcessGetInstruction(md, instr, OpLdfLd, access);
+                ProcessGetter(md, instr, OpLdfLd, access);
             }
 
             if (instr.OpCode == OpCodes.Ldflda && instr.Operand is FieldDefinition OpLdfLda)
             {
-                return ProcessLoadAddressInstruction(md, instr, OpLdfLda, access, index);
+                return ProcessAddress(md, instr, OpLdfLda, access, index);
             }
 
             return 1;
@@ -125,13 +97,12 @@ namespace JFramework.Editor
         /// <summary>
         /// 设置指令
         /// </summary>
-        /// <param name="md"></param>
-        /// <param name="i"></param>
-        /// <param name="opField"></param>
-        /// <param name="access"></param>
-        private static void ProcessSetInstruction(MethodDefinition md, Instruction i, FieldDefinition opField, SyncVarAccess access)
+        private static void ProcessSetter(MethodDefinition md, Instruction i, FieldDefinition opField, SyncVarAccess access)
         {
-            if (md.Name == ".ctor") return;
+            if (md.Name == Const.CTOR)
+            {
+                return;
+            }
 
             if (access.setter.TryGetValue(opField, out var method))
             {
@@ -143,13 +114,12 @@ namespace JFramework.Editor
         /// <summary>
         /// 获取指令
         /// </summary>
-        /// <param name="md"></param>
-        /// <param name="i"></param>
-        /// <param name="opField"></param>
-        /// <param name="access"></param>
-        private static void ProcessGetInstruction(MethodDefinition md, Instruction i, FieldDefinition opField, SyncVarAccess access)
+        private static void ProcessGetter(MethodDefinition md, Instruction i, FieldDefinition opField, SyncVarAccess access)
         {
-            if (md.Name == ".ctor") return;
+            if (md.Name == Const.CTOR)
+            {
+                return;
+            }
 
             if (access.getter.TryGetValue(opField, out var method))
             {
@@ -161,15 +131,12 @@ namespace JFramework.Editor
         /// <summary>
         /// 处理加载地址指令
         /// </summary>
-        /// <param name="md"></param>
-        /// <param name="instr"></param>
-        /// <param name="opField"></param>
-        /// <param name="access"></param>
-        /// <param name="index"></param>
-        /// <returns></returns>
-        private static int ProcessLoadAddressInstruction(MethodDefinition md, Instruction instr, FieldDefinition opField,SyncVarAccess access, int index)
+        private static int ProcessAddress(MethodDefinition md, Instruction instr, FieldDefinition opField, SyncVarAccess access, int index)
         {
-            if (md.Name == ".ctor") return 1;
+            if (md.Name == Const.CTOR)
+            {
+                return 1;
+            }
 
             if (access.setter.TryGetValue(opField, out var method))
             {
