@@ -20,7 +20,9 @@
         }
     }
 ```
+
 2.压缩加密
+
 ```c#
     public class Example
     {
@@ -36,7 +38,9 @@
         }
     }
 ```
+
 3.引用池
+
 ```c#
     public class Example
     {
@@ -52,7 +56,9 @@
         }
     }
 ```
+
 4.事件池
+
 ```c#
     public class Example : MonoBehaviour, IEvent<PackCompleteEvent>
     {
@@ -77,7 +83,9 @@
         }
     }
 ```
+
 5.资源加载
+
 ```c#
     public class Example : MonoBehaviour
     {
@@ -99,7 +107,9 @@
         }
     }
 ```
+
 6.对象池
+
 ```c#
     public class Example : MonoBehaviour
     {
@@ -124,6 +134,7 @@
 ```
 
 7.NetworkManager的使用
+
 ```c#
     private void Start()
     {
@@ -144,7 +155,9 @@
         NetworkManager.StopClient(); // 停止客户端
     }
 ```
+
 8.NetworkServer的使用
+
 ```c#
     private void Start()
     {
@@ -176,7 +189,9 @@
         });
     }
 ```
+
 9.NetworkClient的使用
+
 ```c#
    private void Start()
     {
@@ -204,6 +219,7 @@
 ```
 
 10.NetworkScene的使用
+
 ```c#
     private void Start()
     {
@@ -238,7 +254,9 @@
         Debug.Log("服务器场景加载完成");
     }
 ```
+
 11.远程调用和网络变量
+
 ```c#
     public class Test : NetworkBehaviour // 继承NetworkBehaviour
     {

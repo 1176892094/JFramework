@@ -48,7 +48,10 @@ namespace JFramework.Common
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
         private static void RuntimeInitializeOnLoad()
         {
-            var obj = new GameObject(nameof(UIManager));
+            var obj = new GameObject(nameof(UIManager))
+            {
+                layer = LayerMask.NameToLayer("UI")
+            };
             GlobalManager.canvas = obj.AddComponent<Canvas>();
             GlobalManager.canvas.renderMode = RenderMode.ScreenSpaceCamera;
             obj.AddComponent<GraphicRaycaster>();
@@ -62,8 +65,6 @@ namespace JFramework.Common
             scaler.referencePixelsPerUnit = 64;
 
             obj = new GameObject(nameof(PoolManager));
-            GlobalManager.audioSource = obj.AddComponent<AudioSource>();
-            obj.AddComponent<AudioListener>();
             obj.AddComponent<GlobalManager>();
         }
     }
