@@ -17,6 +17,7 @@ namespace JFramework
     {
         public static void Listen(string group, UIPanel panel)
         {
+            if (!GlobalManager.Instance) return;
             if (!GlobalManager.panelGroup.TryGetValue(group, out var panelGroup))
             {
                 panelGroup = new HashSet<UIPanel>();
@@ -37,6 +38,7 @@ namespace JFramework
 
         public static void Remove(string group, UIPanel panel)
         {
+            if (!GlobalManager.Instance) return;
             if (!GlobalManager.panelGroup.TryGetValue(group, out var panelGroup))
             {
                 panelGroup = new HashSet<UIPanel>();
@@ -57,6 +59,7 @@ namespace JFramework
 
         public static void Show(string group)
         {
+            if (!GlobalManager.Instance) return;
             if (GlobalManager.panelGroup.TryGetValue(group, out var panelGroup))
             {
                 foreach (var panel in panelGroup)
@@ -71,6 +74,7 @@ namespace JFramework
 
         public static void Hide(string group)
         {
+            if (!GlobalManager.Instance) return;
             if (GlobalManager.panelGroup.TryGetValue(group, out var panelGroup))
             {
                 foreach (var panel in panelGroup)
