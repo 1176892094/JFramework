@@ -191,7 +191,6 @@ namespace JFramework.Net
                 Register<NotReadyMessage>(NotReadyMessage);
                 Register<EntityMessage>(EntityMessage);
                 Register<ClientRpcMessage>(ClientRpcMessage);
-
                 Register<SceneMessage>(SceneMessage);
                 Register<SpawnMessage>(SpawnMessage);
                 Register<DespawnMessage>(DespawnMessage);

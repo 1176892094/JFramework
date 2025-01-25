@@ -79,7 +79,7 @@ namespace JFramework.Net
                     }
                 }
 
-                if (Transport.Instance!= null)
+                if (Transport.Instance != null)
                 {
                     Transport.Instance.StopServer();
                 }
@@ -477,7 +477,7 @@ namespace JFramework.Net
         {
             internal static void EarlyUpdate()
             {
-                if (Transport.Instance!= null)
+                if (Transport.Instance != null)
                 {
                     Transport.Instance.ServerEarlyUpdate();
                 }
@@ -487,13 +487,13 @@ namespace JFramework.Net
             {
                 if (isActive)
                 {
-                    if (Tick(Instance.sendRate,ref sendTime))
+                    if (Tick(Instance.sendRate, ref sendTime))
                     {
                         Broadcast();
                     }
                 }
 
-                if (Transport.Instance!= null)
+                if (Transport.Instance != null)
                 {
                     Transport.Instance.ServerAfterUpdate();
                 }
