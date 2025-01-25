@@ -45,6 +45,7 @@ namespace JFramework
 
         private static GUILayoutOption ScrollHeight => GUILayout.Height(Height * 0.4f);
         private static GUILayoutOption BoxWidth => GUILayout.Width((Width - 30f) / 2);
+        private static GUILayoutOption PoolWidth => GUILayout.Width((Width - 50f) / 2);
         private static GUILayoutOption Width80 => GUILayout.Width(80f);
         private static GUILayoutOption Width160 => GUILayout.Width(160f);
         private static GUILayoutOption Height20 => GUILayout.Height(20f);
@@ -56,7 +57,6 @@ namespace JFramework
             Console,
             Scene,
             Reference,
-            Setting,
             System,
             Project,
             Memory,
@@ -82,16 +82,14 @@ namespace JFramework
         }
 
         [Serializable]
-        private class LogInfo
+        private class LogData
         {
             public int count;
             public bool status;
             public Color color;
-            public LogType logType;
 
-            public LogInfo(LogType logType, Color color)
+            public LogData(Color color)
             {
-                this.logType = logType;
                 this.color = color;
                 status = true;
             }

@@ -81,7 +81,7 @@ namespace JFramework
                 pool.Value.Sort(Comparison);
                 GUILayout.BeginHorizontal();
 
-                GUILayout.BeginVertical("Box", BoxWidth);
+                GUILayout.BeginVertical("Box", PoolWidth);
                 GUILayout.Label(pool.Key, Height20);
                 foreach (var data in pool.Value)
                 {

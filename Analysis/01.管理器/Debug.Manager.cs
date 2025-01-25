@@ -221,12 +221,6 @@ namespace JFramework
                     window = Window.Time;
                 }
 
-                GUI.contentColor = window == Window.Setting ? Color.white : Color.gray;
-                if (GUILayout.Button(Window.Setting.ToString(), Height30))
-                {
-                    window = Window.Setting;
-                }
-
                 GUILayout.EndHorizontal();
             }
 
@@ -241,9 +235,6 @@ namespace JFramework
                     break;
                 case Window.Reference:
                     ReferenceWindow();
-                    break;
-                case Window.Setting:
-                    SettingWindow();
                     break;
                 case Window.System:
                     SystemWindow();

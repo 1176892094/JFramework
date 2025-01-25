@@ -29,7 +29,6 @@ namespace JFramework
             GUILayout.Label("公司名称: " + Application.companyName);
             GUILayout.Label("Unity版本: " + Application.unityVersion);
             GUILayout.Label("Unity专业版: " + Application.HasProLicense());
-
             var message = "";
             switch (Application.internetReachability)
             {
@@ -45,10 +44,35 @@ namespace JFramework
             }
 
             GUILayout.Label("网络状态: " + message);
-
+            GUILayout.Label("项目路径: " + Application.dataPath);
+            GUILayout.Label("存储路径: " + Application.persistentDataPath);
+            GUILayout.Label("流动资源路径: " + Application.streamingAssetsPath);
+            GUILayout.Label("临时缓存路径: " + Application.temporaryCachePath);
+            
             GUILayout.EndScrollView();
 
             GUILayout.BeginHorizontal();
+            if (GUILayout.Button("0.5x", Height30))
+            {
+                ScreenRate = new Vector2(3200, 1800);
+            }
+
+            if (GUILayout.Button("1.0x", Height30))
+            {
+                ScreenRate = new Vector2(2560, 1440);
+            }
+
+            if (GUILayout.Button("1.5x", Height30))
+            {
+                ScreenRate = new Vector2(1920, 1080);
+            }
+
+
+            if (GUILayout.Button("2.0x", Height30))
+            {
+                ScreenRate = new Vector2(1280, 720);
+            }
+
             if (GUILayout.Button("退出游戏", Height30))
             {
                 Application.Quit();
