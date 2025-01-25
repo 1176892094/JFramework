@@ -11,43 +11,42 @@
 
 using System;
 using System.Collections.Generic;
-using JFramework.Common;
 using UnityEngine;
 
 namespace JFramework
 {
     public partial class DebugManager
     {
-        private readonly Dictionary<string, List<Reference>> poolDataInfos = new Dictionary<string, List<Reference>>();
-        private Pool pool = Pool.Heap;
+        private readonly Dictionary<string, List<Reference>> poolData = new Dictionary<string, List<Reference>>();
+        private Pool option = Pool.Heap;
 
 
         private void ReferenceWindow()
         {
             GUILayout.BeginHorizontal();
-            GUI.contentColor = pool == Pool.Heap ? Color.white : Color.gray;
+            GUI.contentColor = option == Pool.Heap ? Color.white : Color.gray;
             if (GUILayout.Button("Heap", Height30))
             {
-                pool = Pool.Heap;
+                option = Pool.Heap;
             }
 
-            GUI.contentColor = pool == Pool.Event ? Color.white : Color.gray;
+            GUI.contentColor = option == Pool.Event ? Color.white : Color.gray;
             if (GUILayout.Button("Event", Height30))
             {
-                pool = Pool.Event;
+                option = Pool.Event;
             }
 
-            GUI.contentColor = pool == Pool.Pool ? Color.white : Color.gray;
+            GUI.contentColor = option == Pool.Pool ? Color.white : Color.gray;
             if (GUILayout.Button("Pool", Height30))
             {
-                pool = Pool.Pool;
+                option = Pool.Pool;
             }
 
 
             GUI.contentColor = Color.white;
             GUILayout.EndHorizontal();
 
-            switch (pool)
+            switch (option)
             {
                 case Pool.Event:
                     Draw(Service.Event.Reference(), "事件池", "触发数\t事件数\t添加次数\t移除次数");
@@ -63,50 +62,49 @@ namespace JFramework
 
         private void Draw(Reference[] objectInfos, string message, string module)
         {
-            poolDataInfos.Clear();
+            poolData.Clear();
             foreach (var poolInfo in objectInfos)
             {
                 var assemblyName = Service.Text.Format("{0} - {1}", poolInfo.assetType.Assembly.GetName().Name, message);
-                if (!poolDataInfos.TryGetValue(assemblyName, out var results))
+                if (!poolData.TryGetValue(assemblyName, out var results))
                 {
                     results = new List<Reference>();
-                    poolDataInfos.Add(assemblyName, results);
+                    poolData.Add(assemblyName, results);
                 }
 
                 results.Add(poolInfo);
             }
 
             referenceView = GUILayout.BeginScrollView(referenceView, "Box");
-            foreach (var poolData in poolDataInfos)
+            foreach (var pool in poolData)
             {
-                poolData.Value.Sort(Comparison);
+                pool.Value.Sort(Comparison);
                 GUILayout.BeginHorizontal();
 
                 GUILayout.BeginVertical("Box", BoxWidth);
-                GUILayout.Label(poolData.Key, Height20);
-                foreach (var data in poolData.Value)
+                GUILayout.Label(pool.Key, Height20);
+                foreach (var data in pool.Value)
                 {
-                    if (string.IsNullOrEmpty(data.assetPath))
+                    var assetName = data.assetType.Name;
+                    if (!string.IsNullOrEmpty(data.assetPath))
                     {
-                        GUILayout.Label(Service.Text.Format("{0}", data.assetType.Name), Height20);
+                        assetName = Service.Text.Format("{0} - {1}", data.assetType.Name, data.assetPath);
                     }
-                    else
-                    {
-                        GUILayout.Label(Service.Text.Format("{0} - {1}", data.assetType.Name, data.assetPath), Height20);
-                    }
+
+                    GUILayout.Label(assetName, Height20);
                 }
 
                 GUILayout.EndVertical();
-                
+
                 GUILayout.BeginVertical("Box");
                 GUILayout.Label(module, Height20);
-                foreach (var data in poolData.Value)
+                foreach (var data in pool.Value)
                 {
                     GUILayout.Label(data.ToString(), Height20);
                 }
 
                 GUILayout.EndVertical();
-                
+
                 GUILayout.EndHorizontal();
             }
 

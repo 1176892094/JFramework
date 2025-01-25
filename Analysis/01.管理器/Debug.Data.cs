@@ -18,19 +18,17 @@ namespace JFramework
     {
         private static Vector2 ScreenRate = new Vector2(2560, 1440);
         private static Rect WindowRect = new Rect(10, 20, 108, 69);
-        private static float ScreenScale => ScreenWidth / ScreenRate.x + ScreenHeight / ScreenRate.y;
-        private static float ScreenWidth => Screen.width;
-        private static float ScreenHeight => Screen.height;
-        private static float WindowWidth => ScreenWidth / ScreenScale;
-        private static float WindowHeight => ScreenHeight / ScreenScale;
-        private static Vector3 WindowScale => new Vector3(ScreenScale, ScreenScale, 1f);
+        private static float Width => Screen.width / Rate;
+        private static float Height => Screen.height / Rate;
+        private static float Rate => Screen.width / ScreenRate.x + Screen.height / ScreenRate.y;
+        private static Vector3 Scale => new Vector3(Rate, Rate, 1f);
 
         private static Rect MaxBox
         {
             get
             {
-                var width = WindowWidth - WindowRect.x * 2;
-                var height = WindowHeight - WindowRect.y / 2 * 3;
+                var width = Width - WindowRect.x * 2;
+                var height = Height - WindowRect.y / 2 * 3;
                 return new Rect(WindowRect.x, WindowRect.y, width, height);
             }
         }
@@ -45,8 +43,8 @@ namespace JFramework
             }
         }
 
-        private static GUILayoutOption ScrollHeight => GUILayout.Height(WindowHeight * 0.4f);
-        private static GUILayoutOption BoxWidth => GUILayout.Width((WindowWidth - 30f) / 2);
+        private static GUILayoutOption ScrollHeight => GUILayout.Height(Height * 0.4f);
+        private static GUILayoutOption BoxWidth => GUILayout.Width((Width - 30f) / 2);
         private static GUILayoutOption Width80 => GUILayout.Width(80f);
         private static GUILayoutOption Width160 => GUILayout.Width(160f);
         private static GUILayoutOption Height20 => GUILayout.Height(20f);

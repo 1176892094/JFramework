@@ -23,7 +23,6 @@ namespace JFramework
             { "已保留的内存总量", new MemoryData(Profiler.GetTotalReservedMemoryLong) },
             { "已分配的内存总量", new MemoryData(Profiler.GetTotalAllocatedMemoryLong) },
             { "未使用的内存总量", new MemoryData(Profiler.GetTotalUnusedReservedMemoryLong) },
-            { "临时分配使用内存", new MemoryData(() => Profiler.GetTempAllocatorSize()) },
             { "图形资源使用内存", new MemoryData(Profiler.GetAllocatedMemoryForGraphicsDriver) },
             { "Mono分配的托管堆", new MemoryData(Profiler.GetMonoHeapSizeLong) },
             { "Mono使用的托管堆", new MemoryData(Profiler.GetMonoUsedSizeLong) },

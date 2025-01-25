@@ -9,9 +9,6 @@
 // # Description: This is an automatically generated comment.
 // *********************************************************************************
 
-using System;
-using System.Threading.Tasks;
-using UnityEditor;
 using UnityEngine;
 
 namespace JFramework

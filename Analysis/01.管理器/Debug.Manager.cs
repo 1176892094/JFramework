@@ -19,24 +19,24 @@ namespace JFramework
     public partial class DebugManager : MonoBehaviour, IEvent<PingUpdateEvent>
     {
         private float frameData;
-        private double framePing;
         private double frameTime;
+        private double framePing;
         private Rect minRect;
         private Status status;
         private Window window;
         private Color windowColor = Color.white;
 
-        private Vector2 consoleView = Vector2.zero;
-        private Vector2 messageView = Vector2.zero;
-        private Vector2 referenceView = Vector2.zero;
-        private Vector2 componentView = Vector2.zero;
-        private Vector2 gameObjectView = Vector2.zero;
-        private Vector2 scrollPathView = Vector2.zero;
-        private Vector2 scrollTimeView = Vector2.zero;
-        private Vector2 scrollSystemView = Vector2.zero;
-        private Vector2 scrollScreenView = Vector2.zero;
-        private Vector2 scrollMemoryView = Vector2.zero;
-        private Vector2 scrollProjectView = Vector2.zero;
+        private Vector2 consoleView;
+        private Vector2 messageView;
+        private Vector2 referenceView;
+        private Vector2 componentView;
+        private Vector2 gameObjectView;
+        private Vector2 scrollPathView;
+        private Vector2 scrollTimeView;
+        private Vector2 scrollSystemView;
+        private Vector2 scrollScreenView;
+        private Vector2 scrollMemoryView;
+        private Vector2 scrollProjectView;
         private event Action OnWindow;
 
         private void Awake()
@@ -128,13 +128,13 @@ namespace JFramework
             var labelAlignment = GUI.skin.label.alignment;
             var fieldAlignment = GUI.skin.textField.alignment;
 
-            GUI.matrix = Matrix4x4.Scale(WindowScale);
+            GUI.matrix = Matrix4x4.Scale(Scale);
             GUI.skin.label.alignment = TextAnchor.MiddleLeft;
             GUI.skin.textField.alignment = TextAnchor.MiddleLeft;
 
             if (status.HasFlag(Status.Expand))
             {
-                var maxRect = new Rect(0, 0, WindowWidth, WindowHeight);
+                var maxRect = new Rect(0, 0, Width, Height);
                 GUI.Window(0, maxRect, MaxWindow, "调试器");
             }
             else if (status.HasFlag(Status.Window))
