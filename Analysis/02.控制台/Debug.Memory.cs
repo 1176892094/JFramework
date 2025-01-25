@@ -34,7 +34,7 @@ namespace JFramework
             GUILayout.Label(" 内存信息", Height25);
             GUILayout.EndHorizontal();
 
-            scrollMemoryView = GUILayout.BeginScrollView(scrollMemoryView, "Box");
+            consoleView = GUILayout.BeginScrollView(consoleView, "Box");
             foreach (var data in memoryData)
             {
                 GUILayout.Label(data.Key + ":  \t" + data.Value.GetString());

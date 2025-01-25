@@ -93,7 +93,7 @@ namespace JFramework
             gameObjectFilter = GUILayout.TextField(gameObjectFilter, Height25);
             GUILayout.EndHorizontal();
 
-            gameObjectView = GUILayout.BeginScrollView(gameObjectView);
+            consoleView = GUILayout.BeginScrollView(consoleView);
             for (var i = 0; i < gameObjects.Count; i++)
             {
                 var target = gameObjects[i];
@@ -167,7 +167,7 @@ namespace JFramework
                 GUILayout.EndHorizontal();
             }
 
-            componentView = GUILayout.BeginScrollView(componentView);
+            messageView = GUILayout.BeginScrollView(messageView);
 
             if (gameObjectIndex != -1)
             {

@@ -21,7 +21,7 @@ namespace JFramework
             GUILayout.Label(" 系统信息", Height25);
             GUILayout.EndHorizontal();
 
-            scrollSystemView = GUILayout.BeginScrollView(scrollSystemView, "Box");
+            consoleView = GUILayout.BeginScrollView(consoleView, "Box");
             GUILayout.Label("操作系统: " + SystemInfo.operatingSystem);
             GUILayout.Label("系统内存: " + SystemInfo.systemMemorySize + "MB");
             GUILayout.Label("处理器: " + SystemInfo.processorType);

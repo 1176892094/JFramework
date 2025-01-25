@@ -75,7 +75,7 @@ namespace JFramework
                 results.Add(poolInfo);
             }
 
-            referenceView = GUILayout.BeginScrollView(referenceView, "Box");
+            consoleView = GUILayout.BeginScrollView(consoleView, "Box");
             foreach (var pool in poolData)
             {
                 pool.Value.Sort(Comparison);

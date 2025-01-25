@@ -28,15 +28,7 @@ namespace JFramework
 
         private Vector2 consoleView;
         private Vector2 messageView;
-        private Vector2 referenceView;
-        private Vector2 componentView;
-        private Vector2 gameObjectView;
-        private Vector2 scrollPathView;
-        private Vector2 scrollTimeView;
-        private Vector2 scrollSystemView;
-        private Vector2 scrollScreenView;
-        private Vector2 scrollMemoryView;
-        private Vector2 scrollProjectView;
+
         private event Action OnWindow;
 
         private void Awake()

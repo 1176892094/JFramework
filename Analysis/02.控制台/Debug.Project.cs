@@ -21,7 +21,7 @@ namespace JFramework
             GUILayout.Label(" 环境配置", Height25);
             GUILayout.EndHorizontal();
 
-            scrollProjectView = GUILayout.BeginScrollView(scrollProjectView, "Box");
+            consoleView = GUILayout.BeginScrollView(consoleView, "Box");
             GUILayout.Label("项目名称: " + Application.productName);
             GUILayout.Label("项目标识: " + Application.identifier);
             GUILayout.Label("项目版本: " + Application.version);

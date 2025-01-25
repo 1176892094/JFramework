@@ -21,7 +21,7 @@ namespace JFramework
             GUILayout.Label(" 屏幕信息", Height25);
             GUILayout.EndHorizontal();
 
-            scrollScreenView = GUILayout.BeginScrollView(scrollScreenView, "Box");
+            consoleView = GUILayout.BeginScrollView(consoleView, "Box");
 
             GUILayout.Label("像素密度: " + Screen.dpi);
             GUILayout.Label("启用全屏: " + Screen.fullScreen);

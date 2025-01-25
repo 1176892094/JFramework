@@ -22,7 +22,7 @@ namespace JFramework
             GUILayout.Label(" 时间信息", Height25);
             GUILayout.EndHorizontal();
 
-            scrollTimeView = GUILayout.BeginScrollView(scrollTimeView, "Box");
+            consoleView = GUILayout.BeginScrollView(consoleView, "Box");
             GUILayout.Label("DataTime:\t\t\t\t" + DateTime.Now.ToString("yyyy/MM/dd hh:mm:ss"));
             GUILayout.Label("Time.realtimeSinceStartup:\t" + Time.realtimeSinceStartup.ToString("F"));
             GUILayout.Label("Time.timeScale:\t\t\t" + Time.timeScale);

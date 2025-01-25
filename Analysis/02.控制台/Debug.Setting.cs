@@ -21,7 +21,7 @@ namespace JFramework
             GUILayout.Label(" 路径配置", Height25);
             GUILayout.EndHorizontal();
 
-            scrollPathView = GUILayout.BeginScrollView(scrollPathView, "Box");
+            consoleView = GUILayout.BeginScrollView(consoleView, "Box");
             GUILayout.Label("项目路径: " + Application.dataPath);
             GUILayout.Label("存储路径: " + Application.persistentDataPath);
             GUILayout.Label("流动资源路径: " + Application.streamingAssetsPath);
