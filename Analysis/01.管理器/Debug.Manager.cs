@@ -185,11 +185,10 @@ namespace JFramework
                 window = Window.Reference;
             }
 
-
-            GUI.contentColor = window == Window.Memory ? Color.white : Color.gray;
-            if (GUILayout.Button(Window.Memory.ToString(), Height30))
+            GUI.contentColor = window == Window.Project ? Color.white : Color.gray;
+            if (GUILayout.Button(Window.Project.ToString(), Height30))
             {
-                window = Window.Memory;
+                window = Window.Project;
             }
 
             GUILayout.EndHorizontal();
@@ -197,10 +196,10 @@ namespace JFramework
             if (window != Window.Console && window != Window.Scene && window != Window.Reference)
             {
                 GUILayout.BeginHorizontal();
-                GUI.contentColor = window == Window.Project ? Color.white : Color.gray;
-                if (GUILayout.Button(Window.Project.ToString(), Height30))
+                GUI.contentColor = window == Window.Memory ? Color.white : Color.gray;
+                if (GUILayout.Button(Window.Memory.ToString(), Height30))
                 {
-                    window = Window.Project;
+                    window = Window.Memory;
                 }
 
                 GUI.contentColor = window == Window.System ? Color.white : Color.gray;
