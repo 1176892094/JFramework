@@ -35,6 +35,10 @@ namespace JFramework.Net
             string reason;
             switch (error)
             {
+                case 1:
+                    return;
+                case 2:
+                    return;
                 case 3:
                     reason = "Congestion";
                     break;

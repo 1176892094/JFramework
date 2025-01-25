@@ -93,7 +93,7 @@ namespace JFramework
             itemTreeViewE = editorType.GetMethod("GetRows", Service.Find.Instance);
             editorType = GetEditorType("AssetsTreeViewDataSource");
             itemTreeViewF = editorType.GetMethod("GetRows", Service.Find.Instance);
-            editorType = Service.Find.Assembly("JFramework.Unity")?.GetType("JFramework.EditorSetting");
+            editorType = Service.Find.Assembly("JFramework.Unity")?.GetType("JFramework.Common.EditorSetting");
             showEditorWindow = editorType?.GetMethod("ShowWindow", Service.Find.Static);
             var types = new[] { typeof(Rect), typeof(Object), typeof(int) };
             contextMenuMethod = GetMethod(typeof(EditorUtility), Service.Find.Static, "DisplayObjectContextMenu", types);

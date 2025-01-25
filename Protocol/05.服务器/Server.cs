@@ -135,8 +135,11 @@ namespace JFramework.Udp
 
             void OnDisconnect()
             {
-                copies.Add(clientId);
-                Log.Info($"[{DateTime.Now:MM-dd HH:mm:ss}] 客户端 {clientId} 从服务器断开。");
+                if (copies.Add(clientId))
+                {
+                    Log.Info($"[{DateTime.Now:MM-dd HH:mm:ss}] 客户端 {clientId} 从服务器断开。");
+                }
+
                 this.OnDisconnect?.Invoke(clientId);
             }
 

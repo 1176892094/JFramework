@@ -237,6 +237,7 @@ namespace JFramework.Udp
             {
                 Logger(Error.Timeout, $"{GetType()}: 网络消息被重传了 {kcp.dead_link} 次而没有得到确认！");
                 Disconnect();
+                return;
             }
 
             var time = (uint)watch.ElapsedMilliseconds;
@@ -244,6 +245,7 @@ namespace JFramework.Udp
             {
                 Logger(Error.Timeout, $"{GetType()}: 在 {timeout}ms 内没有收到任何消息后的连接超时！");
                 Disconnect();
+                return;
             }
 
             var total = kcp.receiveQueue.Count + kcp.sendQueue.Count + kcp.receiveBuffer.Count + kcp.sendBuffer.Count;
@@ -252,6 +254,7 @@ namespace JFramework.Udp
                 Logger(Error.Congestion, $"{GetType()}: 断开连接，因为它处理数据的速度不够快！");
                 kcp.sendQueue.Clear();
                 Disconnect();
+                return;
             }
 
             if (time >= pingTime + PING_INTERVAL)
