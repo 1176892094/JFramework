@@ -24,6 +24,13 @@ namespace JFramework
         public override void Dispose()
         {
             base.Dispose();
+            var copies = new List<IState>(states.Values);
+            foreach (var stateData in copies)
+            {
+                stateData.Dispose();
+                Service.Pool.Enqueue(stateData, stateData.GetType());
+            }
+
             states.Clear();
             state = null;
         }
@@ -33,31 +40,35 @@ namespace JFramework
             state.OnUpdate();
         }
 
-        public void AddState<T>() where T : State<TOwner>
+        public void AddState<T>()
         {
-            states.Add(typeof(T), (IState)AgentManager.Show(owner, typeof(T)));
+            var stateData = Service.Pool.Dequeue<IState>(typeof(T));
+            states[typeof(T)] = stateData;
+            stateData.OnAwake(owner);
         }
 
-        public void AddState(Type stateType)
+        public void AddState<T>(Type stateType)
         {
-            states.Add(stateType, (IState)AgentManager.Show(owner, stateType));
+            var stateData = Service.Pool.Dequeue<IState>(stateType);
+            states[typeof(T)] = stateData;
+            stateData.OnAwake(owner);
         }
 
-        public void ChangeState<T>() where T : State<TOwner>
+        public void ChangeState<T>() 
         {
-            state.OnExit();
+            state?.OnExit();
             state = states[typeof(T)];
-            state.OnEnter();
+            state?.OnEnter();
         }
 
         public void ChangeState(Type stateType)
         {
-            state.OnExit();
+            state?.OnExit();
             state = states[stateType];
-            state.OnEnter();
+            state?.OnEnter();
         }
 
-        public void RemoveState<T>() where T : State<TOwner>
+        public void RemoveState<T>()
         {
             states.Remove(typeof(T));
         }

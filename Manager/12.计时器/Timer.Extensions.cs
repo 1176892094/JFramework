@@ -15,12 +15,12 @@ namespace JFramework
 {
     public static partial class Extensions
     {
-        public static Watch Watch(this GameObject current, float duration)
+        public static Watch Wait(this Component current, float duration)
         {
             return TimerManager.Load<Watch>(current, duration);
         }
 
-        public static Tween Tween(this GameObject current, float duration)
+        public static Tween Tween(this Component current, float duration)
         {
             return TimerManager.Load<Tween>(current, duration);
         }
@@ -28,7 +28,7 @@ namespace JFramework
         public static Tween DOMoveX(this Transform transform, float endValue, float duration)
         {
             var position = transform.position;
-            return transform.gameObject.Tween(duration).OnUpdate(progress =>
+            return transform.Tween(duration).OnUpdate(progress =>
             {
                 var positionX = Mathf.Lerp(position.x, endValue, progress);
                 transform.position = new Vector3(positionX, position.y, position.z);
@@ -38,7 +38,7 @@ namespace JFramework
         public static Tween DOMoveY(this Transform transform, float endValue, float duration)
         {
             var position = transform.position;
-            return transform.gameObject.Tween(duration).OnUpdate(progress =>
+            return transform.Tween(duration).OnUpdate(progress =>
             {
                 var positionY = Mathf.Lerp(position.y, endValue, progress);
                 transform.position = new Vector3(position.x, positionY, position.z);
@@ -48,7 +48,7 @@ namespace JFramework
         public static Tween DOMoveZ(this Transform transform, float endValue, float duration)
         {
             var position = transform.position;
-            return transform.gameObject.Tween(duration).OnUpdate(progress =>
+            return transform.Tween(duration).OnUpdate(progress =>
             {
                 var positionZ = Mathf.Lerp(position.z, endValue, progress);
                 transform.position = new Vector3(position.x, position.y, positionZ);
@@ -58,7 +58,7 @@ namespace JFramework
         public static Tween DOMove(this Transform transform, Vector3 endValue, float duration)
         {
             var position = transform.position;
-            return transform.gameObject.Tween(duration).OnUpdate(progress =>
+            return transform.Tween(duration).OnUpdate(progress =>
             {
                 var positionX = Mathf.Lerp(position.x, endValue.x, progress);
                 var positionY = Mathf.Lerp(position.y, endValue.y, progress);
@@ -70,7 +70,7 @@ namespace JFramework
         public static Tween DORotateX(this Transform transform, float endValue, float duration)
         {
             var rotation = transform.rotation.eulerAngles;
-            return transform.gameObject.Tween(duration).OnUpdate(progress =>
+            return transform.Tween(duration).OnUpdate(progress =>
             {
                 var rotationX = Mathf.LerpAngle(rotation.x, endValue, progress);
                 transform.rotation = Quaternion.Euler(rotationX, rotation.y, rotation.z);
@@ -80,7 +80,7 @@ namespace JFramework
         public static Tween DORotateY(this Transform transform, float endValue, float duration)
         {
             var rotation = transform.rotation.eulerAngles;
-            return transform.gameObject.Tween(duration).OnUpdate(progress =>
+            return transform.Tween(duration).OnUpdate(progress =>
             {
                 var rotationY = Mathf.LerpAngle(rotation.y, endValue, progress);
                 transform.rotation = Quaternion.Euler(rotation.x, rotationY, rotation.z);
@@ -90,7 +90,7 @@ namespace JFramework
         public static Tween DORotateZ(this Transform transform, float endValue, float duration)
         {
             var rotation = transform.rotation.eulerAngles;
-            return transform.gameObject.Tween(duration).OnUpdate(progress =>
+            return transform.Tween(duration).OnUpdate(progress =>
             {
                 var rotationZ = Mathf.LerpAngle(rotation.z, endValue, progress);
                 transform.rotation = Quaternion.Euler(rotation.x, rotation.y, rotationZ);
@@ -100,7 +100,7 @@ namespace JFramework
         public static Tween DORotate(this Transform transform, Vector3 endValue, float duration)
         {
             var rotation = transform.rotation.eulerAngles;
-            return transform.gameObject.Tween(duration).OnUpdate(progress =>
+            return transform.Tween(duration).OnUpdate(progress =>
             {
                 var rotationX = Mathf.Lerp(rotation.x, endValue.x, progress);
                 var rotationY = Mathf.Lerp(rotation.y, endValue.y, progress);
@@ -112,7 +112,7 @@ namespace JFramework
         public static Tween DOScaleX(this Transform transform, float endValue, float duration)
         {
             var localScale = transform.localScale;
-            return transform.gameObject.Tween(duration).OnUpdate(progress =>
+            return transform.Tween(duration).OnUpdate(progress =>
             {
                 var localScaleX = Mathf.Lerp(localScale.x, endValue, progress);
                 transform.localScale = new Vector3(localScaleX, localScale.y, localScale.z);
@@ -122,7 +122,7 @@ namespace JFramework
         public static Tween DOScaleY(this Transform transform, float endValue, float duration)
         {
             var localScale = transform.localScale;
-            return transform.gameObject.Tween(duration).OnUpdate(progress =>
+            return transform.Tween(duration).OnUpdate(progress =>
             {
                 var localScaleY = Mathf.Lerp(localScale.y, endValue, progress);
                 transform.localScale = new Vector3(localScale.x, localScaleY, localScale.z);
@@ -132,7 +132,7 @@ namespace JFramework
         public static Tween DOScaleZ(this Transform transform, float endValue, float duration)
         {
             var localScale = transform.localScale;
-            return transform.gameObject.Tween(duration).OnUpdate(progress =>
+            return transform.Tween(duration).OnUpdate(progress =>
             {
                 var localScaleZ = Mathf.Lerp(localScale.z, endValue, progress);
                 transform.localScale = new Vector3(localScale.x, localScale.y, localScaleZ);
@@ -142,7 +142,7 @@ namespace JFramework
         public static Tween DOScale(this Transform transform, Vector3 endValue, float duration)
         {
             var localScale = transform.localScale;
-            return transform.gameObject.Tween(duration).OnUpdate(progress =>
+            return transform.Tween(duration).OnUpdate(progress =>
             {
                 var localScaleX = Mathf.Lerp(localScale.x, endValue.x, progress);
                 var localScaleY = Mathf.Lerp(localScale.y, endValue.y, progress);

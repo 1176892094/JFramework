@@ -23,7 +23,7 @@ namespace JFramework
         private Action OnDispose;
         private Action OnUpdated;
 
-        private GameObject owner;
+        private Component owner;
         private int progress;
         private bool unscaled;
         private float waitTime;
@@ -39,7 +39,7 @@ namespace JFramework
             OnDispose = null;
         }
 
-        void ITimer.Start(GameObject owner, float duration, Action OnDispose)
+        void ITimer.Start(Component owner, float duration, Action OnDispose)
         {
             progress = 1;
             waitTime = 0;
@@ -59,7 +59,7 @@ namespace JFramework
                     return;
                 }
 
-                if (!owner.activeInHierarchy)
+                if (!owner.gameObject.activeInHierarchy)
                 {
                     OnDispose.Invoke();
                     return;

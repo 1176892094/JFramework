@@ -11,6 +11,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Text;
 using System.Threading.Tasks;
 using JFramework.Common;
 using UnityEngine;
@@ -25,9 +26,9 @@ namespace JFramework
     public class GlobalManager : MonoBehaviour
     {
         public static GlobalManager Instance;
-        
+
         public static Canvas canvas;
-        
+
         public static AudioSource audioSource;
 
         internal static Component entity;
@@ -67,9 +68,9 @@ namespace JFramework
         internal static readonly Dictionary<string, HashSet<UIPanel>> panelGroup = new Dictionary<string, HashSet<UIPanel>>();
 
         internal static readonly Dictionary<UIPanel, HashSet<string>> groupPanel = new Dictionary<UIPanel, HashSet<string>>();
-        
+
         internal static readonly Dictionary<UILayer, RectTransform> panelLayer = new Dictionary<UILayer, RectTransform>();
-        
+
         private void Awake()
         {
             Instance = this;
@@ -101,6 +102,29 @@ namespace JFramework
             Service.Pool.Dispose();
             Service.Event.Dispose();
             GC.Collect();
+        }
+
+        public static string Reference()
+        {
+            var builder = Service.Pool.Dequeue<StringBuilder>();
+            builder.AppendLine("audioData.Count:" + audioData.Count);
+            builder.AppendLine("panelData.Count:" + panelData.Count);
+            builder.AppendLine("itemTable.Count:" + itemTable.Count);
+            builder.AppendLine("nameTable.Count:" + nameTable.Count);
+            builder.AppendLine("enumTable.Count:" + enumTable.Count);
+            builder.AppendLine("assetData.Count:" + assetData.Count);
+            builder.AppendLine("assetPack.Count:" + assetPack.Count);
+            builder.AppendLine("assetTask.Count:" + assetTask.Count);
+            builder.AppendLine("poolData.Count:" + poolData.Count);
+            builder.AppendLine("poolGroup.Count:" + poolGroup.Count);
+            builder.AppendLine("agentData.Count:" + agentData.Count);
+            builder.AppendLine("panelGroup.Count:" + panelGroup.Count);
+            builder.AppendLine("groupPanel.Count:" + groupPanel.Count);
+            builder.AppendLine("panelLayer.Count:" + panelLayer.Count);
+            var result = builder.ToString();
+            Service.Pool.Enqueue(builder);
+            builder.Length = 0;
+            return result;
         }
     }
 }

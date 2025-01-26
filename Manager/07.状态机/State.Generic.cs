@@ -16,8 +16,14 @@ using UnityEngine;
 namespace JFramework
 {
     [Serializable]
-    public abstract class State<T> : Agent<T>, IState where T : Component
+    public abstract class State<T> : IState where T : Component
     {
+        protected T owner { get; private set; }
+
+        void IDisposable.Dispose() => owner = default;
+
+        void IAgent.OnAwake(Component owner) => this.owner = (T)owner;
+        
         void IState.OnEnter() => OnEnter();
 
         void IState.OnUpdate() => OnUpdate();

@@ -9,7 +9,7 @@
 // # Description: This is an automatically generated comment.
 // *********************************************************************************
 
-using System;
+using JFramework.Common;
 using UnityEngine;
 
 namespace JFramework
@@ -29,7 +29,7 @@ namespace JFramework
                     lock (locked)
                     {
                         instance ??= FindFirstObjectByType<T>();
-                        if ((instance.status & Status.Automatic) != 0)
+                        if (typeof(IAutomatic).IsAssignableFrom(typeof(T)))
                         {
                             instance ??= new GameObject(typeof(T).Name).AddComponent<T>();
                         }
@@ -41,8 +41,6 @@ namespace JFramework
                 return instance;
             }
         }
-
-        protected virtual Status status => Status.None;
 
         protected virtual void Awake()
         {
@@ -56,7 +54,7 @@ namespace JFramework
                 Destroy(this);
             }
 
-            if ((instance.status & Status.Perpetual) != 0)
+            if (typeof(IPerpetual).IsAssignableFrom(typeof(T)))
             {
                 DontDestroyOnLoad(gameObject);
             }
@@ -65,14 +63,6 @@ namespace JFramework
         protected virtual void OnDestroy()
         {
             instance = null;
-        }
-
-        [Flags]
-        protected enum Status
-        {
-            None,
-            Automatic = 1 << 0,
-            Perpetual = 1 << 1,
         }
     }
 }

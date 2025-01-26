@@ -24,7 +24,7 @@ namespace JFramework
             }
         }
 
-        public static T Load<T>(GameObject entity, float duration) where T : class, ITimer
+        public static T Load<T>(Component entity, float duration) where T : class, ITimer
         {
             if (!GlobalManager.Instance) return default;
             var timerData = Service.Pool.Dequeue<T>();

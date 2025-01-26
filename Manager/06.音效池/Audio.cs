@@ -81,7 +81,7 @@ namespace JFramework
             assetData.volume = audioValue;
             assetAction?.Invoke(assetData);
             assetData.Play();
-            assetData.gameObject.Watch(assetData.clip.length).OnComplete(() => StopLoop(assetData));
+            assetData.Wait(assetData.clip.length).OnComplete(() => StopLoop(assetData));
         }
 
         public static void StopMain(bool pause = true)
