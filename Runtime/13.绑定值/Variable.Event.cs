@@ -14,14 +14,4 @@ namespace JFramework.Common
     public struct VariableEvent : IEvent
     {
     }
-
-    public struct PingUpdateEvent : IEvent
-    {
-        public double pingTime { get; private set; }
-
-        public PingUpdateEvent(double pingTime)
-        {
-            this.pingTime = pingTime;
-        }
-    }
 }

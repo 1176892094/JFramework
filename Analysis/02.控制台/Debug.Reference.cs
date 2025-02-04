@@ -41,21 +41,19 @@ namespace JFramework
             {
                 option = Pool.Pool;
             }
-
-
+            
             GUI.contentColor = Color.white;
             GUILayout.EndHorizontal();
-
             switch (option)
             {
                 case Pool.Event:
-                    Draw(Service.Event.Reference(), "事件池", "触发数\t事件数\t添加次数\t移除次数");
+                    Draw(ServiceEventRef.Invoke(), "事件池", "触发数\t事件数\t添加次数\t移除次数");
                     break;
                 case Pool.Heap:
-                    Draw(Service.Pool.Reference(), "引用池", "未使用\t使用中\t使用次数\t释放次数");
+                    Draw(ServicePoolRef.Invoke(), "引用池", "未使用\t使用中\t使用次数\t释放次数");
                     break;
                 case Pool.Pool:
-                    Draw(PoolManager.Reference(), "对象池", "未激活\t激活中\t出队次数\t入队次数");
+                    Draw(PoolManagerRef.Invoke(), "对象池", "未激活\t激活中\t出队次数\t入队次数");
                     break;
             }
         }

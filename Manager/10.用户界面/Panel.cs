@@ -158,6 +158,7 @@ namespace JFramework
                 var name = Service.Text.Format("Pool - Canvas/{0}", layer);
                 var child = new GameObject(name, typeof(RectTransform));
                 child.transform.SetParent(GlobalManager.canvas.transform);
+                child.layer = LayerMask.NameToLayer("UI");
                 parent = child.GetComponent<RectTransform>();
                 parent.anchorMin = Vector2.zero;
                 parent.anchorMax = Vector2.one;

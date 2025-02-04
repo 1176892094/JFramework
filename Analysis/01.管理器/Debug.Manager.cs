@@ -11,6 +11,7 @@
 
 using System;
 using JFramework.Common;
+using JFramework.Net;
 using UnityEngine;
 
 namespace JFramework
@@ -29,7 +30,10 @@ namespace JFramework
         private Vector2 consoleView;
         private Vector2 messageView;
 
-        private event Action OnWindow;
+        private Func<Reference[]> ServicePoolRef;
+        private Func<Reference[]> ServiceEventRef;
+        private Func<Reference[]> PoolManagerRef;
+        private Action NetworkManagerRef;
 
         private void Awake()
         {
@@ -38,23 +42,33 @@ namespace JFramework
 
         private void Start()
         {
+            var message = typeof(Service.Pool).GetMethod("Reference", Service.Find.Static);
+            if (message != null)
+            {
+                ServicePoolRef = (Func<Reference[]>)Delegate.CreateDelegate(typeof(Func<Reference[]>), message);
+            }
+            
+            message = typeof(Service.Event).GetMethod("Reference", Service.Find.Static);
+            if (message != null)
+            {
+                ServiceEventRef = (Func<Reference[]>)Delegate.CreateDelegate(typeof(Func<Reference[]>), message);
+            }
+
+            message = typeof(PoolManager).GetMethod("Reference", Service.Find.Static);
+            if (message != null)
+            {
+                PoolManagerRef = (Func<Reference[]>)Delegate.CreateDelegate(typeof(Func<Reference[]>), message);
+            }
+
+            message = typeof(NetworkManager).GetMethod("Reference", Service.Find.Static);
+            if (message != null)
+            {
+                status |= Status.Ping;
+                NetworkManagerRef = (Action)Delegate.CreateDelegate(typeof(Action), message);
+            }
+
             foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
             {
-                if ((status & Status.Ping) == 0)
-                {
-                    if (assembly.GetName().Name == "JFramework.Net")
-                    {
-                        var manager = assembly.GetType("JFramework.Net.NetworkManager");
-                        var message = manager.GetMethod("Window", Service.Find.Static);
-                        if (message != null)
-                        {
-                            OnWindow = (Action)Delegate.CreateDelegate(typeof(Action), message);
-                        }
-
-                        status |= Status.Ping;
-                    }
-                }
-
                 var sceneTypes = assembly.GetTypes();
                 foreach (var sceneType in sceneTypes)
                 {
@@ -296,7 +310,7 @@ namespace JFramework
             {
                 var boxAlignment = GUI.skin.box.alignment;
                 GUI.skin.box.alignment = TextAnchor.MiddleCenter;
-                OnWindow?.Invoke();
+                NetworkManagerRef.Invoke();
                 GUI.skin.box.alignment = boxAlignment;
             }
 

@@ -30,8 +30,8 @@ namespace JFramework
 
         public Type assetType { get; private set; }
         public string assetPath { get; private set; }
-        public int caches => cached.Count;
-        public int unuseds => unused.Count;
+        public int acquire => cached.Count;
+        public int release => unused.Count;
         public int dequeue { get; private set; }
         public int enqueue { get; private set; }
 

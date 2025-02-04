@@ -223,7 +223,7 @@ namespace JFramework.Net
             return @object.gameObject.hideFlags != HideFlags.HideAndDontSave;
         }
 
-        internal static void Window()
+        private static void Reference()
         {
             var option = GUILayout.Height(30f);
             if (!Client.isConnected && !Server.isActive)

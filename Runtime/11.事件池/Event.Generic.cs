@@ -29,8 +29,8 @@ namespace JFramework
 
             public Type assetType { get; private set; }
             public string assetPath { get; private set; }
-            public int caches => cached.Count;
-            public int unuseds { get; private set; }
+            public int acquire => cached.Count;
+            public int release { get; private set; }
             public int dequeue { get; private set; }
             public int enqueue { get; private set; }
 
@@ -62,7 +62,7 @@ namespace JFramework
 
             public void Invoke(T message)
             {
-                unuseds++;
+                release++;
                 OnExecute?.Invoke(message);
             }
         }

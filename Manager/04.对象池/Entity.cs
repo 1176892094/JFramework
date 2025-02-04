@@ -63,7 +63,7 @@ namespace JFramework
             return (EntityPool)poolData;
         }
 
-        public static Reference[] Reference()
+        private static Reference[] Reference()
         {
             var index = 0;
             var results = new Reference[GlobalManager.poolData.Count];
@@ -71,7 +71,7 @@ namespace JFramework
             {
                 var assetType = value.assetType;
                 var assetPath = value.assetPath;
-                results[index++] = new Reference(assetType, assetPath, value.caches, value.unuseds, value.dequeue, value.enqueue);
+                results[index++] = new Reference(assetType, assetPath, value.acquire, value.release, value.dequeue, value.enqueue);
             }
 
             return results;

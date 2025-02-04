@@ -17,8 +17,8 @@ namespace JFramework.Common
     {
         public Type assetType { get; }
         public string assetPath { get; }
-        public int caches { get; }
-        public int unuseds { get; }
+        public int acquire { get; }
+        public int release { get; }
         public int dequeue { get; }
         public int enqueue { get; }
     }
