@@ -20,15 +20,25 @@ namespace JFramework.Common
 {
     internal partial class GlobalSetting
     {
+        protected override bool odinSerialize
+        {
+            get
+            {
+#if ODIN_INSPECTOR && UNITY_EDITOR
+                return true;
+#endif
+                return false;
+            }
+        }
+
         protected override string scriptDataPath
         {
             get
             {
 #if UNITY_EDITOR
                 return ScriptPath;
-#else
-                return string.Empty;
 #endif
+                return string.Empty;
             }
         }
 
@@ -38,9 +48,8 @@ namespace JFramework.Common
             {
 #if UNITY_EDITOR
                 return DataTablePath;
-#else
-                return string.Empty;
 #endif
+                return string.Empty;
             }
         }
 
@@ -104,9 +113,8 @@ namespace JFramework.Common
             if (!EditorSetting.objects.TryGetValue(assetPath, out var assetData)) return null;
             var request = UnityEditor.AssetDatabase.LoadAssetAtPath(assetData, assetType);
             return request is GameObject ? Instantiate(request) : request;
-#else
-            return null;
 #endif
+            return null;
         }
 
         public override async Task<KeyValuePair<int, string>> LoadRequest(string persistentData, string streamingAssets)
@@ -115,7 +123,6 @@ namespace JFramework.Common
             {
                 return new KeyValuePair<int, string>(1, persistentData);
             }
-
 #if UNITY_ANDROID && !UNITY_EDITOR
             using var request = UnityWebRequest.Head(streamingAssets);
             await request.SendWebRequest();
