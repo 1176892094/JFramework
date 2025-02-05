@@ -45,9 +45,13 @@ namespace JFramework
 
         [SerializeField] protected string assetCachePath = "Assets/Template";
 
+        protected abstract bool odinSerialize { get; }
+        
         protected abstract string scriptDataPath { get; }
 
         protected abstract string assetDataPath { get; }
+
+        internal static bool odinInspector => Instance.odinSerialize;
 
         internal static string platformPath => Instance.assetPlatform.ToString();
 

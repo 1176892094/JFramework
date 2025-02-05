@@ -9,15 +9,18 @@
 // # Description: This is an automatically generated comment.
 // *********************************************************************************
 
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace JFramework
 {
     public abstract class UIPanel : MonoBehaviour
     {
-        public UILayer layer { get; set; } = UILayer.Layer1;
+        public UIState state = UIState.Common;
+
+        [Range(0, 9)] public int layer = 1 << 0;
         
-        public UIState state { get; set; } = UIState.Common;
+        public List<string> groups = new List<string>();
 
         protected virtual void Awake()
         {
@@ -27,6 +30,8 @@ namespace JFramework
         protected virtual void OnDestroy()
         {
             this.Destroy();
+            groups.Clear();
+            groups = null;
         }
 
         public virtual void Show()

@@ -18,7 +18,7 @@ namespace JFramework
     {
         [SerializeField] private T instance;
 
-        public T owner => instance ??= (T)GlobalManager.entity;
+        public T owner => instance ??= (T)GlobalManager.cached;
 
         public virtual void OnAwake(Component owner) => instance ??= (T)owner;
 

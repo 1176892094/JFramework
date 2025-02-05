@@ -24,15 +24,9 @@ namespace JFramework
                 GlobalManager.panelGroup.Add(group, panelGroup);
             }
 
-            if (!GlobalManager.groupPanel.TryGetValue(panel, out var groupPanel))
-            {
-                groupPanel = new HashSet<string>();
-                GlobalManager.groupPanel.Add(panel, groupPanel);
-            }
-
             if (panelGroup.Add(panel))
             {
-                groupPanel.Add(group);
+                panel.groups.Add(group);
             }
         }
 
@@ -45,15 +39,9 @@ namespace JFramework
                 GlobalManager.panelGroup.Add(group, panelGroup);
             }
 
-            if (!GlobalManager.groupPanel.TryGetValue(panel, out var groupPanel))
-            {
-                groupPanel = new HashSet<string>();
-                GlobalManager.groupPanel.Add(panel, groupPanel);
-            }
-
             if (panelGroup.Remove(panel))
             {
-                groupPanel.Remove(group);
+                panel.groups.Remove(group);
             }
         }
 
@@ -89,13 +77,7 @@ namespace JFramework
 
         private static bool ShowInGroup(UIPanel panel)
         {
-            if (!GlobalManager.groupPanel.TryGetValue(panel, out var groupPanel))
-            {
-                groupPanel = new HashSet<string>();
-                GlobalManager.groupPanel.Add(panel, groupPanel);
-            }
-
-            foreach (var group in groupPanel)
+            foreach (var group in panel.groups)
             {
                 if (!GlobalManager.panelGroup.TryGetValue(group, out var panelGroup))
                 {
@@ -110,23 +92,11 @@ namespace JFramework
                     }
                 }
             }
-
             return !panel.gameObject.activeInHierarchy;
         }
 
         internal static void Dispose()
         {
-            var groupPanel = new List<UIPanel>(GlobalManager.groupPanel.Keys);
-            foreach (var panel in groupPanel)
-            {
-                if (GlobalManager.groupPanel.TryGetValue(panel, out var group))
-                {
-                    group.Clear();
-                }
-            }
-
-            GlobalManager.groupPanel.Clear();
-
             var panelGroup = new List<string>(GlobalManager.panelGroup.Keys);
             foreach (var group in panelGroup)
             {
@@ -136,8 +106,8 @@ namespace JFramework
                 }
             }
 
-            GlobalManager.panelGroup.Clear();
             GlobalManager.panelData.Clear();
+            GlobalManager.panelGroup.Clear();
             GlobalManager.panelLayer.Clear();
         }
     }

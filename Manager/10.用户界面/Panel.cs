@@ -81,7 +81,9 @@ namespace JFramework
             if (!GlobalManager.Instance) return;
             if (GlobalManager.panelData.TryGetValue(typeof(T), out var panel))
             {
-                Destroy(panel, typeof(T));
+                panel.Hide();
+                GlobalManager.panelData.Remove(typeof(T));
+                Object.Destroy(panel.gameObject);
             }
         }
 
@@ -131,7 +133,9 @@ namespace JFramework
             if (!GlobalManager.Instance) return;
             if (GlobalManager.panelData.TryGetValue(assetType, out var panel))
             {
-                Destroy(panel, assetType);
+                panel.Hide();
+                GlobalManager.panelData.Remove(assetType);
+                Object.Destroy(panel.gameObject);
             }
         }
 
@@ -144,20 +148,22 @@ namespace JFramework
                 {
                     if (panel.state != UIState.Stable)
                     {
-                        Destroy(panel, assetType);
+                        panel.Hide();
+                        GlobalManager.panelData.Remove(assetType);
+                        Object.Destroy(panel.gameObject);
                     }
                 }
             }
         }
 
-        public static void Surface(Transform panel, UILayer layer)
+        public static void Surface(Transform panel, int layer)
         {
             if (!GlobalManager.Instance) return;
             if (!GlobalManager.panelLayer.TryGetValue(layer, out var parent))
             {
-                var name = Service.Text.Format("Pool - Canvas/{0}", layer);
+                var name = Service.Text.Format("Pool - Canvas/Layer-{0}", layer);
                 var child = new GameObject(name, typeof(RectTransform));
-                child.transform.SetParent(GlobalManager.canvas.transform);
+                child.transform.SetParent(GlobalManager.Instance.canvas.transform);
                 child.layer = LayerMask.NameToLayer("UI");
                 parent = child.GetComponent<RectTransform>();
                 parent.anchorMin = Vector2.zero;
@@ -178,25 +184,6 @@ namespace JFramework
             transform.offsetMax = Vector2.zero;
             transform.localScale = Vector3.one;
             transform.localPosition = Vector3.zero;
-        }
-
-        private static void Destroy(UIPanel panel, Type assetType)
-        {
-            if (!GlobalManager.Instance) return;
-            if (GlobalManager.groupPanel.TryGetValue(panel, out var groupPanel))
-            {
-                foreach (var group in groupPanel)
-                {
-                    GlobalManager.panelGroup.Remove(group);
-                }
-
-                groupPanel.Clear();
-                GlobalManager.groupPanel.Remove(panel);
-            }
-
-            panel.Hide();
-            GlobalManager.panelData.Remove(assetType);
-            Object.Destroy(panel.gameObject);
         }
     }
 }

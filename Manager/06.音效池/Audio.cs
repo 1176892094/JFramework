@@ -18,34 +18,34 @@ namespace JFramework
     {
         public static float musicValue
         {
-            get => GlobalManager.setting.musicValue;
+            get => GlobalManager.settings.musicValue;
             set
             {
-                GlobalManager.setting.musicValue = value;
-                GlobalManager.audioSource.volume = value;
-                JsonManager.Save(GlobalManager.setting, nameof(AudioSetting));
+                GlobalManager.settings.musicValue = value;
+                GlobalManager.Instance.sounds.volume = value;
+                JsonManager.Save(GlobalManager.settings, nameof(AudioSetting));
             }
         }
 
         public static float audioValue
         {
-            get => GlobalManager.setting.audioValue;
+            get => GlobalManager.settings.audioValue;
             set
             {
-                GlobalManager.setting.audioValue = value;
+                GlobalManager.settings.audioValue = value;
                 foreach (var audioSource in GlobalManager.audioData)
                 {
                     audioSource.volume = value;
                 }
 
-                JsonManager.Save(GlobalManager.setting, nameof(AudioSetting));
+                JsonManager.Save(GlobalManager.settings, nameof(AudioSetting));
             }
         }
 
         public static async void PlayMain(string assetName, Action<AudioSource> assetAction = null)
         {
             if (!GlobalManager.Instance) return;
-            var audioSource = GlobalManager.audioSource;
+            var audioSource = GlobalManager.Instance.sounds;
             audioSource.clip = await AssetManager.Load<AudioClip>(GlobalSetting.GetAudioPath(assetName));
             audioSource.loop = true;
             audioSource.volume = musicValue;
@@ -89,11 +89,11 @@ namespace JFramework
             if (!GlobalManager.Instance) return;
             if (pause)
             {
-                GlobalManager.audioSource.Pause();
+                GlobalManager.Instance.sounds.Pause();
             }
             else
             {
-                GlobalManager.audioSource.Stop();
+                GlobalManager.Instance.sounds.Stop();
             }
         }
 

@@ -30,7 +30,7 @@ namespace JFramework
 
             if (!agentData.TryGetValue(typeof(T), out var agent))
             {
-                GlobalManager.entity = entity;
+                GlobalManager.cached = entity;
                 agent = LoadPool(typeof(T)).Dequeue();
                 agentData.Add(typeof(T), agent);
                 ((IAgent)agent).OnAwake(entity);
@@ -50,7 +50,7 @@ namespace JFramework
 
             if (!agentData.TryGetValue(agentType, out var agent))
             {
-                GlobalManager.entity = entity;
+                GlobalManager.cached = entity;
                 agent = LoadPool(agentType).Dequeue();
                 agentData.Add(agentType, agent);
                 ((IAgent)agent).OnAwake(entity);
