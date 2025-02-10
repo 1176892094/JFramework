@@ -88,7 +88,7 @@ TextAsset:
     20:12:28\n// # Copyright: 2024, \u4E91\u8C37\u5343\u7FBD\n// # Description: This
     is an automatically generated comment.\n// *********************************************************************************\n\nusing
     System;\nusing System.Text;\nusing UnityEngine;\nusing JFramework.Common;\n\nnamespace
-    JFramework.Table\n{\n    public class TemplateDataTable : DataTable<TemplateData>
+    JFramework.Table\n{\n    internal class TemplateDataTable : DataTable<TemplateData>
     { }\n    \n    [Serializable]\n    public struct TemplateData : IData\n    {\n//TODO:1\n#if
     UNITY_EDITOR\n        public void Create(string[] sheet, int column)\n       
     {\n//TODO:2\n        }\n#endif\n    }\n}"
