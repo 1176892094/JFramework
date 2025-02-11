@@ -25,7 +25,7 @@ namespace JFramework
             if (!GlobalManager.Instance) return;
             if (!GlobalSetting.assetLoadMode)
             {
-                Service.Event.Invoke(new PackCompleteEvent(0, "启动本地资源加载。"));
+                Service.Event.Invoke(new PackComplete(0, "启动本地资源加载。"));
                 return;
             }
 
@@ -50,11 +50,11 @@ namespace JFramework
                     sizes[i] = assetPacks[i].size;
                 }
 
-                Service.Event.Invoke(new PackAwakeEvent(sizes));
+                Service.Event.Invoke(new PackAwake(sizes));
             }
             else
             {
-                Service.Event.Invoke(new PackCompleteEvent(-1, "没有连接到服务器!"));
+                Service.Event.Invoke(new PackComplete(-1, "没有连接到服务器!"));
                 return;
             }
 
@@ -104,7 +104,7 @@ namespace JFramework
                 File.WriteAllText(filePath, serverRequest);
             }
 
-            Service.Event.Invoke(new PackCompleteEvent(1, status ? "更新完成!" : "更新失败!"));
+            Service.Event.Invoke(new PackComplete(1, status ? "更新完成!" : "更新失败!"));
         }
 
         private static async Task<bool> LoadPacketRequest(HashSet<string> fileNames)
@@ -181,11 +181,11 @@ namespace JFramework
                 var result = request.SendWebRequest();
                 while (!result.isDone && GlobalSetting.Instance != null)
                 {
-                    Service.Event.Invoke(new PackUpdateEvent(packName, request.downloadProgress));
+                    Service.Event.Invoke(new PackUpdate(packName, request.downloadProgress));
                     await Task.Yield();
                 }
 
-                Service.Event.Invoke(new PackUpdateEvent(packName, 1));
+                Service.Event.Invoke(new PackUpdate(packName, 1));
                 if (request.result != UnityWebRequest.Result.Success)
                 {
                     Debug.Log(Service.Text.Format("请求服务器下载 {0} 失败!\n", packName));

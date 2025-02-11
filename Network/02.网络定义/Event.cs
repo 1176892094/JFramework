@@ -15,119 +15,119 @@ using JFramework.Net;
 
 namespace JFramework.Common
 {
-    public struct ServerConnectEvent : IEvent
+    public struct ServerConnect : IEvent
     {
         public NetworkClient client { get; private set; }
 
-        public ServerConnectEvent(NetworkClient client)
+        public ServerConnect(NetworkClient client)
         {
             this.client = client;
         }
     }
 
-    public struct ServerDisconnectEvent : IEvent
+    public struct ServerDisconnect : IEvent
     {
         public NetworkClient client { get; private set; }
 
-        public ServerDisconnectEvent(NetworkClient client)
+        public ServerDisconnect(NetworkClient client)
         {
             this.client = client;
         }
     }
 
-    public struct ServerReadyEvent : IEvent
+    public struct ServerReady : IEvent
     {
         public NetworkClient client { get; private set; }
 
-        public ServerReadyEvent(NetworkClient client)
+        public ServerReady(NetworkClient client)
         {
             this.client = client;
         }
     }
 
-    public struct ServerLoadSceneEvent : IEvent
+    public struct ServerChangeScene : IEvent
     {
         public string sceneName { get; private set; }
 
-        public ServerLoadSceneEvent(string sceneName)
+        public ServerChangeScene(string sceneName)
         {
             this.sceneName = sceneName;
         }
     }
 
-    public struct ServerLoadCompleteEvent : IEvent
+    public struct ServerSceneChanged : IEvent
     {
         public string sceneName { get; private set; }
 
-        public ServerLoadCompleteEvent(string sceneName)
+        public ServerSceneChanged(string sceneName)
         {
             this.sceneName = sceneName;
         }
     }
 
-    public struct ClientConnectEvent : IEvent
+    public struct ClientConnect : IEvent
     {
     }
 
-    public struct ClientDisconnectEvent : IEvent
+    public struct ClientDisconnect : IEvent
     {
     }
 
-    public struct ClientNotReadyEvent : IEvent
+    public struct ClientNotReady : IEvent
     {
     }
 
-    public struct ClientLoadSceneEvent : IEvent
+    public struct ClientChangeScene : IEvent
     {
         public string sceneName { get; private set; }
 
-        public ClientLoadSceneEvent(string sceneName)
+        public ClientChangeScene(string sceneName)
         {
             this.sceneName = sceneName;
         }
     }
 
-    public struct ClientLoadCompleteEvent : IEvent
+    public struct ClientSceneChanged : IEvent
     {
         public string sceneName { get; private set; }
 
-        public ClientLoadCompleteEvent(string sceneName)
+        public ClientSceneChanged(string sceneName)
         {
             this.sceneName = sceneName;
         }
     }
 
-    public struct ServerResponseEvent : IEvent
+    public struct ServerResponse : IEvent
     {
         public Uri uri { get; private set; }
         public IPEndPoint endPoint { get; private set; }
 
-        public ServerResponseEvent(Uri uri, IPEndPoint endPoint)
+        public ServerResponse(Uri uri, IPEndPoint endPoint)
         {
             this.uri = uri;
             this.endPoint = endPoint;
         }
     }
 
-    public struct LobbyUpdateEvent : IEvent
+    public struct LobbyUpdate : IEvent
     {
         public RoomData[] rooms { get; private set; }
 
-        public LobbyUpdateEvent(RoomData[] rooms)
+        public LobbyUpdate(RoomData[] rooms)
         {
             this.rooms = rooms;
         }
     }
 
-    public struct LobbyDisconnectEvent : IEvent
+    public struct LobbyDisconnect : IEvent
     {
     }
     
-    public struct PingUpdateEvent : IEvent
+    public struct PingUpdate : IEvent
     {
         public double pingTime { get; private set; }
 
-        public PingUpdateEvent(double pingTime)
+        public PingUpdate(double pingTime)
         {
             this.pingTime = pingTime;
         }

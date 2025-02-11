@@ -171,7 +171,7 @@ namespace JFramework.Net
 
                     var endPoint = result.RemoteEndPoint;
                     var response = reader.Invoke<ResponseMessage>();
-                    Service.Event.Invoke(new ServerResponseEvent(new UriBuilder(response.uri)
+                    Service.Event.Invoke(new ServerResponse(new UriBuilder(response.uri)
                     {
                         Host = endPoint.Address.ToString()
                     }.Uri, endPoint));

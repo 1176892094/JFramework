@@ -44,7 +44,7 @@ namespace JFramework
                 names[i] = assetTypes[i].Name;
             }
 
-            Service.Event.Invoke(new DataAwakeEvent(names));
+            Service.Event.Invoke(new DataAwake(names));
             foreach (var assetType in assetTypes)
             {
                 try
@@ -95,7 +95,7 @@ namespace JFramework
                         }
                     }
 
-                    Service.Event.Invoke(new DataUpdateEvent(assetType.Name));
+                    Service.Event.Invoke(new DataUpdate(assetType.Name));
                 }
                 catch (Exception e)
                 {
@@ -103,7 +103,7 @@ namespace JFramework
                 }
             }
 
-            Service.Event.Invoke(new DataCompleteEvent());
+            Service.Event.Invoke(new DataComplete());
         }
 
         public static T Get<T>(int key) where T : IData

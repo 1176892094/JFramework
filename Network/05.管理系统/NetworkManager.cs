@@ -16,7 +16,7 @@ using UnityEngine;
 
 namespace JFramework.Net
 {
-    public partial class NetworkManager : MonoBehaviour, IEvent<SceneCompleteEvent>
+    public partial class NetworkManager : MonoBehaviour, IEvent<SceneComplete>
     {
         public static NetworkManager Instance;
 
@@ -77,7 +77,7 @@ namespace JFramework.Net
             }
         }
 
-        public void Execute(SceneCompleteEvent message)
+        public void Execute(SceneComplete message)
         {
             switch (Mode)
             {

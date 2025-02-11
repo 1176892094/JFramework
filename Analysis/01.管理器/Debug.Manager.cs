@@ -17,7 +17,7 @@ using UnityEngine;
 namespace JFramework
 {
     [DefaultExecutionOrder(-20)]
-    public partial class DebugManager : MonoBehaviour, IEvent<PingUpdateEvent>
+    public partial class DebugManager : MonoBehaviour, IEvent<PingUpdate>
     {
         private float frameData;
         private double frameTime;
@@ -164,7 +164,7 @@ namespace JFramework
             GUI.skin.textField.alignment = fieldAlignment;
         }
 
-        void IEvent<PingUpdateEvent>.Execute(PingUpdateEvent message)
+        void IEvent<PingUpdate>.Execute(PingUpdate message)
         {
             framePing = message.pingTime;
         }

@@ -24,7 +24,7 @@ namespace JFramework
         {
             var platform = await LoadAssetPack(GlobalSetting.platformPath);
             GlobalManager.manifest ??= platform.LoadAsset<AssetBundleManifest>(nameof(AssetBundleManifest));
-            Service.Event.Invoke(new AssetAwakeEvent(GlobalManager.manifest.GetAllAssetBundles()));
+            Service.Event.Invoke(new AssetAwake(GlobalManager.manifest.GetAllAssetBundles()));
 
             var assetPacks = GlobalManager.manifest.GetAllAssetBundles();
             foreach (var assetPack in assetPacks)
@@ -33,7 +33,7 @@ namespace JFramework
             }
 
             await Task.WhenAll(GlobalManager.assetTask.Values);
-            Service.Event.Invoke(new AssetCompleteEvent());
+            Service.Event.Invoke(new AssetComplete());
         }
 
         public static async Task<T> Load<T>(string assetPath) where T : Object
@@ -150,7 +150,7 @@ namespace JFramework
             {
                 assetPack = await assetTask;
                 GlobalManager.assetPack.Add(assetPath, assetPack);
-                Service.Event.Invoke(new AssetUpdateEvent(assetPath));
+                Service.Event.Invoke(new AssetUpdate(assetPath));
                 return assetPack;
             }
             finally

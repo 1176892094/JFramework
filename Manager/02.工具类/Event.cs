@@ -11,109 +11,109 @@
 
 namespace JFramework.Common
 {
-    public struct PackAwakeEvent : IEvent
+    public struct PackAwake : IEvent
     {
         public int[] sizes { get; private set; }
 
-        public PackAwakeEvent(int[] sizes)
+        public PackAwake(int[] sizes)
         {
             this.sizes = sizes;
         }
     }
 
-    public struct PackUpdateEvent : IEvent
+    public struct PackUpdate : IEvent
     {
         public string name { get; private set; }
         public float progress { get; private set; }
 
-        public PackUpdateEvent(string name, float progress)
+        public PackUpdate(string name, float progress)
         {
             this.name = name;
             this.progress = progress;
         }
     }
 
-    public struct PackCompleteEvent : IEvent
+    public struct PackComplete : IEvent
     {
         public int status { get; private set; }
         public string message { get; private set; }
 
-        public PackCompleteEvent(int status, string message)
+        public PackComplete(int status, string message)
         {
             this.status = status;
             this.message = message;
         }
     }
 
-    public struct AssetAwakeEvent : IEvent
+    public struct AssetAwake : IEvent
     {
         public string[] names { get; private set; }
 
-        public AssetAwakeEvent(string[] names)
+        public AssetAwake(string[] names)
         {
             this.names = names;
         }
     }
 
-    public struct AssetUpdateEvent : IEvent
+    public struct AssetUpdate : IEvent
     {
         public string name { get; private set; }
 
-        public AssetUpdateEvent(string name)
+        public AssetUpdate(string name)
         {
             this.name = name;
         }
     }
 
-    public struct AssetCompleteEvent : IEvent
+    public struct AssetComplete : IEvent
     {
     }
 
-    public struct SceneAwakeEvent : IEvent
+    public struct SceneAwake : IEvent
     {
         public string name { get; private set; }
 
-        public SceneAwakeEvent(string name)
+        public SceneAwake(string name)
         {
             this.name = name;
         }
     }
 
-    public struct SceneUpdateEvent : IEvent
+    public struct SceneUpdate : IEvent
     {
         public float progress { get; private set; }
 
-        public SceneUpdateEvent(float progress)
+        public SceneUpdate(float progress)
         {
             this.progress = progress;
         }
     }
 
-    public struct SceneCompleteEvent : IEvent
+    public struct SceneComplete : IEvent
     {
     }
 
-    public struct DataAwakeEvent : IEvent
+    public struct DataAwake : IEvent
     {
         public string[] names { get; private set; }
 
-        public DataAwakeEvent(string[] names)
+        public DataAwake(string[] names)
         {
             this.names = names;
         }
     }
 
-    public struct DataUpdateEvent : IEvent
+    public struct DataUpdate : IEvent
     {
         public string name { get; private set; }
 
-        public DataUpdateEvent(string name)
+        public DataUpdate(string name)
         {
             this.name = name;
         }
     }
 
-    public struct DataCompleteEvent : IEvent
+    public struct DataComplete : IEvent
     {
     }
 }

@@ -106,7 +106,7 @@ namespace JFramework.Net
                 messages.Clear();
                 connection = null;
                 isLoadScene = false;
-                Service.Event.Invoke(new ClientDisconnectEvent());
+                Service.Event.Invoke(new ClientDisconnect());
             }
 
             private static void Pong()
@@ -151,7 +151,7 @@ namespace JFramework.Net
                     return;
                 }
 
-                Service.Event.Invoke(new ClientLoadSceneEvent(sceneName));
+                Service.Event.Invoke(new ClientChangeScene(sceneName));
                 if (Server.isActive) return;
                 isLoadScene = true;
                 Instance.sceneName = sceneName;
@@ -167,7 +167,7 @@ namespace JFramework.Net
                     Ready();
                 }
 
-                Service.Event.Invoke(new ClientLoadCompleteEvent(sceneName));
+                Service.Event.Invoke(new ClientSceneChanged(sceneName));
             }
         }
 
@@ -230,13 +230,13 @@ namespace JFramework.Net
                     pingTime += 2.0 / (6 + 1) * delta;
                 }
 
-                Service.Event.Invoke(new PingUpdateEvent(pingTime));
+                Service.Event.Invoke(new PingUpdate(pingTime));
             }
 
             private static void NotReadyMessage(NotReadyMessage message)
             {
                 isReady = false;
-                Service.Event.Invoke(new ClientNotReadyEvent());
+                Service.Event.Invoke(new ClientNotReady());
             }
 
             private static void EntityMessage(EntityMessage message)
@@ -365,7 +365,7 @@ namespace JFramework.Net
                 }
 
                 state = StateMode.Connected;
-                Service.Event.Invoke(new ClientConnectEvent());
+                Service.Event.Invoke(new ClientConnect());
                 Pong();
                 Ready();
             }
