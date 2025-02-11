@@ -63,7 +63,7 @@ namespace JFramework
             {
                 agent.OnHide();
                 agentData.Remove(agentType);
-                Service.Pool.Enqueue(agent, typeof(IAgent));
+                Service.Pool.Enqueue(agent,agent.GetType());
             }
 
             if (agentData.Count == 0)

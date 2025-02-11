@@ -28,7 +28,7 @@ namespace JFramework
             foreach (var stateData in copies)
             {
                 stateData.OnHide();
-                Service.Pool.Enqueue(stateData, typeof(IState));
+                Service.Pool.Enqueue(stateData, stateData.GetType());
             }
 
             states.Clear();

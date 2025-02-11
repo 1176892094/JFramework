@@ -17,7 +17,7 @@ using UnityEngine;
 namespace JFramework
 {
     [Serializable]
-    internal abstract class Scroll<TItem, TGrid> : UIPanel, IScroll where TGrid : Component, IGrid<Scroll<TItem, TGrid>, TItem>
+    public abstract class UIScroll<TItem, TGrid> : UIPanel, IScroll where TGrid : Component, IGrid<UIScroll<TItem, TGrid>, TItem>
     {
         private Dictionary<int, TGrid> grids;
         private List<TItem> items;
@@ -27,12 +27,7 @@ namespace JFramework
         [Inject] public RectTransform content;
         [SerializeField] protected Rect assetRect;
         [SerializeField] protected string assetPath;
-
-        protected Scroll(RectTransform content)
-        {
-            this.content = content;
-        }
-
+        
         private int row => (int)assetRect.y;
         private int column => (int)assetRect.x;
 
