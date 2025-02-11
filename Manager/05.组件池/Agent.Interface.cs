@@ -9,13 +9,16 @@
 // # Description: This is an automatically generated comment.
 // *********************************************************************************
 
-using System;
 using UnityEngine;
 
 namespace JFramework.Common
 {
-    internal interface IAgent : IDisposable
+    public interface IAgent
     {
-        void OnAwake(Component owner);
+        void OnShow(Component owner);
+
+        void OnUpdate();
+
+        void OnHide();
     }
 }

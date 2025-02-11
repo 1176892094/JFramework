@@ -21,13 +21,13 @@ namespace JFramework
         private readonly Dictionary<Type, IState> states = new Dictionary<Type, IState>();
         private IState state;
 
-        public override void Dispose()
+        public override void OnHide()
         {
-            base.Dispose();
+            base.OnHide();
             var copies = new List<IState>(states.Values);
             foreach (var stateData in copies)
             {
-                stateData.Dispose();
+                stateData.OnHide();
                 Service.Pool.Enqueue(stateData, stateData.GetType());
             }
 
@@ -35,23 +35,23 @@ namespace JFramework
             state = null;
         }
 
-        public void OnUpdate()
+        public override void OnUpdate()
         {
-            state.OnUpdate();
+            state?.OnUpdate();
         }
 
         public void AddState<T>()
         {
             var stateData = Service.Pool.Dequeue<IState>(typeof(T));
             states[typeof(T)] = stateData;
-            stateData.OnAwake(owner);
+            stateData.OnShow(owner);
         }
 
         public void AddState<T>(Type stateType)
         {
             var stateData = Service.Pool.Dequeue<IState>(stateType);
             states[typeof(T)] = stateData;
-            stateData.OnAwake(owner);
+            stateData.OnShow(owner);
         }
 
         public void ChangeState<T>() 

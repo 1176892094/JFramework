@@ -9,7 +9,6 @@
 // # Description: This is an automatically generated comment.
 // *********************************************************************************
 
-using System;
 using System.Reflection;
 using JFramework.Common;
 using UnityEngine;
@@ -19,19 +18,19 @@ namespace JFramework
 {
     public static partial class Extensions
     {
-        public static ScriptableObject Agent(this Component current, Type agentType)
+        public static void Register<T>(this Component current)
         {
-            return AgentManager.Show(current, agentType);
+            AgentManager.Register(current, typeof(T));
         }
 
-        public static T Agent<T>(this Component current) where T : ScriptableObject
+        public static T Find<T>(this Component current) where T : IAgent
         {
-            return AgentManager.Show<T>(current);
+            return (T)AgentManager.Find(current, typeof(T));
         }
 
-        public static void Destroy(this Component current)
+        public static void UnRegister<T>(this Component current)
         {
-            AgentManager.Hide(current);
+            AgentManager.UnRegister(current, typeof(T));
         }
 
         public static void Inject(this Component entity)
@@ -41,13 +40,6 @@ namespace JFramework
             {
                 if (field.GetCustomAttribute<InjectAttribute>(true) == null)
                 {
-                    continue;
-                }
-
-                if (typeof(IAgent).IsAssignableFrom(field.FieldType))
-                {
-                    var component = entity.Agent(field.FieldType);
-                    field.SetValue(entity, component);
                     continue;
                 }
 

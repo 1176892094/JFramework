@@ -15,8 +15,6 @@ namespace JFramework.Common
     {
         void OnEnter();
 
-        void OnUpdate();
-
         void OnExit();
     }
 }

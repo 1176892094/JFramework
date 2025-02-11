@@ -13,79 +13,75 @@ using System;
 using System.Collections.Generic;
 using JFramework.Common;
 using UnityEngine;
-using Object = UnityEngine.Object;
 
 namespace JFramework
 {
     internal static class AgentManager
     {
-        public static T Show<T>(Component entity) where T : ScriptableObject
+        internal static void Register(Component component, Type agentType)
         {
-            if (!GlobalManager.Instance) return default;
-            if (!GlobalManager.agentData.TryGetValue(entity, out var agentData))
+            if (!GlobalManager.Instance) return;
+            if (!GlobalManager.agentData.TryGetValue(component, out var agentData))
             {
-                agentData = new Dictionary<Type, ScriptableObject>();
-                GlobalManager.agentData.Add(entity, agentData);
-            }
-
-            if (!agentData.TryGetValue(typeof(T), out var agent))
-            {
-                GlobalManager.cached = entity;
-                agent = LoadPool(typeof(T)).Dequeue();
-                agentData.Add(typeof(T), agent);
-                ((IAgent)agent).OnAwake(entity);
-            }
-            
-            return (T)GlobalManager.agentData[entity][typeof(T)];
-        }
-
-        public static ScriptableObject Show(Component entity, Type agentType)
-        {
-            if (!GlobalManager.Instance) return default;
-            if (!GlobalManager.agentData.TryGetValue(entity, out var agentData))
-            {
-                agentData = new Dictionary<Type, ScriptableObject>();
-                GlobalManager.agentData.Add(entity, agentData);
+                agentData = new Dictionary<Type, IAgent>();
+                GlobalManager.agentData.Add(component, agentData);
             }
 
             if (!agentData.TryGetValue(agentType, out var agent))
             {
-                GlobalManager.cached = entity;
-                agent = LoadPool(agentType).Dequeue();
+                agent = Service.Pool.Dequeue<IAgent>(agentType);
                 agentData.Add(agentType, agent);
-                ((IAgent)agent).OnAwake(entity);
+                agent.OnShow(component);
             }
-
-            return GlobalManager.agentData[entity][agentType];
         }
 
-        public static void Hide(Component entity)
+        internal static IAgent Find(Component component, Type agentType)
+        {
+            if (!GlobalManager.Instance) return default;
+            if (!GlobalManager.agentData.TryGetValue(component, out var agentData))
+            {
+                return default;
+            }
+
+            if (!agentData.TryGetValue(agentType, out var agent))
+            {
+                return default;
+            }
+
+            return agent;
+        }
+
+        internal static void UnRegister(Component component, Type agentType)
         {
             if (!GlobalManager.Instance) return;
-            if (GlobalManager.agentData.TryGetValue(entity, out var agentData))
+            if (!GlobalManager.agentData.TryGetValue(component, out var agentData))
+            {
+                return;
+            }
+
+            if (agentData.TryGetValue(agentType, out var agent))
+            {
+                agent.OnHide();
+                agentData.Remove(agentType);
+                Service.Pool.Enqueue(agent, typeof(IAgent));
+            }
+
+            if (agentData.Count == 0)
+            {
+                GlobalManager.agentData.Remove(component);
+            }
+        }
+
+        internal static void Update()
+        {
+            if (!GlobalManager.Instance) return;
+            foreach (var agentData in GlobalManager.agentData.Values)
             {
                 foreach (var agent in agentData.Values)
                 {
-                    ((IAgent)agent).Dispose();
-                    LoadPool(agent.GetType()).Enqueue(agent);
+                    agent.OnUpdate();
                 }
-
-                agentData.Clear();
-                GlobalManager.agentData.Remove(entity);
             }
-        }
-
-        private static AgentPool LoadPool(Type assetType)
-        {
-            var assetName = assetType.Name;
-            if (GlobalManager.poolData.TryGetValue(assetName, out var poolData))
-            {
-                return (AgentPool)poolData;
-            }
-
-            poolData = new AgentPool(assetType);
-            GlobalManager.poolData.Add(assetName, poolData);
-            return (AgentPool)poolData;
         }
 
         internal static void Dispose()
@@ -97,7 +93,8 @@ namespace JFramework
                 {
                     foreach (var agent in agentData.Values)
                     {
-                        Object.Destroy(agent);
+                        agent.OnHide();
+                        Service.Pool.Enqueue(agent, agent.GetType());
                     }
 
                     agentData.Clear();

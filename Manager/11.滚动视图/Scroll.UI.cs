@@ -35,6 +35,12 @@ namespace JFramework
             scroll.Update();
         }
 
+        protected override void OnDestroy()
+        {
+            base.OnDestroy();
+            scroll = null;
+        }
+        
         public override void Hide()
         {
             base.Hide();

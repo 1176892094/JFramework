@@ -18,6 +18,6 @@ namespace JFramework.Common
     {
         void Start(Component owner, float duration, Action OnDispose);
         
-        void Update(float elapsedTime, float unscaleTime);
+        void Update();
     }
 }

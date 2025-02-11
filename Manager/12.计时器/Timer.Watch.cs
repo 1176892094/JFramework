@@ -49,7 +49,7 @@ namespace JFramework
             this.OnDispose = OnDispose;
         }
 
-        void ITimer.Update(float elapsedTime, float unscaleTime)
+        void ITimer.Update()
         {
             try
             {
@@ -66,7 +66,7 @@ namespace JFramework
                 }
 
 
-                keepTime = unscaled ? elapsedTime : unscaleTime;
+                keepTime = unscaled ? Time.time : Time.unscaledTime;
                 if (waitTime <= 0)
                 {
                     waitTime = keepTime + duration;

@@ -45,7 +45,7 @@ namespace JFramework
             this.OnDispose = OnDispose;
         }
 
-        void ITimer.Update(float elapsedTime, float unscaleTime)
+        void ITimer.Update()
         {
             try
             {
@@ -63,10 +63,10 @@ namespace JFramework
 
                 if (waitTime <= 0)
                 {
-                    waitTime = elapsedTime;
+                    waitTime = Time.time;
                 }
 
-                progress = (elapsedTime - waitTime) / duration;
+                progress = (Time.time - waitTime) / duration;
                 if (progress > 1)
                 {
                     progress = 1;

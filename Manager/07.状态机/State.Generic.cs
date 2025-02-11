@@ -20,13 +20,13 @@ namespace JFramework
     {
         protected T owner { get; private set; }
 
-        void IDisposable.Dispose() => owner = default;
+        void IAgent.OnHide() => owner = default;
 
-        void IAgent.OnAwake(Component owner) => this.owner = (T)owner;
+        void IAgent.OnShow(Component owner) => this.owner = (T)owner;
         
         void IState.OnEnter() => OnEnter();
 
-        void IState.OnUpdate() => OnUpdate();
+        void IAgent.OnUpdate() => OnUpdate();
 
         void IState.OnExit() => OnExit();
 

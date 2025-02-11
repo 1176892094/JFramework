@@ -18,7 +18,7 @@ using AssetData = System.Collections.Generic.KeyValuePair<string, string>;
 using EnumTable = System.Collections.Generic.Dictionary<System.Enum, JFramework.Common.IData>;
 using ItemTable = System.Collections.Generic.Dictionary<int, JFramework.Common.IData>;
 using NameTable = System.Collections.Generic.Dictionary<string, JFramework.Common.IData>;
-using AgentData = System.Collections.Generic.Dictionary<System.Type, UnityEngine.ScriptableObject>;
+using AgentData = System.Collections.Generic.Dictionary<System.Type, JFramework.Common.IAgent>;
 
 namespace JFramework
 {
@@ -29,8 +29,6 @@ namespace JFramework
         public Canvas canvas;
 
         public AudioSource sounds;
-
-        internal static Component cached;
 
         internal static AssetBundleManifest manifest;
 
@@ -110,7 +108,8 @@ namespace JFramework
 
         private void Update()
         {
-            TimerManager.Update(Time.time, Time.unscaledTime);
+            AgentManager.Update();
+            TimerManager.Update();
         }
 
         private void OnDestroy()

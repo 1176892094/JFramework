@@ -79,9 +79,9 @@ namespace JFramework
             attributes[key] = value;
         }
 
-        public override void Dispose()
+        public override void OnHide()
         {
-            base.Dispose();
+            base.OnHide();
             attributes.Clear();
         }
 

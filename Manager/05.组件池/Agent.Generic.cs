@@ -14,14 +14,23 @@ using UnityEngine;
 
 namespace JFramework
 {
-    public abstract class Agent<T> : ScriptableObject, IAgent where T : Component
+    public abstract class Agent<T> : IAgent where T : Component
     {
-        [SerializeField] private T instance;
+        public T owner { get; private set; }
 
-        public T owner => instance ??= (T)GlobalManager.cached;
+        public virtual void OnShow(Component owner)
+        {
+            this.owner ??= (T)owner;
+        }
 
-        public virtual void OnAwake(Component owner) => instance ??= (T)owner;
+        public virtual void OnUpdate()
+        {
+        }
 
-        public virtual void Dispose() => instance = default;
+
+        public virtual void OnHide()
+        {
+            owner = default;
+        }
     }
 }

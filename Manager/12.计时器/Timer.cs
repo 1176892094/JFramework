@@ -16,11 +16,11 @@ namespace JFramework
 {
     internal static class TimerManager
     {
-        public static void Update(float elapsedTime, float unscaleTime)
+        public static void Update()
         {
             for (var i = GlobalManager.timerData.Count - 1; i >= 0; i--)
             {
-                GlobalManager.timerData[i].Update(elapsedTime, unscaleTime);
+                GlobalManager.timerData[i].Update();
             }
         }
 

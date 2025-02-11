@@ -29,7 +29,6 @@ namespace JFramework
 
         protected virtual void OnDestroy()
         {
-            this.Destroy();
             groups.Clear();
             groups = null;
         }
