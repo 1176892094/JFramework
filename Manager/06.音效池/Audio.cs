@@ -23,7 +23,7 @@ namespace JFramework
             {
                 GlobalManager.settings.musicValue = value;
                 GlobalManager.Instance.sounds.volume = value;
-                JsonManager.Save(GlobalManager.settings, nameof(AudioSetting));
+                JsonManager.Save(GlobalManager.settings, nameof(AudioManager));
             }
         }
 
@@ -38,7 +38,7 @@ namespace JFramework
                     audioSource.volume = value;
                 }
 
-                JsonManager.Save(GlobalManager.settings, nameof(AudioSetting));
+                JsonManager.Save(GlobalManager.settings, nameof(AudioManager));
             }
         }
 

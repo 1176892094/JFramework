@@ -63,10 +63,22 @@ namespace JFramework
 
         private static string LoadPath(string fileName)
         {
-            var filePath = Path.Combine(Application.streamingAssetsPath, Service.Text.Format("{0}.json", fileName));
+            var jsonPath = Path.Combine(Application.streamingAssetsPath, nameof(JsonManager));
+            if (!Directory.Exists(jsonPath))
+            {
+                Directory.CreateDirectory(jsonPath);
+            }
+
+            var filePath = Path.Combine(jsonPath, Service.Text.Format("{0}.json", fileName));
             if (!File.Exists(filePath))
             {
-                filePath = Path.Combine(Application.persistentDataPath, Service.Text.Format("{0}.json", fileName));
+                jsonPath = Path.Combine(Application.persistentDataPath, nameof(JsonManager));
+                if (!Directory.Exists(jsonPath))
+                {
+                    Directory.CreateDirectory(jsonPath);
+                }
+
+                filePath = Path.Combine(jsonPath, Service.Text.Format("{0}.json", fileName));
             }
 
             return filePath;

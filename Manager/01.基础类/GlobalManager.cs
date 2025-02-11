@@ -100,7 +100,7 @@ namespace JFramework
         {
             Instance = this;
             DontDestroyOnLoad(gameObject);
-            JsonManager.Load(settings, nameof(AudioSetting));
+            JsonManager.Load(settings, nameof(AudioManager));
         }
 
         private void Start()
