@@ -17,7 +17,7 @@ using AssetData = System.Collections.Generic.KeyValuePair<string, string>;
 using EnumTable = System.Collections.Generic.Dictionary<System.Enum, JFramework.Common.IData>;
 using ItemTable = System.Collections.Generic.Dictionary<int, JFramework.Common.IData>;
 using NameTable = System.Collections.Generic.Dictionary<string, JFramework.Common.IData>;
-using AgentData = System.Collections.Generic.Dictionary<System.Type, UnityEngine.ScriptableObject>;
+using AgentData = System.Collections.Generic.Dictionary<System.Type, JFramework.Common.IAgent>;
 
 namespace JFramework.Common
 {
