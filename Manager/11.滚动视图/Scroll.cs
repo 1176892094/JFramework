@@ -4,7 +4,7 @@
 // # Author: 云谷千羽
 // # Version: 1.0.0
 // # History: 2025-01-09 16:01:50
-// # Recently: 2025-01-10 20:01:59
+// # Recently: 2025-02-12 01:02:28
 // # Copyright: 2024, 云谷千羽
 // # Description: This is an automatically generated comment.
 // *********************************************************************************
@@ -17,61 +17,40 @@ using UnityEngine;
 namespace JFramework
 {
     [Serializable]
-    internal sealed class Scroll<TPanel, TItem, TGrid> where TPanel : UIPanel, IScroll where TGrid : Component, IGrid<TPanel, TItem>
+    internal abstract class Scroll<TItem, TGrid> : UIPanel, IScroll where TGrid : Component, IGrid<Scroll<TItem, TGrid>, TItem>
     {
-        private Dictionary<int, TGrid> grids = new Dictionary<int, TGrid>();
+        private Dictionary<int, TGrid> grids;
         private List<TItem> items;
         private int oldMaxIndex = -1;
         private int oldMinIndex = -1;
-        private TPanel owner;
-        private int row => (int)owner.rect.y;
-        private int column => (int)owner.rect.x;
-        private float width => owner.rect.width;
-        private float height => owner.rect.height;
-        private string prefab => owner.prefab;
 
-        public Scroll(Component owner)
+        [Inject] public RectTransform content;
+        [SerializeField] protected Rect assetRect;
+        [SerializeField] protected string assetPath;
+
+        protected Scroll(RectTransform content)
         {
-            this.owner = (TPanel)owner;
-            this.owner.content.pivot = Vector2.up;
-            this.owner.content.anchorMin = Vector2.up;
-            this.owner.content.anchorMax = Vector2.one;
+            this.content = content;
         }
 
-        public void Dispose()
-        {
-            items = null;
-            foreach (var i in grids.Keys)
-            {
-                if (grids.TryGetValue(i, out var grid))
-                {
-                    if (grid != null)
-                    {
-                        grid.Dispose();
-                        PoolManager.Hide(grid.gameObject);
-                    }
-                }
-            }
+        private int row => (int)assetRect.y;
+        private int column => (int)assetRect.x;
 
-            grids.Clear();
-            oldMinIndex = -1;
-            oldMaxIndex = -1;
+        protected override void Awake()
+        {
+            base.Awake();
+            content.pivot = Vector2.up;
+            content.anchorMin = Vector2.up;
+            content.anchorMax = Vector2.one;
+            grids = new Dictionary<int, TGrid>();
         }
 
-        public void SetItem(List<TItem> items)
-        {
-            Dispose();
-            this.items = items;
-            owner.content.anchoredPosition = Vector2.zero;
-            owner.content.sizeDelta = new Vector2(0, Mathf.Ceil((float)items.Count / column * height + 1));
-        }
-
-        public void Update()
+        protected virtual void Update()
         {
             if (items == null) return;
-            var position = owner.content.anchoredPosition.y;
-            var minIndex = Mathf.Max(0, (int)(position / height) * column);
-            var maxIndex = Mathf.Min((int)((position + row * height) / height) * column + column - 1, items.Count - 1);
+            var position = content.anchoredPosition.y;
+            var minIndex = Mathf.Max(0, (int)(position / assetRect.height) * column);
+            var maxIndex = Mathf.Min((int)((position + row * assetRect.height) / assetRect.height) * column + column - 1, items.Count - 1);
 
             if (minIndex != oldMinIndex || maxIndex != oldMaxIndex)
             {
@@ -112,9 +91,9 @@ namespace JFramework
                 {
                     var index = i;
                     grids[index] = default;
-                    var posX = index % column * width + width / 2;
-                    var posY = -(index / column) * height - height / 2;
-                    PoolManager.Show(prefab, obj =>
+                    var posX = index % column * assetRect.width + assetRect.width / 2;
+                    var posY = -(index / column) * assetRect.height - assetRect.height / 2;
+                    PoolManager.Show(assetPath, obj =>
                     {
                         var grid = obj.GetComponent<TGrid>();
                         if (grid == null)
@@ -122,11 +101,11 @@ namespace JFramework
                             grid = obj.AddComponent<TGrid>();
                         }
 
-                        var transform = grid.transform;
-                        transform.SetParent(owner.content);
-                        transform.localScale = Vector3.one;
-                        transform.localPosition = new Vector3(posX, posY, 0);
-                        ((RectTransform)transform).sizeDelta = new Vector2(width, height);
+                        var target = (RectTransform)grid.transform;
+                        target.SetParent(content);
+                        target.sizeDelta = new Vector2(assetRect.width, assetRect.height);
+                        target.localScale = Vector3.one;
+                        target.localPosition = new Vector3(posX, posY, 0);
 
                         if (!grids.ContainsKey(index))
                         {
@@ -141,5 +120,41 @@ namespace JFramework
                 }
             }
         }
+
+        public override void Hide()
+        {
+            base.Hide();
+            Dispose();
+        }
+
+        public void SetItem(List<TItem> items)
+        {
+            Dispose();
+            this.items = items;
+            content.anchoredPosition = Vector2.zero;
+            content.sizeDelta = new Vector2(0, Mathf.Ceil((float)items.Count / column * assetRect.height + 1));
+        }
+
+        public void Dispose()
+        {
+            items = null;
+            foreach (var i in grids.Keys)
+            {
+                if (grids.TryGetValue(i, out var grid))
+                {
+                    if (grid != null)
+                    {
+                        grid.Dispose();
+                        PoolManager.Hide(grid.gameObject);
+                    }
+                }
+            }
+
+            grids.Clear();
+            oldMinIndex = -1;
+            oldMaxIndex = -1;
+        }
+
+        RectTransform IScroll.content => content;
     }
 }

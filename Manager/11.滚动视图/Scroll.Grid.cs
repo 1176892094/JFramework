@@ -9,12 +9,12 @@
 // # Description: This is an automatically generated comment.
 // *********************************************************************************
 
-using System;
-
 namespace JFramework.Common
 {
-    public interface IGrid : IDisposable
+    public interface IGrid
     {
         void Select();
+
+        void Dispose();
     }
 }

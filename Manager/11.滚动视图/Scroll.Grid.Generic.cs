@@ -9,6 +9,8 @@
 // # Description: This is an automatically generated comment.
 // *********************************************************************************
 
+using UnityEngine;
+
 namespace JFramework.Common
 {
     public interface IGrid<TItem> : IGrid
@@ -17,7 +19,12 @@ namespace JFramework.Common
         void SetItem(TItem item);
     }
 
-    public interface IGrid<out TPanel, TItem> : IGrid<TItem>, IContent where TPanel : UIPanel
+    public interface IScroll
+    {
+        RectTransform content { get; }
+    }
+
+    public interface IGrid<out TPanel, TItem> : IGrid<TItem> where TPanel : UIPanel, IScroll
     {
         TPanel panel { get; }
     }

@@ -28,7 +28,7 @@ namespace JFramework
             foreach (var stateData in copies)
             {
                 stateData.OnHide();
-                Service.Pool.Enqueue(stateData, stateData.GetType());
+                Service.Pool.Enqueue(stateData, typeof(IState));
             }
 
             states.Clear();
@@ -54,7 +54,7 @@ namespace JFramework
             stateData.OnShow(owner);
         }
 
-        public void ChangeState<T>() 
+        public void ChangeState<T>()
         {
             state?.OnExit();
             state = states[typeof(T)];
