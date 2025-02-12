@@ -171,20 +171,7 @@ namespace JFramework.Net
             StopClient();
             StopServer();
         }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool Tick(float sendRate, ref double sendTime)
-        {
-            var duration = 1.0 / sendRate;
-            if (sendTime + duration <= Time.unscaledTimeAsDouble)
-            {
-                sendTime = (long)(Time.unscaledTimeAsDouble / duration) * duration;
-                return true;
-            }
-
-            return false;
-        }
-
+        
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static NetworkObject GetNetworkObject(uint objectId)
         {
@@ -206,6 +193,19 @@ namespace JFramework.Net
 
             return null;
         }
+        
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        internal static bool Tick(float sendRate, ref double sendTime)
+        {
+            var duration = 1.0 / sendRate;
+            if (sendTime + duration <= Time.unscaledTimeAsDouble)
+            {
+                sendTime = (long)(Time.unscaledTimeAsDouble / duration) * duration;
+                return true;
+            }
+
+            return false;
+        }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static bool IsSceneObject(NetworkObject @object)
@@ -221,81 +221,6 @@ namespace JFramework.Net
             }
 
             return @object.gameObject.hideFlags != HideFlags.HideAndDontSave;
-        }
-
-        private static void Reference()
-        {
-            var option = GUILayout.Height(30f);
-            if (!Client.isConnected && !Server.isActive)
-            {
-                if (!Client.isActive)
-                {
-                    if (GUILayout.Button("Host (Server + Client)", option))
-                    {
-                        StartHost();
-                    }
-
-                    GUILayout.BeginHorizontal();
-                    if (GUILayout.Button("Server", option))
-                    {
-                        StartServer();
-                    }
-
-                    if (GUILayout.Button("Client", option))
-                    {
-                        StartClient();
-                    }
-
-                    GUILayout.EndHorizontal();
-                }
-                else
-                {
-                    GUILayout.Label("Connecting...".Bold(), "Box", option);
-
-                    if (GUILayout.Button("Stop Client", option))
-                    {
-                        StopClient();
-                    }
-                }
-            }
-            else
-            {
-                if (Server.isActive || Client.isActive)
-                {
-                    var message = Service.Text.Format("{0} : {1}".Bold(), Transport.Instance.address, Transport.Instance.port);
-                    GUILayout.Label(message, "Box", option);
-                }
-            }
-
-            if (Client.isConnected && !Client.isReady)
-            {
-                if (GUILayout.Button("Ready", option))
-                {
-                    Client.Ready();
-                }
-            }
-
-            if (Server.isActive && Client.isConnected)
-            {
-                if (GUILayout.Button("Stop Host", option))
-                {
-                    StopHost();
-                }
-            }
-            else if (Client.isConnected)
-            {
-                if (GUILayout.Button("Stop Client", option))
-                {
-                    StopClient();
-                }
-            }
-            else if (Server.isActive)
-            {
-                if (GUILayout.Button("Stop Server", option))
-                {
-                    StopServer();
-                }
-            }
         }
     }
 }

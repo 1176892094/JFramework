@@ -18,15 +18,16 @@ namespace JFramework.Net
 {
     public abstract partial class NetworkBehaviour : MonoBehaviour
     {
+        internal byte componentId;
+        
         public SyncMode syncDirection;
 
-        [Range(0, 2)] public float syncInterval;
-
-        internal byte componentId;
-
-        private double lastSyncTime;
-
+        public float syncInterval;
+        
         private ulong syncVarHook;
+
+        private double syncVarTime;
+        
         protected ulong syncVarDirty { get; set; }
 
         public NetworkObject @object { get; internal set; }
@@ -60,7 +61,7 @@ namespace JFramework.Net
         public NetworkClient connection => @object.connection;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public bool IsDirty() => syncVarDirty != 0UL && Time.unscaledTimeAsDouble - lastSyncTime >= syncInterval;
+        public bool IsDirty() => syncVarDirty != 0UL && Time.unscaledTimeAsDouble - syncVarTime >= syncInterval;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         internal void SetSyncVarDirty(ulong dirty) => syncVarDirty |= dirty;
@@ -72,7 +73,7 @@ namespace JFramework.Net
         public void ClearDirty()
         {
             syncVarDirty = 0UL;
-            lastSyncTime = Time.unscaledTimeAsDouble;
+            syncVarTime = Time.unscaledTimeAsDouble;
         }
 
         internal void Serialize(MemoryWriter writer, bool status)

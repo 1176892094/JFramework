@@ -19,13 +19,13 @@ namespace JFramework.Net
 {
     public sealed partial class NetworkObject : MonoBehaviour
     {
-        [SerializeField] internal string assetId;
-
-        [SerializeField] internal uint objectId;
-
-        [SerializeField] internal ulong sceneId;
-
         [SerializeField] internal EntityMode entityMode;
+        
+        [SerializeField] internal uint objectId;
+        
+        [SerializeField] internal ulong sceneId;
+        
+        [SerializeField] internal string assetId;
 
         private int frameCount;
 
@@ -222,27 +222,6 @@ namespace JFramework.Net
             }
         }
 
-        internal void OnNotifyAuthority()
-        {
-            if ((entityState & EntityState.Authority) == 0 && (entityMode & EntityMode.Owner) != 0)
-            {
-                OnStartAuthority();
-            }
-            else if ((entityState & EntityState.Authority) != 0 && (entityMode & EntityMode.Owner) == 0)
-            {
-                OnStopAuthority();
-            }
-
-            if ((entityMode & EntityMode.Owner) != 0)
-            {
-                entityState |= EntityState.Authority;
-            }
-            else
-            {
-                entityState &= ~EntityState.Authority;
-            }
-        }
-
         private void OnStartAuthority()
         {
             foreach (var entity in entities)
@@ -270,6 +249,27 @@ namespace JFramework.Net
                 {
                     Debug.LogWarning(e, entity.gameObject);
                 }
+            }
+        }
+        
+        internal void OnNotifyAuthority()
+        {
+            if ((entityState & EntityState.Authority) == 0 && (entityMode & EntityMode.Owner) != 0)
+            {
+                OnStartAuthority();
+            }
+            else if ((entityState & EntityState.Authority) != 0 && (entityMode & EntityMode.Owner) == 0)
+            {
+                OnStopAuthority();
+            }
+
+            if ((entityMode & EntityMode.Owner) != 0)
+            {
+                entityState |= EntityState.Authority;
+            }
+            else
+            {
+                entityState &= ~EntityState.Authority;
             }
         }
     }

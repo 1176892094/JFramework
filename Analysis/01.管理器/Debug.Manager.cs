@@ -33,7 +33,6 @@ namespace JFramework
         private Func<Reference[]> ServicePoolRef;
         private Func<Reference[]> ServiceEventRef;
         private Func<Reference[]> PoolManagerRef;
-        private Action NetworkManagerRef;
 
         private void Awake()
         {
@@ -47,7 +46,7 @@ namespace JFramework
             {
                 ServicePoolRef = (Func<Reference[]>)Delegate.CreateDelegate(typeof(Func<Reference[]>), message);
             }
-            
+
             message = typeof(Service.Event).GetMethod("Reference", Service.Find.Static);
             if (message != null)
             {
@@ -59,14 +58,8 @@ namespace JFramework
             {
                 PoolManagerRef = (Func<Reference[]>)Delegate.CreateDelegate(typeof(Func<Reference[]>), message);
             }
-
-            message = typeof(NetworkManager).GetMethod("Reference", Service.Find.Static);
-            if (message != null)
-            {
-                status |= Status.Ping;
-                NetworkManagerRef = (Action)Delegate.CreateDelegate(typeof(Action), message);
-            }
-
+            
+            status |= Status.Ping;
             foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
             {
                 var sceneTypes = assembly.GetTypes();
@@ -310,11 +303,86 @@ namespace JFramework
             {
                 var boxAlignment = GUI.skin.box.alignment;
                 GUI.skin.box.alignment = TextAnchor.MiddleCenter;
-                NetworkManagerRef.Invoke();
+                Reference();
                 GUI.skin.box.alignment = boxAlignment;
             }
 
             GUILayout.EndArea();
+        }
+
+        private static void Reference()
+        {
+            var option = GUILayout.Height(30f);
+            if (!NetworkManager.Client.isConnected && !NetworkManager.Server.isActive)
+            {
+                if (!NetworkManager.Client.isActive)
+                {
+                    if (GUILayout.Button("Host (Server + Client)", option))
+                    {
+                        NetworkManager.StartHost();
+                    }
+
+                    GUILayout.BeginHorizontal();
+                    if (GUILayout.Button("Server", option))
+                    {
+                        NetworkManager.StartServer();
+                    }
+
+                    if (GUILayout.Button("Client", option))
+                    {
+                        NetworkManager.StartClient();
+                    }
+
+                    GUILayout.EndHorizontal();
+                }
+                else
+                {
+                    GUILayout.Label("Connecting...".Bold(), "Box", option);
+
+                    if (GUILayout.Button("Stop Client", option))
+                    {
+                        NetworkManager.StopClient();
+                    }
+                }
+            }
+            else
+            {
+                if (NetworkManager.Server.isActive || NetworkManager.Client.isActive)
+                {
+                    var message = Service.Text.Format("{0} : {1}".Bold(), Transport.Instance.address, Transport.Instance.port);
+                    GUILayout.Label(message, "Box", option);
+                }
+            }
+
+            if (NetworkManager.Client.isConnected && !NetworkManager.Client.isReady)
+            {
+                if (GUILayout.Button("Ready", option))
+                {
+                    NetworkManager.Client.Ready();
+                }
+            }
+
+            if (NetworkManager.Server.isActive && NetworkManager.Client.isConnected)
+            {
+                if (GUILayout.Button("Stop Host", option))
+                {
+                    NetworkManager.StopHost();
+                }
+            }
+            else if (NetworkManager.Client.isConnected)
+            {
+                if (GUILayout.Button("Stop Client", option))
+                {
+                    NetworkManager.StopClient();
+                }
+            }
+            else if (NetworkManager.Server.isActive)
+            {
+                if (GUILayout.Button("Stop Server", option))
+                {
+                    NetworkManager.StopServer();
+                }
+            }
         }
     }
 }
