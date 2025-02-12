@@ -9,6 +9,7 @@
 // # Description: This is an automatically generated comment.
 // *********************************************************************************
 
+using System;
 using System.Reflection;
 using JFramework.Common;
 using UnityEngine;
@@ -18,9 +19,9 @@ namespace JFramework
 {
     public static partial class Extensions
     {
-        public static void Register<T>(this Component current)
+        public static void Register(this Component current, Type agentType)
         {
-            AgentManager.Register(current, typeof(T));
+            AgentManager.Register(current, agentType);
         }
 
         public static T Find<T>(this Component current) where T : IAgent
@@ -28,9 +29,14 @@ namespace JFramework
             return (T)AgentManager.Find(current, typeof(T));
         }
 
-        public static void UnRegister<T>(this Component current)
+        public static T Find<T>(this Component current, Type agentType) where T : IAgent
         {
-            AgentManager.UnRegister(current, typeof(T));
+            return (T)AgentManager.Find(current, agentType);
+        }
+
+        public static void UnRegister(this Component current, Type agentType)
+        {
+            AgentManager.UnRegister(current, agentType);
         }
 
         public static void Inject(this Component entity)
