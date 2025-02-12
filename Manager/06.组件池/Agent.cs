@@ -18,32 +18,29 @@ namespace JFramework
 {
     internal static class AgentManager
     {
-        internal static void Register(Component component, Type agentType)
+        internal static void Register<T>(Component owner, Type agentType)
         {
             if (!GlobalManager.Instance) return;
-            if (!GlobalManager.agentData.TryGetValue(component, out var agentData))
+            if (!GlobalManager.agentData.TryGetValue(owner, out var agents))
             {
-                agentData = new Dictionary<Type, IAgent>();
-                GlobalManager.agentData.Add(component, agentData);
+                agents = new Dictionary<Type, IAgent>();
+                GlobalManager.agentData.Add(owner, agents);
             }
 
-            if (!agentData.TryGetValue(agentType, out var agent))
-            {
-                agent = Service.Pool.Dequeue<IAgent>(agentType);
-                agentData.Add(agentType, agent);
-                agent.OnShow(component);
-            }
+            var agentData = Service.Pool.Dequeue<IAgent>(agentType);
+            agents[typeof(T)] = agentData;
+            agentData.OnShow(owner);
         }
 
-        internal static IAgent Find(Component component, Type agentType)
+        internal static IAgent Find<T>(Component owner)
         {
             if (!GlobalManager.Instance) return default;
-            if (!GlobalManager.agentData.TryGetValue(component, out var agentData))
+            if (!GlobalManager.agentData.TryGetValue(owner, out var agentData))
             {
                 return default;
             }
 
-            if (!agentData.TryGetValue(agentType, out var agent))
+            if (!agentData.TryGetValue(typeof(T), out var agent))
             {
                 return default;
             }
@@ -51,24 +48,24 @@ namespace JFramework
             return agent;
         }
 
-        internal static void UnRegister(Component component, Type agentType)
+        internal static void UnRegister<T>(Component owner)
         {
             if (!GlobalManager.Instance) return;
-            if (!GlobalManager.agentData.TryGetValue(component, out var agentData))
+            if (!GlobalManager.agentData.TryGetValue(owner, out var agents))
             {
                 return;
             }
 
-            if (agentData.TryGetValue(agentType, out var agent))
+            if (agents.TryGetValue(typeof(T), out var agentData))
             {
-                agent.OnHide();
-                agentData.Remove(agentType);
-                Service.Pool.Enqueue(agent,agent.GetType());
+                agentData.OnHide();
+                agents.Remove(typeof(T));
+                Service.Pool.Enqueue(agentData, agentData.GetType());
             }
 
-            if (agentData.Count == 0)
+            if (agents.Count == 0)
             {
-                GlobalManager.agentData.Remove(component);
+                GlobalManager.agentData.Remove(owner);
             }
         }
 

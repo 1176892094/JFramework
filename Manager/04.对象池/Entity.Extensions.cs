@@ -19,24 +19,24 @@ namespace JFramework
 {
     public static partial class Extensions
     {
-        public static void Register(this Component current, Type agentType)
+        public static void Register<T>(this Component current)
         {
-            AgentManager.Register(current, agentType);
+            AgentManager.Register<T>(current, typeof(T));
+        }
+
+        public static void Register<T>(this Component current, Type agentType)
+        {
+            AgentManager.Register<T>(current, agentType);
         }
 
         public static T Find<T>(this Component current) where T : IAgent
         {
-            return (T)AgentManager.Find(current, typeof(T));
+            return (T)AgentManager.Find<T>(current);
         }
 
-        public static T Find<T>(this Component current, Type agentType) where T : IAgent
+        public static void UnRegister<T>(this Component current)
         {
-            return (T)AgentManager.Find(current, agentType);
-        }
-
-        public static void UnRegister(this Component current, Type agentType)
-        {
-            AgentManager.UnRegister(current, agentType);
+            AgentManager.UnRegister<T>(current);
         }
 
         public static void Inject(this Component entity)

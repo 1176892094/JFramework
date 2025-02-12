@@ -61,21 +61,14 @@ namespace JFramework
             state?.OnEnter();
         }
 
-        public void ChangeState(Type stateType)
-        {
-            state?.OnExit();
-            state = states[stateType];
-            state?.OnEnter();
-        }
-
         public void RemoveState<T>()
         {
-            states.Remove(typeof(T));
-        }
-
-        public void RemoveState(Type stateType)
-        {
-            states.Remove(stateType);
+            if (states.TryGetValue(typeof(T), out var stateData))
+            {
+                stateData.OnHide();
+                states.Remove(typeof(T));
+                Service.Pool.Enqueue(stateData, stateData.GetType());
+            }
         }
     }
 }
