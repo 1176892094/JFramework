@@ -10,12 +10,11 @@
 // *********************************************************************************
 
 using System;
-using JFramework.Common;
 using JFramework.Udp;
 
 namespace JFramework.Net
 {
-    internal sealed class Transport : ITransport
+    internal sealed class Transport
     {
         public string address = "localhost";
         public ushort port = 20974;
@@ -29,18 +28,6 @@ namespace JFramework.Net
 
         private Client client;
         private Server server;
-
-        string IAddress.address
-        {
-            get => address;
-            set => address = value;
-        }
-
-        ushort IAddress.port
-        {
-            get => port;
-            set => port = value;
-        }
 
         public Action OnClientConnect { get; set; }
         public Action OnClientDisconnect { get; set; }

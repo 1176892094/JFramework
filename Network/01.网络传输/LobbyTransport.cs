@@ -33,18 +33,6 @@ namespace JFramework.Net
         private int objectId;
         private StateMode state = StateMode.Disconnect;
 
-        public override string address
-        {
-            get => transport.address;
-            set => transport.address = value;
-        }
-
-        public override ushort port
-        {
-            get => transport.port;
-            set => transport.port = value;
-        }
-
         private void Awake()
         {
             transport.OnClientConnect -= OnClientConnect;
@@ -90,6 +78,8 @@ namespace JFramework.Net
                 return;
             }
 
+            transport.port = port;
+            transport.address = address;
             transport.StartClient();
         }
 
@@ -116,12 +106,12 @@ namespace JFramework.Net
                 return;
             }
 
-            var uri = Service.Text.Format("http://{0}:{1}/api/compressed/servers", transport.address, transport.port);
+            var uri = Service.Text.Format("http://{0}:{1}/api/compressed/servers", address, port);
             using var request = UnityWebRequest.Get(uri);
             await request.SendWebRequest();
             if (request.result != UnityWebRequest.Result.Success)
             {
-                Debug.LogWarning(Service.Text.Format("无法获取服务器列表: {0}:{1}", transport.address, transport.port));
+                Debug.LogWarning(Service.Text.Format("无法获取服务器列表: {0}:{1}", address, port));
                 return;
             }
 
@@ -323,7 +313,7 @@ namespace JFramework.Net
         {
             if (uri != null)
             {
-                transport.address = uri.Host;
+                address = uri.Host;
             }
 
             StartClient();
@@ -357,8 +347,21 @@ namespace JFramework.Net
         public override void ServerAfterUpdate()
         {
         }
+        
+        private enum OpCodes : byte
+        {
+            Connect = 1,
+            Connected = 2,
+            JoinRoom = 3,
+            CreateRoom = 4,
+            UpdateRoom = 5,
+            LeaveRoom = 6,
+            UpdateData = 7,
+            KickRoom = 8,
+        }
     }
 
+    [Serializable]
     public struct RoomData
     {
         public string roomId;

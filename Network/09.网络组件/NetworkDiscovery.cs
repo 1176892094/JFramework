@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace JFramework.Net
 {
-    public class NetworkDiscovery : MonoBehaviour, IAddress
+    public class NetworkDiscovery : MonoBehaviour
     {
         [SerializeField] private string address = IPAddress.Broadcast.ToString();
 
@@ -19,18 +19,6 @@ namespace JFramework.Net
         private UdpClient udpClient;
 
         private UdpClient udpServer;
-
-        ushort IAddress.port
-        {
-            get => port;
-            set => port = value;
-        }
-
-        string IAddress.address
-        {
-            get => address;
-            set => address = value;
-        }
 
         public void StartDiscovery()
         {

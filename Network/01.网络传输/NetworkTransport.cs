@@ -17,8 +17,6 @@ namespace JFramework.Net
 {
     public sealed class NetworkTransport : Transport
     {
-        [SerializeField] private string _address = "localhost";
-        [SerializeField] private ushort _port = 20974;
         public int maxUnit = 1200;
         public uint timeout = 10000;
         public uint interval = 10;
@@ -29,19 +27,7 @@ namespace JFramework.Net
 
         private Client client;
         private Server server;
-
-        public override ushort port
-        {
-            get => _port;
-            set => _port = value;
-        }
-
-        public override string address
-        {
-            get => _address;
-            set => _address = value;
-        }
-
+        
         private void Awake()
         {
             Log.Info = Debug.Log;
@@ -100,7 +86,7 @@ namespace JFramework.Net
 
         public override void StartServer()
         {
-            server.Connect(_port);
+            server.Connect(port);
         }
 
         public override void StopServer()
@@ -120,12 +106,12 @@ namespace JFramework.Net
 
         public override void StartClient()
         {
-            client.Connect(_address, _port);
+            client.Connect(address, port);
         }
 
         public override void StartClient(Uri uri)
         {
-            client.Connect(uri.Host, (ushort)(uri.IsDefaultPort ? _port : uri.Port));
+            client.Connect(uri.Host, (ushort)(uri.IsDefaultPort ? port : uri.Port));
         }
 
         public override void StopClient()

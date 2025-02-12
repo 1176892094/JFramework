@@ -15,22 +15,25 @@ using UnityEngine;
 
 namespace JFramework.Net
 {
-    public abstract class Transport : MonoBehaviour, ITransport
+    public abstract class Transport : MonoBehaviour
     {
         public static Transport Instance;
-        public abstract string address { get; set; }
-        public abstract ushort port { get; set; }
-        public Action OnClientConnect { get; set; }
-        public Action OnClientDisconnect { get; set; }
-        public Action<int, string> OnClientError { get; set; }
-        public Action<ArraySegment<byte>, int> OnClientReceive { get; set; }
-        public Action<int> OnServerConnect { get; set; }
-        public Action<int> OnServerDisconnect { get; set; }
-        public Action<int, int, string> OnServerError { get; set; }
-        public Action<int, ArraySegment<byte>, int> OnServerReceive { get; set; }
+        
+        public string address = "localhost";
+        public ushort port = 20974;
+        
+        public Action OnClientConnect;
+        public Action OnClientDisconnect;
+        public Action<int, string> OnClientError;
+        public Action<ArraySegment<byte>, int> OnClientReceive;
+        public Action<int> OnServerConnect;
+        public Action<int> OnServerDisconnect;
+        public Action<int, int, string> OnServerError;
+        public Action<int, ArraySegment<byte>, int> OnServerReceive;
+        
         public abstract int MessageSize(int channel);
         public abstract void SendToClient(int clientId, ArraySegment<byte> segment, int channel = Channel.Reliable);
-        public abstract void SendToServer(ArraySegment<byte> segment, int channel =  Channel.Reliable);
+        public abstract void SendToServer(ArraySegment<byte> segment, int channel = Channel.Reliable);
         public abstract void StartServer();
         public abstract void StopServer();
         public abstract void StopClient(int clientId);
