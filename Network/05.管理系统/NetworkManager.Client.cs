@@ -300,8 +300,8 @@ namespace JFramework.Net
                         }
 
                         @object.entityMode |= EntityMode.Client;
-                        @object.OnStartClient();
                         @object.OnNotifyAuthority();
+                        @object.OnStartClient();
                     }
 
                     return;
