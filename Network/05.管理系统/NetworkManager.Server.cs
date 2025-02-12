@@ -515,19 +515,19 @@ namespace JFramework.Net
                                 return;
                             }
 
-                            var serialize = @object.Synchronization(Time.frameCount);
+                            @object.Synchronization(Time.frameCount);
                             if (@object.connection == client)
                             {
-                                if (serialize.owner.position > 0)
+                                if (@object.owner.position > 0)
                                 {
-                                    client.Send(new EntityMessage(@object.objectId, serialize.owner));
+                                    client.Send(new EntityMessage(@object.objectId, @object.owner));
                                 }
                             }
                             else
                             {
-                                if (serialize.observer.position > 0)
+                                if (@object.observer.position > 0)
                                 {
-                                    client.Send(new EntityMessage(@object.objectId, serialize.observer));
+                                    client.Send(new EntityMessage(@object.objectId, @object.observer));
                                 }
                             }
                         }

@@ -27,25 +27,48 @@ namespace JFramework.Net
 
         [SerializeField] internal EntityMode entityMode;
 
+        private int frameCount;
+
+        internal EntityState entityState;
+
         internal NetworkClient connection;
 
         internal NetworkBehaviour[] entities;
 
-        internal EntityState entityState;
+        internal MemoryWriter owner = new MemoryWriter();
 
-        private NetworkSerialize serialize = new NetworkSerialize(0);
+        internal MemoryWriter observer = new MemoryWriter();
 
         private void Awake()
         {
             entities = GetComponentsInChildren<NetworkBehaviour>(true);
-            if (IsValid())
+            if (entities == null)
             {
-                for (var i = 0; i < entities.Length; ++i)
-                {
-                    entities[i].@object = this;
-                    entities[i].componentId = (byte)i;
-                }
+                Debug.LogError("网络对象持有的 NetworkEntity 为空", gameObject);
+                return;
             }
+
+            if (entities.Length > 64)
+            {
+                Debug.LogError("网络对象持有的 NetworkBehaviour 的数量不能超过 64");
+                return;
+            }
+
+            for (byte i = 0; i < entities.Length; ++i)
+            {
+                entities[i].@object = this;
+                entities[i].componentId = i;
+            }
+        }
+
+        public void Reset()
+        {
+            objectId = 0;
+            connection = null;
+            owner.position = 0;
+            observer.position = 0;
+            entityMode = EntityMode.None;
+            entityState = EntityState.None;
         }
 
         private void OnValidate()
@@ -60,14 +83,6 @@ namespace JFramework.Net
             }
         }
 
-        public void Reset()
-        {
-            objectId = 0;
-            connection = null;
-            entityMode = EntityMode.None;
-            entityState = EntityState.None;
-        }
-
         private void OnDestroy()
         {
             if ((entityMode & EntityMode.Server) == EntityMode.Server && (entityState & EntityState.Destroy) == 0)
@@ -79,29 +94,17 @@ namespace JFramework.Net
             {
                 NetworkManager.Client.spawns.Remove(objectId);
             }
+
+            owner = null;
+            observer = null;
+            entities = null;
+            connection = null;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static bool IsDirty(ulong mask, int index)
         {
             return (mask & (ulong)(1 << index)) != 0;
-        }
-
-        private bool IsValid()
-        {
-            if (entities == null)
-            {
-                Debug.LogError("网络对象持有的 NetworkEntity 为空", gameObject);
-                return false;
-            }
-
-            if (entities.Length > 64)
-            {
-                Debug.LogError("网络对象持有的 NetworkEntity 的数量不能超过 64");
-                return false;
-            }
-
-            return true;
         }
 
         internal void InvokeMessage(byte index, ushort function, InvokeMode mode, MemoryReader reader, NetworkClient client = null)
@@ -124,21 +127,19 @@ namespace JFramework.Net
             }
         }
 
-        internal NetworkSerialize Synchronization(int frame)
+        internal void Synchronization(int frame)
         {
-            if (serialize.frame != frame)
+            if (frameCount != frame)
             {
-                serialize.frame = frame;
-                serialize.owner.position = 0;
-                serialize.observer.position = 0;
-                ServerSerialize(false, serialize.owner, serialize.observer);
+                frameCount = frame;
+                owner.position = 0;
+                observer.position = 0;
+                ServerSerialize(false, owner, observer);
                 ClearDirty(true);
             }
-
-            return serialize;
         }
 
-        internal void ClearDirty(bool total = false)
+        internal void ClearDirty(bool total)
         {
             foreach (var entity in entities)
             {
@@ -166,7 +167,7 @@ namespace JFramework.Net
                 }
                 catch (Exception e)
                 {
-                    Debug.LogWarning(e.ToString(),  entity.gameObject);
+                    Debug.LogWarning(e, entity.gameObject);
                 }
             }
         }
@@ -186,7 +187,7 @@ namespace JFramework.Net
                 }
                 catch (Exception e)
                 {
-                    Debug.LogWarning(e.ToString(), entity.gameObject);
+                    Debug.LogWarning(e, entity.gameObject);
                 }
             }
         }
@@ -201,7 +202,7 @@ namespace JFramework.Net
                 }
                 catch (Exception e)
                 {
-                    Debug.LogWarning(e.ToString(),  entity.gameObject);
+                    Debug.LogWarning(e, entity.gameObject);
                 }
             }
         }
@@ -216,7 +217,7 @@ namespace JFramework.Net
                 }
                 catch (Exception e)
                 {
-                    Debug.LogWarning(e.ToString(),  entity.gameObject);
+                    Debug.LogWarning(e, entity.gameObject);
                 }
             }
         }
@@ -252,7 +253,7 @@ namespace JFramework.Net
                 }
                 catch (Exception e)
                 {
-                    Debug.LogWarning(e.ToString(),  entity.gameObject);
+                    Debug.LogWarning(e, entity.gameObject);
                 }
             }
         }
@@ -267,22 +268,8 @@ namespace JFramework.Net
                 }
                 catch (Exception e)
                 {
-                    Debug.LogWarning(e.ToString(),  entity.gameObject);
+                    Debug.LogWarning(e, entity.gameObject);
                 }
-            }
-        }
-
-        internal struct NetworkSerialize
-        {
-            public int frame;
-            public readonly MemoryWriter owner;
-            public readonly MemoryWriter observer;
-
-            public NetworkSerialize(int frame)
-            {
-                this.frame = frame;
-                owner = new MemoryWriter();
-                observer = new MemoryWriter();
             }
         }
     }

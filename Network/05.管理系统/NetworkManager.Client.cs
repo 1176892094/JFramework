@@ -584,7 +584,7 @@ namespace JFramework.Net
                     if (writer.position > 0)
                     {
                         connection.Send(new EntityMessage(@object.objectId, writer));
-                        @object.ClearDirty();
+                        @object.ClearDirty(false);
                     }
                 }
             }
