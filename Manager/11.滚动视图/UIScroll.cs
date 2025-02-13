@@ -17,35 +17,101 @@ using UnityEngine;
 namespace JFramework
 {
     [Serializable]
-    public abstract class UIScroll<TItem, TGrid> : UIPanel, IScroll where TGrid : Component, IGrid<UIScroll<TItem, TGrid>, TItem>
+    public sealed class UIScroll<TItem, TGrid> : Agent<RectTransform> where TGrid : Component, IGrid<TItem>
     {
         private Dictionary<int, TGrid> grids;
         private List<TItem> items;
-        private int oldMaxIndex = -1;
-        private int oldMinIndex = -1;
+        private int oldMaxIndex;
+        private int oldMinIndex;
 
-        [Inject] public RectTransform content;
-        [SerializeField] protected Rect assetRect;
-        [SerializeField] protected string assetPath;
-        
-        private int row => (int)assetRect.y;
-        private int column => (int)assetRect.x;
+        public Rect assetRect;
+        public string assetPath;
+        public ScrollType direction;
 
-        protected override void Awake()
+        private int row => (int)assetRect.y + (direction == ScrollType.Vertical ? 1 : 0);
+        private int column => (int)assetRect.x + (direction == ScrollType.Horizontal ? 1 : 0);
+
+        public override void OnShow(Component owner)
         {
-            base.Awake();
+            base.OnShow(owner);
+            var content = (RectTransform)owner;
+            if (direction == ScrollType.Vertical)
+            {
+                content.anchorMin = Vector2.up;
+                content.anchorMax = Vector2.one;
+            }
+            else
+            {
+                content.anchorMin = Vector2.zero;
+                content.anchorMax = Vector2.up;
+            }
+
             content.pivot = Vector2.up;
-            content.anchorMin = Vector2.up;
-            content.anchorMax = Vector2.one;
-            grids = new Dictionary<int, TGrid>();
         }
 
-        protected virtual void Update()
+
+        public override void OnHide()
         {
-            if (items == null) return;
-            var position = content.anchoredPosition.y;
-            var minIndex = Mathf.Max(0, (int)(position / assetRect.height) * column);
-            var maxIndex = Mathf.Min((int)((position + row * assetRect.height) / assetRect.height) * column + column - 1, items.Count - 1);
+            items = null;
+            oldMinIndex = -1;
+            oldMaxIndex = -1;
+            if (grids == null) return;
+            foreach (var i in grids.Keys)
+            {
+                if (grids.TryGetValue(i, out var grid))
+                {
+                    if (grid != null)
+                    {
+                        grid.Dispose();
+                        PoolManager.Hide(grid.gameObject);
+                    }
+                }
+            }
+
+            grids.Clear();
+            grids = null;
+        }
+
+        public override void OnUpdate()
+        {
+            if (items == null)
+            {
+                return;
+            }
+
+            if (grids == null)
+            {
+                return;
+            }
+
+            int newIndex;
+            int minIndex;
+            int maxIndex;
+            float position;
+            if (direction == ScrollType.Vertical)
+            {
+                position = owner.anchoredPosition.y;
+                newIndex = (int)(position / assetRect.height);
+                minIndex = newIndex * column;
+                maxIndex = (newIndex + row) * column - 1;
+            }
+            else
+            {
+                position = -owner.anchoredPosition.x;
+                newIndex = (int)(position / assetRect.width);
+                minIndex = newIndex * row;
+                maxIndex = (newIndex + column) * row - 1;
+            }
+
+            if (minIndex < 0)
+            {
+                minIndex = 0;
+            }
+
+            if (maxIndex > items.Count - 1)
+            {
+                maxIndex = items.Count - 1;
+            }
 
             if (minIndex != oldMinIndex || maxIndex != oldMaxIndex)
             {
@@ -84,10 +150,21 @@ namespace JFramework
             {
                 if (!grids.ContainsKey(i))
                 {
+                    float posX;
+                    float posY;
                     var index = i;
                     grids[index] = default;
-                    var posX = index % column * assetRect.width + assetRect.width / 2;
-                    var posY = -(index / column) * assetRect.height - assetRect.height / 2;
+                    if (direction == ScrollType.Vertical)
+                    {
+                        posX = index % column * assetRect.width + assetRect.width / 2;
+                        posY = -(index / column) * assetRect.height - assetRect.height / 2;
+                    }
+                    else
+                    {
+                        posX = index / row * assetRect.width + assetRect.width / 2;
+                        posY = -(index % row) * assetRect.height - assetRect.height / 2;
+                    }
+
                     PoolManager.Show(assetPath, obj =>
                     {
                         var grid = obj.GetComponent<TGrid>();
@@ -97,7 +174,7 @@ namespace JFramework
                         }
 
                         var target = (RectTransform)grid.transform;
-                        target.SetParent(content);
+                        target.SetParent(owner);
                         target.sizeDelta = new Vector2(assetRect.width, assetRect.height);
                         target.localScale = Vector3.one;
                         target.localPosition = new Vector3(posX, posY, 0);
@@ -116,40 +193,24 @@ namespace JFramework
             }
         }
 
-        public override void Hide()
-        {
-            base.Hide();
-            Dispose();
-        }
-
         public void SetItem(List<TItem> items)
         {
-            Dispose();
+            OnHide();
             this.items = items;
-            content.anchoredPosition = Vector2.zero;
-            content.sizeDelta = new Vector2(0, Mathf.Ceil((float)items.Count / column * assetRect.height + 1));
-        }
-
-        public void Dispose()
-        {
-            items = null;
-            foreach (var i in grids.Keys)
+            float value = items.Count;
+            if (direction == ScrollType.Vertical)
             {
-                if (grids.TryGetValue(i, out var grid))
-                {
-                    if (grid != null)
-                    {
-                        grid.Dispose();
-                        PoolManager.Hide(grid.gameObject);
-                    }
-                }
+                value = Mathf.Ceil(value / column);
+                owner.sizeDelta = new Vector2(0, value * assetRect.height);
+            }
+            else
+            {
+                value = Mathf.Ceil(value / row);
+                owner.sizeDelta = new Vector2(value * assetRect.width, 0);
             }
 
-            grids.Clear();
-            oldMinIndex = -1;
-            oldMaxIndex = -1;
+            grids = new Dictionary<int, TGrid>();
+            owner.anchoredPosition = Vector2.zero;
         }
-
-        RectTransform IScroll.content => content;
     }
 }
