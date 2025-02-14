@@ -116,6 +116,12 @@ namespace JFramework
 
         private static AudioPool LoadPool(string assetPath)
         {
+            if (GlobalManager.settings == null)
+            {
+                GlobalManager.settings = new AudioSetting();
+                JsonManager.Load(GlobalManager.settings, nameof(AudioManager));
+            }
+
             if (GlobalManager.poolData.TryGetValue(assetPath, out var poolData))
             {
                 return (AudioPool)poolData;

@@ -29,10 +29,10 @@ namespace JFramework
         public Canvas canvas;
 
         public AudioSource sounds;
+        
+        internal static AudioSetting settings;
 
         internal static AssetBundleManifest manifest;
-
-        internal static readonly AudioSetting settings = new AudioSetting();
 
         internal static readonly List<ITimer> timerData = new List<ITimer>();
 
@@ -98,7 +98,6 @@ namespace JFramework
         {
             Instance = this;
             DontDestroyOnLoad(gameObject);
-            JsonManager.Load(settings, nameof(AudioManager));
         }
 
         private void Start()
@@ -115,13 +114,13 @@ namespace JFramework
         private void OnDestroy()
         {
             UIManager.Dispose();
-            PoolManager.Dispose();
             PackManager.Dispose();
             DataManager.Dispose();
             AudioManager.Dispose();
             AssetManager.Dispose();
             AgentManager.Dispose();
             TimerManager.Dispose();
+            PoolManager.Dispose();
             typeof(Service.Pool).GetMethod("Dispose", Service.Find.Static)?.Invoke(null, null);
             typeof(Service.Event).GetMethod("Dispose", Service.Find.Static)?.Invoke(null, null);
             Instance = null;

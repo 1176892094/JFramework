@@ -19,10 +19,11 @@ namespace JFramework
     [Serializable]
     public sealed class UIScroll<TItem, TGrid> : Agent<RectTransform> where TGrid : Component, IGrid<TItem>
     {
-        private Dictionary<int, TGrid> grids;
+        private readonly Dictionary<int, TGrid> grids = new Dictionary<int, TGrid>();
         private List<TItem> items;
         private int oldMaxIndex;
         private int oldMinIndex;
+        private bool initialized;
 
         public Rect assetRect;
         public string assetPath;
@@ -34,28 +35,14 @@ namespace JFramework
         public override void OnShow(Component owner)
         {
             base.OnShow(owner);
-            var content = (RectTransform)owner;
-            if (direction == ScrollType.Vertical)
-            {
-                content.anchorMin = Vector2.up;
-                content.anchorMax = Vector2.one;
-            }
-            else
-            {
-                content.anchorMin = Vector2.zero;
-                content.anchorMax = Vector2.up;
-            }
-
-            content.pivot = Vector2.up;
+            initialized = false;
         }
-
 
         public override void OnHide()
         {
             items = null;
             oldMinIndex = -1;
             oldMaxIndex = -1;
-            if (grids == null) return;
             foreach (var i in grids.Keys)
             {
                 if (grids.TryGetValue(i, out var grid))
@@ -69,17 +56,28 @@ namespace JFramework
             }
 
             grids.Clear();
-            grids = null;
         }
 
         public override void OnUpdate()
         {
-            if (items == null)
+            if (!initialized)
             {
-                return;
+                initialized = true;
+                if (direction == ScrollType.Vertical)
+                {
+                    owner.anchorMin = Vector2.up;
+                    owner.anchorMax = Vector2.one;
+                }
+                else
+                {
+                    owner.anchorMin = Vector2.zero;
+                    owner.anchorMax = Vector2.up;
+                }
+
+                owner.pivot = Vector2.up;
             }
 
-            if (grids == null)
+            if (items == null)
             {
                 return;
             }
@@ -209,7 +207,6 @@ namespace JFramework
                 owner.sizeDelta = new Vector2(value * assetRect.width, 0);
             }
 
-            grids = new Dictionary<int, TGrid>();
             owner.anchoredPosition = Vector2.zero;
         }
     }

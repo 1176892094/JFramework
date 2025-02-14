@@ -64,24 +64,24 @@ namespace JFramework
         private static string LoadPath(string fileName)
         {
             var jsonPath = Path.Combine(Application.streamingAssetsPath, nameof(JsonManager));
-            if (!Directory.Exists(jsonPath))
+            if (Directory.Exists(jsonPath))
             {
-                Directory.CreateDirectory(jsonPath);
-            }
-
-            var filePath = Path.Combine(jsonPath, Service.Text.Format("{0}.json", fileName));
-            if (!File.Exists(filePath))
-            {
-                jsonPath = Path.Combine(Application.persistentDataPath, nameof(JsonManager));
-                if (!Directory.Exists(jsonPath))
+                var filePath = Path.Combine(jsonPath, Service.Text.Format("{0}.json", fileName));
+                if (!File.Exists(filePath))
                 {
-                    Directory.CreateDirectory(jsonPath);
+                    jsonPath = Path.Combine(Application.persistentDataPath, nameof(JsonManager));
+                    if (!Directory.Exists(jsonPath))
+                    {
+                        Directory.CreateDirectory(jsonPath);
+                    }
+
+                    filePath = Path.Combine(jsonPath, Service.Text.Format("{0}.json", fileName));
                 }
 
-                filePath = Path.Combine(jsonPath, Service.Text.Format("{0}.json", fileName));
+                return filePath;
             }
 
-            return filePath;
+            return string.Empty;
         }
     }
 }
