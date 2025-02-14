@@ -22,7 +22,7 @@ using AgentData = System.Collections.Generic.Dictionary<System.Type, JFramework.
 
 namespace JFramework
 {
-    public abstract class GlobalManager : MonoBehaviour
+    public class GlobalManager : MonoBehaviour
     {
         public static GlobalManager Instance;
 
@@ -38,61 +38,33 @@ namespace JFramework
 
         internal static readonly List<AudioSource> audioData = new List<AudioSource>();
 
-        internal static Dictionary<Type, UIPanel> panelData => Instance.m_PanelData;
+        internal static Dictionary<Type, UIPanel> panelData = new Dictionary<Type, UIPanel>();
 
-        internal static Dictionary<Type, ItemTable> itemTable => Instance.m_ItemTable;
+        internal static Dictionary<Type, ItemTable> itemTable = new Dictionary<Type, ItemTable>();
 
-        internal static Dictionary<Type, NameTable> nameTable => Instance.m_NameTable;
+        internal static Dictionary<Type, NameTable> nameTable = new Dictionary<Type, NameTable>();
 
-        internal static Dictionary<Type, EnumTable> enumTable => Instance.m_EnumTable;
+        internal static Dictionary<Type, EnumTable> enumTable = new Dictionary<Type, EnumTable>();
 
-        internal static Dictionary<string, PackData> clientPacks => Instance.m_ClientPacks;
+        internal static Dictionary<string, PackData> clientPacks = new Dictionary<string, PackData>();
 
-        internal static Dictionary<string, PackData> serverPacks => Instance.m_ServerPacks;
+        internal static Dictionary<string, PackData> serverPacks = new Dictionary<string, PackData>();
 
-        internal static Dictionary<string, AssetData> assetData => Instance.m_AssetData;
+        internal static Dictionary<string, AssetData> assetData = new Dictionary<string, AssetData>();
 
-        internal static Dictionary<string, AssetBundle> assetPack => Instance.m_AssetPack;
+        internal static Dictionary<string, AssetBundle> assetPack = new Dictionary<string, AssetBundle>();
 
-        internal static Dictionary<string, Task<AssetBundle>> assetTask => Instance.m_AssetTask;
+        internal static Dictionary<string, Task<AssetBundle>> assetTask = new Dictionary<string, Task<AssetBundle>>();
 
-        internal static Dictionary<string, IPool> poolData => Instance.m_PoolData;
+        internal static Dictionary<string, IPool> poolData = new Dictionary<string, IPool>();
 
-        internal static Dictionary<string, GameObject> poolGroup => Instance.m_PoolGroup;
+        internal static Dictionary<string, GameObject> poolGroup = new Dictionary<string, GameObject>();
 
-        internal static Dictionary<Component, AgentData> agentData => Instance.m_AgentData;
+        internal static Dictionary<Component, AgentData> agentData = new Dictionary<Component, AgentData>();
 
-        internal static Dictionary<string, HashSet<UIPanel>> panelGroup => Instance.m_PanelGroup;
+        internal static Dictionary<string, HashSet<UIPanel>> panelGroup = new Dictionary<string, HashSet<UIPanel>>();
 
-        internal static Dictionary<int, RectTransform> panelLayer => Instance.m_PanelLayer;
-
-        protected abstract Dictionary<Type, UIPanel> m_PanelData { get; }
-
-        protected abstract Dictionary<Type, ItemTable> m_ItemTable { get; }
-
-        protected abstract Dictionary<Type, NameTable> m_NameTable { get; }
-
-        protected abstract Dictionary<Type, EnumTable> m_EnumTable { get; }
-
-        protected abstract Dictionary<string, PackData> m_ClientPacks { get; }
-
-        protected abstract Dictionary<string, PackData> m_ServerPacks { get; }
-
-        protected abstract Dictionary<string, AssetData> m_AssetData { get; }
-
-        protected abstract Dictionary<string, AssetBundle> m_AssetPack { get; }
-
-        protected abstract Dictionary<string, Task<AssetBundle>> m_AssetTask { get; }
-
-        protected abstract Dictionary<string, IPool> m_PoolData { get; }
-
-        protected abstract Dictionary<string, GameObject> m_PoolGroup { get; }
-
-        protected abstract Dictionary<Component, AgentData> m_AgentData { get; }
-
-        protected abstract Dictionary<string, HashSet<UIPanel>> m_PanelGroup { get; }
-
-        protected abstract Dictionary<int, RectTransform> m_PanelLayer { get; }
+        internal static Dictionary<int, RectTransform> panelLayer = new Dictionary<int, RectTransform>();
 
         private void Awake()
         {
@@ -113,6 +85,7 @@ namespace JFramework
 
         private void OnDestroy()
         {
+            Instance = null;
             UIManager.Dispose();
             PackManager.Dispose();
             DataManager.Dispose();
@@ -123,7 +96,6 @@ namespace JFramework
             PoolManager.Dispose();
             typeof(Service.Pool).GetMethod("Dispose", Service.Find.Static)?.Invoke(null, null);
             typeof(Service.Event).GetMethod("Dispose", Service.Find.Static)?.Invoke(null, null);
-            Instance = null;
             GC.Collect();
         }
     }
