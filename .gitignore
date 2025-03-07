@@ -93,3 +93,4 @@ global.json
 /Settings/obj
 /Manager/bin
 /Manager/obj
+.DS_Store
