@@ -156,7 +156,7 @@ namespace JFramework
 
         public static List<T> GetTable<T>() where T : IData
         {
-            if (!GlobalManager.Instance) return default;
+            if (!GlobalManager.Instance) return null;
             if (GlobalManager.itemTable.TryGetValue(typeof(T), out var itemTable))
             {
                 var caches = new List<T>();
@@ -191,7 +191,7 @@ namespace JFramework
             }
 
             Debug.LogError(Service.Text.Format("获取 {0} 失败!", typeof(T).Name));
-            return default;
+            return null;
         }
 
         internal static void Dispose()

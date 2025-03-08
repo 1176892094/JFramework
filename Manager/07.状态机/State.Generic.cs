@@ -20,7 +20,7 @@ namespace JFramework
     {
         protected T owner { get; private set; }
 
-        void IAgent.OnHide() => owner = default;
+        void IAgent.OnHide() => owner = null;
 
         void IAgent.OnShow(Component owner) => this.owner = (T)owner;
         

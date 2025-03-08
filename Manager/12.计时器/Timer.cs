@@ -26,7 +26,7 @@ namespace JFramework
 
         public static T Load<T>(Component entity, float duration) where T : class, ITimer
         {
-            if (!GlobalManager.Instance) return default;
+            if (!GlobalManager.Instance) return null;
             var timerData = Service.Pool.Dequeue<T>();
             timerData.Start(entity, duration, OnComplete);
             GlobalManager.timerData.Add(timerData);

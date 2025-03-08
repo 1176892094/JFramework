@@ -40,7 +40,7 @@ namespace JFramework
         {
             try
             {
-                if (!GlobalManager.Instance) return default;
+                if (!GlobalManager.Instance) return null;
                 var assetData = await LoadAsset(assetPath, typeof(T));
                 if (assetData != null)
                 {
@@ -54,7 +54,7 @@ namespace JFramework
                 Debug.LogWarning(Service.Text.Format("加载资源 {0} 失败!\n{1}", assetPath, e));
             }
 
-            return default;
+            return null;
         }
 
         public static async void Load<T>(string assetPath, Action<T> assetAction) where T : Object

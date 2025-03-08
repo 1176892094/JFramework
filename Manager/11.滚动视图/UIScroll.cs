@@ -151,7 +151,7 @@ namespace JFramework
                     float posX;
                     float posY;
                     var index = i;
-                    grids[index] = default;
+                    grids[index] = null;
                     if (direction == ScrollType.Vertical)
                     {
                         posX = index % column * assetRect.width + assetRect.width / 2;

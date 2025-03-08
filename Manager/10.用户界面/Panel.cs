@@ -67,13 +67,13 @@ namespace JFramework
 
         public static T Find<T>() where T : UIPanel
         {
-            if (!GlobalManager.Instance) return default;
+            if (!GlobalManager.Instance) return null;
             if (GlobalManager.panelData.TryGetValue(typeof(T), out var panel))
             {
                 return (T)panel;
             }
 
-            return default;
+            return null;
         }
 
         public static void Destroy<T>()
@@ -119,13 +119,13 @@ namespace JFramework
 
         public static UIPanel Find(Type assetType)
         {
-            if (!GlobalManager.Instance) return default;
+            if (!GlobalManager.Instance) return null;
             if (GlobalManager.panelData.TryGetValue(assetType, out var panel))
             {
                 return panel;
             }
 
-            return default;
+            return null;
         }
 
         public static void Destroy(Type assetType)

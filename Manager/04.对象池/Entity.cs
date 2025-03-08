@@ -20,7 +20,7 @@ namespace JFramework
     {
         public static async Task<GameObject> Show(string assetPath)
         {
-            if (!GlobalManager.Instance) return default;
+            if (!GlobalManager.Instance) return null;
             var assetData = await LoadPool(assetPath).Dequeue();
             assetData.transform.SetParent(null);
             assetData.SetActive(true);

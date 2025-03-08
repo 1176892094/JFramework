@@ -34,15 +34,15 @@ namespace JFramework
 
         internal static IAgent Find<T>(Component owner)
         {
-            if (!GlobalManager.Instance) return default;
+            if (!GlobalManager.Instance) return null;
             if (!GlobalManager.agentData.TryGetValue(owner, out var agentData))
             {
-                return default;
+                return null;
             }
 
             if (!agentData.TryGetValue(typeof(T), out var agent))
             {
-                return default;
+                return null;
             }
 
             return agent;

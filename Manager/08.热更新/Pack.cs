@@ -199,7 +199,7 @@ namespace JFramework
         private static async Task<string> LoadClientRequest(string persistentData, string streamingAssets)
         {
             var packData = await GlobalSetting.Instance.LoadRequest(persistentData, streamingAssets);
-            string result = default;
+            string result = null;
             if (packData.Key == 1)
             {
                 result = File.ReadAllText(packData.Value);
@@ -220,7 +220,7 @@ namespace JFramework
         internal static async Task<AssetBundle> LoadAssetRequest(string persistentData, string streamingAssets)
         {
             var packData = await GlobalSetting.Instance.LoadRequest(persistentData, streamingAssets);
-            byte[] result = default;
+            byte[] result = null;
             if (packData.Key == 1)
             {
                 result = await Task.Run(() => Service.Xor.Decrypt(File.ReadAllBytes(packData.Value)));
@@ -235,7 +235,7 @@ namespace JFramework
                 }
             }
 
-            return GlobalSetting.Instance != null ? AssetBundle.LoadFromMemory(result) : null;
+            return GlobalSetting.Instance ? AssetBundle.LoadFromMemory(result) : null;
         }
 
         internal static void Dispose()

@@ -168,7 +168,7 @@ namespace JFramework
         {
             if (string.IsNullOrEmpty(reason))
             {
-                return default;
+                return null;
             }
 
             if (target == typeof(string))
