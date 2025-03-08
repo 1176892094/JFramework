@@ -199,6 +199,11 @@ namespace JFramework
         public void SetItem(List<TItem> items)
         {
             OnHide();
+            if (owner == null)
+            {
+                return;
+            }
+
             this.items = items;
             float value = items.Count;
             if (direction == ScrollType.Vertical)
