@@ -67,21 +67,19 @@ namespace JFramework
             if (Directory.Exists(jsonPath))
             {
                 var filePath = Path.Combine(jsonPath, Service.Text.Format("{0}.json", fileName));
-                if (!File.Exists(filePath))
+                if (File.Exists(filePath))
                 {
-                    jsonPath = Path.Combine(Application.persistentDataPath, nameof(JsonManager));
-                    if (!Directory.Exists(jsonPath))
-                    {
-                        Directory.CreateDirectory(jsonPath);
-                    }
-
-                    filePath = Path.Combine(jsonPath, Service.Text.Format("{0}.json", fileName));
+                    return filePath;
                 }
-
-                return filePath;
             }
 
-            return string.Empty;
+            jsonPath = Path.Combine(Application.persistentDataPath, nameof(JsonManager));
+            if (!Directory.Exists(jsonPath))
+            {
+                Directory.CreateDirectory(jsonPath);
+            }
+                
+            return Path.Combine(jsonPath, Service.Text.Format("{0}.json", fileName));
         }
     }
 }
