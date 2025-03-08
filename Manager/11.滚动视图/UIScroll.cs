@@ -60,6 +60,11 @@ namespace JFramework
 
         public override void OnUpdate()
         {
+            if (owner == null)
+            {
+                return;
+            }
+
             if (!initialized)
             {
                 initialized = true;
