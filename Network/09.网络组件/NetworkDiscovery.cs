@@ -39,7 +39,7 @@ namespace JFramework.Net
                 GlobalSetting.Instance.MulticastLock(true);
                 ServerReceive();
             }
-            else if (!NetworkManager.Client.isActive)
+            else
             {
                 udpClient = new UdpClient(0)
                 {
