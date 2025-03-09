@@ -19,11 +19,6 @@ namespace JFramework
 {
     public static partial class Extensions
     {
-        public static void Register<T>(this Component current)
-        {
-            AgentManager.Register<T>(current, typeof(T));
-        }
-
         public static void Register<T>(this Component current, Type agentType)
         {
             AgentManager.Register<T>(current, agentType);
@@ -112,6 +107,18 @@ namespace JFramework
                 {
                     inject.SetToggle(name, (UnityEvent<bool>)property.GetValue(toggle));
                 }
+
+                return;
+            }
+
+            injectType = Service.Find.Type("TMPro.TMP_InputField,Unity.TextMeshPro");
+            if (component.TryGetComponent(injectType, out var inputField))
+            {
+                var property = injectType.GetProperty("onSubmit", Service.Find.Instance);
+                if (property != null)
+                {
+                    inject.SetInputField(name, (UnityEvent<string>)property.GetValue(inputField));
+                }
             }
         }
 
@@ -161,6 +168,23 @@ namespace JFramework
             }
 
             toggle.AddListener(value =>
+            {
+                if (panel.state != UIState.Freeze)
+                {
+                    inject.SendMessage(name, value);
+                }
+            });
+        }
+
+        private static void SetInputField(this Component inject, string name, UnityEvent<string> inputField)
+        {
+            if (!inject.TryGetComponent(out UIPanel panel))
+            {
+                inputField.AddListener(value => inject.SendMessage(name, value));
+                return;
+            }
+
+            inputField.AddListener(value =>
             {
                 if (panel.state != UIState.Freeze)
                 {
