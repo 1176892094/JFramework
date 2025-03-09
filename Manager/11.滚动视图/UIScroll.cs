@@ -17,7 +17,7 @@ using UnityEngine;
 namespace JFramework
 {
     [Serializable]
-    public sealed class UIScroll<TItem, TGrid> : Agent<RectTransform> where TGrid : Component, IGrid<TItem>
+    public sealed class UIScroll<TItem, TGrid> : Agent<RectTransform>, IScroll<TItem> where TGrid : Component, IGrid<TItem>
     {
         private readonly Dictionary<int, TGrid> grids = new Dictionary<int, TGrid>();
         private List<TItem> items;
@@ -25,9 +25,9 @@ namespace JFramework
         private int oldMinIndex;
         private bool initialized;
 
-        public Rect assetRect;
-        public string assetPath;
-        public ScrollType direction;
+        public Rect assetRect { get; set; }
+        public string assetPath { get; set; }
+        public ScrollType direction { get; set; }
 
         private int row => (int)assetRect.y + (direction == ScrollType.Vertical ? 1 : 0);
         private int column => (int)assetRect.x + (direction == ScrollType.Horizontal ? 1 : 0);
