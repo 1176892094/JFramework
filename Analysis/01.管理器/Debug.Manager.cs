@@ -10,18 +10,16 @@
 // *********************************************************************************
 
 using System;
-using JFramework.Common;
-using JFramework.Net;
+using System.Reflection;
 using UnityEngine;
 
 namespace JFramework
 {
     [DefaultExecutionOrder(-20)]
-    public partial class DebugManager : MonoBehaviour, IEvent<PingUpdate>
+    public partial class DebugManager : MonoBehaviour
     {
         private float frameData;
         private double frameTime;
-        private double framePing;
         private Rect minRect;
         private Status status;
         private Window window;
@@ -30,6 +28,8 @@ namespace JFramework
         private Vector2 consoleView;
         private Vector2 messageView;
 
+        private FieldInfo NetworkClientRef;
+        private MethodInfo NetworkManagerRef;
         private Func<Reference[]> ServicePoolRef;
         private Func<Reference[]> ServiceEventRef;
         private Func<Reference[]> PoolManagerRef;
@@ -53,13 +53,22 @@ namespace JFramework
                 ServiceEventRef = (Func<Reference[]>)Delegate.CreateDelegate(typeof(Func<Reference[]>), message);
             }
 
-            message = typeof(PoolManager).GetMethod("Reference", Service.Find.Static);
+            var messageType = Service.Find.Type("JFramework.PoolManager,JFramework.Ray");
+            message = messageType.GetMethod("Reference", Service.Find.Static);
             if (message != null)
             {
                 PoolManagerRef = (Func<Reference[]>)Delegate.CreateDelegate(typeof(Func<Reference[]>), message);
             }
-            
-            status |= Status.Ping;
+
+            messageType = Service.Find.Type("JFramework.NetworkManager,JFramework.Net");
+            NetworkManagerRef = messageType.GetMethod("Reference", Service.Find.Static);
+            messageType = Service.Find.Type("JFramework.NetworkManager.Client,JFramework.Net");
+            NetworkClientRef = messageType.GetField("pingTime", Service.Find.Static);
+            if (NetworkManagerRef != null && NetworkClientRef != null)
+            {
+                status |= Status.Ping;
+            }
+
             foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
             {
                 var sceneTypes = assembly.GetTypes();
@@ -99,16 +108,6 @@ namespace JFramework
 
             frameData = (int)(1.0 / Time.deltaTime);
             frameTime = Time.realtimeSinceStartup + 1;
-        }
-
-        private void OnEnable()
-        {
-            Service.Event.Listen(this);
-        }
-
-        private void OnDisable()
-        {
-            Service.Event.Remove(this);
         }
 
         private void OnDestroy()
@@ -155,11 +154,6 @@ namespace JFramework
             GUI.matrix = matrix;
             GUI.skin.label.alignment = labelAlignment;
             GUI.skin.textField.alignment = fieldAlignment;
-        }
-
-        void IEvent<PingUpdate>.Execute(PingUpdate message)
-        {
-            framePing = message.pingTime;
         }
 
         private void MaxWindow(int id)
@@ -285,104 +279,36 @@ namespace JFramework
                 status |= Status.Expand;
             }
 
-            if (GUILayout.Button(Service.Text.Format("Ping: {0}", (int)(framePing * 1000)), Height30))
+            if ((status & Status.Ping) != 0)
             {
-                if ((status & Status.Window) != 0)
+                if (GUILayout.Button(Service.Text.Format("Ping: {0}", (int)((double)NetworkClientRef.GetValue(null) * 1000)), Height30))
                 {
-                    status &= ~Status.Window;
-                }
-                else
-                {
-                    status |= Status.Window;
+                    if ((status & Status.Window) != 0)
+                    {
+                        status &= ~Status.Window;
+                    }
+                    else
+                    {
+                        status |= Status.Window;
+                    }
                 }
             }
 
             GUI.contentColor = Color.white;
             GUILayout.EndHorizontal();
-            if (status.HasFlag(Status.Window))
+            
+            if ((status & Status.Ping) != 0)
             {
-                var boxAlignment = GUI.skin.box.alignment;
-                GUI.skin.box.alignment = TextAnchor.MiddleCenter;
-                Reference();
-                GUI.skin.box.alignment = boxAlignment;
+                if (status.HasFlag(Status.Window))
+                {
+                    var boxAlignment = GUI.skin.box.alignment;
+                    GUI.skin.box.alignment = TextAnchor.MiddleCenter;
+                    NetworkManagerRef.Invoke(null, null);
+                    GUI.skin.box.alignment = boxAlignment;
+                }
             }
 
             GUILayout.EndArea();
-        }
-
-        private static void Reference()
-        {
-            var option = GUILayout.Height(30f);
-            if (!NetworkManager.Client.isConnected && !NetworkManager.Server.isActive)
-            {
-                if (!NetworkManager.Client.isActive)
-                {
-                    if (GUILayout.Button("Host (Server + Client)", option))
-                    {
-                        NetworkManager.StartHost();
-                    }
-
-                    GUILayout.BeginHorizontal();
-                    if (GUILayout.Button("Server", option))
-                    {
-                        NetworkManager.StartServer();
-                    }
-
-                    if (GUILayout.Button("Client", option))
-                    {
-                        NetworkManager.StartClient();
-                    }
-
-                    GUILayout.EndHorizontal();
-                }
-                else
-                {
-                    GUILayout.Label("Connecting...".Bold(), "Box", option);
-
-                    if (GUILayout.Button("Stop Client", option))
-                    {
-                        NetworkManager.StopClient();
-                    }
-                }
-            }
-            else
-            {
-                if (NetworkManager.Server.isActive || NetworkManager.Client.isActive)
-                {
-                    var message = Service.Text.Format("{0} : {1}".Bold(), Transport.Instance.address, Transport.Instance.port);
-                    GUILayout.Label(message, "Box", option);
-                }
-            }
-
-            if (NetworkManager.Client.isConnected && !NetworkManager.Client.isReady)
-            {
-                if (GUILayout.Button("Ready", option))
-                {
-                    NetworkManager.Client.Ready();
-                }
-            }
-
-            if (NetworkManager.Server.isActive && NetworkManager.Client.isConnected)
-            {
-                if (GUILayout.Button("Stop Host", option))
-                {
-                    NetworkManager.StopHost();
-                }
-            }
-            else if (NetworkManager.Client.isConnected)
-            {
-                if (GUILayout.Button("Stop Client", option))
-                {
-                    NetworkManager.StopClient();
-                }
-            }
-            else if (NetworkManager.Server.isActive)
-            {
-                if (GUILayout.Button("Stop Server", option))
-                {
-                    NetworkManager.StopServer();
-                }
-            }
         }
     }
 }

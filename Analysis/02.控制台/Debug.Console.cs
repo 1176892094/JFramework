@@ -92,7 +92,15 @@ namespace JFramework
                     mailBody.Append(message + "\n\n" + message.stackTrace + "\n\n");
                 }
 
-                Service.Mail.Send(GlobalSetting.Instance.SendMail(mailBody.ToString()));
+                var settings = Resources.Load<ScriptableObject>("GlobalSetting");
+                if (settings != null)
+                {
+                    var dataInfo = settings.GetType().GetMethod("SendMail", Service.Find.Static);
+                    if (dataInfo != null)
+                    {
+                        Service.Mail.Send((MailData)dataInfo.Invoke(null, new object[] { mailBody.ToString() }));
+                    }
+                }
             }
 
             GUILayout.EndHorizontal();

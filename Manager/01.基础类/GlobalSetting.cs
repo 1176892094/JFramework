@@ -111,16 +111,16 @@ namespace JFramework
 
         public abstract Task<KeyValuePair<int, string>> LoadRequest(string persistentData, string streamingAssets);
 
-        public MailData SendMail(string mailBody)
+        public static MailData SendMail(string mailBody)
         {
             return new MailData
             {
-                smtpServer = smtpServer,
-                smtpPort = smtpPort,
+                smtpServer = Instance.smtpServer,
+                smtpPort = Instance.smtpPort,
                 senderName = "JFramework",
-                senderAddress = smtpUsername,
-                senderPassword = smtpPassword,
-                targetAddress = smtpUsername,
+                senderAddress = Instance.smtpUsername,
+                senderPassword = Instance.smtpPassword,
+                targetAddress = Instance.smtpUsername,
                 mailName = "来自《JFramework》的调试日志:",
                 mailBody = mailBody
             };
