@@ -30,7 +30,7 @@ namespace JFramework
 
         public virtual void OnHide()
         {
-            owner = default;
+            owner = null;
         }
     }
 }
