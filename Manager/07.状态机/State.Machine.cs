@@ -39,14 +39,7 @@ namespace JFramework
         {
             state?.OnUpdate();
         }
-
-        public void AddState<T>()
-        {
-            var stateData = Service.Pool.Dequeue<IState>(typeof(T));
-            states[typeof(T)] = stateData;
-            stateData.OnShow(owner);
-        }
-
+        
         public void AddState<T>(Type stateType)
         {
             var stateData = Service.Pool.Dequeue<IState>(stateType);
