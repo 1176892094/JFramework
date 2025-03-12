@@ -13,7 +13,7 @@ using System.IO;
 
 namespace JFramework
 {
-    public static partial class FormManager
+    internal static partial class FormManager
     {
         private const int NAME_LINE = 1;
         private const int TYPE_LINE = 2;

@@ -16,7 +16,7 @@ using System.Xml;
 
 namespace JFramework
 {
-    public static partial class FormManager
+    internal static partial class FormManager
     {
         private static List<KeyValuePair<string, string[,]>> LoadDataTable(string filePath)
         {

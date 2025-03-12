@@ -18,7 +18,7 @@ using UnityEngine;
 
 namespace JFramework
 {
-    public static partial class FormManager
+    internal static partial class FormManager
     {
         public static async Task WriteAssets(string filePaths)
         {
