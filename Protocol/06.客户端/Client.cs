@@ -13,7 +13,7 @@ using System;
 using System.Net;
 using System.Net.Sockets;
 
-namespace JFramework.Udp
+namespace JFramework
 {
     internal sealed class Client : Agent
     {
@@ -54,7 +54,7 @@ namespace JFramework.Udp
                     status = Status.Connect;
                     endPoint = new IPEndPoint(addresses[0], port);
                     socket = new Socket(endPoint.AddressFamily, SocketType.Dgram, ProtocolType.Udp);
-                    Common.SetBuffer(socket);
+                    Utils.SetBuffer(socket);
                     socket.Connect(endPoint);
                     Log.Info($"客户端连接到：{addresses[0]} 端口：{port}。");
                     SendReliable(Reliable.Connect);

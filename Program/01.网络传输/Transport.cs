@@ -10,7 +10,6 @@
 // *********************************************************************************
 
 using System;
-using JFramework.Udp;
 
 namespace JFramework.Net
 {
@@ -40,7 +39,7 @@ namespace JFramework.Net
 
         public Transport()
         {
-            var setting = new Udp.Setting(maxUnit, timeout, interval, deadLink, fastResend, sendWindow, receiveWindow);
+            var setting = new JFramework.Setting(maxUnit, timeout, interval, deadLink, fastResend, sendWindow, receiveWindow);
             client = new Client(setting, ClientConnect, ClientDisconnect, ClientError, ClientReceive);
             server = new Server(setting, ServerConnect, ServerDisconnect, ServerError, ServerReceive);
             return;

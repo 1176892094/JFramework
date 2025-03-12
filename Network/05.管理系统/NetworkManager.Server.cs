@@ -160,7 +160,7 @@ namespace JFramework.Net
 
             public static void Register<T>(Action<NetworkClient, T> handle) where T : struct, IMessage
             {
-                messages[Service.Hash<T>.Id] = (client, reader, channel) =>
+                messages[Hash<T>.Id] = (client, reader, channel) =>
                 {
                     try
                     {
@@ -177,7 +177,7 @@ namespace JFramework.Net
 
             public static void Register<T>(Action<NetworkClient, T, int> handle) where T : struct, IMessage
             {
-                messages[Service.Hash<T>.Id] = (client, reader, channel) =>
+                messages[Hash<T>.Id] = (client, reader, channel) =>
                 {
                     try
                     {

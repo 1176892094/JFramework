@@ -12,7 +12,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace JFramework.Udp
+namespace JFramework
 {
     internal class Kcp
     {

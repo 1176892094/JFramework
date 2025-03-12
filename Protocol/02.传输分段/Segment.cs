@@ -11,7 +11,7 @@
 
 using System.IO;
 
-namespace JFramework.Udp
+namespace JFramework
 {
     internal class Segment
     {

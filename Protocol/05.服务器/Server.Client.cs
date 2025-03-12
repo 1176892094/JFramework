@@ -12,7 +12,7 @@
 using System;
 using System.Net;
 
-namespace JFramework.Udp
+namespace JFramework
 {
     internal sealed partial class Server
     {

@@ -9,9 +9,11 @@
 // # Description: This is an automatically generated comment.
 // *********************************************************************************
 
+using System;
+using System.Net.Sockets;
 using System.Runtime.CompilerServices;
 
-namespace JFramework.Udp
+namespace JFramework
 {
     internal static class Utils
     {
@@ -67,6 +69,47 @@ namespace JFramework.Udp
         public static int Compare(uint later, uint earlier)
         {
             return (int)(later - earlier);
+        }
+        
+        internal static bool ParseReliable(byte value, out Reliable header)
+        {
+            if (Enum.IsDefined(typeof(Reliable), value))
+            {
+                header = (Reliable)value;
+                return true;
+            }
+
+            header = Reliable.Ping;
+            return false;
+        }
+
+        internal static bool ParseUnreliable(byte value, out Unreliable header)
+        {
+            if (Enum.IsDefined(typeof(Unreliable), value))
+            {
+                header = (Unreliable)value;
+                return true;
+            }
+
+            header = Unreliable.Disconnect;
+            return false;
+        }
+
+        internal static void SetBuffer(Socket socket, int buffer = 1024 * 1024 * 7)
+        {
+            socket.Blocking = false;
+            var sendBuffer = socket.SendBufferSize;
+            var receiveBuffer = socket.ReceiveBufferSize;
+            try
+            {
+                socket.SendBufferSize = buffer;
+                socket.ReceiveBufferSize = buffer;
+            }
+            catch (SocketException)
+            {
+                Log.Info($"发送缓存: {buffer} => {sendBuffer} : {sendBuffer / buffer:F}");
+                Log.Info($"接收缓存: {buffer} => {receiveBuffer} : {receiveBuffer / buffer:F}");
+            }
         }
     }
 }

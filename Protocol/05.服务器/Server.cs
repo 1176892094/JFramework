@@ -15,7 +15,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Runtime.InteropServices;
 
-namespace JFramework.Udp
+namespace JFramework
 {
     internal partial class Server
     {
@@ -78,7 +78,7 @@ namespace JFramework.Udp
                 socket.Bind(new IPEndPoint(IPAddress.Any, port));
             }
 
-            Common.SetBuffer(socket);
+            Utils.SetBuffer(socket);
         }
 
         private bool TryReceive(out ArraySegment<byte> segment, out int clientId)

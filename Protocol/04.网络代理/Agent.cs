@@ -13,7 +13,7 @@ using System;
 using System.Diagnostics;
 using System.Net.Sockets;
 
-namespace JFramework.Udp
+namespace JFramework
 {
     internal abstract class Agent
     {
@@ -94,7 +94,7 @@ namespace JFramework.Udp
                 return false;
             }
 
-            if (!Common.ParseReliable(receiveBuffer[0], out header))
+            if (!Utils.ParseReliable(receiveBuffer[0], out header))
             {
                 Logger(Error.InvalidReceive, $"{GetType()}: 未知的网络消息头部 {header}");
                 Disconnect();
@@ -119,7 +119,7 @@ namespace JFramework.Udp
             {
                 if (segment.Count < 1) return;
                 var headerByte = segment.Array[segment.Offset];
-                if (!Common.ParseUnreliable(headerByte, out var header))
+                if (!Utils.ParseUnreliable(headerByte, out var header))
                 {
                     Logger(Error.InvalidReceive, $"{GetType()}: 未知的网络消息头部 {header}");
                     Disconnect();

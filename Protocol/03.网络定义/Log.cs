@@ -11,7 +11,7 @@
 
 using System;
 
-namespace JFramework.Udp
+namespace JFramework
 {
     internal static class Log
     {

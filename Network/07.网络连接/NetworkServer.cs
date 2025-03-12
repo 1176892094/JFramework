@@ -42,7 +42,7 @@ namespace JFramework.Net
         public void Send<T>(T message, int channel = Channel.Reliable) where T : struct, IMessage
         {
             using var writer = MemoryWriter.Pop();
-            writer.WriteUShort(Service.Hash<T>.Id);
+            writer.WriteUShort(Hash<T>.Id);
             writer.Invoke(message);
 
             if (writer.position > Transport.Instance.MessageSize(channel))

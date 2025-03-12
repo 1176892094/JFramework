@@ -198,7 +198,7 @@ namespace JFramework.Net
 
             public static void Register<T>(Action<T> handle) where T : struct, IMessage
             {
-                messages[Service.Hash<T>.Id] = (client, reader, channel) =>
+                messages[Hash<T>.Id] = (client, reader, channel) =>
                 {
                     try
                     {
