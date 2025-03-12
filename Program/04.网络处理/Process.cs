@@ -143,8 +143,7 @@ namespace JFramework.Net
 
                     rooms.Add(id, room);
                     clients.Add(clientId, room);
-                    Log.Info(Service.Text.Format("客户端 {0} 创建房间。 房间名称: {1} 房间数: {2} 连接数: {3}", clientId, room.roomName, rooms.Count,
-                        clients.Count));
+                    Log.Info(Service.Text.Format("客户端 {0} 创建房间。 房间名称: {1} 房间数: {2} 连接数: {3}", clientId, room.roomName, rooms.Count, clients.Count));
 
                     using var writer = MemoryWriter.Pop();
                     writer.WriteByte((byte)OpCodes.CreateRoom);
@@ -159,8 +158,7 @@ namespace JFramework.Net
                     {
                         room.clients.Add(clientId);
                         clients.Add(clientId, room);
-                        Log.Info(Service.Text.Format("客户端 {0} 加入房间。 房间名称: {1} 房间数: {2} 连接数: {3}", clientId, room.roomName, rooms.Count,
-                            clients.Count));
+                        Log.Info(Service.Text.Format("客户端 {0} 加入房间。 房间名称: {1} 房间数: {2} 连接数: {3}", clientId, room.roomName, rooms.Count, clients.Count));
 
                         using var writer = MemoryWriter.Pop();
                         writer.WriteByte((byte)OpCodes.JoinRoom);

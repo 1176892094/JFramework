@@ -85,24 +85,24 @@ namespace JFramework.Net
                 transport.Update();
                 await Task.Delay(Setting.UpdateTime);
             }
-        }
 
-        private static void Info(string message)
-        {
-            Console.ForegroundColor = ConsoleColor.White;
-            Console.WriteLine(Service.Text.Format("[{0}] {1}", DateTime.Now.ToString("MM-dd HH:mm:ss"), message));
-        }
+            void Info(string message)
+            {
+                Console.ForegroundColor = ConsoleColor.White;
+                Console.WriteLine(Service.Text.Format("[{0}] {1}", DateTime.Now.ToString("MM-dd HH:mm:ss"), message));
+            }
 
-        private static void Warn(string message)
-        {
-            Console.ForegroundColor = ConsoleColor.Yellow;
-            Console.WriteLine(Service.Text.Format("[{0}] {1}", DateTime.Now.ToString("MM-dd HH:mm:ss"), message));
-        }
+            void Warn(string message)
+            {
+                Console.ForegroundColor = ConsoleColor.Yellow;
+                Console.WriteLine(Service.Text.Format("[{0}] {1}", DateTime.Now.ToString("MM-dd HH:mm:ss"), message));
+            }
 
-        private static void Error(string message)
-        {
-            Console.ForegroundColor = ConsoleColor.Red;
-            Console.WriteLine(Service.Text.Format("[{0}] {1}", DateTime.Now.ToString("MM-dd HH:mm:ss"), message));
+            void Error(string message)
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine(Service.Text.Format("[{0}] {1}", DateTime.Now.ToString("MM-dd HH:mm:ss"), message));
+            }
         }
     }
 }

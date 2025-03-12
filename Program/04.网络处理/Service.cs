@@ -9,10 +9,7 @@
 // # Description: This is an automatically generated comment.
 // *********************************************************************************
 
-using System;
 using System.IO;
-using System.IO.Compression;
-using System.Text;
 using System.Threading.Tasks;
 using Grapevine;
 using Microsoft.Extensions.Configuration;
@@ -32,7 +29,7 @@ namespace JFramework.Net
             if (Program.Setting.RequestRoom)
             {
                 var json = JsonConvert.SerializeObject(Program.Process.roomInfo);
-                await context.Response.SendResponseAsync(RestUtility.Compress(json));
+                await context.Response.SendResponseAsync(Service.Zip.Compress(json));
             }
             else
             {
@@ -69,18 +66,6 @@ namespace JFramework.Net
             {
                 server.Prefixes.Add(Service.Text.Format("http://*:{0}/", port));
             }
-        }
-
-        public static string Compress(string message)
-        {
-            var bytes = Encoding.UTF8.GetBytes(message);
-            using var output = new MemoryStream();
-            using (var gzip = new GZipStream(output, CompressionMode.Compress, true))
-            {
-                gzip.Write(bytes, 0, bytes.Length);
-            }
-
-            return Convert.ToBase64String(output.ToArray());
         }
     }
 }
