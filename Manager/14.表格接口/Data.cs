@@ -52,7 +52,7 @@ namespace JFramework
                     if (string.IsNullOrEmpty(assetType.FullName)) continue;
                     var dataTable = (IDataTable)await AssetManager.Load<ScriptableObject>(GlobalSetting.GetTablePath(assetType.Name));
                     var children = assembly.GetType(assetType.FullName.Substring(0, assetType.FullName.Length - 5));
-                    var properties = children.GetProperties(Service.Find.Instance);
+                    var properties = children.GetProperties(Service.Find.Entity);
                     foreach (var property in properties)
                     {
                         if (property.GetCustomAttribute(typeof(PrimaryAttribute)) == null)

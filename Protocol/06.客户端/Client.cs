@@ -15,7 +15,7 @@ using System.Net.Sockets;
 
 namespace JFramework.Udp
 {
-    public sealed class Client : Agent
+    internal sealed class Client : Agent
     {
         private readonly byte[] buffer;
         private readonly Setting setting;

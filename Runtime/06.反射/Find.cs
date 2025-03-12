@@ -22,7 +22,7 @@ namespace JFramework
         public static class Find
         {
             public const BindingFlags Static = BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic;
-            public const BindingFlags Instance = BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic;
+            public const BindingFlags Entity = BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic;
             private static readonly Dictionary<string, Type> cachedType = new Dictionary<string, Type>();
             private static readonly Dictionary<string, Assembly> assemblies = new Dictionary<string, Assembly>();
 

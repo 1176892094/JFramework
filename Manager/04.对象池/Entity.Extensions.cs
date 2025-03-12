@@ -36,7 +36,7 @@ namespace JFramework
 
         public static void Inject(this Component entity)
         {
-            var fields = entity.GetType().GetFields(Service.Find.Instance);
+            var fields = entity.GetType().GetFields(Service.Find.Entity);
             foreach (var field in fields)
             {
                 if (field.GetCustomAttribute<InjectAttribute>(true) == null)
@@ -81,7 +81,7 @@ namespace JFramework
 
             field.SetValue(inject, component);
 
-            var method = inject.GetType().GetMethod(name, Service.Find.Instance);
+            var method = inject.GetType().GetMethod(name, Service.Find.Entity);
             if (method == null)
             {
                 return;
@@ -90,7 +90,7 @@ namespace JFramework
             var injectType = Service.Find.Type("UnityEngine.UI.Button,UnityEngine.UI");
             if (component.TryGetComponent(injectType, out var button))
             {
-                var property = injectType.GetProperty("onClick", Service.Find.Instance);
+                var property = injectType.GetProperty("onClick", Service.Find.Entity);
                 if (property != null)
                 {
                     inject.SetButton(name, (UnityEvent)property.GetValue(button));
@@ -102,7 +102,7 @@ namespace JFramework
             injectType = Service.Find.Type("UnityEngine.UI.Toggle,UnityEngine.UI");
             if (component.TryGetComponent(injectType, out var toggle))
             {
-                var property = injectType.GetProperty("onValueChanged", Service.Find.Instance);
+                var property = injectType.GetProperty("onValueChanged", Service.Find.Entity);
                 if (property != null)
                 {
                     inject.SetToggle(name, (UnityEvent<bool>)property.GetValue(toggle));
@@ -114,7 +114,7 @@ namespace JFramework
             injectType = Service.Find.Type("TMPro.TMP_InputField,Unity.TextMeshPro");
             if (component.TryGetComponent(injectType, out var inputField))
             {
-                var property = injectType.GetProperty("onSubmit", Service.Find.Instance);
+                var property = injectType.GetProperty("onSubmit", Service.Find.Entity);
                 if (property != null)
                 {
                     inject.SetInputField(name, (UnityEvent<string>)property.GetValue(inputField));

@@ -17,9 +17,9 @@ namespace JFramework
 {
     public static partial class Service
     {
-        public static class Address
+        public static class Host
         {
-            public static string Host()
+            public static string Ip()
             {
                 try
                 {

@@ -17,7 +17,7 @@ using System.Runtime.InteropServices;
 
 namespace JFramework.Udp
 {
-    public partial class Server
+    internal partial class Server
     {
         private readonly byte[] buffer;
         private readonly Dictionary<int, Client> clients = new Dictionary<int, Client>();

@@ -15,7 +15,7 @@ using System.Net.Sockets;
 
 namespace JFramework.Udp
 {
-    public abstract class Agent
+    internal abstract class Agent
     {
         private const int PING_INTERVAL = 1000;
         private const int METADATA_SIZE = sizeof(byte) + sizeof(int);

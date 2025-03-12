@@ -14,7 +14,7 @@ using System.Net;
 
 namespace JFramework.Udp
 {
-    public sealed partial class Server
+    internal sealed partial class Server
     {
         private sealed class Client : Agent
         {

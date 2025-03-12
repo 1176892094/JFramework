@@ -14,7 +14,7 @@ using System;
 namespace JFramework.Udp
 {
     [Serializable]
-    public struct Setting
+    internal struct Setting
     {
         public int MaxUnit;
         public uint Timeout;

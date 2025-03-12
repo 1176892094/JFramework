@@ -188,7 +188,7 @@ namespace JFramework
 
             var member = reason.Split(',');
             var result = Activator.CreateInstance(target);
-            var fields = target.GetFields(Service.Find.Instance);
+            var fields = target.GetFields(Service.Find.Entity);
             for (var i = 0; i < fields.Length; i++)
             {
                 fields[i].SetValue(result, Encoding.UTF8.GetBytes(member[i]));
