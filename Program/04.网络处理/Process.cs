@@ -20,7 +20,6 @@ namespace JFramework.Net
         private readonly Dictionary<string, Room> rooms = new Dictionary<string, Room>();
         private readonly Dictionary<int, Room> clients = new Dictionary<int, Room>();
         private readonly HashSet<int> connections = new HashSet<int>();
-        private readonly Random random = new Random();
         private readonly Transport transport;
 
         public Process(Transport transport)
@@ -127,7 +126,7 @@ namespace JFramework.Net
                     string id;
                     do
                     {
-                        id = new string(Enumerable.Repeat("ABCDEFGHIJKLMNOPQRSTUVWXYZ", 5).Select(s => s[random.Next(s.Length)]).ToArray());
+                        id = new string(Enumerable.Repeat("ABCDEFGHIJKLMNOPQRSTUVWXYZ", 5).Select(s => s[Service.Random.Next(s.Length)]).ToArray());
                     } while (rooms.ContainsKey(id));
 
                     var room = new Room

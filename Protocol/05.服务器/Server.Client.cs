@@ -28,7 +28,7 @@ namespace JFramework
                 this.OnReceive = OnReceive;
                 this.OnDisconnect = OnDisconnect;
                 this.endPoint = endPoint;
-                status = Status.Connect;
+                state = State.Connect;
             }
 
             private event Action OnDisconnect;
@@ -61,7 +61,7 @@ namespace JFramework
                 var channel = segment.Array[segment.Offset];
                 Utils.Decode32U(segment.Array, segment.Offset + 1, out var newCookie);
 
-                if (status == Status.Connected)
+                if (state == State.Connected)
                 {
                     if (newCookie != cookie)
                     {

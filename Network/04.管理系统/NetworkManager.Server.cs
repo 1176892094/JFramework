@@ -29,7 +29,7 @@ namespace JFramework.Net
 
             internal static readonly Dictionary<uint, NetworkObject> spawns = new Dictionary<uint, NetworkObject>();
 
-            private static StateMode state = StateMode.Disconnect;
+            private static State state = State.Disconnect;
 
             private static List<NetworkClient> copies = new List<NetworkClient>();
 
@@ -37,7 +37,7 @@ namespace JFramework.Net
 
             private static double sendTime;
 
-            public static bool isActive => state != StateMode.Disconnect;
+            public static bool isActive => state != State.Disconnect;
 
             public static bool isReady => clients.Values.All(client => client.isReady);
 
@@ -61,14 +61,14 @@ namespace JFramework.Net
 
                 Register();
                 clients.Clear();
-                state = StateMode.Connected;
+                state = State.Connected;
                 SpawnObjects();
             }
 
             internal static void Stop()
             {
                 if (!isActive) return;
-                state = StateMode.Disconnect;
+                state = State.Disconnect;
                 copies = clients.Values.ToList();
                 foreach (var client in copies)
                 {

@@ -31,7 +31,7 @@ namespace JFramework.Net
         private bool isClient;
         private bool isServer;
         private int objectId;
-        private StateMode state = StateMode.Disconnect;
+        private State state = State.Disconnect;
 
         private void Awake()
         {
@@ -44,7 +44,7 @@ namespace JFramework.Net
 
             void OnClientConnect()
             {
-                state = StateMode.Connect;
+                state = State.Connect;
             }
 
             void OnClientDisconnect()
@@ -72,7 +72,7 @@ namespace JFramework.Net
 
         public void StartLobby()
         {
-            if (state != StateMode.Disconnect)
+            if (state != State.Disconnect)
             {
                 Debug.LogWarning("大厅服务器已经连接！");
                 return;
@@ -85,10 +85,10 @@ namespace JFramework.Net
 
         public void StopLobby()
         {
-            if (state != StateMode.Disconnect)
+            if (state != State.Disconnect)
             {
                 Debug.Log("停止大厅服务器。");
-                state = StateMode.Disconnect;
+                state = State.Disconnect;
                 clients.Clear();
                 players.Clear();
                 isServer = false;
@@ -100,7 +100,7 @@ namespace JFramework.Net
 
         public async void UpdateLobby()
         {
-            if (state != StateMode.Connected)
+            if (state != State.Connected)
             {
                 Debug.Log("您必须连接到大厅以请求房间列表!");
                 return;
@@ -148,7 +148,7 @@ namespace JFramework.Net
             }
             else if (opcode == OpCodes.Connected)
             {
-                state = StateMode.Connected;
+                state = State.Connected;
                 UpdateLobby();
             }
             else if (opcode == OpCodes.CreateRoom)
@@ -239,7 +239,7 @@ namespace JFramework.Net
 
         public override void StartServer()
         {
-            if (state != StateMode.Connected)
+            if (state != State.Connected)
             {
                 Debug.Log("没有连接到大厅!");
                 return;
@@ -289,7 +289,7 @@ namespace JFramework.Net
 
         public override void StartClient()
         {
-            if (state != StateMode.Connected)
+            if (state != State.Connected)
             {
                 Debug.Log("没有连接到大厅！");
                 OnClientDisconnect?.Invoke();
@@ -321,7 +321,7 @@ namespace JFramework.Net
 
         public override void StopClient()
         {
-            if (state != StateMode.Disconnect)
+            if (state != State.Disconnect)
             {
                 isClient = false;
                 using var writer = MemoryWriter.Pop();

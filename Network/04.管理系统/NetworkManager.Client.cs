@@ -29,7 +29,7 @@ namespace JFramework.Net
 
             internal static readonly Dictionary<uint, NetworkObject> spawns = new Dictionary<uint, NetworkObject>();
 
-            private static StateMode state = StateMode.Disconnect;
+            private static State state = State.Disconnect;
 
             private static double waitTime;
 
@@ -37,7 +37,7 @@ namespace JFramework.Net
 
             private static double sendTime;
 
-            public static bool isActive => state != StateMode.Disconnect;
+            public static bool isActive => state != State.Disconnect;
 
             public static bool isReady { get; internal set; }
 
@@ -45,14 +45,14 @@ namespace JFramework.Net
 
             public static NetworkServer connection { get; private set; }
 
-            public static bool isConnected => state == StateMode.Connected;
+            public static bool isConnected => state == State.Connected;
 
             internal static void Start(EntryMode mode)
             {
                 if (mode == EntryMode.Host)
                 {
                     Register(EntryMode.Host);
-                    state = StateMode.Connected;
+                    state = State.Connected;
                     connection = new NetworkServer();
                     Server.Connect(new NetworkClient(Server.hostId));
                     Ready();
@@ -60,7 +60,7 @@ namespace JFramework.Net
                 }
 
                 Register(EntryMode.Client);
-                state = StateMode.Connect;
+                state = State.Connect;
                 connection = new NetworkServer();
                 Transport.Instance.StartClient();
             }
@@ -68,7 +68,7 @@ namespace JFramework.Net
             internal static void Start(Uri uri)
             {
                 Register(EntryMode.Client);
-                state = StateMode.Connect;
+                state = State.Connect;
                 connection = new NetworkServer();
                 Transport.Instance.StartClient(uri);
             }
@@ -91,7 +91,7 @@ namespace JFramework.Net
                     }
                 }
 
-                state = StateMode.Disconnect;
+                state = State.Disconnect;
                 if (Transport.Instance != null)
                 {
                     Transport.Instance.StopClient();
@@ -364,7 +364,7 @@ namespace JFramework.Net
                     return;
                 }
 
-                state = StateMode.Connected;
+                state = State.Connected;
                 Service.Event.Invoke(new ClientConnect());
                 Pong();
                 Ready();

@@ -22,11 +22,11 @@ namespace JFramework
         Unexpected = 7        // 意外错误异常，需要修复
     }
 
-    internal enum Status : byte
+    internal enum State : byte
     {
-        Connect,
-        Connected,
-        Disconnect
+        Connect = 0,
+        Connected = 1,
+        Disconnect = 2
     }
 
     internal enum Reliable : byte

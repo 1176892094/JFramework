@@ -41,7 +41,7 @@ namespace JFramework
         {
             try
             {
-                if (status != Status.Disconnect)
+                if (state != State.Disconnect)
                 {
                     Log.Warn("客户端已经连接！");
                     return;
@@ -51,7 +51,7 @@ namespace JFramework
                 if (addresses.Length >= 1)
                 {
                     Reset(setting);
-                    status = Status.Connect;
+                    state = State.Connect;
                     endPoint = new IPEndPoint(addresses[0], port);
                     socket = new Socket(endPoint.AddressFamily, SocketType.Dgram, ProtocolType.Udp);
                     Utils.SetBuffer(socket);
@@ -93,7 +93,7 @@ namespace JFramework
 
         public void Send(ArraySegment<byte> segment, int channel)
         {
-            if (status == Status.Disconnect)
+            if (state == State.Disconnect)
             {
                 Log.Warn("客户端没有连接，发送消息失败！");
                 return;
@@ -177,7 +177,7 @@ namespace JFramework
 
         public override void EarlyUpdate()
         {
-            if (status == Status.Disconnect)
+            if (state == State.Disconnect)
             {
                 return;
             }
@@ -192,7 +192,7 @@ namespace JFramework
 
         public override void AfterUpdate()
         {
-            if (status == Status.Disconnect)
+            if (state == State.Disconnect)
             {
                 return;
             }

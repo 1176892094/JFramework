@@ -26,7 +26,7 @@ namespace JFramework
         private readonly int unreliableSize;
         private readonly Stopwatch watch = new Stopwatch();
         private Kcp kcp;
-        internal Status status;
+        internal State state;
         private uint timeout;
         private uint pingTime;
         private uint receiveTime;
@@ -41,7 +41,7 @@ namespace JFramework
             rawSendBuffer = new byte[setting.MaxUnit];
             receiveBuffer = new byte[1 + reliableSize];
             kcpSendBuffer = new byte[1 + reliableSize];
-            status = Status.Disconnect;
+            state = State.Disconnect;
         }
 
         protected void Reset(Setting config)
@@ -49,7 +49,7 @@ namespace JFramework
             cookie = 0;
             pingTime = 0;
             receiveTime = 0;
-            status = Status.Disconnect;
+            state = State.Disconnect;
             watch.Restart();
 
             kcp = new Kcp(0, SendReliable);
@@ -128,7 +128,7 @@ namespace JFramework
 
                 if (header == Unreliable.Data)
                 {
-                    if (status == Status.Connected)
+                    if (state == State.Connected)
                     {
                         segment = new ArraySegment<byte>(segment.Array, segment.Offset + 1, segment.Count - 1);
                         Receive(segment, Channel.Unreliable);
@@ -216,7 +216,7 @@ namespace JFramework
 
         public void Disconnect()
         {
-            if (status == Status.Disconnect) return;
+            if (state == State.Disconnect) return;
             try
             {
                 for (var i = 0; i < 5; ++i)
@@ -226,7 +226,7 @@ namespace JFramework
             }
             finally
             {
-                status = Status.Disconnect;
+                state = State.Disconnect;
                 Disconnected();
             }
         }
@@ -265,13 +265,13 @@ namespace JFramework
 
             try
             {
-                if (status == Status.Connect)
+                if (state == State.Connect)
                 {
                     if (TryReceive(out var header, out _))
                     {
                         if (header == Reliable.Connect)
                         {
-                            status = Status.Connected;
+                            state = State.Connected;
                             Connected();
                         }
                         else if (header == Reliable.Data)
@@ -281,7 +281,7 @@ namespace JFramework
                         }
                     }
                 }
-                else if (status == Status.Connected)
+                else if (state == State.Connected)
                 {
                     while (TryReceive(out var header, out var segment))
                     {
@@ -325,7 +325,7 @@ namespace JFramework
         {
             try
             {
-                if (status != Status.Disconnect)
+                if (state != State.Disconnect)
                 {
                     kcp.Update((uint)watch.ElapsedMilliseconds);
                 }
