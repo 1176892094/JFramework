@@ -41,7 +41,7 @@ namespace JFramework.Net
         }
     }
 
-    public static class RestUtility
+    internal static class RestUtility
     {
         public static bool StartServer(ushort port)
         {

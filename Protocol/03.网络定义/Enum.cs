@@ -41,4 +41,16 @@ namespace JFramework
         Data = 4,
         Disconnect = 5,
     }
+    
+    internal enum OpCodes : byte
+    {
+        Connect = 1,
+        Connected = 2,
+        JoinRoom = 3,
+        CreateRoom = 4,
+        UpdateRoom = 5,
+        LeaveRoom = 6,
+        UpdateData = 7,
+        KickRoom = 8,
+    }
 }

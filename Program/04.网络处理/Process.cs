@@ -265,17 +265,5 @@ namespace JFramework.Net
                 transport.StopClient(clientId);
             }
         }
-
-        private enum OpCodes
-        {
-            Connect = 1,
-            Connected = 2,
-            JoinRoom = 3,
-            CreateRoom = 4,
-            UpdateRoom = 5,
-            LeaveRoom = 6,
-            UpdateData = 7,
-            KickRoom = 8,
-        }
     }
 }

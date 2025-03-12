@@ -347,29 +347,44 @@ namespace JFramework.Net
         public override void ServerAfterUpdate()
         {
         }
-        
-        private enum OpCodes : byte
-        {
-            Connect = 1,
-            Connected = 2,
-            JoinRoom = 3,
-            CreateRoom = 4,
-            UpdateRoom = 5,
-            LeaveRoom = 6,
-            UpdateData = 7,
-            KickRoom = 8,
-        }
     }
 
     [Serializable]
     public struct RoomData
     {
-        public string roomId;
-        public string roomName;
-        public string roomData;
-        public RoomMode roomMode;
-        public int maxCount;
+        /// <summary>
+        /// 房间拥有者
+        /// </summary>
         public int clientId;
+
+        /// <summary>
+        /// 是否显示
+        /// </summary>
+        public RoomMode roomMode;
+
+        /// <summary>
+        /// 房间最大人数
+        /// </summary>
+        public int maxCount;
+
+        /// <summary>
+        /// 额外房间数据
+        /// </summary>
+        public string roomData;
+
+        /// <summary>
+        /// 房间Id
+        /// </summary>
+        public string roomId;
+
+        /// <summary>
+        /// 房间名称
+        /// </summary>
+        public string roomName;
+
+        /// <summary>
+        /// 客户端数量
+        /// </summary>
         public int[] clients;
     }
 }

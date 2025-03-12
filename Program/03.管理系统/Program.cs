@@ -27,8 +27,11 @@ namespace JFramework.Net
             new Program().MainAsync().GetAwaiter().GetResult();
         }
 
-        public async Task MainAsync()
+        private async Task MainAsync()
         {
+            Log.Info = Info;
+            Log.Warn = Warn;
+            Log.Error = Error;
             var transport = new Transport();
             try
             {
@@ -45,14 +48,14 @@ namespace JFramework.Net
                 }
 
                 Setting = JsonConvert.DeserializeObject<Setting>(await File.ReadAllTextAsync("setting.json"));
-                
+
                 Log.Info("加载程序集...");
                 Assembly.LoadFile(Path.GetFullPath("JFramework.dll"));
                 Assembly.LoadFile(Path.GetFullPath("JFramework.Kcp.dll"));
-                
+
                 Log.Info("初始化传输类...");
                 Process = new Process(transport);
-                
+
                 transport.OnServerError = Process.ServerError;
                 transport.OnServerConnect = Process.ServerConnect;
                 transport.OnServerReceive = Process.ServerReceive;
@@ -82,6 +85,24 @@ namespace JFramework.Net
                 transport.Update();
                 await Task.Delay(Setting.UpdateTime);
             }
+        }
+
+        private static void Info(string message)
+        {
+            Console.ForegroundColor = ConsoleColor.White;
+            Console.WriteLine(Service.Text.Format("[{0}] {1}", DateTime.Now.ToString("MM-dd HH:mm:ss"), message));
+        }
+
+        private static void Warn(string message)
+        {
+            Console.ForegroundColor = ConsoleColor.Yellow;
+            Console.WriteLine(Service.Text.Format("[{0}] {1}", DateTime.Now.ToString("MM-dd HH:mm:ss"), message));
+        }
+
+        private static void Error(string message)
+        {
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine(Service.Text.Format("[{0}] {1}", DateTime.Now.ToString("MM-dd HH:mm:ss"), message));
         }
     }
 }
