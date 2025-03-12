@@ -48,7 +48,7 @@ namespace JFramework
                 return (Event<T>)pool;
             }
 
-            private static Reference[] Reference()
+            internal static Reference[] Reference()
             {
                 var index = 0;
                 var results = new Reference[poolData.Count];

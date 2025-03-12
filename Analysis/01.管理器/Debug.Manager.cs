@@ -30,8 +30,6 @@ namespace JFramework
 
         private FieldInfo NetworkClientRef;
         private MethodInfo NetworkManagerRef;
-        private Func<Reference[]> ServicePoolRef;
-        private Func<Reference[]> ServiceEventRef;
         private Func<Reference[]> PoolManagerRef;
 
         private void Awake()
@@ -41,20 +39,8 @@ namespace JFramework
 
         private void Start()
         {
-            var message = typeof(Service.Pool).GetMethod("Reference", Service.Find.Static);
-            if (message != null)
-            {
-                ServicePoolRef = (Func<Reference[]>)Delegate.CreateDelegate(typeof(Func<Reference[]>), message);
-            }
-
-            message = typeof(Service.Event).GetMethod("Reference", Service.Find.Static);
-            if (message != null)
-            {
-                ServiceEventRef = (Func<Reference[]>)Delegate.CreateDelegate(typeof(Func<Reference[]>), message);
-            }
-
             var messageType = Service.Find.Type("JFramework.PoolManager,JFramework.Ray");
-            message = messageType.GetMethod("Reference", Service.Find.Static);
+            var message = messageType.GetMethod("Reference", Service.Find.Static);
             if (message != null)
             {
                 PoolManagerRef = (Func<Reference[]>)Delegate.CreateDelegate(typeof(Func<Reference[]>), message);
