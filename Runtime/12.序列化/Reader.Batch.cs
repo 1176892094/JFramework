@@ -12,7 +12,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace JFramework.Net
+namespace JFramework
 {
     internal class ReaderBatch
     {
@@ -77,7 +77,7 @@ namespace JFramework.Net
                 return false;
             }
 
-            var size = (int)NetworkLength.Decompress(reader);
+            var size = (int)Service.Length.Decompress(reader);
 
             if (reader.residue < size)
             {

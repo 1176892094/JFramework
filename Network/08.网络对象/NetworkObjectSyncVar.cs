@@ -26,12 +26,12 @@ namespace JFramework.Net
 
             if (ownerMask != 0)
             {
-                NetworkLength.Compress(owner, ownerMask);
+                Service.Length.Compress(owner, ownerMask);
             }
 
             if (observerMask != 0)
             {
-                NetworkLength.Compress(observer, observerMask);
+                Service.Length.Compress(observer, observerMask);
             }
 
             if ((ownerMask | observerMask) != 0)
@@ -66,7 +66,7 @@ namespace JFramework.Net
             var dirtyMask = ClientDirtyMask();
             if (dirtyMask != 0)
             {
-                NetworkLength.Compress(writer, dirtyMask);
+                Service.Length.Compress(writer, dirtyMask);
                 for (var i = 0; i < components.Length; ++i)
                 {
                     var component = components[i];
@@ -82,7 +82,7 @@ namespace JFramework.Net
         internal bool ServerDeserialize(MemoryReader reader)
         {
             var components = entities;
-            var mask = NetworkLength.Decompress(reader);
+            var mask = Service.Length.Decompress(reader);
 
             for (var i = 0; i < components.Length; ++i)
             {
@@ -108,7 +108,7 @@ namespace JFramework.Net
         internal void ClientDeserialize(MemoryReader reader, bool status)
         {
             var components = entities;
-            var mask = NetworkLength.Decompress(reader);
+            var mask = Service.Length.Decompress(reader);
 
             for (var i = 0; i < components.Length; ++i)
             {

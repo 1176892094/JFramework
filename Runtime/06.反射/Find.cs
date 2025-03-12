@@ -65,8 +65,12 @@ namespace JFramework
                 }
 
                 var assembly = Assembly(name.Substring(index + 1).Trim());
-                cachedType = assembly.GetType(name.Substring(0, index));
-                Find.cachedType.Add(name, cachedType);
+                if (assembly != null)
+                {
+                    cachedType = assembly.GetType(name.Substring(0, index));
+                    Find.cachedType.Add(name, cachedType);
+                }
+
                 return cachedType;
             }
         }

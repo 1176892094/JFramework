@@ -39,7 +39,7 @@ namespace JFramework
 
         private void Start()
         {
-            var messageType = Service.Find.Type("JFramework.PoolManager,JFramework.Ray");
+            var messageType = Service.Find.Type("JFramework.PoolManager,JFramework.Sdk");
             var message = messageType.GetMethod("Reference", Service.Find.Static);
             if (message != null)
             {

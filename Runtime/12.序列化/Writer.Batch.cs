@@ -12,7 +12,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace JFramework.Net
+namespace JFramework
 {
     internal class WriterBatch
     {
@@ -27,7 +27,7 @@ namespace JFramework.Net
 
         public void AddMessage(ArraySegment<byte> segment, double remoteTime)
         {
-            var header = NetworkLength.GetLength((ulong)segment.Count);
+            var header = Service.Length.GetLength((ulong)segment.Count);
             if (writer != null && writer.position + header + segment.Count > maxCount)
             {
                 writers.Enqueue(writer);
@@ -40,7 +40,7 @@ namespace JFramework.Net
                 writer.Write(remoteTime);
             }
 
-            NetworkLength.Compress(writer, (ulong)segment.Count);
+            Service.Length.Compress(writer, (ulong)segment.Count);
             writer.WriteBytes(segment.Array, segment.Offset, segment.Count);
         }
 
