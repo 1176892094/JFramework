@@ -20,7 +20,7 @@ namespace JFramework
         {
             public readonly EndPoint endPoint;
 
-            public Client(Action<Client> OnConnect, Action OnDisconnect, Action<int, string> OnError, Action<ArraySegment<byte>, int> OnReceive, Action<ArraySegment<byte>> OnSend, Setting setting, uint cookie, EndPoint endPoint) : base(setting, cookie)
+            public Client(Action<Client> OnConnect, Action OnDisconnect, Action<Error, string> OnError, Action<ArraySegment<byte>, int> OnReceive, Action<ArraySegment<byte>> OnSend, Setting setting, uint cookie, EndPoint endPoint) : base(setting, cookie)
             {
                 this.OnSend = OnSend;
                 this.OnError = OnError;
@@ -33,7 +33,7 @@ namespace JFramework
 
             private event Action OnDisconnect;
             private event Action<Client> OnConnect;
-            private event Action<int, string> OnError;
+            private event Action<Error, string> OnError;
             private event Action<ArraySegment<byte>> OnSend;
             private event Action<ArraySegment<byte>, int> OnReceive;
 
@@ -49,7 +49,7 @@ namespace JFramework
 
             protected override void Receive(ArraySegment<byte> message, int channel) => OnReceive?.Invoke(message, channel);
 
-            internal override void Logger(Error error, string message) => OnError?.Invoke((int)error, message);
+            internal override void Logger(Error error, string message) => OnError?.Invoke(error, message);
 
             public void Input(ArraySegment<byte> segment)
             {

@@ -26,7 +26,7 @@ namespace JFramework
         private EndPoint endPoint;
         private Socket socket;
 
-        public Server(Setting setting, Action<int> OnConnect, Action<int> OnDisconnect, Action<int, int, string> OnError, Action<int, ArraySegment<byte>, int> OnReceive)
+        public Server(Setting setting, Action<int> OnConnect, Action<int> OnDisconnect, Action<int, Error, string> OnError, Action<int, ArraySegment<byte>, int> OnReceive)
         {
             this.setting = setting;
             this.OnError = OnError;
@@ -39,7 +39,7 @@ namespace JFramework
 
         private event Action<int> OnConnect;
         private event Action<int> OnDisconnect;
-        private event Action<int, int, string> OnError;
+        private event Action<int, Error, string> OnError;
         private event Action<int, ArraySegment<byte>, int> OnReceive;
 
         public void Connect(ushort port)
@@ -143,7 +143,7 @@ namespace JFramework
                 this.OnDisconnect?.Invoke(clientId);
             }
 
-            void OnError(int error, string message)
+            void OnError(Error error, string message)
             {
                 this.OnError?.Invoke(clientId, error, message);
             }

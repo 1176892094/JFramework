@@ -47,9 +47,9 @@ namespace JFramework.Net
                 OnClientDisconnect.Invoke();
             }
 
-            void ClientError(int error, string message)
+            void ClientError(Error error, string message)
             {
-                OnClientError?.Invoke(error, message);
+                Debug.LogWarning(Service.Text.Format("错误代码: {0} => {1}", error, message));
             }
 
             void ClientReceive(ArraySegment<byte> message, int channel)
@@ -67,9 +67,8 @@ namespace JFramework.Net
                 OnServerDisconnect.Invoke(clientId);
             }
 
-            void ServerError(int clientId, int error, string message)
+            void ServerError(int clientId, Error error, string message)
             {
-                OnServerError?.Invoke(clientId, error, message);
             }
 
             void ServerReceive(int clientId, ArraySegment<byte> message, int channel)

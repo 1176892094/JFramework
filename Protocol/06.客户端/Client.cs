@@ -22,7 +22,7 @@ namespace JFramework
         private EndPoint endPoint;
         private Socket socket;
 
-        public Client(Setting setting, Action OnConnect, Action OnDisconnect, Action<int, string> OnError, Action<ArraySegment<byte>, int> OnReceive) : base(setting)
+        public Client(Setting setting, Action OnConnect, Action OnDisconnect, Action<Error, string> OnError, Action<ArraySegment<byte>, int> OnReceive) : base(setting)
         {
             this.setting = setting;
             this.OnError = OnError;
@@ -34,7 +34,7 @@ namespace JFramework
 
         private event Action OnConnect;
         private event Action OnDisconnect;
-        private event Action<int, string> OnError;
+        private event Action<Error, string> OnError;
         private event Action<ArraySegment<byte>, int> OnReceive;
 
         public void Connect(string address, ushort port)
@@ -163,7 +163,7 @@ namespace JFramework
 
         internal override void Logger(Error error, string message)
         {
-            OnError?.Invoke((int)error, message);
+            OnError?.Invoke(error, message);
         }
 
         protected override void Disconnected()

@@ -23,11 +23,9 @@ namespace JFramework.Net
         
         public Action OnClientConnect;
         public Action OnClientDisconnect;
-        public Action<int, string> OnClientError;
         public Action<ArraySegment<byte>, int> OnClientReceive;
         public Action<int> OnServerConnect;
         public Action<int> OnServerDisconnect;
-        public Action<int, int, string> OnServerError;
         public Action<int, ArraySegment<byte>, int> OnServerReceive;
         
         public abstract int MessageSize(int channel);

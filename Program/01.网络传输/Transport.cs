@@ -28,16 +28,14 @@ namespace JFramework.Net
         private Client client;
         private Server server;
 
-        public Action OnClientConnect { get; set; }
-        public Action OnClientDisconnect { get; set; }
-        public Action<int, string> OnClientError { get; set; }
-        public Action<ArraySegment<byte>, int> OnClientReceive { get; set; }
-        public Action<int> OnServerConnect { get; set; }
-        public Action<int> OnServerDisconnect { get; set; }
-        public Action<int, int, string> OnServerError { get; set; }
-        public Action<int, ArraySegment<byte>, int> OnServerReceive { get; set; }
+        public Action OnClientConnect;
+        public Action OnClientDisconnect;
+        public Action<ArraySegment<byte>, int> OnClientReceive;
+        public Action<int> OnServerConnect;
+        public Action<int> OnServerDisconnect;
+        public Action<int, ArraySegment<byte>, int> OnServerReceive;
 
-        public Transport()
+        public void Awake()
         {
             var setting = new JFramework.Setting(maxUnit, timeout, interval, deadLink, fastResend, sendWindow, receiveWindow);
             client = new Client(setting, ClientConnect, ClientDisconnect, ClientError, ClientReceive);
@@ -54,9 +52,8 @@ namespace JFramework.Net
                 OnClientDisconnect.Invoke();
             }
 
-            void ClientError(int error, string message)
+            void ClientError(Error error, string message)
             {
-                OnClientError?.Invoke(error, message);
             }
 
             void ClientReceive(ArraySegment<byte> message, int channel)
@@ -74,9 +71,12 @@ namespace JFramework.Net
                 OnServerDisconnect.Invoke(clientId);
             }
 
-            void ServerError(int clientId, int error, string message)
+            void ServerError(int clientId, Error error, string message)
             {
-                OnServerError?.Invoke(clientId, error, message);
+                if (error != Error.DnsResolve && error != Error.Timeout)
+                {
+                    Log.Warn(Service.Text.Format("客户端: {0}  错误代码: {1}\n{2}", clientId, error, message));
+                }
             }
 
             void ServerReceive(int clientId, ArraySegment<byte> message, int channel)

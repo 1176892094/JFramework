@@ -33,6 +33,7 @@ namespace JFramework.Net
             Log.Warn = Warn;
             Log.Error = Error;
             var transport = new Transport();
+            transport.Awake();
             try
             {
                 Log.Info("运行服务器...");
@@ -52,11 +53,10 @@ namespace JFramework.Net
                 Log.Info("加载程序集...");
                 Assembly.LoadFile(Path.GetFullPath("JFramework.dll"));
                 Assembly.LoadFile(Path.GetFullPath("JFramework.Kcp.dll"));
-
+                
                 Log.Info("初始化传输类...");
                 Process = new Process(transport);
-
-                transport.OnServerError = Process.ServerError;
+                
                 transport.OnServerConnect = Process.ServerConnect;
                 transport.OnServerReceive = Process.ServerReceive;
                 transport.OnServerDisconnect = Process.ServerDisconnect;

@@ -29,35 +29,6 @@ namespace JFramework.Net
 
         public List<Room> roomInfo => rooms.Values.ToList();
 
-        public void ServerError(int clientId, int error, string message)
-        {
-            string reason;
-            switch (error)
-            {
-                case 1:
-                    return;
-                case 2:
-                    return;
-                case 3:
-                    reason = "Congestion";
-                    break;
-                case 4:
-                    reason = "InvalidReceive";
-                    break;
-                case 5:
-                    reason = "InvalidSend";
-                    break;
-                case 6:
-                    reason = "ConnectionClosed";
-                    break;
-                default:
-                    reason = "Unexpected";
-                    break;
-            }
-
-            Log.Warn(Service.Text.Format("客户端: {0}  错误代码: {1}\n{2}", clientId, reason, message));
-        }
-
         public void ServerConnect(int clientId)
         {
             connections.Add(clientId);

@@ -179,11 +179,9 @@ namespace JFramework.Net
                 {
                     Transport.Instance.OnClientConnect -= OnClientConnect;
                     Transport.Instance.OnClientDisconnect -= OnClientDisconnect;
-                    Transport.Instance.OnClientError -= OnClientError;
                     Transport.Instance.OnClientReceive -= OnClientReceive;
                     Transport.Instance.OnClientConnect += OnClientConnect;
                     Transport.Instance.OnClientDisconnect += OnClientDisconnect;
-                    Transport.Instance.OnClientError += OnClientError;
                     Transport.Instance.OnClientReceive += OnClientReceive;
                 }
 
@@ -373,21 +371,6 @@ namespace JFramework.Net
             private static void OnClientDisconnect()
             {
                 Stop();
-            }
-
-            private static void OnClientError(int error, string message)
-            {
-                var reason = error switch
-                {
-                    1 => "DnsResolve",
-                    2 => "Timeout",
-                    3 => "Congestion",
-                    4 => "InvalidReceive",
-                    5 => "InvalidSend",
-                    6 => "ConnectionClosed",
-                    _ => "Unexpected",
-                };
-                Debug.LogWarning(Service.Text.Format("错误代码: {0} => {1}", reason, message));
             }
 
             internal static void OnClientReceive(ArraySegment<byte> segment, int channel)
