@@ -94,8 +94,8 @@ namespace JFramework
             AgentManager.Dispose();
             TimerManager.Dispose();
             PoolManager.Dispose();
-            typeof(Service.Pool).GetMethod("Dispose", Service.Find.Static)?.Invoke(null, null);
-            typeof(Service.Event).GetMethod("Dispose", Service.Find.Static)?.Invoke(null, null);
+            Service.Pool.Dispose();
+            Service.Event.Dispose();
             GC.Collect();
         }
     }

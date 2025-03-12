@@ -13,7 +13,7 @@ using System;
 
 namespace JFramework.Common
 {
-    public interface IPool : IDisposable
+    internal interface IPool : IDisposable
     {
         public Type assetType { get; }
         public string assetPath { get; }

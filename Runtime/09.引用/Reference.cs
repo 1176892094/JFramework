@@ -2,7 +2,7 @@ using System;
 
 namespace JFramework
 {
-    public struct Reference
+    internal struct Reference
     {
         public Type assetType { get; }
         public string assetPath { get; }

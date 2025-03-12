@@ -62,7 +62,7 @@ namespace JFramework
                 return results;
             }
 
-            private static void Dispose()
+            internal static void Dispose()
             {
                 var poolCaches = new List<Type>(poolData.Keys);
                 foreach (var cache in poolCaches)
