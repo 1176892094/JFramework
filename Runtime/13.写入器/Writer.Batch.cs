@@ -27,7 +27,7 @@ namespace JFramework
 
         public void AddMessage(ArraySegment<byte> segment, double remoteTime)
         {
-            var header = Service.Length.GetLength((ulong)segment.Count);
+            var header = Service.Bit.Length((ulong)segment.Count);
             if (writer != null && writer.position + header + segment.Count > maxCount)
             {
                 writers.Enqueue(writer);
@@ -40,7 +40,7 @@ namespace JFramework
                 writer.Write(remoteTime);
             }
 
-            Service.Length.Compress(writer, (ulong)segment.Count);
+            Service.Bit.Encode(writer, (ulong)segment.Count);
             writer.WriteBytes(segment.Array, segment.Offset, segment.Count);
         }
 

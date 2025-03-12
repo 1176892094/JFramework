@@ -13,7 +13,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 
-namespace JFramework.Net
+namespace JFramework
 {
     public static partial class Extensions
     {

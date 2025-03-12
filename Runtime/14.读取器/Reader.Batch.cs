@@ -77,7 +77,7 @@ namespace JFramework
                 return false;
             }
 
-            var size = (int)Service.Length.Decompress(reader);
+            var size = (int)Service.Bit.Decode(reader);
 
             if (reader.residue < size)
             {

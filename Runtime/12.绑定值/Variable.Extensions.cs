@@ -13,7 +13,7 @@ using System.Runtime.CompilerServices;
 
 namespace JFramework
 {
-    public static class Extensions
+    public static partial class Extensions
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static int GetBit(this Variable<byte> variable, int shift, int mask)

@@ -13,9 +13,9 @@ namespace JFramework
 {
     public static partial class Service
     {
-        internal static class Length
+        internal static class Bit
         {
-            public static int GetLength(ulong length)
+            public static int Length(ulong length)
             {
                 if (length == 0)
                 {
@@ -32,7 +32,7 @@ namespace JFramework
                 return result;
             }
 
-            public static void Compress(MemoryWriter writer, ulong length)
+            public static void Encode(MemoryWriter writer, ulong length)
             {
                 while (length >= 0x80)
                 {
@@ -43,7 +43,7 @@ namespace JFramework
                 writer.Write((byte)length);
             }
 
-            public static ulong Decompress(MemoryReader reader)
+            public static ulong Decode(MemoryReader reader)
             {
                 var shift = 0;
                 var length = 0UL;
