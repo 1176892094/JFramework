@@ -1,17 +1,20 @@
 ﻿using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("Network")]
+[assembly: AssemblyTitle("Sdk")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("Network")]
+[assembly: AssemblyProduct("Sdk")]
 [assembly: AssemblyCopyright("Copyright ©  2025")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
+[assembly: InternalsVisibleTo("JFramework.Unity")]
+[assembly: InternalsVisibleTo("JFramework.Editor")]
 
 // Setting ComVisible to false makes the types in this assembly not visible 
 // to COM components.  If you need to access a type in this assembly from 
@@ -19,7 +22,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("B9F33BDB-2FB6-4B50-91DC-387FE83920DD")]
+[assembly: Guid("9B2624C2-A568-44BF-934F-DF209D78F6B1")]
 
 // Version information for an assembly consists of the following four values:
 //

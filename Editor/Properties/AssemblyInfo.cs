@@ -1,32 +1,19 @@
-﻿// *********************************************************************************
-// # Project: JFramework
-// # Unity: 6000.3.5f1
-// # Author: 云谷千羽
-// # Version: 1.0.0
-// # History: 2025-01-10 16:01:33
-// # Recently: 2025-01-11 18:01:28
-// # Copyright: 2024, 云谷千羽
-// # Description: This is an automatically generated comment.
-// *********************************************************************************
-
-using System.Reflection;
+﻿using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("Runtime")]
+[assembly: AssemblyTitle("Editor")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("Runtime")]
+[assembly: AssemblyProduct("Editor")]
 [assembly: AssemblyCopyright("Copyright ©  2025")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
-[assembly: InternalsVisibleTo("JFramework.Log")]
-[assembly: InternalsVisibleTo("JFramework.Sdk")]
-[assembly: InternalsVisibleTo("JFramework.Net")]
+[assembly: InternalsVisibleTo("JFramework.Unity")]
 
 // Setting ComVisible to false makes the types in this assembly not visible 
 // to COM components.  If you need to access a type in this assembly from 
@@ -34,7 +21,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("8BDB64FE-516E-4EAC-AEC1-1DD7FF7CCCB5")]
+[assembly: Guid("154A1835-A0E4-47AC-BC12-5459573A6FAD")]
 
 // Version information for an assembly consists of the following four values:
 //
