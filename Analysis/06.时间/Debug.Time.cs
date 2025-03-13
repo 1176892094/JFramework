@@ -19,10 +19,10 @@ namespace JFramework
         private void TimeWindow()
         {
             GUILayout.BeginHorizontal();
-            GUILayout.Label(" 时间信息", Height25);
+            GUILayout.Label(" 时间信息", GUILayout.Height(25));
             GUILayout.EndHorizontal();
 
-            consoleView = GUILayout.BeginScrollView(consoleView, "Box");
+            screenView = GUILayout.BeginScrollView(screenView, "Box");
             GUILayout.Label("DataTime:\t\t\t\t" + DateTime.Now.ToString("yyyy/MM/dd hh:mm:ss"));
             GUILayout.Label("Time.realtimeSinceStartup:\t" + Time.realtimeSinceStartup.ToString("F"));
             GUILayout.Label("Time.timeScale:\t\t\t" + Time.timeScale);
@@ -38,42 +38,42 @@ namespace JFramework
             GUILayout.EndScrollView();
 
             GUILayout.BeginHorizontal();
-            if (GUILayout.Button("0.0x", Height30))
+            if (GUILayout.Button("0.0x", GUILayout.Height(30)))
             {
                 Time.timeScale = 0.0f;
             }
 
-            if (GUILayout.Button("0.1x", Height30))
+            if (GUILayout.Button("0.1x", GUILayout.Height(30)))
             {
                 Time.timeScale = 0.1f;
             }
 
-            if (GUILayout.Button("0.2x", Height30))
+            if (GUILayout.Button("0.2x", GUILayout.Height(30)))
             {
                 Time.timeScale = 0.2f;
             }
 
-            if (GUILayout.Button("0.5x", Height30))
+            if (GUILayout.Button("0.5x", GUILayout.Height(30)))
             {
                 Time.timeScale = 0.5f;
             }
 
-            if (GUILayout.Button("1x", Height30))
+            if (GUILayout.Button("1x", GUILayout.Height(30)))
             {
                 Time.timeScale = 1f;
             }
 
-            if (GUILayout.Button("2x", Height30))
+            if (GUILayout.Button("2x", GUILayout.Height(30)))
             {
                 Time.timeScale = 2f;
             }
 
-            if (GUILayout.Button("5x ", Height30))
+            if (GUILayout.Button("5x ", GUILayout.Height(30)))
             {
                 Time.timeScale = 5f;
             }
 
-            if (GUILayout.Button("10x", Height30))
+            if (GUILayout.Button("10x", GUILayout.Height(30)))
             {
                 Time.timeScale = 10f;
             }

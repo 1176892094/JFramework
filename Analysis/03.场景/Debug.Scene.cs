@@ -31,8 +31,8 @@ namespace JFramework
         private void SceneWindow()
         {
             GUILayout.BeginHorizontal();
-            GUILayout.Label(Service.Text.Format("GameObject [{0}]", gameObjects.Count), "Button", BoxWidth, Height30);
-            if (GUILayout.Button("Refresh", Height30))
+            GUILayout.Label(Service.Text.Format("GameObject [{0}]", gameObjects.Count), "Button", GUILayout.Width((screenWidth - 30) / 2), GUILayout.Height(30));
+            if (GUILayout.Button("Refresh", GUILayout.Height(30)))
             {
                 UpdateGameObject();
                 UpdateComponent();
@@ -42,11 +42,11 @@ namespace JFramework
 
             GUILayout.BeginHorizontal();
 
-            GUILayout.BeginVertical("Box", BoxWidth);
+            GUILayout.BeginVertical("Box", GUILayout.Width((screenWidth - 30) / 2));
             ShowGameObject();
             GUILayout.EndVertical();
 
-            GUILayout.BeginVertical("Box", BoxWidth);
+            GUILayout.BeginVertical("Box", GUILayout.Width((screenWidth - 30) / 2));
             ShowComponent();
             GUILayout.EndVertical();
 
@@ -90,10 +90,10 @@ namespace JFramework
         private void ShowGameObject()
         {
             GUILayout.BeginHorizontal();
-            gameObjectFilter = GUILayout.TextField(gameObjectFilter, Height25);
+            gameObjectFilter = GUILayout.TextField(gameObjectFilter, GUILayout.Height(25));
             GUILayout.EndHorizontal();
 
-            consoleView = GUILayout.BeginScrollView(consoleView);
+            screenView = GUILayout.BeginScrollView(screenView);
             for (var i = 0; i < gameObjects.Count; i++)
             {
                 var target = gameObjects[i];
@@ -115,7 +115,7 @@ namespace JFramework
                         GUILayout.BeginVertical("Box");
 
                         GUILayout.BeginHorizontal();
-                        GUILayout.Label("Tag: " + target.tag, Width160);
+                        GUILayout.Label("Tag: " + target.tag, GUILayout.Width(160));
                         GUILayout.Label("Layer: " + LayerMask.LayerToName(target.layer));
                         GUILayout.EndHorizontal();
 
@@ -134,13 +134,13 @@ namespace JFramework
                 GUILayout.BeginHorizontal();
                 if (cachedComponent)
                 {
-                    componentFilter = GUILayout.TextField(componentFilter, Height25);
+                    componentFilter = GUILayout.TextField(componentFilter, GUILayout.Height(25));
                 }
                 else
                 {
                     if (componentIndex != -1 && componentIndex < components.Count && components[componentIndex])
                     {
-                        if (GUILayout.Button("Remove Component", Height25))
+                        if (GUILayout.Button("Remove Component", GUILayout.Height(25)))
                         {
                             var component = components[componentIndex];
                             if (component is DebugManager || component is Transform)
@@ -157,7 +157,7 @@ namespace JFramework
                     }
                     else
                     {
-                        if (GUILayout.Button("Add Component", Height25))
+                        if (GUILayout.Button("Add Component", GUILayout.Height(25)))
                         {
                             cachedComponent = !cachedComponent;
                         }
@@ -167,7 +167,7 @@ namespace JFramework
                 GUILayout.EndHorizontal();
             }
 
-            messageView = GUILayout.BeginScrollView(messageView);
+            windowView = GUILayout.BeginScrollView(windowView);
 
             if (gameObjectIndex != -1)
             {
@@ -185,7 +185,7 @@ namespace JFramework
                             continue;
                         }
 
-                        if (GUILayout.Button(cachedType.FullName, Height25))
+                        if (GUILayout.Button(cachedType.FullName, GUILayout.Height(25)))
                         {
                             gameObjects[gameObjectIndex].gameObject.AddComponent(cachedType);
                             cachedComponent = false;

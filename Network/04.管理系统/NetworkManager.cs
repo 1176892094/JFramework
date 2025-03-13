@@ -225,7 +225,7 @@ namespace JFramework.Net
 
         private static void Reference()
         {
-            var option = GUILayout.Height(30f);
+            var option = GUILayout.Height(30);
             if (!Client.isConnected && !Server.isActive)
             {
                 if (!Client.isActive)

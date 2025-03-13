@@ -14,7 +14,7 @@ using System;
 namespace JFramework
 {
     [Serializable]
-    public struct PackData : IEquatable<PackData>
+    internal struct PackData : IEquatable<PackData>
     {
         public string code;
         public string name;

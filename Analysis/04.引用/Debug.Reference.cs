@@ -18,33 +18,33 @@ namespace JFramework
     public partial class DebugManager
     {
         private readonly Dictionary<string, List<Reference>> poolData = new Dictionary<string, List<Reference>>();
-        private Pool option = Pool.Heap;
+        private Pool windowOption = Pool.Heap;
 
 
         private void ReferenceWindow()
         {
             GUILayout.BeginHorizontal();
-            GUI.contentColor = option == Pool.Heap ? Color.white : Color.gray;
-            if (GUILayout.Button("Heap", Height30))
+            GUI.contentColor = windowOption == Pool.Heap ? Color.white : Color.gray;
+            if (GUILayout.Button("Heap", GUILayout.Height(30)))
             {
-                option = Pool.Heap;
+                windowOption = Pool.Heap;
             }
 
-            GUI.contentColor = option == Pool.Event ? Color.white : Color.gray;
-            if (GUILayout.Button("Event", Height30))
+            GUI.contentColor = windowOption == Pool.Event ? Color.white : Color.gray;
+            if (GUILayout.Button("Event", GUILayout.Height(30)))
             {
-                option = Pool.Event;
+                windowOption = Pool.Event;
             }
 
-            GUI.contentColor = option == Pool.Pool ? Color.white : Color.gray;
-            if (GUILayout.Button("Pool", Height30))
+            GUI.contentColor = windowOption == Pool.Pool ? Color.white : Color.gray;
+            if (GUILayout.Button("Pool", GUILayout.Height(30)))
             {
-                option = Pool.Pool;
+                windowOption = Pool.Pool;
             }
 
             GUI.contentColor = Color.white;
             GUILayout.EndHorizontal();
-            switch (option)
+            switch (windowOption)
             {
                 case Pool.Event:
                     Draw(Service.Pool.Reference(), "事件池", "触发数\t事件数\t添加次数\t移除次数");
@@ -58,30 +58,30 @@ namespace JFramework
             }
         }
 
-        private void Draw(Reference[] objectInfos, string message, string module)
+        private void Draw(Reference[] references, string message, string module)
         {
             poolData.Clear();
-            foreach (var poolInfo in objectInfos)
+            foreach (var reference in references)
             {
-                var assemblyName = Service.Text.Format("{0} - {1}", poolInfo.assetType.Assembly.GetName().Name, message);
+                var assemblyName = Service.Text.Format("{0} - {1}", reference.assetType.Assembly.GetName().Name, message);
                 if (!poolData.TryGetValue(assemblyName, out var results))
                 {
                     results = new List<Reference>();
                     poolData.Add(assemblyName, results);
                 }
 
-                results.Add(poolInfo);
+                results.Add(reference);
             }
 
-            consoleView = GUILayout.BeginScrollView(consoleView, "Box");
-            foreach (var pool in poolData)
+            screenView = GUILayout.BeginScrollView(screenView, "Box");
+            foreach (var poolPair in poolData)
             {
-                pool.Value.Sort(Comparison);
+                poolPair.Value.Sort(Comparison);
                 GUILayout.BeginHorizontal();
 
-                GUILayout.BeginVertical("Box", PoolWidth);
-                GUILayout.Label(pool.Key, Height20);
-                foreach (var data in pool.Value)
+                GUILayout.BeginVertical("Box", GUILayout.Width((screenWidth - 50) / 2));
+                GUILayout.Label(poolPair.Key, GUILayout.Height(20));
+                foreach (var data in poolPair.Value)
                 {
                     var assetName = data.assetType.Name;
                     if (!string.IsNullOrEmpty(data.assetPath))
@@ -89,16 +89,16 @@ namespace JFramework
                         assetName = Service.Text.Format("{0} - {1}", data.assetType.Name, data.assetPath);
                     }
 
-                    GUILayout.Label(assetName, Height20);
+                    GUILayout.Label(assetName, GUILayout.Height(20));
                 }
 
                 GUILayout.EndVertical();
 
                 GUILayout.BeginVertical("Box");
-                GUILayout.Label(module, Height20);
-                foreach (var data in pool.Value)
+                GUILayout.Label(module, GUILayout.Height(20));
+                foreach (var data in poolPair.Value)
                 {
-                    GUILayout.Label(data.ToString(), Height20);
+                    GUILayout.Label(data.ToString(), GUILayout.Height(20));
                 }
 
                 GUILayout.EndVertical();
@@ -112,6 +112,13 @@ namespace JFramework
         private static int Comparison(Reference origin, Reference target)
         {
             return string.Compare(origin.assetType.Name, target.assetType.Name, StringComparison.Ordinal);
+        }
+
+        private enum Pool
+        {
+            Heap,
+            Event,
+            Pool,
         }
     }
 }

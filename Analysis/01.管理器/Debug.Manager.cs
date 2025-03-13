@@ -15,30 +15,37 @@ using UnityEngine;
 
 namespace JFramework
 {
-    [DefaultExecutionOrder(-20)]
+    [DefaultExecutionOrder(-100)]
     public partial class DebugManager : MonoBehaviour
     {
         private float frameData;
         private double frameTime;
-        private Rect minRect;
+        
         private Status status;
         private Window window;
-        private Color windowColor = Color.white;
 
-        private Vector2 consoleView;
-        private Vector2 messageView;
-
+        private Rect windowRect;
+        private Rect screenRect;
+        private Color screenColor;
+        private Vector2 screenView;
+        private Vector2 windowView;
+        private Vector2 screenRate;
+        
         private FieldInfo NetworkClientRef;
         private MethodInfo NetworkManagerRef;
         private Func<Reference[]> PoolManagerRef;
 
+        private float screenWidth => Screen.width / screenSize;
+        private float screenHeight => Screen.height / screenSize;
+        private float screenSize => Screen.width / screenRate.x + Screen.height / screenRate.y;
+        private Rect maxWindow => new Rect(screenRect.x, screenRect.y, screenWidth - screenRect.x * 2, screenHeight - screenRect.y / 2 * 3);
+        private Rect minWindow => new Rect(screenRect.x, screenRect.y, screenRect.width - screenRect.x * 2, screenRect.height - screenRect.y / 2 * 3);
+
         private void Awake()
         {
-            Application.logMessageReceived += LogMessageReceived;
-        }
-
-        private void Start()
-        {
+            screenColor = Color.white;
+            screenRate = new Vector2(2560, 1440);
+            screenRect = new Rect(10, 20, 108, 69);
             var messageType = Service.Find.Type("JFramework.PoolManager,JFramework.Sdk");
             var message = messageType.GetMethod("Reference", Service.Find.Static);
             if (message != null)
@@ -54,7 +61,10 @@ namespace JFramework
             {
                 status |= Status.Ping;
             }
-
+        }
+        
+        private void Start()
+        {
             foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
             {
                 var sceneTypes = assembly.GetTypes();
@@ -80,6 +90,16 @@ namespace JFramework
             }
         }
 
+        private void OnEnable()
+        {
+            Application.logMessageReceived += LogMessageReceived;
+        }
+
+        private void OnDisable()
+        {
+            Application.logMessageReceived -= LogMessageReceived;
+        }
+
         private void Update()
         {
             if ((status & Status.Freeze) != 0)
@@ -96,11 +116,6 @@ namespace JFramework
             frameTime = Time.realtimeSinceStartup + 1;
         }
 
-        private void OnDestroy()
-        {
-            Application.logMessageReceived -= LogMessageReceived;
-        }
-
         private void OnGUI()
         {
             if ((status & Status.Freeze) != 0)
@@ -112,29 +127,29 @@ namespace JFramework
             var labelAlignment = GUI.skin.label.alignment;
             var fieldAlignment = GUI.skin.textField.alignment;
 
-            GUI.matrix = Matrix4x4.Scale(Scale);
+            GUI.matrix = Matrix4x4.Scale(new Vector3(screenSize, screenSize, 1));
             GUI.skin.label.alignment = TextAnchor.MiddleLeft;
             GUI.skin.textField.alignment = TextAnchor.MiddleLeft;
 
             if (status.HasFlag(Status.Expand))
             {
-                var maxRect = new Rect(0, 0, Width, Height);
+                var maxRect = new Rect(0, 0, screenWidth, screenHeight);
                 GUI.Window(0, maxRect, MaxWindow, "调试器");
             }
             else if (status.HasFlag(Status.Window))
             {
-                minRect.size = new Vector2(WindowRect.size.x + 83, WindowRect.size.y + 66);
-                minRect = GUI.Window(0, minRect, MinWindow, "调试器");
+                windowRect.size = new Vector2(screenRect.size.x + 83, screenRect.size.y + 66);
+                windowRect = GUI.Window(0, windowRect, MinWindow, "调试器");
             }
             else if (status.HasFlag(Status.Ping))
             {
-                minRect.size = new Vector2(WindowRect.size.x + 83, WindowRect.size.y);
-                minRect = GUI.Window(0, minRect, MinWindow, "调试器");
+                windowRect.size = new Vector2(screenRect.size.x + 83, screenRect.size.y);
+                windowRect = GUI.Window(0, windowRect, MinWindow, "调试器");
             }
             else if (status.HasFlag(Status.Common))
             {
-                minRect.size = WindowRect.size;
-                minRect = GUI.Window(0, minRect, MinWindow, "调试器");
+                windowRect.size = screenRect.size;
+                windowRect = GUI.Window(0, windowRect, MinWindow, "调试器");
             }
 
             GUI.matrix = matrix;
@@ -144,22 +159,22 @@ namespace JFramework
 
         private void MaxWindow(int id)
         {
-            GUILayout.BeginArea(MaxBox, "", "Box");
+            GUILayout.BeginArea(maxWindow, "", "Box");
             GUILayout.BeginHorizontal();
-            GUI.contentColor = windowColor;
-            if (GUILayout.Button(Service.Text.Format("FPS: {0}", frameData), Height30, Width80))
+            GUI.contentColor = screenColor;
+            if (GUILayout.Button(Service.Text.Format("FPS: {0}", frameData), GUILayout.Height(30), GUILayout.Width(80)))
             {
                 status &= ~Status.Expand;
             }
 
             GUI.contentColor = window == Window.Console ? Color.white : Color.gray;
-            if (GUILayout.Button(Window.Console.ToString(), Height30))
+            if (GUILayout.Button(Window.Console.ToString(), GUILayout.Height(30)))
             {
                 window = Window.Console;
             }
 
             GUI.contentColor = window == Window.Scene ? Color.white : Color.gray;
-            if (GUILayout.Button(Window.Scene.ToString(), Height30))
+            if (GUILayout.Button(Window.Scene.ToString(), GUILayout.Height(30)))
             {
                 UpdateGameObject();
                 UpdateComponent();
@@ -167,13 +182,13 @@ namespace JFramework
             }
 
             GUI.contentColor = window == Window.Reference ? Color.white : Color.gray;
-            if (GUILayout.Button(Window.Reference.ToString(), Height30))
+            if (GUILayout.Button(Window.Reference.ToString(), GUILayout.Height(30)))
             {
                 window = Window.Reference;
             }
 
             GUI.contentColor = window == Window.Project ? Color.white : Color.gray;
-            if (GUILayout.Button(Window.Project.ToString(), Height30))
+            if (GUILayout.Button(Window.Project.ToString(), GUILayout.Height(30)))
             {
                 window = Window.Project;
             }
@@ -184,25 +199,25 @@ namespace JFramework
             {
                 GUILayout.BeginHorizontal();
                 GUI.contentColor = window == Window.Memory ? Color.white : Color.gray;
-                if (GUILayout.Button(Window.Memory.ToString(), Height30))
+                if (GUILayout.Button(Window.Memory.ToString(), GUILayout.Height(30)))
                 {
                     window = Window.Memory;
                 }
 
                 GUI.contentColor = window == Window.System ? Color.white : Color.gray;
-                if (GUILayout.Button(Window.System.ToString(), Height30))
+                if (GUILayout.Button(Window.System.ToString(), GUILayout.Height(30)))
                 {
                     window = Window.System;
                 }
 
                 GUI.contentColor = window == Window.Screen ? Color.white : Color.gray;
-                if (GUILayout.Button(Window.Screen.ToString(), Height30))
+                if (GUILayout.Button(Window.Screen.ToString(), GUILayout.Height(30)))
                 {
                     window = Window.Screen;
                 }
 
                 GUI.contentColor = window == Window.Time ? Color.white : Color.gray;
-                if (GUILayout.Button(Window.Time.ToString(), Height30))
+                if (GUILayout.Button(Window.Time.ToString(), GUILayout.Height(30)))
                 {
                     window = Window.Time;
                 }
@@ -244,9 +259,9 @@ namespace JFramework
 
         private void MinWindow(int id)
         {
-            GUI.DragWindow(new Rect(0, 0, WindowRect.width, 20f));
+            GUI.DragWindow(new Rect(0, 0, screenRect.width, 20f));
 
-            var newRect = MinBox;
+            var newRect = minWindow;
             if ((status & Status.Ping) != 0)
             {
                 newRect.width += 83;
@@ -257,17 +272,17 @@ namespace JFramework
                 newRect.height += 66;
             }
 
-            GUI.contentColor = windowColor;
+            GUI.contentColor = screenColor;
             GUILayout.BeginArea(newRect, "", "Box");
             GUILayout.BeginHorizontal();
-            if (GUILayout.Button(Service.Text.Format("FPS: {0}", frameData), Height30, Width80))
+            if (GUILayout.Button(Service.Text.Format("FPS: {0}", frameData), GUILayout.Height(30), GUILayout.Width(80)))
             {
                 status |= Status.Expand;
             }
 
             if ((status & Status.Ping) != 0)
             {
-                if (GUILayout.Button(Service.Text.Format("Ping: {0}", (int)((double)NetworkClientRef.GetValue(null) * 1000)), Height30))
+                if (GUILayout.Button(Service.Text.Format("Ping: {0}", (int)((double)NetworkClientRef.GetValue(null) * 1000)), GUILayout.Height(30)))
                 {
                     if ((status & Status.Window) != 0)
                     {
@@ -282,7 +297,7 @@ namespace JFramework
 
             GUI.contentColor = Color.white;
             GUILayout.EndHorizontal();
-            
+
             if ((status & Status.Ping) != 0)
             {
                 if (status.HasFlag(Status.Window))
@@ -295,6 +310,29 @@ namespace JFramework
             }
 
             GUILayout.EndArea();
+        }
+        
+        private enum Window
+        {
+            Console,
+            Scene,
+            Reference,
+            Network,
+            System,
+            Project,
+            Memory,
+            Screen,
+            Time,
+        }
+
+        [Flags]
+        private enum Status
+        {
+            Common,
+            Expand = 1 << 0,
+            Freeze = 1 << 1,
+            Ping = 1 << 2,
+            Window = 1 << 3,
         }
     }
 }

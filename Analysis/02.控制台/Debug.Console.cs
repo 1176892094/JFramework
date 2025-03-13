@@ -9,6 +9,7 @@
 // # Description: This is an automatically generated comment.
 // *********************************************************************************
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -62,7 +63,7 @@ namespace JFramework
             {
                 if (log.count > 0)
                 {
-                    windowColor = log.color;
+                    screenColor = log.color;
                     break;
                 }
             }
@@ -72,7 +73,7 @@ namespace JFramework
         {
             GUILayout.BeginHorizontal();
 
-            if (GUILayout.Button("Clear", BoxWidth, Height30))
+            if (GUILayout.Button("Clear", GUILayout.Width((screenWidth - 30) / 2), GUILayout.Height(30)))
             {
                 selectMessage = -1;
                 foreach (var data in logData.Values)
@@ -81,10 +82,10 @@ namespace JFramework
                 }
 
                 messages.Clear();
-                windowColor = Color.white;
+                screenColor = Color.white;
             }
 
-            if (GUILayout.Button("Report", Height30))
+            if (GUILayout.Button("Report", GUILayout.Height(30)))
             {
                 var mailBody = new StringBuilder(1024);
                 foreach (var message in messages)
@@ -114,7 +115,7 @@ namespace JFramework
                 if (logData.TryGetValue(type, out var data))
                 {
                     GUI.contentColor = data.status ? Color.white : Color.gray;
-                    if (GUILayout.Button(Service.Text.Format("{0} [{1}]", type, data.count), Height30))
+                    if (GUILayout.Button(Service.Text.Format("{0} [{1}]", type, data.count), GUILayout.Height(30)))
                     {
                         data.status = !data.status;
                     }
@@ -126,7 +127,7 @@ namespace JFramework
 
         private void ConsoleScroll()
         {
-            consoleView = GUILayout.BeginScrollView(consoleView, "Box", ScrollHeight);
+            screenView = GUILayout.BeginScrollView(screenView, "Box", GUILayout.Height(screenHeight * 0.4f));
 
             for (var i = 0; i < messages.Count; i++)
             {
@@ -134,7 +135,7 @@ namespace JFramework
                 {
                     GUILayout.BeginHorizontal();
                     GUI.contentColor = data.color;
-                    if (GUILayout.Toggle(selectMessage == i, messages[i].ToString(), Height20))
+                    if (GUILayout.Toggle(selectMessage == i, messages[i].ToString(), GUILayout.Height(20)))
                     {
                         selectMessage = i;
                     }
@@ -146,13 +147,49 @@ namespace JFramework
 
             GUILayout.EndScrollView();
 
-            messageView = GUILayout.BeginScrollView(messageView, "Box");
+            windowView = GUILayout.BeginScrollView(windowView, "Box");
             if (selectMessage != -1)
             {
                 GUILayout.Label(messages[selectMessage].message + "\n\n" + messages[selectMessage].stackTrace);
             }
 
             GUILayout.EndScrollView();
+        }
+
+        [Serializable]
+        private class LogData
+        {
+            public int count;
+            public bool status;
+            public Color color;
+
+            public LogData(Color color)
+            {
+                this.color = color;
+                status = true;
+            }
+        }
+
+        [Serializable]
+        private struct LogMessage
+        {
+            public string message;
+            public string stackTrace;
+            public LogType logType;
+            public DateTime dateTime;
+
+            public LogMessage(string message, string stackTrace, LogType logType)
+            {
+                this.logType = logType;
+                this.message = message;
+                this.stackTrace = stackTrace;
+                dateTime = DateTime.Now;
+            }
+
+            public override string ToString()
+            {
+                return Service.Text.Format("[{0}] [{1}] {2}", dateTime.ToString("HH:mm:ss"), logType, message);
+            }
         }
     }
 }

@@ -18,11 +18,10 @@ namespace JFramework
         private void ScreenWindow()
         {
             GUILayout.BeginHorizontal();
-            GUILayout.Label(" 屏幕信息", Height25);
+            GUILayout.Label(" 屏幕信息", GUILayout.Height(25));
             GUILayout.EndHorizontal();
 
-            consoleView = GUILayout.BeginScrollView(consoleView, "Box");
-
+            screenView = GUILayout.BeginScrollView(screenView, "Box");
             GUILayout.Label("像素密度: " + Screen.dpi);
             GUILayout.Label("启用全屏: " + Screen.fullScreen);
             GUILayout.Label("屏幕模式: " + Screen.fullScreenMode);
@@ -30,16 +29,13 @@ namespace JFramework
             GUILayout.Label("设备分辨率: " + Screen.currentResolution);
             GUILayout.Label("显示区域: " + Screen.safeArea);
             GUILayout.Label("质量等级: " + QualitySettings.names[QualitySettings.GetQualityLevel()]);
-
-
             GUILayout.EndScrollView();
 
             GUILayout.BeginHorizontal();
-
             for (var i = 0; i < QualitySettings.names.Length; i++)
             {
                 var label = QualitySettings.names[i];
-                if (GUILayout.Button(label, Height30))
+                if (GUILayout.Button(label, GUILayout.Height(30)))
                 {
                     QualitySettings.SetQualityLevel(i);
                 }

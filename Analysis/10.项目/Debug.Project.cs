@@ -18,14 +18,14 @@ namespace JFramework
         private void ProjectWindow()
         {
             GUILayout.BeginHorizontal();
-            GUILayout.Label(" 环境配置", Height25);
+            GUILayout.Label(" 环境配置", GUILayout.Height(25));
             GUILayout.EndHorizontal();
 
-            consoleView = GUILayout.BeginScrollView(consoleView, "Box");
+            screenView = GUILayout.BeginScrollView(screenView, "Box");
             GUILayout.Label("项目名称: " + Application.productName);
-            GUILayout.Label("项目标识: " + Application.identifier);
             GUILayout.Label("项目版本: " + Application.version);
             GUILayout.Label("运行平台: " + Application.platform);
+            GUILayout.Label("项目标识: " + Application.identifier);
             GUILayout.Label("公司名称: " + Application.companyName);
             GUILayout.Label("Unity版本: " + Application.unityVersion);
             GUILayout.Label("Unity专业版: " + Application.HasProLicense());
@@ -48,34 +48,28 @@ namespace JFramework
             GUILayout.Label("存储路径: " + Application.persistentDataPath);
             GUILayout.Label("流动资源路径: " + Application.streamingAssetsPath);
             GUILayout.Label("临时缓存路径: " + Application.temporaryCachePath);
-            
+
             GUILayout.EndScrollView();
 
             GUILayout.BeginHorizontal();
-            if (GUILayout.Button("0.5x", Height30))
+            if (GUILayout.Button("0.5x", GUILayout.Height(30)))
             {
-                ScreenRate = new Vector2(3200, 1800);
+                screenRate = new Vector2(3200, 1800);
             }
 
-            if (GUILayout.Button("1.0x", Height30))
+            if (GUILayout.Button("1.0x", GUILayout.Height(30)))
             {
-                ScreenRate = new Vector2(2560, 1440);
+                screenRate = new Vector2(2560, 1440);
             }
 
-            if (GUILayout.Button("1.5x", Height30))
+            if (GUILayout.Button("1.5x", GUILayout.Height(30)))
             {
-                ScreenRate = new Vector2(1920, 1080);
+                screenRate = new Vector2(1920, 1080);
             }
 
-
-            if (GUILayout.Button("2.0x", Height30))
+            if (GUILayout.Button("2.0x", GUILayout.Height(30)))
             {
-                ScreenRate = new Vector2(1280, 720);
-            }
-
-            if (GUILayout.Button("退出游戏", Height30))
-            {
-                Application.Quit();
+                screenRate = new Vector2(1280, 720);
             }
 
             GUILayout.EndHorizontal();

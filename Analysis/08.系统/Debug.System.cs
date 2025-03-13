@@ -18,10 +18,10 @@ namespace JFramework
         private void SystemWindow()
         {
             GUILayout.BeginHorizontal();
-            GUILayout.Label(" 系统信息", Height25);
+            GUILayout.Label(" 系统信息", GUILayout.Height(25));
             GUILayout.EndHorizontal();
 
-            consoleView = GUILayout.BeginScrollView(consoleView, "Box");
+            screenView = GUILayout.BeginScrollView(screenView, "Box");
             GUILayout.Label("操作系统: " + SystemInfo.operatingSystem);
             GUILayout.Label("系统内存: " + SystemInfo.systemMemorySize + "MB");
             GUILayout.Label("处理器: " + SystemInfo.processorType);
@@ -37,6 +37,14 @@ namespace JFramework
             GUILayout.Label("设备类型: " + SystemInfo.deviceType);
             GUILayout.Label("设备唯一标识符: " + SystemInfo.deviceUniqueIdentifier);
             GUILayout.EndScrollView();
+            
+            GUILayout.BeginHorizontal();
+            if (GUILayout.Button("退出游戏", GUILayout.Height(30)))
+            {
+                Application.Quit();
+            }
+            
+            GUILayout.EndHorizontal();
         }
     }
 }
