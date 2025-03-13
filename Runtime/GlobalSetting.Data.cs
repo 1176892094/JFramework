@@ -26,8 +26,9 @@ namespace JFramework.Common
             {
 #if ODIN_INSPECTOR && UNITY_EDITOR
                 return true;
-#endif
+#else
                 return false;
+#endif
             }
         }
 
@@ -37,8 +38,9 @@ namespace JFramework.Common
             {
 #if UNITY_EDITOR
                 return ScriptPath;
-#endif
+#else
                 return string.Empty;
+#endif
             }
         }
 
@@ -48,8 +50,9 @@ namespace JFramework.Common
             {
 #if UNITY_EDITOR
                 return DataTablePath;
-#endif
+#else
                 return string.Empty;
+#endif
             }
         }
 
@@ -113,8 +116,9 @@ namespace JFramework.Common
             if (!EditorSetting.objects.TryGetValue(assetPath, out var assetData)) return null;
             var request = UnityEditor.AssetDatabase.LoadAssetAtPath(assetData, assetType);
             return request is GameObject ? Instantiate(request) : request;
-#endif
+#else
             return null;
+#endif
         }
 
         public override async Task<KeyValuePair<int, string>> LoadRequest(string persistentData, string streamingAssets)
