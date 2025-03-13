@@ -30,10 +30,10 @@ namespace JFramework.Net
             internal static readonly Dictionary<uint, NetworkObject> spawns = new Dictionary<uint, NetworkObject>();
 
             private static State state = State.Disconnect;
+            
+            internal static double pingTime;
 
             private static double waitTime;
-
-            private static double pingTime;
 
             private static double sendTime;
 

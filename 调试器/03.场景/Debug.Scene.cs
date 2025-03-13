@@ -206,7 +206,7 @@ namespace JFramework
 
                         GUILayout.BeginHorizontal();
                         var selected = componentIndex == i;
-                        if (GUILayout.Toggle(selected, component.GetType().Name) != selected)
+                        if (GUILayout.Toggle(selected, " " + component.GetType().Name) != selected)
                         {
                             componentIndex = componentIndex != i ? i : -1;
                         }

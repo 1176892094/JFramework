@@ -10,7 +10,6 @@
 // *********************************************************************************
 
 using System;
-using System.Reflection;
 using UnityEngine;
 
 namespace JFramework
@@ -18,21 +17,17 @@ namespace JFramework
     [DefaultExecutionOrder(-100)]
     public partial class DebugManager : MonoBehaviour
     {
+        private bool maximized;
         private float frameData;
         private double frameTime;
-        
-        private Status status;
-        private Window window;
 
+        private Window window;
         private Rect windowRect;
         private Rect screenRect;
         private Color screenColor;
         private Vector2 screenView;
         private Vector2 windowView;
         private Vector2 screenRate;
-        
-        private FieldInfo NetworkClientRef;
-        private MethodInfo NetworkManagerRef;
 
         private float screenWidth => Screen.width / screenSize;
         private float screenHeight => Screen.height / screenSize;
@@ -45,19 +40,8 @@ namespace JFramework
             screenColor = Color.white;
             screenRate = new Vector2(2560, 1440);
             screenRect = new Rect(10, 20, 108, 69);
-            
-
-            var messageType = Service.Find.Type("JFramework.Net.NetworkManager,JFramework.Net");
-            NetworkManagerRef = messageType.GetMethod("Reference", Service.Find.Static);
-            messageType = Service.Find.Type("JFramework.Net.NetworkManager+Client,JFramework.Net");
-            NetworkClientRef = messageType.GetField("pingTime", Service.Find.Static);
-          
-            if (NetworkManagerRef != null && NetworkClientRef != null)
-            {
-                status |= Status.Ping;
-            }
         }
-        
+
         private void Start()
         {
             foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
@@ -97,11 +81,6 @@ namespace JFramework
 
         private void Update()
         {
-            if ((status & Status.Freeze) != 0)
-            {
-                return;
-            }
-
             if (frameTime > Time.realtimeSinceStartup)
             {
                 return;
@@ -113,11 +92,6 @@ namespace JFramework
 
         private void OnGUI()
         {
-            if ((status & Status.Freeze) != 0)
-            {
-                return;
-            }
-
             var matrix = GUI.matrix;
             var labelAlignment = GUI.skin.label.alignment;
             var fieldAlignment = GUI.skin.textField.alignment;
@@ -126,22 +100,12 @@ namespace JFramework
             GUI.skin.label.alignment = TextAnchor.MiddleLeft;
             GUI.skin.textField.alignment = TextAnchor.MiddleLeft;
 
-            if (status.HasFlag(Status.Expand))
+            if (maximized)
             {
                 var maxRect = new Rect(0, 0, screenWidth, screenHeight);
                 GUI.Window(0, maxRect, MaxWindow, "调试器");
             }
-            else if (status.HasFlag(Status.Window))
-            {
-                windowRect.size = new Vector2(screenRect.size.x + 83, screenRect.size.y + 66);
-                windowRect = GUI.Window(0, windowRect, MinWindow, "调试器");
-            }
-            else if (status.HasFlag(Status.Ping))
-            {
-                windowRect.size = new Vector2(screenRect.size.x + 83, screenRect.size.y);
-                windowRect = GUI.Window(0, windowRect, MinWindow, "调试器");
-            }
-            else if (status.HasFlag(Status.Common))
+            else
             {
                 windowRect.size = screenRect.size;
                 windowRect = GUI.Window(0, windowRect, MinWindow, "调试器");
@@ -159,7 +123,7 @@ namespace JFramework
             GUI.contentColor = screenColor;
             if (GUILayout.Button(Service.Text.Format("FPS: {0}", frameData), GUILayout.Height(30), GUILayout.Width(80)))
             {
-                status &= ~Status.Expand;
+                maximized = false;
             }
 
             GUI.contentColor = window == Window.Console ? Color.white : Color.gray;
@@ -182,10 +146,10 @@ namespace JFramework
                 window = Window.Reference;
             }
 
-            GUI.contentColor = window == Window.Project ? Color.white : Color.gray;
-            if (GUILayout.Button(Window.Project.ToString(), GUILayout.Height(30)))
+            GUI.contentColor = window == Window.Network ? Color.white : Color.gray;
+            if (GUILayout.Button(Window.Network.ToString(), GUILayout.Height(30)))
             {
-                window = Window.Project;
+                window = Window.Network;
             }
 
             GUILayout.EndHorizontal();
@@ -217,6 +181,12 @@ namespace JFramework
                     window = Window.Time;
                 }
 
+                GUI.contentColor = window == Window.Project ? Color.white : Color.gray;
+                if (GUILayout.Button(Window.Project.ToString(), GUILayout.Height(30)))
+                {
+                    window = Window.Project;
+                }
+
                 GUILayout.EndHorizontal();
             }
 
@@ -231,6 +201,9 @@ namespace JFramework
                     break;
                 case Window.Reference:
                     ReferenceWindow();
+                    break;
+                case Window.Network:
+                    NetworkWindow();
                     break;
                 case Window.System:
                     SystemWindow();
@@ -256,57 +229,19 @@ namespace JFramework
         {
             GUI.DragWindow(new Rect(0, 0, screenRect.width, 20f));
 
-            var newRect = minWindow;
-            if ((status & Status.Ping) != 0)
-            {
-                newRect.width += 83;
-            }
-
-            if ((status & Status.Window) != 0)
-            {
-                newRect.height += 66;
-            }
-
-            GUI.contentColor = screenColor;
-            GUILayout.BeginArea(newRect, "", "Box");
+            GUILayout.BeginArea(minWindow, "", "Box");
             GUILayout.BeginHorizontal();
+            GUI.contentColor = screenColor;
             if (GUILayout.Button(Service.Text.Format("FPS: {0}", frameData), GUILayout.Height(30), GUILayout.Width(80)))
             {
-                status |= Status.Expand;
-            }
-
-            if ((status & Status.Ping) != 0)
-            {
-                if (GUILayout.Button(Service.Text.Format("Ping: {0}", (int)((double)NetworkClientRef.GetValue(null) * 1000)), GUILayout.Height(30)))
-                {
-                    if ((status & Status.Window) != 0)
-                    {
-                        status &= ~Status.Window;
-                    }
-                    else
-                    {
-                        status |= Status.Window;
-                    }
-                }
+                maximized = true;
             }
 
             GUI.contentColor = Color.white;
             GUILayout.EndHorizontal();
-
-            if ((status & Status.Ping) != 0)
-            {
-                if (status.HasFlag(Status.Window))
-                {
-                    var boxAlignment = GUI.skin.box.alignment;
-                    GUI.skin.box.alignment = TextAnchor.MiddleCenter;
-                    NetworkManagerRef.Invoke(null, null);
-                    GUI.skin.box.alignment = boxAlignment;
-                }
-            }
-
             GUILayout.EndArea();
         }
-        
+
         private enum Window
         {
             Console,
@@ -318,16 +253,6 @@ namespace JFramework
             Memory,
             Screen,
             Time,
-        }
-
-        [Flags]
-        private enum Status
-        {
-            Common,
-            Expand = 1 << 0,
-            Freeze = 1 << 1,
-            Ping = 1 << 2,
-            Window = 1 << 3,
         }
     }
 }
