@@ -122,7 +122,7 @@ namespace JFramework
             }
             else if (cookie != newCookie)
             {
-                // Log.Info($"从 {endPoint} 删除无效cookie: {newCookie}预期:{cookie}。");
+                Log.Info($"从 {endPoint} 删除无效cookie: {newCookie}预期:{cookie}。");
                 return;
             }
 

@@ -65,7 +65,7 @@ namespace JFramework
                 {
                     if (newCookie != cookie)
                     {
-                        Log.Info($"[{DateTime.Now:MM-dd HH:mm:ss}] 从 {endPoint} 删除无效cookie: {newCookie}预期:{cookie}。");
+                        Log.Info($"从 {endPoint} 删除无效cookie: {newCookie}预期:{cookie}。");
                         return;
                     }
                 }

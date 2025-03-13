@@ -129,7 +129,7 @@ namespace JFramework
             void OnConnect(Client client)
             {
                 clients.Add(clientId, client);
-                Log.Info($"[{DateTime.Now:MM-dd HH:mm:ss}] 客户端 {clientId} 连接到服务器。");
+                Log.Info($"客户端 {clientId} 连接到服务器。");
                 this.OnConnect?.Invoke(clientId);
             }
 
@@ -137,7 +137,7 @@ namespace JFramework
             {
                 if (copies.Add(clientId))
                 {
-                    Log.Info($"[{DateTime.Now:MM-dd HH:mm:ss}] 客户端 {clientId} 从服务器断开。");
+                    Log.Info($"客户端 {clientId} 从服务器断开。");
                 }
 
                 this.OnDisconnect?.Invoke(clientId);
