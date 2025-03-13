@@ -143,7 +143,7 @@ namespace JFramework
 
             Texture icon = AssetPreview.GetMiniThumbnail(target);
            
-            if (icon.name is "d_Prefab Icon" or "Prefab Icon")
+            if (icon.name == "d_Prefab Icon" || icon.name == "Prefab Icon")
             {
                 if (PrefabUtility.IsAnyPrefabInstanceRoot(target))
                 {
@@ -182,7 +182,7 @@ namespace JFramework
                 return Reflection.objectIcon.image;
             }
 
-            if (icon.name is "cs Script Icon" or "d_cs Script Icon" or "dll Script Icon")
+            if (icon.name == "cs Script Icon" || icon.name == "d_cs Script Icon" || icon.name == "dll Script Icon")
             {
                 return AssetPreview.GetMiniThumbnail(components[0]);
             }

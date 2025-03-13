@@ -40,10 +40,12 @@ namespace JFramework
         {
             foreach (var obj in Resources.FindObjectsOfTypeAll(Reflection.toolbarType))
             {
-                if (obj is not ScriptableObject window) continue;
-                var parent = FindElement(Reflection.GetRoot(window), "unity-editor-toolbar-container");
-                parent.Q<VisualElement>("ToolbarZoneLeftAlign").Add(LeftElement());
-                parent.Q<VisualElement>("ToolbarZoneRightAlign").Add(RightElement());
+                if (obj is ScriptableObject window)
+                {
+                    var parent = FindElement(Reflection.GetRoot(window), "unity-editor-toolbar-container");
+                    parent.Q<VisualElement>("ToolbarZoneLeftAlign").Add(LeftElement());
+                    parent.Q<VisualElement>("ToolbarZoneRightAlign").Add(RightElement());
+                }
             }
         }
 
