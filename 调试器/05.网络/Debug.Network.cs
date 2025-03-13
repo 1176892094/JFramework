@@ -9,6 +9,7 @@
 // // # Description: This is an automatically generated comment.
 // // *********************************************************************************
 
+using System;
 using JFramework.Net;
 using UnityEngine;
 
@@ -39,7 +40,7 @@ namespace JFramework.Common
 
             GUILayout.Label("连接状态: \t\t" + message);
             GUILayout.Label("消息传输: \t\t" + NetworkManager.Client.isReady);
-            GUILayout.Label("往返时间: \t\t" + (int)(NetworkManager.Client.pingTime * 1000));
+            GUILayout.Label("往返时间: \t\t" + Math.Min((int)(framePing * 1000), 999) + "ms");
             GUILayout.Label("连接数量: \t\t" + NetworkManager.Server.connections + "/" + NetworkManager.Instance.connection);
             GUILayout.Label("同步帧率: \t\t" + NetworkManager.Instance.sendRate);
             GUILayout.EndScrollView();

@@ -31,7 +31,7 @@ namespace JFramework.Net
 
             private static State state = State.Disconnect;
             
-            internal static double pingTime;
+            private static double pingTime;
 
             private static double waitTime;
 
@@ -217,7 +217,7 @@ namespace JFramework.Net
                 {
                     return;
                 }
-
+                
                 if (pingTime <= 0)
                 {
                     pingTime = Time.unscaledTimeAsDouble - message.clientTime;

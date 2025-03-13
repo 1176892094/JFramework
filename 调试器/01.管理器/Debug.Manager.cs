@@ -15,11 +15,12 @@ using UnityEngine;
 namespace JFramework.Common
 {
     [DefaultExecutionOrder(-100)]
-    public partial class DebugManager : MonoBehaviour
+    public partial class DebugManager : MonoBehaviour, IEvent<PingUpdate>
     {
         private bool maximized;
         private float frameData;
         private double frameTime;
+        private double framePing;
 
         private Window window;
         private Rect windowRect;
@@ -71,11 +72,13 @@ namespace JFramework.Common
 
         private void OnEnable()
         {
+            EventManager.Listen(this);
             Application.logMessageReceived += LogMessageReceived;
         }
 
         private void OnDisable()
         {
+            EventManager.Remove(this);
             Application.logMessageReceived -= LogMessageReceived;
         }
 
@@ -114,6 +117,11 @@ namespace JFramework.Common
             GUI.matrix = matrix;
             GUI.skin.label.alignment = labelAlignment;
             GUI.skin.textField.alignment = fieldAlignment;
+        }
+
+        public void Execute(PingUpdate message)
+        {
+            framePing = message.pingTime;
         }
 
         private void MaxWindow(int id)
