@@ -12,9 +12,9 @@
 using System;
 using UnityEngine;
 
-namespace JFramework
+namespace JFramework.Common
 {
-    public static class AudioManager
+    public static partial class AudioManager
     {
         public static float musicValue
         {

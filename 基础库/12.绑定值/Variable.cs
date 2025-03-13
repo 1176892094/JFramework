@@ -36,7 +36,7 @@ namespace JFramework
                     return origin;
                 }
 
-                Service.Event.Invoke(new VariableEvent());
+                EventManager.Invoke(new VariableEvent());
                 return default;
             }
             set

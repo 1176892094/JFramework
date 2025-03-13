@@ -13,9 +13,9 @@ using System;
 using System.Collections.Generic;
 using JFramework.Common;
 
-namespace JFramework
+namespace JFramework.Common
 {
-    public static partial class Service
+    public static partial class PoolManager
     {
         [Serializable]
         private class Pool<T> : IPool

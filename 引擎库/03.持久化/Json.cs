@@ -13,7 +13,7 @@ using System.IO;
 using System.Text;
 using UnityEngine;
 
-namespace JFramework
+namespace JFramework.Common
 {
     public static partial class JsonManager
     {

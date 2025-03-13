@@ -14,6 +14,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 [assembly: InternalsVisibleTo("JFramework.Log")]
+[assembly: InternalsVisibleTo("JFramework.Net")]
 [assembly: InternalsVisibleTo("JFramework.Unity")]
 [assembly: InternalsVisibleTo("JFramework.Editor")]
 

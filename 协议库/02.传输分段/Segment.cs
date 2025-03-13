@@ -10,6 +10,7 @@
 // *********************************************************************************
 
 using System.IO;
+using JFramework.Common;
 
 namespace JFramework
 {
@@ -60,12 +61,12 @@ namespace JFramework
 
         public static Segment Dequeue()
         {
-            return Service.Pool.Dequeue<Segment>();
+            return PoolManager.Dequeue<Segment>();
         }
 
         public static void Enqueue(Segment segment)
         {
-            Service.Pool.Enqueue(segment);
+            PoolManager.Enqueue(segment);
         }
     }
 }

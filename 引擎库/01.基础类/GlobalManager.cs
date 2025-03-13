@@ -12,7 +12,6 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using JFramework.Common;
 using UnityEngine;
 using AssetData = System.Collections.Generic.KeyValuePair<string, string>;
 using EnumTable = System.Collections.Generic.Dictionary<System.Enum, JFramework.Common.IData>;
@@ -20,7 +19,7 @@ using ItemTable = System.Collections.Generic.Dictionary<int, JFramework.Common.I
 using NameTable = System.Collections.Generic.Dictionary<string, JFramework.Common.IData>;
 using AgentData = System.Collections.Generic.Dictionary<System.Type, JFramework.Common.IAgent>;
 
-namespace JFramework
+namespace JFramework.Common
 {
     public class GlobalManager : MonoBehaviour
     {
@@ -29,7 +28,7 @@ namespace JFramework
         public Canvas canvas;
 
         public AudioSource sounds;
-        
+
         internal static AudioSetting settings;
 
         internal static AssetBundleManifest manifest;
@@ -71,7 +70,7 @@ namespace JFramework
             Instance = this;
             DontDestroyOnLoad(gameObject);
         }
-
+        
         private void Start()
         {
             PackManager.LoadAssetData();
@@ -89,13 +88,13 @@ namespace JFramework
             UIManager.Dispose();
             PackManager.Dispose();
             DataManager.Dispose();
+            EventManager.Dispose();
             AudioManager.Dispose();
             AssetManager.Dispose();
             AgentManager.Dispose();
             TimerManager.Dispose();
+            EntityManager.Dispose();
             PoolManager.Dispose();
-            Service.Pool.Dispose();
-            Service.Event.Dispose();
             GC.Collect();
         }
     }

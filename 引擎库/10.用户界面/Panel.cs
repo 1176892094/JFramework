@@ -15,7 +15,7 @@ using System.Threading.Tasks;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
-namespace JFramework
+namespace JFramework.Common
 {
     public static partial class UIManager
     {

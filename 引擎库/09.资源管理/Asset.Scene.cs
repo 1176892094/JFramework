@@ -15,7 +15,7 @@ using JFramework.Common;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-namespace JFramework
+namespace JFramework.Common
 {
     public static partial class AssetManager
     {
@@ -27,18 +27,18 @@ namespace JFramework
                 var assetData = await LoadSceneAsset(GlobalSetting.GetScenePath(assetPath));
                 if (assetData != null)
                 {
-                    Service.Event.Invoke(new SceneAwake(assetPath));
+                    EventManager.Invoke(new SceneAwake(assetPath));
                     var request = SceneManager.LoadSceneAsync(assetPath, LoadSceneMode.Single);
                     if (request != null)
                     {
                         while (!request.isDone && GlobalSetting.Instance != null)
                         {
-                            Service.Event.Invoke(new SceneUpdate(request.progress));
+                            EventManager.Invoke(new SceneUpdate(request.progress));
                             await Task.Yield();
                         }
                     }
 
-                    Service.Event.Invoke(new SceneComplete());
+                    EventManager.Invoke(new SceneComplete());
                     return;
                 }
 

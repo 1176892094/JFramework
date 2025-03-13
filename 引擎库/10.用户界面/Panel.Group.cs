@@ -11,7 +11,7 @@
 
 using System.Collections.Generic;
 
-namespace JFramework
+namespace JFramework.Common
 {
     public static partial class UIManager
     {

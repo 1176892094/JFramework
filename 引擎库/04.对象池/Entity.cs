@@ -14,9 +14,9 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using UnityEngine;
 
-namespace JFramework
+namespace JFramework.Common
 {
-    public static class PoolManager
+    public static partial class EntityManager
     {
         public static async Task<GameObject> Show(string assetPath)
         {

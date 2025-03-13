@@ -15,7 +15,7 @@ using System.Reflection;
 using JFramework.Common;
 using UnityEngine;
 
-namespace JFramework
+namespace JFramework.Common
 {
     public static class DataManager
     {
@@ -42,7 +42,7 @@ namespace JFramework
                 return;
             }
 
-            Service.Event.Invoke(new DataAwake(assetNames.ToArray()));
+            EventManager.Invoke(new DataAwake(assetNames.ToArray()));
             foreach (var assetName in assetNames)
             {
                 var shortName = assetName.Substring(assetName.LastIndexOf('.') + 1);
@@ -93,7 +93,7 @@ namespace JFramework
                         }
                     }
 
-                    Service.Event.Invoke(new DataUpdate(shortName));
+                    EventManager.Invoke(new DataUpdate(shortName));
                 }
                 catch (Exception e)
                 {
@@ -101,7 +101,7 @@ namespace JFramework
                 }
             }
 
-            Service.Event.Invoke(new DataComplete());
+            EventManager.Invoke(new DataComplete());
         }
 
         public static T Get<T>(int key) where T : IData

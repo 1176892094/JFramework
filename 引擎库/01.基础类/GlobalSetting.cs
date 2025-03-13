@@ -18,7 +18,7 @@ using Object = UnityEngine.Object;
 
 namespace JFramework
 {
-    public abstract class GlobalSetting : ScriptableObject
+    internal abstract class GlobalSetting : ScriptableObject
     {
         protected static GlobalSetting instance;
         public static GlobalSetting Instance => instance ??= Resources.Load<GlobalSetting>(nameof(GlobalSetting));
@@ -46,7 +46,7 @@ namespace JFramework
         [SerializeField] protected string assetCachePath = "Assets/Template";
 
         protected abstract bool odinSerialize { get; }
-        
+
         protected abstract string scriptDataPath { get; }
 
         protected abstract string assetDataPath { get; }
@@ -82,7 +82,7 @@ namespace JFramework
         internal static string assetPackPath => Service.Text.Format("{0}/{1}", Application.persistentDataPath, Instance.assetBuildPath);
 
         internal static string GetScenePath(string assetName) => Service.Text.Format("Scenes/{0}", assetName);
-        
+
         internal static string GetAudioPath(string assetName) => Service.Text.Format("Audios/{0}", assetName);
 
         internal static string GetPanelPath(string assetName) => Service.Text.Format("Prefabs/{0}", assetName);
@@ -111,16 +111,16 @@ namespace JFramework
 
         public abstract Task<KeyValuePair<int, string>> LoadRequest(string persistentData, string streamingAssets);
 
-        public static MailData SendMail(string mailBody)
+        internal MailData MailData(string mailBody)
         {
             return new MailData
             {
-                smtpServer = Instance.smtpServer,
-                smtpPort = Instance.smtpPort,
+                smtpServer = smtpServer,
+                smtpPort = smtpPort,
                 senderName = "JFramework",
-                senderAddress = Instance.smtpUsername,
-                senderPassword = Instance.smtpPassword,
-                targetAddress = Instance.smtpUsername,
+                senderAddress = smtpUsername,
+                senderPassword = smtpPassword,
+                targetAddress = smtpUsername,
                 mailName = "来自《JFramework》的调试日志:",
                 mailBody = mailBody
             };

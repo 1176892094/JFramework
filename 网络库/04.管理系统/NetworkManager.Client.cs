@@ -106,7 +106,7 @@ namespace JFramework.Net
                 messages.Clear();
                 connection = null;
                 isLoadScene = false;
-                Service.Event.Invoke(new ClientDisconnect());
+                EventManager.Invoke(new ClientDisconnect());
             }
 
             private static void Pong()
@@ -151,7 +151,7 @@ namespace JFramework.Net
                     return;
                 }
 
-                Service.Event.Invoke(new ClientChangeScene(sceneName));
+                EventManager.Invoke(new ClientChangeScene(sceneName));
                 if (Server.isActive) return;
                 isLoadScene = true;
                 Instance.sceneName = sceneName;
@@ -167,7 +167,7 @@ namespace JFramework.Net
                     Ready();
                 }
 
-                Service.Event.Invoke(new ClientSceneChanged(sceneName));
+                EventManager.Invoke(new ClientSceneChanged(sceneName));
             }
         }
 
@@ -228,13 +228,13 @@ namespace JFramework.Net
                     pingTime += 2.0 / (6 + 1) * delta;
                 }
 
-                Service.Event.Invoke(new PingUpdate(pingTime));
+                EventManager.Invoke(new PingUpdate(pingTime));
             }
 
             private static void NotReadyMessage(NotReadyMessage message)
             {
                 isReady = false;
-                Service.Event.Invoke(new ClientNotReady());
+                EventManager.Invoke(new ClientNotReady());
             }
 
             private static void EntityMessage(EntityMessage message)
@@ -343,7 +343,7 @@ namespace JFramework.Net
 
                 if (@object.assetId.Equals(@object.name, StringComparison.OrdinalIgnoreCase))
                 {
-                    PoolManager.Hide(@object.gameObject);
+                    EntityManager.Hide(@object.gameObject);
                     @object.Reset();
                     return;
                 }
@@ -363,7 +363,7 @@ namespace JFramework.Net
                 }
 
                 state = State.Connected;
-                Service.Event.Invoke(new ClientConnect());
+                EventManager.Invoke(new ClientConnect());
                 Pong();
                 Ready();
             }
@@ -432,7 +432,7 @@ namespace JFramework.Net
                     GameObject prefab;
                     if (message.isPool)
                     {
-                        prefab = await PoolManager.Show(message.assetId);
+                        prefab = await EntityManager.Show(message.assetId);
                     }
                     else
                     {

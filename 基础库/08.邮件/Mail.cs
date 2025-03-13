@@ -19,16 +19,16 @@ namespace JFramework
     {
         public static class Mail
         {
-            public static async void Send(MailData mailData)
+            public static async void Send(MailData message)
             {
                 try
                 {
-                    if (string.IsNullOrEmpty(mailData.senderAddress))
+                    if (string.IsNullOrEmpty(message.senderAddress))
                     {
                         return;
                     }
 
-                    if (string.IsNullOrEmpty(mailData.senderPassword))
+                    if (string.IsNullOrEmpty(message.senderPassword))
                     {
                         return;
                     }
@@ -37,17 +37,17 @@ namespace JFramework
                     {
                         var mailMessage = new MailMessage
                         {
-                            From = new MailAddress(mailData.senderAddress, mailData.senderName),
-                            Subject = mailData.mailName,
-                            Body = mailData.mailBody,
+                            From = new MailAddress(message.senderAddress, message.senderName),
+                            Subject = message.mailName,
+                            Body = message.mailBody,
                             IsBodyHtml = false,
                         };
-                        mailMessage.To.Add(mailData.targetAddress);
+                        mailMessage.To.Add(message.targetAddress);
 
-                        var smtpClient = new SmtpClient(mailData.smtpServer, mailData.smtpPort)
+                        var smtpClient = new SmtpClient(message.smtpServer, message.smtpPort)
                         {
                             UseDefaultCredentials = false,
-                            Credentials = new NetworkCredential(mailData.senderAddress, mailData.senderPassword),
+                            Credentials = new NetworkCredential(message.senderAddress, message.senderPassword),
                             EnableSsl = true,
                             DeliveryMethod = SmtpDeliveryMethod.Network,
                             Timeout = 20000

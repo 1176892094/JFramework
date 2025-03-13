@@ -13,9 +13,9 @@ using System;
 using System.Collections.Generic;
 using JFramework.Common;
 
-namespace JFramework
+namespace JFramework.Common
 {
-    public static partial class Service
+    public static partial class EventManager
     {
         [Serializable]
         private class Event<T> : IPool where T : struct, IEvent

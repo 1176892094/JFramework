@@ -13,74 +13,71 @@ using System;
 using System.Collections.Generic;
 using JFramework.Common;
 
-namespace JFramework
+namespace JFramework.Common
 {
-    public static partial class Service
+    public static partial class PoolManager
     {
-        public static class Pool
+        private static readonly Dictionary<Type, IPool> poolData = new Dictionary<Type, IPool>();
+
+        public static T Dequeue<T>()
         {
-            private static readonly Dictionary<Type, IPool> poolData = new Dictionary<Type, IPool>();
+            return LoadPool<T>(typeof(T)).Dequeue();
+        }
 
-            public static T Dequeue<T>()
+        public static T Dequeue<T>(Type heapType)
+        {
+            return LoadPool<T>(heapType).Dequeue();
+        }
+
+        public static void Enqueue<T>(T heapData)
+        {
+            LoadPool<T>(typeof(T)).Enqueue(heapData);
+        }
+
+        public static void Enqueue<T>(T heapData, Type heapType)
+        {
+            LoadPool<T>(heapType).Enqueue(heapData);
+        }
+
+        private static Pool<T> LoadPool<T>(Type heapType)
+        {
+            if (poolData.TryGetValue(heapType, out var pool))
             {
-                return LoadPool<T>(typeof(T)).Dequeue();
-            }
-
-            public static T Dequeue<T>(Type heapType)
-            {
-                return LoadPool<T>(heapType).Dequeue();
-            }
-
-            public static void Enqueue<T>(T heapData)
-            {
-                LoadPool<T>(typeof(T)).Enqueue(heapData);
-            }
-
-            public static void Enqueue<T>(T heapData, Type heapType)
-            {
-                LoadPool<T>(heapType).Enqueue(heapData);
-            }
-
-            private static Pool<T> LoadPool<T>(Type heapType)
-            {
-                if (poolData.TryGetValue(heapType, out var pool))
-                {
-                    return (Pool<T>)pool;
-                }
-
-                pool = new Pool<T>(heapType);
-                poolData.Add(heapType, pool);
                 return (Pool<T>)pool;
             }
 
-            internal static Reference[] Reference()
-            {
-                var index = 0;
-                var results = new Reference[poolData.Count];
-                foreach (var value in poolData.Values)
-                {
-                    var assetType = value.assetType;
-                    var assetPath = value.assetPath;
-                    results[index++] = new Reference(assetType, assetPath, value.acquire, value.release, value.dequeue, value.enqueue);
-                }
+            pool = new Pool<T>(heapType);
+            poolData.Add(heapType, pool);
+            return (Pool<T>)pool;
+        }
 
-                return results;
+        internal static Reference[] Reference()
+        {
+            var index = 0;
+            var results = new Reference[poolData.Count];
+            foreach (var value in poolData.Values)
+            {
+                var assetType = value.assetType;
+                var assetPath = value.assetPath;
+                results[index++] = new Reference(assetType, assetPath, value.acquire, value.release, value.dequeue, value.enqueue);
             }
 
-            internal static void Dispose()
-            {
-                var poolCaches = new List<Type>(poolData.Keys);
-                foreach (var cache in poolCaches)
-                {
-                    if (poolData.TryGetValue(cache, out var pool))
-                    {
-                        pool.Dispose();
-                        poolData.Remove(cache);
-                    }
-                }
+            return results;
+        }
 
-                poolData.Clear();
+        internal static void Dispose()
+        {
+            var poolCaches = new List<Type>(poolData.Keys);
+            foreach (var cache in poolCaches)
+            {
+                if (poolData.TryGetValue(cache, out var pool))
+                {
+                    pool.Dispose();
+                    poolData.Remove(cache);
+                }
             }
+
+            poolData.Clear();
         }
     }
 }

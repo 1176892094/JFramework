@@ -14,6 +14,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
+using JFramework.Common;
 using UnityEngine;
 
 namespace JFramework
@@ -137,7 +138,7 @@ namespace JFramework
 
         private static KeyValuePair<string, string> WriteTable(string className, Dictionary<string, string> fields)
         {
-            var builder = Service.Pool.Dequeue<StringBuilder>();
+            var builder = PoolManager.Dequeue<StringBuilder>();
             var scriptText = GlobalSetting.tableData.Replace("Template", className);
 
             foreach (var field in fields)
@@ -184,13 +185,13 @@ namespace JFramework
             builder.Length -= 1;
             scriptText = scriptText.Replace("//TODO:2", builder.ToString());
             builder.Length = 0;
-            Service.Pool.Enqueue(builder);
+            PoolManager.Enqueue(builder);
             return new KeyValuePair<string, string>(Service.Text.Format(GlobalSetting.tablePath, className), scriptText);
         }
 
         private static KeyValuePair<string, string> WriteStruct(string className, string classType)
         {
-            var builder = Service.Pool.Dequeue<StringBuilder>();
+            var builder = PoolManager.Dequeue<StringBuilder>();
             var scriptText = GlobalSetting.structData.Replace("Template", className);
 
             var members = classType.Substring(1, classType.IndexOf('}') - 1).Split(',');
@@ -218,13 +219,13 @@ namespace JFramework
             builder.Length -= 1;
             scriptText = scriptText.Replace("//TODO:1", builder.ToString());
             builder.Length = 0;
-            Service.Pool.Enqueue(builder);
+            PoolManager.Enqueue(builder);
             return new KeyValuePair<string, string>(Service.Text.Format(GlobalSetting.structPath, className), scriptText);
         }
 
         private static KeyValuePair<string, string> WriteEnum(string className, IEnumerable<string> members)
         {
-            var builder = Service.Pool.Dequeue<StringBuilder>();
+            var builder = PoolManager.Dequeue<StringBuilder>();
             var scriptText = GlobalSetting.enumData.Replace("Template", className);
 
             foreach (var member in members)
@@ -244,7 +245,7 @@ namespace JFramework
             builder.Length -= 1;
             scriptText = scriptText.Replace("//TODO:1", builder.ToString());
             builder.Length = 0;
-            Service.Pool.Enqueue(builder);
+            PoolManager.Enqueue(builder);
             return new KeyValuePair<string, string>(Service.Text.Format(GlobalSetting.enumPath, className), scriptText);
         }
 

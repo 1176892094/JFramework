@@ -97,7 +97,7 @@ namespace JFramework.Net
                 if (!clients.ContainsKey(client.clientId))
                 {
                     clients.Add(client.clientId, client);
-                    Service.Event.Invoke(new ServerConnect(client));
+                    EventManager.Invoke(new ServerConnect(client));
                 }
             }
 
@@ -121,7 +121,7 @@ namespace JFramework.Net
                     client.Send(new NotReadyMessage());
                 }
 
-                Service.Event.Invoke(new ServerChangeScene(sceneName));
+                EventManager.Invoke(new ServerChangeScene(sceneName));
                 if (!isActive) return;
                 isLoadScene = true;
                 Instance.sceneName = sceneName;
@@ -138,7 +138,7 @@ namespace JFramework.Net
             {
                 isLoadScene = false;
                 SpawnObjects();
-                Service.Event.Invoke(new ServerSceneChanged(sceneName));
+                EventManager.Invoke(new ServerSceneChanged(sceneName));
             }
         }
 
@@ -205,7 +205,7 @@ namespace JFramework.Net
                     SpawnToClient(client, @object);
                 }
 
-                Service.Event.Invoke(new ServerReady(client));
+                EventManager.Invoke(new ServerReady(client));
             }
 
             internal static void EntityMessage(NetworkClient client, EntityMessage message)
@@ -296,7 +296,7 @@ namespace JFramework.Net
                     }
 
                     clients.Remove(client.clientId);
-                    Service.Event.Invoke(new ServerDisconnect(client));
+                    EventManager.Invoke(new ServerDisconnect(client));
                 }
             }
 
@@ -463,7 +463,7 @@ namespace JFramework.Net
                 @object.OnStopServer();
                 if (@object.assetId.Equals(@object.name, StringComparison.OrdinalIgnoreCase))
                 {
-                    PoolManager.Hide(@object.gameObject);
+                    EntityManager.Hide(@object.gameObject);
                     @object.Reset();
                     return;
                 }

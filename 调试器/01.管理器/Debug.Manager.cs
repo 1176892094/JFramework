@@ -12,7 +12,7 @@
 using System;
 using UnityEngine;
 
-namespace JFramework
+namespace JFramework.Common
 {
     [DefaultExecutionOrder(-100)]
     public partial class DebugManager : MonoBehaviour

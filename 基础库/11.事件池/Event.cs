@@ -13,69 +13,66 @@ using System;
 using System.Collections.Generic;
 using JFramework.Common;
 
-namespace JFramework
+namespace JFramework.Common
 {
-    public static partial class Service
+    public static partial class EventManager
     {
-        public static class Event
+        private static readonly Dictionary<Type, IPool> poolData = new Dictionary<Type, IPool>();
+
+        public static void Listen<T>(IEvent<T> objectData) where T : struct, IEvent
         {
-            private static readonly Dictionary<Type, IPool> poolData = new Dictionary<Type, IPool>();
+            LoadPool<T>().Listen(objectData);
+        }
 
-            public static void Listen<T>(IEvent<T> objectData) where T : struct, IEvent
+        public static void Remove<T>(IEvent<T> objectData) where T : struct, IEvent
+        {
+            LoadPool<T>().Remove(objectData);
+        }
+
+        public static void Invoke<T>(T objectData) where T : struct, IEvent
+        {
+            LoadPool<T>().Invoke(objectData);
+        }
+
+        private static Event<T> LoadPool<T>() where T : struct, IEvent
+        {
+            if (poolData.TryGetValue(typeof(T), out var pool))
             {
-                LoadPool<T>().Listen(objectData);
-            }
-
-            public static void Remove<T>(IEvent<T> objectData) where T : struct, IEvent
-            {
-                LoadPool<T>().Remove(objectData);
-            }
-
-            public static void Invoke<T>(T objectData) where T : struct, IEvent
-            {
-                LoadPool<T>().Invoke(objectData);
-            }
-
-            private static Event<T> LoadPool<T>() where T : struct, IEvent
-            {
-                if (poolData.TryGetValue(typeof(T), out var pool))
-                {
-                    return (Event<T>)pool;
-                }
-
-                pool = new Event<T>(typeof(T));
-                poolData.Add(typeof(T), pool);
                 return (Event<T>)pool;
             }
 
-            internal static Reference[] Reference()
-            {
-                var index = 0;
-                var results = new Reference[poolData.Count];
-                foreach (var value in poolData.Values)
-                {
-                    var assetType = value.assetType;
-                    var assetPath = value.assetPath;
-                    results[index++] = new Reference(assetType, assetPath, value.acquire, value.release, value.dequeue, value.enqueue);
-                }
+            pool = new Event<T>(typeof(T));
+            poolData.Add(typeof(T), pool);
+            return (Event<T>)pool;
+        }
 
-                return results;
+        internal static Reference[] Reference()
+        {
+            var index = 0;
+            var results = new Reference[poolData.Count];
+            foreach (var value in poolData.Values)
+            {
+                var assetType = value.assetType;
+                var assetPath = value.assetPath;
+                results[index++] = new Reference(assetType, assetPath, value.acquire, value.release, value.dequeue, value.enqueue);
             }
 
-            internal static void Dispose()
-            {
-                var poolCaches = new List<Type>(poolData.Keys);
-                foreach (var cache in poolCaches)
-                {
-                    if (poolData.TryGetValue(cache, out var pool))
-                    {
-                        pool.Dispose();
-                        poolData.Remove(cache);
-                    }
-                }
+            return results;
+        }
 
-                poolData.Clear();
+        internal static void Dispose()
+        {
+            var poolCaches = new List<Type>(poolData.Keys);
+            foreach (var cache in poolCaches)
+            {
+                if (poolData.TryGetValue(cache, out var pool))
+                {
+                    pool.Dispose();
+                    poolData.Remove(cache);
+                }
             }
+
+            poolData.Clear();
         }
     }
 }

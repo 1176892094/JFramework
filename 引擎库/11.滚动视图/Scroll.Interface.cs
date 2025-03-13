@@ -1,14 +1,13 @@
 using System.Collections.Generic;
-using JFramework.Common;
 using UnityEngine;
 
-namespace JFramework
+namespace JFramework.Common
 {
     public interface IScroll<TItem> : IAgent
     {
         public Rect assetRect { get; set; }
         public string assetPath { get; set; }
-        public ScrollType direction { get; set; }
+        public UIState direction { get; set; }
         void SetItem(List<TItem> items);
     }
 }

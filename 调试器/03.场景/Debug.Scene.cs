@@ -13,7 +13,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace JFramework
+namespace JFramework.Common
 {
     public partial class DebugManager
     {

@@ -12,6 +12,7 @@
 using System;
 using System.Runtime.CompilerServices;
 using System.Text;
+using JFramework.Common;
 
 // ReSharper disable All
 
@@ -30,7 +31,7 @@ namespace JFramework
 
         void IDisposable.Dispose()
         {
-            Service.Pool.Enqueue(this);
+            PoolManager.Enqueue(this);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -68,7 +69,7 @@ namespace JFramework
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static MemoryReader Pop(ArraySegment<byte> segment)
         {
-            var reader = Service.Pool.Dequeue<MemoryReader>();
+            var reader = PoolManager.Dequeue<MemoryReader>();
             reader.Reset(segment);
             return reader;
         }
@@ -76,7 +77,7 @@ namespace JFramework
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void Push(MemoryReader reader)
         {
-            Service.Pool.Enqueue(reader);
+            PoolManager.Enqueue(reader);
         }
 
         public override string ToString()

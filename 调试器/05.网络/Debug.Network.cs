@@ -12,7 +12,7 @@
 using JFramework.Net;
 using UnityEngine;
 
-namespace JFramework
+namespace JFramework.Common
 {
     public partial class DebugManager
     {

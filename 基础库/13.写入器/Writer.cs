@@ -12,6 +12,7 @@
 using System;
 using System.Runtime.CompilerServices;
 using System.Text;
+using JFramework.Common;
 
 // ReSharper disable All
 
@@ -30,7 +31,7 @@ namespace JFramework
 
         void IDisposable.Dispose()
         {
-            Service.Pool.Enqueue(this);
+            PoolManager.Enqueue(this);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -73,7 +74,7 @@ namespace JFramework
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static MemoryWriter Pop()
         {
-            var writer = Service.Pool.Dequeue<MemoryWriter>();
+            var writer = PoolManager.Dequeue<MemoryWriter>();
             writer.Reset();
             return writer;
         }
@@ -81,7 +82,7 @@ namespace JFramework
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void Push(MemoryWriter writer)
         {
-            Service.Pool.Enqueue(writer);
+            PoolManager.Enqueue(writer);
         }
 
         public override string ToString()

@@ -16,7 +16,7 @@ using JFramework.Common;
 using UnityEngine;
 using UnityEngine.Networking;
 
-namespace JFramework
+namespace JFramework.Common
 {
     internal static class PackManager
     {
@@ -25,7 +25,7 @@ namespace JFramework
             if (!GlobalManager.Instance) return;
             if (!GlobalSetting.assetLoadMode)
             {
-                Service.Event.Invoke(new PackComplete(0, "启动本地资源加载。"));
+                EventManager.Invoke(new PackComplete(0, "启动本地资源加载。"));
                 return;
             }
 
@@ -50,11 +50,11 @@ namespace JFramework
                     sizes[i] = assetPacks[i].size;
                 }
 
-                Service.Event.Invoke(new PackAwake(sizes));
+                EventManager.Invoke(new PackAwake(sizes));
             }
             else
             {
-                Service.Event.Invoke(new PackComplete(-1, "没有连接到服务器!"));
+                EventManager.Invoke(new PackComplete(-1, "没有连接到服务器!"));
                 return;
             }
 
@@ -104,7 +104,7 @@ namespace JFramework
                 File.WriteAllText(filePath, serverRequest);
             }
 
-            Service.Event.Invoke(new PackComplete(1, status ? "更新完成!" : "更新失败!"));
+            EventManager.Invoke(new PackComplete(1, status ? "更新完成!" : "更新失败!"));
         }
 
         private static async Task<bool> LoadPacketRequest(HashSet<string> fileNames)
@@ -181,11 +181,11 @@ namespace JFramework
                 var result = request.SendWebRequest();
                 while (!result.isDone && GlobalSetting.Instance != null)
                 {
-                    Service.Event.Invoke(new PackUpdate(packName, request.downloadProgress));
+                    EventManager.Invoke(new PackUpdate(packName, request.downloadProgress));
                     await Task.Yield();
                 }
 
-                Service.Event.Invoke(new PackUpdate(packName, 1));
+                EventManager.Invoke(new PackUpdate(packName, 1));
                 if (request.result != UnityWebRequest.Result.Success)
                 {
                     Debug.Log(Service.Text.Format("请求服务器下载 {0} 失败!\n", packName));

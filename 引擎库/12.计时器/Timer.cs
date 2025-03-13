@@ -12,7 +12,7 @@
 using JFramework.Common;
 using UnityEngine;
 
-namespace JFramework
+namespace JFramework.Common
 {
     internal static class TimerManager
     {
@@ -27,7 +27,7 @@ namespace JFramework
         public static T Load<T>(Component entity, float duration) where T : class, ITimer
         {
             if (!GlobalManager.Instance) return null;
-            var timerData = Service.Pool.Dequeue<T>();
+            var timerData = PoolManager.Dequeue<T>();
             timerData.Start(entity, duration, OnComplete);
             GlobalManager.timerData.Add(timerData);
             return timerData;
@@ -36,7 +36,7 @@ namespace JFramework
             {
                 GlobalManager.timerData.Remove(timerData);
                 timerData.Dispose();
-                Service.Pool.Enqueue(timerData, typeof(T));
+                PoolManager.Enqueue(timerData, typeof(T));
             }
         }
 

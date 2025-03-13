@@ -27,10 +27,10 @@ namespace JFramework
 
         public Rect assetRect { get; set; }
         public string assetPath { get; set; }
-        public ScrollType direction { get; set; }
+        public UIState direction { get; set; }
 
-        private int row => (int)assetRect.y + (direction == ScrollType.Vertical ? 1 : 0);
-        private int column => (int)assetRect.x + (direction == ScrollType.Horizontal ? 1 : 0);
+        private int row => (int)assetRect.y + (direction == UIState.Vertical ? 1 : 0);
+        private int column => (int)assetRect.x + (direction == UIState.Horizontal ? 1 : 0);
 
         public override void OnShow(Component owner)
         {
@@ -50,7 +50,7 @@ namespace JFramework
                     if (grid != null)
                     {
                         grid.Dispose();
-                        PoolManager.Hide(grid.gameObject);
+                        EntityManager.Hide(grid.gameObject);
                     }
                 }
             }
@@ -68,7 +68,7 @@ namespace JFramework
             if (!initialized)
             {
                 initialized = true;
-                if (direction == ScrollType.Vertical)
+                if (direction == UIState.Vertical)
                 {
                     owner.anchorMin = Vector2.up;
                     owner.anchorMax = Vector2.one;
@@ -91,7 +91,7 @@ namespace JFramework
             int minIndex;
             int maxIndex;
             float position;
-            if (direction == ScrollType.Vertical)
+            if (direction == UIState.Vertical)
             {
                 position = owner.anchoredPosition.y;
                 newIndex = (int)(position / assetRect.height);
@@ -125,7 +125,7 @@ namespace JFramework
                         if (grid != null)
                         {
                             grid.Dispose();
-                            PoolManager.Hide(grid.gameObject);
+                            EntityManager.Hide(grid.gameObject);
                         }
 
                         grids.Remove(i);
@@ -139,7 +139,7 @@ namespace JFramework
                         if (grid != null)
                         {
                             grid.Dispose();
-                            PoolManager.Hide(grid.gameObject);
+                            EntityManager.Hide(grid.gameObject);
                         }
 
                         grids.Remove(i);
@@ -157,7 +157,7 @@ namespace JFramework
                     float posY;
                     var index = i;
                     grids[index] = null;
-                    if (direction == ScrollType.Vertical)
+                    if (direction == UIState.Vertical)
                     {
                         posX = index % column * assetRect.width + assetRect.width / 2;
                         posY = -(index / column) * assetRect.height - assetRect.height / 2;
@@ -168,7 +168,7 @@ namespace JFramework
                         posY = -(index % row) * assetRect.height - assetRect.height / 2;
                     }
 
-                    PoolManager.Show(assetPath, obj =>
+                    EntityManager.Show(assetPath, obj =>
                     {
                         var grid = obj.GetComponent<TGrid>();
                         if (grid == null)
@@ -185,7 +185,7 @@ namespace JFramework
                         if (!grids.ContainsKey(index))
                         {
                             grid.Dispose();
-                            PoolManager.Hide(grid.gameObject);
+                            EntityManager.Hide(grid.gameObject);
                             return;
                         }
 
@@ -206,7 +206,7 @@ namespace JFramework
 
             this.items = items;
             float value = items.Count;
-            if (direction == ScrollType.Vertical)
+            if (direction == UIState.Vertical)
             {
                 value = Mathf.Ceil(value / column);
                 owner.sizeDelta = new Vector2(0, value * assetRect.height);

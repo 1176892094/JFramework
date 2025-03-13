@@ -11,49 +11,50 @@
 
 using System;
 using System.Collections.Generic;
+using JFramework.Common;
 using UnityEngine;
 
-namespace JFramework
+namespace JFramework.Common
 {
     public partial class DebugManager
     {
         private readonly Dictionary<string, List<Reference>> poolData = new Dictionary<string, List<Reference>>();
-        private Pool windowOption = Pool.Heap;
+        private PoolMode windowOption = PoolMode.Pool;
 
 
         private void ReferenceWindow()
         {
             GUILayout.BeginHorizontal();
-            GUI.contentColor = windowOption == Pool.Heap ? Color.white : Color.gray;
-            if (GUILayout.Button("Heap", GUILayout.Height(30)))
-            {
-                windowOption = Pool.Heap;
-            }
-
-            GUI.contentColor = windowOption == Pool.Event ? Color.white : Color.gray;
-            if (GUILayout.Button("Event", GUILayout.Height(30)))
-            {
-                windowOption = Pool.Event;
-            }
-
-            GUI.contentColor = windowOption == Pool.Pool ? Color.white : Color.gray;
+            GUI.contentColor = windowOption == PoolMode.Pool ? Color.white : Color.gray;
             if (GUILayout.Button("Pool", GUILayout.Height(30)))
             {
-                windowOption = Pool.Pool;
+                windowOption = PoolMode.Pool;
+            }
+
+            GUI.contentColor = windowOption == PoolMode.Event ? Color.white : Color.gray;
+            if (GUILayout.Button("Event", GUILayout.Height(30)))
+            {
+                windowOption = PoolMode.Event;
+            }
+
+            GUI.contentColor = windowOption == PoolMode.Entity ? Color.white : Color.gray;
+            if (GUILayout.Button("Entity", GUILayout.Height(30)))
+            {
+                windowOption = PoolMode.Entity;
             }
 
             GUI.contentColor = Color.white;
             GUILayout.EndHorizontal();
             switch (windowOption)
             {
-                case Pool.Event:
-                    Draw(Service.Pool.Reference(), "事件池", "触发数\t事件数\t添加次数\t移除次数");
+                case PoolMode.Pool:
+                    Draw(PoolManager.Reference(), "引用池", "未使用\t使用中\t使用次数\t释放次数");
                     break;
-                case Pool.Heap:
-                    Draw(Service.Event.Reference(), "引用池", "未使用\t使用中\t使用次数\t释放次数");
+                case PoolMode.Event:
+                    Draw(EventManager.Reference(), "事件池", "触发数\t事件数\t添加次数\t移除次数");
                     break;
-                case Pool.Pool:
-                    Draw(PoolManager.Reference(), "对象池", "未激活\t激活中\t出队次数\t入队次数");
+                case PoolMode.Entity:
+                    Draw(EntityManager.Reference(), "对象池", "未激活\t激活中\t出队次数\t入队次数");
                     break;
             }
         }
@@ -114,11 +115,11 @@ namespace JFramework
             return string.Compare(origin.assetType.Name, target.assetType.Name, StringComparison.Ordinal);
         }
 
-        private enum Pool
+        private enum PoolMode
         {
-            Heap,
-            Event,
             Pool,
+            Event,
+            Entity,
         }
     }
 }

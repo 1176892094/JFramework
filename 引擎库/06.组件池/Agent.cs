@@ -14,7 +14,7 @@ using System.Collections.Generic;
 using JFramework.Common;
 using UnityEngine;
 
-namespace JFramework
+namespace JFramework.Common
 {
     internal static class AgentManager
     {
@@ -27,7 +27,7 @@ namespace JFramework
                 GlobalManager.agentData.Add(owner, agents);
             }
 
-            var agentData = Service.Pool.Dequeue<IAgent>(agentType);
+            var agentData = PoolManager.Dequeue<IAgent>(agentType);
             agents[typeof(T)] = agentData;
             agentData.OnShow(owner);
         }
@@ -60,7 +60,7 @@ namespace JFramework
             {
                 agent.OnHide();
                 agents.Remove(typeof(T));
-                Service.Pool.Enqueue(agent, agent.GetType());
+                PoolManager.Enqueue(agent, agent.GetType());
             }
 
             if (agents.Count == 0)
@@ -91,7 +91,7 @@ namespace JFramework
                     foreach (var agent in agents.Values)
                     {
                         agent.OnHide();
-                        Service.Pool.Enqueue(agent, agent.GetType());
+                        PoolManager.Enqueue(agent, agent.GetType());
                     }
 
                     agents.Clear();

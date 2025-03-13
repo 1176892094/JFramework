@@ -28,7 +28,7 @@ namespace JFramework
             foreach (var stateData in copies)
             {
                 stateData.OnHide();
-                Service.Pool.Enqueue(stateData, stateData.GetType());
+                PoolManager.Enqueue(stateData, stateData.GetType());
             }
 
             states.Clear();
@@ -42,7 +42,7 @@ namespace JFramework
         
         public void AddState<T>(Type stateType)
         {
-            var stateData = Service.Pool.Dequeue<IState>(stateType);
+            var stateData = PoolManager.Dequeue<IState>(stateType);
             states[typeof(T)] = stateData;
             stateData.OnShow(owner);
         }
@@ -60,7 +60,7 @@ namespace JFramework
             {
                 stateData.OnHide();
                 states.Remove(typeof(T));
-                Service.Pool.Enqueue(stateData, stateData.GetType());
+                PoolManager.Enqueue(stateData, stateData.GetType());
             }
         }
     }

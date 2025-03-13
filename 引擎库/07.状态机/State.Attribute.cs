@@ -11,6 +11,7 @@
 
 using System.Collections.Generic;
 using System.Text;
+using JFramework.Common;
 using UnityEngine;
 
 namespace JFramework
@@ -87,7 +88,7 @@ namespace JFramework
 
         public override string ToString()
         {
-            var builder = Service.Pool.Dequeue<StringBuilder>();
+            var builder = PoolManager.Dequeue<StringBuilder>();
             foreach (var attribute in attributes)
             {
                 builder.AppendFormat("{0} : {1}", attribute.Key, attribute.Value);
@@ -95,7 +96,7 @@ namespace JFramework
 
             var message = builder.ToString();
             builder.Length = 0;
-            Service.Pool.Enqueue(builder);
+            PoolManager.Enqueue(builder);
             return message;
         }
     }

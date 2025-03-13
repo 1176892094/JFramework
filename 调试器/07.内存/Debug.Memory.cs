@@ -14,7 +14,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Profiling;
 
-namespace JFramework
+namespace JFramework.Common
 {
     public partial class DebugManager
     {

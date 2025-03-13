@@ -13,8 +13,10 @@ namespace JFramework
 {
     public enum UIState : byte
     {
-        Common,
-        Freeze,
-        Stable,
+        Common = 1 << 0,
+        Freeze = 1 << 1,
+        Stable = 1 << 2,
+        Vertical = 1 << 3,
+        Horizontal = 1 << 4,
     }
 }
