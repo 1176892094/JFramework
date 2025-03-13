@@ -33,7 +33,6 @@ namespace JFramework
         
         private FieldInfo NetworkClientRef;
         private MethodInfo NetworkManagerRef;
-        private Func<Reference[]> PoolManagerRef;
 
         private float screenWidth => Screen.width / screenSize;
         private float screenHeight => Screen.height / screenSize;
@@ -46,14 +45,9 @@ namespace JFramework
             screenColor = Color.white;
             screenRate = new Vector2(2560, 1440);
             screenRect = new Rect(10, 20, 108, 69);
-            var messageType = Service.Find.Type("JFramework.PoolManager,JFramework.Sdk");
-            var message = messageType.GetMethod("Reference", Service.Find.Static);
-            if (message != null)
-            {
-                PoolManagerRef = (Func<Reference[]>)Delegate.CreateDelegate(typeof(Func<Reference[]>), message);
-            }
+            
 
-            messageType = Service.Find.Type("JFramework.Net.NetworkManager,JFramework.Net");
+            var messageType = Service.Find.Type("JFramework.Net.NetworkManager,JFramework.Net");
             NetworkManagerRef = messageType.GetMethod("Reference", Service.Find.Static);
             messageType = Service.Find.Type("JFramework.Net.NetworkManager+Client,JFramework.Net");
             NetworkClientRef = messageType.GetField("pingTime", Service.Find.Static);

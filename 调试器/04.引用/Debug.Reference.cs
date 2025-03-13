@@ -53,7 +53,7 @@ namespace JFramework
                     Draw(Service.Event.Reference(), "引用池", "未使用\t使用中\t使用次数\t释放次数");
                     break;
                 case Pool.Pool:
-                    Draw(PoolManagerRef.Invoke(), "对象池", "未激活\t激活中\t出队次数\t入队次数");
+                    Draw(PoolManager.Reference(), "对象池", "未激活\t激活中\t出队次数\t入队次数");
                     break;
             }
         }

@@ -70,8 +70,8 @@ namespace JFramework
         {
             return (int)(later - earlier);
         }
-        
-        internal static bool ParseReliable(byte value, out Reliable header)
+
+        public static bool ParseReliable(byte value, out Reliable header)
         {
             if (Enum.IsDefined(typeof(Reliable), value))
             {
@@ -83,7 +83,7 @@ namespace JFramework
             return false;
         }
 
-        internal static bool ParseUnreliable(byte value, out Unreliable header)
+        public static bool ParseUnreliable(byte value, out Unreliable header)
         {
             if (Enum.IsDefined(typeof(Unreliable), value))
             {
@@ -95,7 +95,7 @@ namespace JFramework
             return false;
         }
 
-        internal static void SetBuffer(Socket socket, int buffer = 1024 * 1024 * 7)
+        public static void SetBuffer(Socket socket, int buffer = 1024 * 1024 * 7)
         {
             socket.Blocking = false;
             var sendBuffer = socket.SendBufferSize;

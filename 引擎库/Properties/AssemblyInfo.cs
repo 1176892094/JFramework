@@ -13,6 +13,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyCopyright("Copyright ©  2025")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
+[assembly: InternalsVisibleTo("JFramework.Log")]
 [assembly: InternalsVisibleTo("JFramework.Unity")]
 [assembly: InternalsVisibleTo("JFramework.Editor")]
 

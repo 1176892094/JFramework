@@ -26,8 +26,7 @@ namespace JFramework
         public virtual void OnUpdate()
         {
         }
-
-
+        
         public virtual void OnHide()
         {
             owner = null;

@@ -15,4 +15,13 @@ namespace JFramework.Common
     {
         void Create(string[] sheet, int column);
     }
+    
+    internal interface IDataTable
+    {
+        int Count { get; }
+
+        void AddData(IData data);
+
+        IData GetData(int index);
+    }
 }

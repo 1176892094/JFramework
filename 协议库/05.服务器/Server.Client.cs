@@ -49,7 +49,7 @@ namespace JFramework
 
             protected override void Receive(ArraySegment<byte> message, int channel) => OnReceive?.Invoke(message, channel);
 
-            internal override void Logger(Error error, string message) => OnError?.Invoke(error, message);
+            protected override void Logger(Error error, string message) => OnError?.Invoke(error, message);
 
             public void Input(ArraySegment<byte> segment)
             {

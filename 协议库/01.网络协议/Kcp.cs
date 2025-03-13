@@ -295,7 +295,7 @@ namespace JFramework
             rx_rto = rto;
         }
 
-        internal void ShrinkBuf()
+        private void ShrinkBuf()
         {
             if (sendBuffer.Count > 0)
             {
@@ -308,7 +308,7 @@ namespace JFramework
             }
         }
 
-        internal void ParseAck(uint sn)
+        private void ParseAck(uint sn)
         {
             if (Utils.Compare(sn, snd_una) < 0 || Utils.Compare(sn, snd_nxt) >= 0)
             {
@@ -333,7 +333,7 @@ namespace JFramework
         }
 
 
-        internal void ParseUna(uint una)
+        private void ParseUna(uint una)
         {
             int removed = 0;
             foreach (Segment seg in sendBuffer)
@@ -353,7 +353,7 @@ namespace JFramework
         }
 
 
-        internal void ParseFastAck(uint sn, uint ts)
+        private void ParseFastAck(uint sn, uint ts)
         {
             if (sn < snd_una)
             {
@@ -394,7 +394,7 @@ namespace JFramework
         }
 
 
-        internal void InsertSegmentInReceiveBuffer(Segment segment)
+        private void InsertSegmentInReceiveBuffer(Segment segment)
         {
             var repeat = false;
             int i;
@@ -616,7 +616,7 @@ namespace JFramework
             }
         }
 
-        public void Flush()
+        private void Flush()
         {
             var size = 0;
             var lost = false;

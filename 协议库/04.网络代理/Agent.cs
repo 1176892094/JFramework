@@ -350,7 +350,7 @@ namespace JFramework
         protected abstract void Connected();
         protected abstract void Send(ArraySegment<byte> segment);
         protected abstract void Receive(ArraySegment<byte> message, int channel);
-        internal abstract void Logger(Error error, string message);
+        protected abstract void Logger(Error error, string message);
         protected abstract void Disconnected();
     }
 }

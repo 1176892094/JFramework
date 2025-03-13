@@ -35,12 +35,12 @@ namespace JFramework
         internal static IAgent Find<T>(Component owner)
         {
             if (!GlobalManager.Instance) return null;
-            if (!GlobalManager.agentData.TryGetValue(owner, out var agentData))
+            if (!GlobalManager.agentData.TryGetValue(owner, out var agents))
             {
                 return null;
             }
 
-            if (!agentData.TryGetValue(typeof(T), out var agent))
+            if (!agents.TryGetValue(typeof(T), out var agent))
             {
                 return null;
             }
@@ -56,11 +56,11 @@ namespace JFramework
                 return;
             }
 
-            if (agents.TryGetValue(typeof(T), out var agentData))
+            if (agents.TryGetValue(typeof(T), out var agent))
             {
-                agentData.OnHide();
+                agent.OnHide();
                 agents.Remove(typeof(T));
-                Service.Pool.Enqueue(agentData, agentData.GetType());
+                Service.Pool.Enqueue(agent, agent.GetType());
             }
 
             if (agents.Count == 0)
@@ -72,9 +72,9 @@ namespace JFramework
         internal static void Update()
         {
             if (!GlobalManager.Instance) return;
-            foreach (var agentData in GlobalManager.agentData.Values)
+            foreach (var agents in GlobalManager.agentData.Values)
             {
-                foreach (var agent in agentData.Values)
+                foreach (var agent in agents.Values)
                 {
                     agent.OnUpdate();
                 }
@@ -86,15 +86,15 @@ namespace JFramework
             var agentCaches = new List<Component>(GlobalManager.agentData.Keys);
             foreach (var cache in agentCaches)
             {
-                if (GlobalManager.agentData.TryGetValue(cache, out var agentData))
+                if (GlobalManager.agentData.TryGetValue(cache, out var agents))
                 {
-                    foreach (var agent in agentData.Values)
+                    foreach (var agent in agents.Values)
                     {
                         agent.OnHide();
                         Service.Pool.Enqueue(agent, agent.GetType());
                     }
 
-                    agentData.Clear();
+                    agents.Clear();
                     GlobalManager.agentData.Remove(cache);
                 }
             }
