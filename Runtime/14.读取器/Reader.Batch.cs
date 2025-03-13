@@ -16,8 +16,8 @@ namespace JFramework
 {
     internal class ReaderBatch
     {
-        private readonly MemoryReader reader = new MemoryReader();
         private readonly Queue<MemoryWriter> writers = new Queue<MemoryWriter>();
+        private readonly MemoryReader reader = new MemoryReader();
         private double remoteTime;
         public int Count => writers.Count;
 
@@ -55,7 +55,7 @@ namespace JFramework
                 return false;
             }
 
-            if (reader.residue == 0)
+            if (reader.buffer.Count - reader.position == 0)
             {
                 var writer = writers.Dequeue();
                 MemoryWriter.Push(writer);
@@ -72,19 +72,19 @@ namespace JFramework
             }
 
             newTime = remoteTime;
-            if (reader.residue == 0)
+            if (reader.buffer.Count - reader.position == 0)
             {
                 return false;
             }
 
-            var size = (int)Service.Bit.Decode(reader);
+            var length = (int)Service.Long.Decode(reader);
 
-            if (reader.residue < size)
+            if (reader.buffer.Count - reader.position < length)
             {
                 return false;
             }
 
-            segment = reader.ReadArraySegment(size);
+            segment = reader.ReadArraySegment(length);
             return true;
         }
     }

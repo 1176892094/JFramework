@@ -24,11 +24,11 @@ namespace JFramework
                 try
                 {
                     var interfaces = NetworkInterface.GetAllNetworkInterfaces();
-                    foreach (var inter in interfaces)
+                    foreach (var @interface in interfaces)
                     {
-                        if (inter.OperationalStatus == OperationalStatus.Up && inter.NetworkInterfaceType != NetworkInterfaceType.Loopback)
+                        if (@interface.OperationalStatus == OperationalStatus.Up && @interface.NetworkInterfaceType != NetworkInterfaceType.Loopback)
                         {
-                            var properties = inter.GetIPProperties();
+                            var properties = @interface.GetIPProperties();
                             foreach (var ip in properties.UnicastAddresses)
                             {
                                 if (ip.Address.AddressFamily == AddressFamily.InterNetwork)

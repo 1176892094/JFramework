@@ -13,7 +13,7 @@ namespace JFramework
 {
     public static partial class Service
     {
-        internal static class Bit
+        internal static class Long
         {
             public static int Length(ulong length)
             {

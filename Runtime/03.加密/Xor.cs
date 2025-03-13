@@ -1,13 +1,13 @@
-// *********************************************************************************
-// # Project: JFramework
-// # Unity: 6000.3.5f1
-// # Author: 云谷千羽
-// # Version: 1.0.0
-// # History: 2025-01-09 16:01:50
-// # Recently: 2025-01-11 18:01:33
-// # Copyright: 2024, 云谷千羽
-// # Description: This is an automatically generated comment.
-// *********************************************************************************
+// // *********************************************************************************
+// // # Project: JFramework
+// // # Unity: 6000.3.5f1
+// // # Author: 云谷千羽
+// // # Version: 1.0.0
+// // # History: 2025-01-11 18:01:38
+// // # Recently: 2025-03-13 00:03:57
+// // # Copyright: 2024, 云谷千羽
+// // # Description: This is an automatically generated comment.
+// // *********************************************************************************
 
 using System;
 using System.IO;
@@ -20,7 +20,7 @@ namespace JFramework
         {
             private const int LENGTH = 16;
 
-            public static byte[] Encrypt(byte[] data)
+            public static unsafe byte[] Encrypt(byte[] data)
             {
                 var key = new byte[LENGTH];
                 Random.NextBytes(key);
@@ -30,21 +30,25 @@ namespace JFramework
 
                 var buffer = new byte[1024];
 
-                for (var i = 0; i < data.Length; i += buffer.Length)
+                fixed (byte* pData = data, pKey = key, pBuffer = buffer)
                 {
-                    var length = Math.Min(buffer.Length, data.Length - i);
-                    for (var j = 0; j < length; j++)
+                    for (var i = 0; i < data.Length; i += buffer.Length)
                     {
-                        buffer[j] = (byte)(data[i + j] ^ key[(i + j) % key.Length]);
+                        var length = Math.Min(buffer.Length, data.Length - i);
+
+                        for (var j = 0; j < length; j++)
+                        {
+                            pBuffer[j] = (byte)(pData[i + j] ^ pKey[(i + j) % key.Length]);
+                        }
+
+                        ms.Write(buffer, 0, length);
                     }
-
-                    ms.Write(buffer, 0, length);
                 }
-
+                
                 return ms.ToArray();
             }
 
-            public static byte[] Decrypt(byte[] data)
+            public static unsafe byte[] Decrypt(byte[] data)
             {
                 var key = new byte[LENGTH];
                 Buffer.BlockCopy(data, 0, key, 0, key.Length);
@@ -52,16 +56,20 @@ namespace JFramework
                 using var ms = new MemoryStream();
 
                 var buffer = new byte[1024];
-
-                for (var i = LENGTH; i < data.Length; i += buffer.Length)
+                
+                fixed (byte* pData = data, pKey = key, pBuffer = buffer)
                 {
-                    var length = Math.Min(buffer.Length, data.Length - i);
-                    for (var j = 0; j < length; j++)
+                    for (var i = LENGTH; i < data.Length; i += buffer.Length)
                     {
-                        buffer[j] = (byte)(data[i + j] ^ key[(i + j - LENGTH) % key.Length]);
-                    }
+                        var length = Math.Min(buffer.Length, data.Length - i);
 
-                    ms.Write(buffer, 0, length);
+                        for (var j = 0; j < length; j++)
+                        {
+                            pBuffer[j] = (byte)(pData[i + j] ^ pKey[(i + j - LENGTH) % key.Length]);
+                        }
+
+                        ms.Write(buffer, 0, length);
+                    }
                 }
 
                 return ms.ToArray();

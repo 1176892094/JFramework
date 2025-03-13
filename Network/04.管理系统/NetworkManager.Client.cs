@@ -391,7 +391,7 @@ namespace JFramework.Net
                 while (!isLoadScene && connection.reader.GetMessage(out var newSeg, out var remoteTime))
                 {
                     using var reader = MemoryReader.Pop(newSeg);
-                    if (reader.residue < sizeof(ushort))
+                    if (reader.buffer.Count - reader.position < sizeof(ushort))
                     {
                         Debug.LogWarning("无法处理来自服务器的消息。没有头部。");
                         connection.Disconnect();

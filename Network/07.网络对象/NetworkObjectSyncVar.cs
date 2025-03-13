@@ -26,12 +26,12 @@ namespace JFramework.Net
 
             if (ownerMask != 0)
             {
-                Service.Bit.Encode(owner, ownerMask);
+                Service.Long.Encode(owner, ownerMask);
             }
 
             if (observerMask != 0)
             {
-                Service.Bit.Encode(observer, observerMask);
+                Service.Long.Encode(observer, observerMask);
             }
 
             if ((ownerMask | observerMask) != 0)
@@ -66,7 +66,7 @@ namespace JFramework.Net
             var dirtyMask = ClientDirtyMask();
             if (dirtyMask != 0)
             {
-                Service.Bit.Encode(writer, dirtyMask);
+                Service.Long.Encode(writer, dirtyMask);
                 for (var i = 0; i < components.Length; ++i)
                 {
                     var component = components[i];
@@ -82,7 +82,7 @@ namespace JFramework.Net
         internal bool ServerDeserialize(MemoryReader reader)
         {
             var components = entities;
-            var mask = Service.Bit.Decode(reader);
+            var mask = Service.Long.Decode(reader);
 
             for (var i = 0; i < components.Length; ++i)
             {
@@ -108,7 +108,7 @@ namespace JFramework.Net
         internal void ClientDeserialize(MemoryReader reader, bool status)
         {
             var components = entities;
-            var mask = Service.Bit.Decode(reader);
+            var mask = Service.Long.Decode(reader);
 
             for (var i = 0; i < components.Length; ++i)
             {

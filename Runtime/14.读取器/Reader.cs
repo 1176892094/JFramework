@@ -28,8 +28,6 @@ namespace JFramework
         public ArraySegment<byte> buffer;
         public int position;
 
-        public int residue => buffer.Count - position;
-
         void IDisposable.Dispose()
         {
             Service.Pool.Enqueue(this);
@@ -88,7 +86,7 @@ namespace JFramework
 
         public ArraySegment<byte> ReadArraySegment(int count)
         {
-            if (residue < count)
+            if (buffer.Count - position < count)
             {
                 throw new OverflowException("读取器剩余容量不够!");
             }

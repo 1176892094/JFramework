@@ -16,19 +16,19 @@ namespace JFramework
 {
     internal class WriterBatch
     {
-        private readonly int maxCount;
         private readonly Queue<MemoryWriter> writers = new Queue<MemoryWriter>();
         private MemoryWriter writer;
+        private readonly int message;
 
-        public WriterBatch(int maxCount)
+        public WriterBatch(int message)
         {
-            this.maxCount = maxCount;
+            this.message = message;
         }
 
         public void AddMessage(ArraySegment<byte> segment, double remoteTime)
         {
-            var header = Service.Bit.Length((ulong)segment.Count);
-            if (writer != null && writer.position + header + segment.Count > maxCount)
+            var length = Service.Long.Length((ulong)segment.Count);
+            if (writer != null && writer.position + length + segment.Count > message)
             {
                 writers.Enqueue(writer);
                 writer = null;
@@ -40,7 +40,7 @@ namespace JFramework
                 writer.Write(remoteTime);
             }
 
-            Service.Bit.Encode(writer, (ulong)segment.Count);
+            Service.Long.Encode(writer, (ulong)segment.Count);
             writer.WriteBytes(segment.Array, segment.Offset, segment.Count);
         }
 
@@ -48,15 +48,15 @@ namespace JFramework
         {
             if (writers.Count > 0)
             {
-                var first = writers.Dequeue();
+                var cached = writers.Dequeue();
                 if (target.position != 0)
                 {
                     throw new ArgumentException("拷贝目标不是空的！");
                 }
 
-                ArraySegment<byte> segment = first;
+                ArraySegment<byte> segment = cached;
                 target.WriteBytes(segment.Array, segment.Offset, segment.Count);
-                MemoryWriter.Push(first);
+                MemoryWriter.Push(cached);
                 return true;
             }
 

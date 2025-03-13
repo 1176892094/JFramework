@@ -318,7 +318,7 @@ namespace JFramework.Net
                 while (!isLoadScene && client.reader.GetMessage(out var newSeg, out var remoteTime))
                 {
                     using var reader = MemoryReader.Pop(newSeg);
-                    if (reader.residue < sizeof(ushort))
+                    if (reader.buffer.Count - reader.position < sizeof(ushort))
                     {
                         Debug.LogWarning(Service.Text.Format("无法为客户端 {0} 进行处理消息。没有头部。", clientId));
                         client.Disconnect();
