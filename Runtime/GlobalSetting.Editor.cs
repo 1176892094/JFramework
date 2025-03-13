@@ -124,10 +124,6 @@ namespace JFramework.Common
         {
             public override void OnInspectorGUI()
             {
-                if (GUILayout.Button("框架配置窗口"))
-                {
-                    EditorSetting.ShowWindow();
-                }
             }
         }
 
