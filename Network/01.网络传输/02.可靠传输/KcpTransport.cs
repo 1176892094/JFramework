@@ -14,7 +14,7 @@ using UnityEngine;
 
 namespace JFramework.Net
 {
-    public sealed class NetworkTransport : Transport
+    public sealed class KcpTransport : Transport
     {
         public int maxUnit = 1200;
         public uint timeout = 10000;

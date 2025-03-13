@@ -10,11 +10,17 @@
 // *********************************************************************************
 
 using System;
+using UnityEngine;
 
 namespace JFramework
 {
     [AttributeUsage(AttributeTargets.Field)]
     public class InjectAttribute : Attribute
+    {
+    }
+    
+    [AttributeUsage(AttributeTargets.Field)]
+    public class FolderAttribute : PropertyAttribute
     {
     }
 }

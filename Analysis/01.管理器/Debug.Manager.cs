@@ -53,10 +53,11 @@ namespace JFramework
                 PoolManagerRef = (Func<Reference[]>)Delegate.CreateDelegate(typeof(Func<Reference[]>), message);
             }
 
-            messageType = Service.Find.Type("JFramework.NetworkManager,JFramework.Net");
+            messageType = Service.Find.Type("JFramework.Net.NetworkManager,JFramework.Net");
             NetworkManagerRef = messageType.GetMethod("Reference", Service.Find.Static);
-            messageType = Service.Find.Type("JFramework.NetworkManager.Client,JFramework.Net");
+            messageType = Service.Find.Type("JFramework.Net.NetworkManager+Client,JFramework.Net");
             NetworkClientRef = messageType.GetField("pingTime", Service.Find.Static);
+          
             if (NetworkManagerRef != null && NetworkClientRef != null)
             {
                 status |= Status.Ping;
