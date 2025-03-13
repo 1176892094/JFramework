@@ -23,36 +23,34 @@ namespace JFramework
         {
             if (!GlobalManager.Instance) return;
             var assembly = Service.Find.Assembly(GlobalSetting.assemblyName);
-            if (assembly == null) return;
-            var assetTypes = new List<Type>();
-            foreach (var assetType in assembly.GetTypes())
-            {
-                if (typeof(IDataTable).IsAssignableFrom(assetType))
-                {
-                    assetTypes.Add(assetType);
-                }
-            }
-
-            if (assetTypes.Count == 0)
+            if (assembly == null)
             {
                 return;
             }
 
-            var names = new string[assetTypes.Count];
-            for (var i = 0; i < names.Length; i++)
+            var assetNames = new List<string>();
+            foreach (var assetType in assembly.GetTypes())
             {
-                names[i] = assetTypes[i].Name;
+                if (typeof(IDataTable).IsAssignableFrom(assetType))
+                {
+                    assetNames.Add(assetType.FullName);
+                }
             }
 
-            Service.Event.Invoke(new DataAwake(names));
-            foreach (var assetType in assetTypes)
+            if (assetNames.Count == 0)
             {
+                return;
+            }
+
+            Service.Event.Invoke(new DataAwake(assetNames.ToArray()));
+            foreach (var assetName in assetNames)
+            {
+                var shortName = assetName.Substring(assetName.LastIndexOf('.') + 1);
                 try
                 {
-                    if (string.IsNullOrEmpty(assetType.FullName)) continue;
-                    var dataTable = (IDataTable)await AssetManager.Load<ScriptableObject>(GlobalSetting.GetTablePath(assetType.Name));
-                    var children = assembly.GetType(assetType.FullName.Substring(0, assetType.FullName.Length - 5));
-                    var properties = children.GetProperties(Service.Find.Entity);
+                    var assetData = (IDataTable)await AssetManager.Load<ScriptableObject>(GlobalSetting.GetTablePath(shortName));
+                    var assetType = assembly.GetType(assetName.Substring(0, assetName.Length - 5));
+                    var properties = assetType.GetProperties(Service.Find.Entity);
                     foreach (var property in properties)
                     {
                         if (property.GetCustomAttribute(typeof(PrimaryAttribute)) == null)
@@ -62,15 +60,15 @@ namespace JFramework
 
                         if (property.PropertyType == typeof(int))
                         {
-                            GlobalManager.itemTable.Add(children, LoadData<int>());
+                            GlobalManager.itemTable.Add(assetType, LoadData<int>());
                         }
                         else if (property.PropertyType == typeof(string))
                         {
-                            GlobalManager.nameTable.Add(children, LoadData<string>());
+                            GlobalManager.nameTable.Add(assetType, LoadData<string>());
                         }
                         else if (property.PropertyType.IsEnum)
                         {
-                            GlobalManager.enumTable.Add(children, LoadData<Enum>());
+                            GlobalManager.enumTable.Add(assetType, LoadData<Enum>());
                         }
 
                         continue;
@@ -78,9 +76,9 @@ namespace JFramework
                         Dictionary<T, IData> LoadData<T>()
                         {
                             var items = new Dictionary<T, IData>();
-                            for (var i = 0; i < dataTable.Count; i++)
+                            for (var i = 0; i < assetData.Count; i++)
                             {
-                                var data = dataTable.GetData(i);
+                                var data = assetData.GetData(i);
                                 var item = (T)property.GetValue(data);
                                 if (!items.ContainsKey(item))
                                 {
@@ -88,18 +86,18 @@ namespace JFramework
                                     continue;
                                 }
 
-                                Debug.LogWarning(Service.Text.Format("加载数据 {0} 失败。键值重复: {1}", assetType.Name, item));
+                                Debug.LogWarning(Service.Text.Format("加载数据 {0} 失败。键值重复: {1}", shortName, item));
                             }
 
                             return items;
                         }
                     }
 
-                    Service.Event.Invoke(new DataUpdate(assetType.Name));
+                    Service.Event.Invoke(new DataUpdate(shortName));
                 }
                 catch (Exception e)
                 {
-                    Debug.LogError(Service.Text.Format("加载 {0} 数据失败!\n{1}", assetType.Name, e));
+                    Debug.LogError(Service.Text.Format("加载 {0} 数据失败!\n{1}", shortName, e));
                 }
             }
 
