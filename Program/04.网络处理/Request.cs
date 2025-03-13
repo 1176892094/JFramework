@@ -28,7 +28,7 @@ namespace JFramework.Net
         {
             if (Program.Setting.RequestRoom)
             {
-                var json = JsonConvert.SerializeObject(Program.Process.roomInfo);
+                var json = JsonConvert.SerializeObject(Program.Process.roomData);
                 await context.Response.SendResponseAsync(Service.Zip.Compress(json));
             }
             else

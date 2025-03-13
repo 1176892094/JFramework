@@ -27,7 +27,7 @@ namespace JFramework.Net
             this.transport = transport;
         }
 
-        public List<Room> roomInfo => rooms.Values.ToList();
+        public List<Room> roomData => rooms.Values.ToList();
 
         public void ServerConnect(int clientId)
         {

@@ -57,10 +57,10 @@ namespace JFramework.Net
                 Log.Info("初始化传输类...");
                 Process = new Process(transport);
                 
+                transport.port = Setting.RestPort;
                 transport.OnServerConnect = Process.ServerConnect;
                 transport.OnServerReceive = Process.ServerReceive;
                 transport.OnServerDisconnect = Process.ServerDisconnect;
-                transport.port = Setting.RestPort;
                 transport.StartServer();
 
                 Log.Info("开始进行传输...");
