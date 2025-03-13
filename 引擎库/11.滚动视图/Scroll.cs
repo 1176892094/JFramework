@@ -17,7 +17,7 @@ using UnityEngine;
 namespace JFramework
 {
     [Serializable]
-    public sealed class UIScroll<TItem, TGrid> : Agent<RectTransform>, IScroll<TItem> where TGrid : Component, IGrid<TItem>
+    public sealed class Scroll<TItem, TGrid> : Agent<RectTransform>, IScroll<TItem> where TGrid : Component, IGrid<TItem>
     {
         private readonly Dictionary<int, TGrid> grids = new Dictionary<int, TGrid>();
         private List<TItem> items;
