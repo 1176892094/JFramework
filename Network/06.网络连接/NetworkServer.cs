@@ -45,7 +45,7 @@ namespace JFramework.Net
             writer.WriteUShort(Hash<T>.Id);
             writer.Invoke(message);
 
-            if (writer.position > Transport.Instance.MessageSize(channel))
+            if (writer.position > Transport.Instance.SendLength(channel))
             {
                 Debug.LogError(Service.Text.Format("发送消息大小过大！消息大小: {0}", writer.position));
                 return;
@@ -59,7 +59,7 @@ namespace JFramework.Net
         {
             if (!batches.TryGetValue(channel, out var batch))
             {
-                batch = new WriterBatch(Transport.Instance.MessageSize(channel));
+                batch = new WriterBatch(Transport.Instance.SendLength(channel));
                 batches[channel] = batch;
             }
 

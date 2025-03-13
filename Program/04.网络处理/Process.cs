@@ -163,7 +163,7 @@ namespace JFramework.Net
                     var targetId = reader.ReadInt();
                     if (clients.TryGetValue(clientId, out var room) && room != null)
                     {
-                        if (message.Count > transport.MessageSize(channel))
+                        if (message.Count > transport.SendLength(channel))
                         {
                             Log.Warn(Service.Text.Format("接收消息大小过大！消息大小: {0}", message.Count));
                             ServerDisconnect(clientId);

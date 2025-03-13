@@ -77,7 +77,7 @@ namespace JFramework.Net
             }
         }
 
-        public override int MessageSize(int channel)
+        public override int SendLength(int channel)
         {
             return channel == Channel.Reliable ? Agent.ReliableSize(maxUnit, receiveWindow) : Agent.UnreliableSize(maxUnit);
         }

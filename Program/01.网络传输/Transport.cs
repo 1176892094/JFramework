@@ -91,7 +91,7 @@ namespace JFramework.Net
             server.AfterUpdate();
         }
 
-        public int MessageSize(int channel)
+        public int SendLength(int channel)
         {
             return channel == Channel.Reliable ? Agent.ReliableSize(maxUnit, receiveWindow) : Agent.UnreliableSize(maxUnit);
         }

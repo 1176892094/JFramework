@@ -211,9 +211,9 @@ namespace JFramework.Net
             }
         }
 
-        public override int MessageSize(int channel)
+        public override int SendLength(int channel)
         {
-            return transport.MessageSize(channel);
+            return transport.SendLength(channel);
         }
 
         public override void SendToClient(int clientId, ArraySegment<byte> segment, int channel = Channel.Reliable)

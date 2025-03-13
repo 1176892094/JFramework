@@ -100,6 +100,8 @@ namespace JFramework
 
             unityIcon = EditorGUIUtility.IconContent("UnityLogo");
             prefabIcon = EditorGUIUtility.IconContent("Prefab Icon");
+           // targetIcon = EditorGUIUtility.IconContent("Transform Icon");
+           // panelIcon = EditorGUIUtility.IconContent("d_RectTransform Icon");
             objectIcon = EditorGUIUtility.IconContent("GameObject Icon");
             scriptIcon = EditorGUIUtility.IconContent("cs Script Icon");
 

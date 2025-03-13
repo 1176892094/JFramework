@@ -28,7 +28,7 @@ namespace JFramework.Net
         public Action<int> OnServerDisconnect;
         public Action<int, ArraySegment<byte>, int> OnServerReceive;
         
-        public abstract int MessageSize(int channel);
+        public abstract int SendLength(int channel);
         public abstract void SendToClient(int clientId, ArraySegment<byte> segment, int channel = Channel.Reliable);
         public abstract void SendToServer(ArraySegment<byte> segment, int channel = Channel.Reliable);
         public abstract void StartServer();

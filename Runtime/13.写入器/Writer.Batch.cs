@@ -17,18 +17,18 @@ namespace JFramework
     internal class WriterBatch
     {
         private readonly Queue<MemoryWriter> writers = new Queue<MemoryWriter>();
+        private readonly int maxLength;
         private MemoryWriter writer;
-        private readonly int message;
 
-        public WriterBatch(int message)
+        public WriterBatch(int maxLength)
         {
-            this.message = message;
+            this.maxLength = maxLength;
         }
 
         public void AddMessage(ArraySegment<byte> segment, double remoteTime)
         {
             var length = Service.Long.Length((ulong)segment.Count);
-            if (writer != null && writer.position + length + segment.Count > message)
+            if (writer != null && writer.position + length + segment.Count > maxLength)
             {
                 writers.Enqueue(writer);
                 writer = null;
