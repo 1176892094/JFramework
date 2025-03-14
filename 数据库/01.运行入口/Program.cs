@@ -12,12 +12,16 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
+using System.Reflection;
 using Newtonsoft.Json;
 
 namespace JFramework.Net
 {
     internal class Program
     {
+        public static Setting Setting;
+        
         private static void Main(string[] args)
         {
             new Program().StartServer();
@@ -28,9 +32,40 @@ namespace JFramework.Net
             Log.Info = Info;
             Log.Warn = Warn;
             Log.Error = Error;
-            if (!RestUtility.StartServer(20975))
+            try
             {
-                Log.Error("请以管理员身份运行或检查端口是否被占用。");
+                Log.Info("运行服务器...");
+                if (!File.Exists("service.json"))
+                {
+                    var contents = JsonConvert.SerializeObject(new Setting(), Formatting.Indented);
+                    File.WriteAllText("service.json", contents);
+
+                    Log.Warn("请将 service.json 文件配置正确并重新运行。");
+                    Console.ReadKey();
+                    Environment.Exit(0);
+                    return;
+                }
+                
+                Setting = JsonConvert.DeserializeObject<Setting>(File.ReadAllText("service.json"));
+                Log.Info("加载程序集...");
+                Assembly.LoadFile(Path.GetFullPath("JFramework.dll"));
+                Assembly.LoadFile(Path.GetFullPath("JFramework.Kcp.dll"));
+
+                Log.Info("开始进行传输...");
+                if (Setting.UseEndPoint)
+                {
+                    Log.Info("开启REST服务...");
+                    if (!RestUtility.StartServer(Setting.RestPort))
+                    {
+                        Log.Error("请以管理员身份运行或检查端口是否被占用。");
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                Log.Error(e.ToString());
+                Console.ReadKey();
+                Environment.Exit(0);
             }
 
             return;

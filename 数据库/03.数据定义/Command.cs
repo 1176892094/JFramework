@@ -15,7 +15,7 @@ using MySql.Data.MySqlClient;
 
 namespace JFramework.Net
 {
-    public sealed class Command
+    public readonly struct Command
     {
         private readonly string database;
 

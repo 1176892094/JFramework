@@ -9,23 +9,57 @@
 // # Description: This is an automatically generated comment.
 // *********************************************************************************
 
+using System;
+
 namespace JFramework.Net
 {
-    public static class Setting
+    [Serializable]
+    public class Setting
     {
-        public const string ADDRESS = "localhost";
-        public const string DATABASE = "Forest";
-        public const string USERNAME = "root";
-        public const string PASSWORD = "jinyijie";
-
-        public static string GetConnection(string username, string password)
+        /// <summary>
+        /// 连接地址
+        /// </summary>
+        public string Address = "localhost";
+        
+        /// <summary>
+        /// 数据库
+        /// </summary>
+        public string Database = "Forest";
+        
+        /// <summary>
+        /// 用户名
+        /// </summary>
+        public string Username = "root";
+        
+        /// <summary>
+        /// 密码
+        /// </summary>
+        public string Password = "jinyijie";
+        
+        /// <summary>
+        /// Rest服务器端口
+        /// </summary>
+        public ushort RestPort = 20974;
+        
+        /// <summary>
+        /// 是否启用Rest服务
+        /// </summary>
+        public bool UseEndPoint = true;
+        
+        /// <summary>
+        /// 获取数据库连接
+        /// </summary>
+        /// <param name="username">验证用户名</param>
+        /// <param name="password">验证密码</param>
+        /// <returns></returns>
+        public string GetConnection(string username, string password)
         {
-            if (username != USERNAME || password != PASSWORD)
+            if (username != Username || password != Password)
             {
                 return null;
             }
 
-            return $"Server={ADDRESS};Database={DATABASE};User ID={username};Password={password};";
+            return $"Server={Address};Database={Database};User ID={username};Password={password};";
         }
     }
 }
