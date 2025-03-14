@@ -26,10 +26,10 @@ namespace JFramework
         private readonly int unreliableSize;
         private readonly Stopwatch watch = new Stopwatch();
         private Kcp kcp;
-        internal State state;
         private uint timeout;
         private uint pingTime;
         private uint receiveTime;
+        protected State state;
         protected uint cookie;
 
         protected Agent(Setting setting, uint cookie = 0)

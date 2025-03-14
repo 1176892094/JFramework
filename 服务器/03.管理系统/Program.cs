@@ -40,7 +40,7 @@ namespace JFramework.Net
                 if (!File.Exists("setting.json"))
                 {
                     var contents = JsonConvert.SerializeObject(new Setting(), Formatting.Indented);
-                    await File.WriteAllTextAsync("setting.json", contents);
+                    File.WriteAllText("setting.json", contents);
 
                     Log.Warn("请将 setting.json 文件配置正确并重新运行。");
                     Console.ReadKey();
@@ -48,7 +48,7 @@ namespace JFramework.Net
                     return;
                 }
 
-                Setting = JsonConvert.DeserializeObject<Setting>(await File.ReadAllTextAsync("setting.json"));
+                Setting = JsonConvert.DeserializeObject<Setting>(File.ReadAllText("setting.json"));
 
                 Log.Info("加载程序集...");
                 Assembly.LoadFile(Path.GetFullPath("JFramework.dll"));
