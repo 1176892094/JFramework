@@ -9,9 +9,9 @@
 // # Description: This is an automatically generated comment.
 // *********************************************************************************
 
-namespace Runtime
+namespace JFramework.Net
 {
-    public static class Settings
+    public static class Setting
     {
         public const string ADDRESS = "localhost";
         public const string DATABASE = "Forest";

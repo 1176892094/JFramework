@@ -12,7 +12,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace Runtime
+namespace JFramework.Net
 {
     [Serializable]
     public struct SqlSettingManager

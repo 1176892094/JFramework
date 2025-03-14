@@ -11,7 +11,7 @@
 
 using System;
 
-namespace Runtime
+namespace JFramework.Net
 {
     [Serializable]
     public struct LoginRequest

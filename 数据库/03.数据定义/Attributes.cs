@@ -11,7 +11,7 @@
 
 using System;
 
-namespace Runtime
+namespace JFramework.Net
 {
     [AttributeUsage(AttributeTargets.Property)]
     public class ColumnAttribute : Attribute

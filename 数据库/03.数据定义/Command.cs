@@ -13,13 +13,13 @@ using System.Collections.Generic;
 using System.Data;
 using MySql.Data.MySqlClient;
 
-namespace Runtime
+namespace JFramework.Net
 {
-    public sealed class MySqlProxy
+    public sealed class Command
     {
         private readonly string database;
 
-        public MySqlProxy(string database)
+        public Command(string database)
         {
             this.database = database;
         }

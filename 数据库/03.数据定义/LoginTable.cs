@@ -11,7 +11,7 @@
 
 using System;
 
-namespace Runtime
+namespace JFramework.Net
 {
     public class LoginTable
     {
@@ -21,6 +21,7 @@ namespace Runtime
         [Column] public int userId { get; set; }
         
         [Column] public int userData { get; set; }
+        
         [Column] public DateTime loginTime { get; set; }
 
         [Column] public DateTime updateTime { get; set; }

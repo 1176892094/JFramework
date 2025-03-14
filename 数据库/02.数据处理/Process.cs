@@ -15,11 +15,11 @@ using System.Data;
 using System.Linq;
 using System.Reflection;
 
-namespace Runtime
+namespace JFramework.Net
 {
-    public static class MySqlUtils
+    public static class Process
     {
-        public static int Insert<T>(MySqlProxy proxy, T entity)
+        public static int Insert<T>(Command proxy, T entity)
         {
             var parameters = new Dictionary<string, object>();
             var properties = typeof(T).GetProperties();
@@ -35,7 +35,7 @@ namespace Runtime
             return Insert<T>(proxy, parameters);
         }
 
-        public static int Update<T>(MySqlProxy proxy, T entity)
+        public static int Update<T>(Command proxy, T entity)
         {
             var parameter = new KeyValuePair<string, object>();
             var parameters = new Dictionary<string, object>();
@@ -58,7 +58,7 @@ namespace Runtime
             return Update<T>(proxy, parameter, parameters);
         }
 
-        public static int Delete<T>(MySqlProxy proxy, object primaryValue)
+        public static int Delete<T>(Command proxy, object primaryValue)
         {
             var primaryKey = string.Empty;
             var properties = typeof(T).GetProperties();
@@ -85,7 +85,7 @@ namespace Runtime
             return proxy.ExecuteNonQuery(query, parameters);
         }
 
-        public static List<T> Select<T>(MySqlProxy proxy, string clause = "", Dictionary<string, object> parameters = null) where T : new()
+        public static List<T> Select<T>(Command proxy, string clause = "", Dictionary<string, object> parameters = null) where T : new()
         {
             var properties = typeof(T).GetProperties();
 
@@ -125,7 +125,7 @@ namespace Runtime
             return results;
         }
 
-        public static int Insert<T>(MySqlProxy proxy, Dictionary<string, object> parameters)
+        public static int Insert<T>(Command proxy, Dictionary<string, object> parameters)
         {
             var inserts = parameters.Keys.Select(field => $"@{field}").ToList();
             var query = $"INSERT INTO {typeof(T).Name} ({string.Join(", ", parameters.Keys)}) VALUES ({string.Join(", ", inserts)})";
@@ -133,7 +133,7 @@ namespace Runtime
             return proxy.ExecuteNonQuery(query, parameters);
         }
 
-        public static int Update<T>(MySqlProxy proxy, KeyValuePair<string, object> parameter, Dictionary<string, object> parameters)
+        public static int Update<T>(Command proxy, KeyValuePair<string, object> parameter, Dictionary<string, object> parameters)
         {
             var updates = parameters.Keys.Select(field => $"{field} = @{field}").ToList();
             var query = $"UPDATE {typeof(T).Name} SET {string.Join(", ", updates)} WHERE {parameter.Key} = @{parameter.Key}";
