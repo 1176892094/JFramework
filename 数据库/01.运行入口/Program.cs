@@ -21,7 +21,7 @@ namespace JFramework.Net
     internal class Program
     {
         private static Setting Setting;
-        
+
         private static void Main(string[] args)
         {
             new Program().StartServer();
@@ -44,7 +44,7 @@ namespace JFramework.Net
                     Environment.Exit(0);
                     return;
                 }
-                
+
                 Setting = JsonConvert.DeserializeObject<Setting>(File.ReadAllText("service.json"));
                 Log.Info("加载程序集...");
                 Assembly.LoadFile(Path.GetFullPath("JFramework.dll"));
@@ -59,6 +59,8 @@ namespace JFramework.Net
                         Log.Error("请以管理员身份运行或检查端口是否被占用。");
                     }
                 }
+
+                Console.ReadKey();
             }
             catch (Exception e)
             {
