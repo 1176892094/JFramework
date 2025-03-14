@@ -14,7 +14,7 @@ using System;
 namespace JFramework.Net
 {
     [Serializable]
-    public class Setting
+    internal class Setting
     {
         /// <summary>
         /// 连接地址
@@ -35,7 +35,7 @@ namespace JFramework.Net
         /// 密码
         /// </summary>
         public string Password = "jinyijie";
-        
+
         /// <summary>
         /// Rest服务器端口
         /// </summary>

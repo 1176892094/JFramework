@@ -13,15 +13,14 @@ using System;
 
 namespace JFramework.Net
 {
-    public class LoginTable
+    internal class LoginTable
     {
-        [Key] 
-        [Column] public string userName { get; set; }
+        [Key] [Column] public string userName { get; set; }
 
         [Column] public int userId { get; set; }
-        
+
         [Column] public int userData { get; set; }
-        
+
         [Column] public DateTime loginTime { get; set; }
 
         [Column] public DateTime updateTime { get; set; }

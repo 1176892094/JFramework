@@ -17,7 +17,7 @@ using System.Reflection;
 
 namespace JFramework.Net
 {
-    public static class Process
+    internal static class Process
     {
         public static int Insert<T>(Command proxy, T entity)
         {

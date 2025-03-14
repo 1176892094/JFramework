@@ -21,7 +21,7 @@ using Newtonsoft.Json;
 namespace JFramework.Net
 {
     [RestResource]
-    public class Request
+    internal class RestRequest
     {
         [RestRoute("Post", "api/server/login")]
         public async Task Login(IHttpContext context)

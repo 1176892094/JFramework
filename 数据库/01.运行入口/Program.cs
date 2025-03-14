@@ -20,7 +20,7 @@ namespace JFramework.Net
 {
     internal class Program
     {
-        public static Setting Setting;
+        private static Setting Setting;
         
         private static void Main(string[] args)
         {
@@ -39,7 +39,6 @@ namespace JFramework.Net
                 {
                     var contents = JsonConvert.SerializeObject(new Setting(), Formatting.Indented);
                     File.WriteAllText("service.json", contents);
-
                     Log.Warn("请将 service.json 文件配置正确并重新运行。");
                     Console.ReadKey();
                     Environment.Exit(0);
