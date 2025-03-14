@@ -18,7 +18,7 @@
 
 4.数据库 (控制台程序)
 
-程序集：JFramework.Sql.dll
+程序集：JFramework.Mysql.dll
 
 主要功能：数据插入，数据查询，数据删除，数据更新。
 
