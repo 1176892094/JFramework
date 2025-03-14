@@ -89,4 +89,6 @@ global.json
 /服务器/obj
 /协议库/bin
 /协议库/obj
+/数据库/obj
+/数据库/bin
 .DS_Store
