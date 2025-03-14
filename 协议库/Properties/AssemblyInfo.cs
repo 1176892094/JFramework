@@ -14,8 +14,8 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 [assembly: InternalsVisibleTo("JFramework.Net")]
-[assembly: InternalsVisibleTo("JFramework.Sql")]
 [assembly: InternalsVisibleTo("JFramework.Lobby")]
+[assembly: InternalsVisibleTo("JFramework.Mysql")]
 
 // Setting ComVisible to false makes the types in this assembly not visible 
 // to COM components.  If you need to access a type in this assembly from 

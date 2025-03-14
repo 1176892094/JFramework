@@ -18,13 +18,13 @@
 
 4.数据库 (控制台程序)
 
-程序集：JFramework.Mysql.dll
+程序集：JFramework.Mysql.exe
 
 主要功能：数据插入，数据查询，数据删除，数据更新。
 
 5.服务器 (控制台程序)
 
-程序集：JFramework.Lobby.dll
+程序集：JFramework.Lobby.exe
 
 主要功能：大厅匹配，房间列表，主机踢人。
 
