@@ -25,6 +25,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 [assembly: InternalsVisibleTo("JFramework.Log")]
+[assembly: InternalsVisibleTo("JFramework.Sql")]
 [assembly: InternalsVisibleTo("JFramework.Sdk")]
 [assembly: InternalsVisibleTo("JFramework.Net")]
 
