@@ -32,13 +32,13 @@ namespace JFramework.Common
 
         public static string ScriptPath
         {
-            get => EditorPrefs.GetString(nameof(ScriptPath), "Assets/Template/DataTable");
+            get => EditorPrefs.GetString(nameof(ScriptPath), "Assets/Scripts/DataTable");
             set => EditorPrefs.SetString(nameof(ScriptPath), value);
         }
 
         public static string DataTablePath
         {
-            get => EditorPrefs.GetString(nameof(DataTablePath), "Assets/Scripts/DataTable");
+            get => EditorPrefs.GetString(nameof(DataTablePath), "Assets/Template/DataTable");
             set => EditorPrefs.SetString(nameof(DataTablePath), value);
         }
 
