@@ -25,10 +25,10 @@ namespace JFramework.Editor
         /// </summary>
         /// <param name="assembly"></param>
         /// <param name="module"></param>
-        /// <param name="writers"></param>
-        /// <param name="readers"></param>
+        /// <param name="setters"></param>
+        /// <param name="getters"></param>
         /// <param name="td"></param>
-        public static void RuntimeInitializeOnLoad(AssemblyDefinition assembly, Module module, Writer writers, Reader readers, TypeDefinition td)
+        public static void RuntimeInitializeOnLoad(AssemblyDefinition assembly, Module module, Setter setters, Getter getters, TypeDefinition td)
         {
             var method = new MethodDefinition(nameof(RuntimeInitializeOnLoad), MethodAttributes.Public | MethodAttributes.Static, module.Import(typeof(void)));
 
@@ -40,8 +40,8 @@ namespace JFramework.Editor
             }
 
             var worker = method.Body.GetILProcessor();
-            writers.InitializeWriters(worker);
-            readers.InitializeReaders(worker);
+            setters.InitializeSetters(worker);
+            getters.InitializeGetters(worker);
             worker.Emit(OpCodes.Ret);
             td.Methods.Add(method);
         }
@@ -79,14 +79,14 @@ namespace JFramework.Editor
         /// <param name="assembly"></param>
         /// <param name="resolver"></param>
         /// <param name="logger"></param>
-        /// <param name="writer"></param>
-        /// <param name="reader"></param>
+        /// <param name="setter"></param>
+        /// <param name="getter"></param>
         /// <param name="failed"></param>
         /// <returns></returns>
-        public static bool Process(AssemblyDefinition assembly, IAssemblyResolver resolver, Logger logger, Writer writer, Reader reader, ref bool failed)
+        public static bool Process(AssemblyDefinition assembly, IAssemblyResolver resolver, Logger logger, Setter setter, Getter getter, ref bool failed)
         {
-            ProcessAssembly(assembly, resolver, logger, writer, reader, ref failed);
-            return ProcessCustomCode(assembly, assembly, writer, reader, ref failed);
+            ProcessAssembly(assembly, resolver, logger, setter, getter, ref failed);
+            return ProcessCustomCode(assembly, assembly, setter, getter, ref failed);
         }
 
         /// <summary>
@@ -95,10 +95,10 @@ namespace JFramework.Editor
         /// <param name="assembly"></param>
         /// <param name="resolver"></param>
         /// <param name="logger"></param>
-        /// <param name="writer"></param>
-        /// <param name="reader"></param>
+        /// <param name="setter"></param>
+        /// <param name="getter"></param>
         /// <param name="failed"></param>
-        private static void ProcessAssembly(AssemblyDefinition assembly, IAssemblyResolver resolver, Logger logger, Writer writer, Reader reader, ref bool failed)
+        private static void ProcessAssembly(AssemblyDefinition assembly, IAssemblyResolver resolver, Logger logger, Setter setter, Getter getter, ref bool failed)
         {
             AssemblyNameReference assemblyRef = null;
             foreach (var reference in assembly.MainModule.AssemblyReferences)
@@ -115,7 +115,7 @@ namespace JFramework.Editor
                 var assemblyDef = resolver.Resolve(assemblyRef);
                 if (assemblyDef != null)
                 {
-                    ProcessCustomCode(assembly, assemblyDef, writer, reader, ref failed);
+                    ProcessCustomCode(assembly, assemblyDef, setter, getter, ref failed);
                 }
                 else
                 {
@@ -133,25 +133,25 @@ namespace JFramework.Editor
         /// </summary>
         /// <param name="assembly"></param>
         /// <param name="assemblyDef"></param>
-        /// <param name="writer"></param>
-        /// <param name="reader"></param>
+        /// <param name="setter"></param>
+        /// <param name="getter"></param>
         /// <param name="failed"></param>
         /// <returns></returns>
-        private static bool ProcessCustomCode(AssemblyDefinition assembly, AssemblyDefinition assemblyDef, Writer writer, Reader reader, ref bool failed)
+        private static bool ProcessCustomCode(AssemblyDefinition assembly, AssemblyDefinition assemblyDef, Setter setter, Getter getter, ref bool failed)
         {
             var changed = false;
             foreach (var td in assemblyDef.MainModule.Types)
             {
                 if (td.IsAbstract && td.IsSealed)
                 {
-                    changed |= ProcessWriter(assembly, td, writer);
-                    changed |= ProcessReader(assembly, td, reader);
+                    changed |= ProcessSetter(assembly, td, setter);
+                    changed |= ProcessGetter(assembly, td, getter);
                 }
             }
 
             foreach (var td in assemblyDef.MainModule.Types)
             {
-                changed |= ProcessMessage(assembly.MainModule, writer, reader, td, ref failed);
+                changed |= ProcessMessage(assembly.MainModule, setter, getter, td, ref failed);
             }
 
             return changed;
@@ -162,9 +162,9 @@ namespace JFramework.Editor
         /// </summary>
         /// <param name="assembly"></param>
         /// <param name="td"></param>
-        /// <param name="writer"></param>
+        /// <param name="setter"></param>
         /// <returns></returns>
-        private static bool ProcessWriter(AssemblyDefinition assembly, TypeDefinition td, Writer writer)
+        private static bool ProcessSetter(AssemblyDefinition assembly, TypeDefinition td, Setter setter)
         {
             var change = false;
             foreach (var md in td.Methods)
@@ -172,7 +172,7 @@ namespace JFramework.Editor
                 if (md.Parameters.Count != 2)
                     continue;
 
-                if (!md.Parameters[0].ParameterType.Is<MemoryWriter>())
+                if (!md.Parameters[0].ParameterType.Is<MemorySetter>())
                     continue;
 
                 if (!md.ReturnType.Is(typeof(void)))
@@ -184,7 +184,7 @@ namespace JFramework.Editor
                 if (md.HasGenericParameters)
                     continue;
 
-                writer.Register(md.Parameters[1].ParameterType, assembly.MainModule.ImportReference(md));
+                setter.Register(md.Parameters[1].ParameterType, assembly.MainModule.ImportReference(md));
                 change = true;
             }
 
@@ -196,9 +196,9 @@ namespace JFramework.Editor
         /// </summary>
         /// <param name="assembly"></param>
         /// <param name="td"></param>
-        /// <param name="reader"></param>
+        /// <param name="getter"></param>
         /// <returns></returns>
-        private static bool ProcessReader(AssemblyDefinition assembly, TypeDefinition td, Reader reader)
+        private static bool ProcessGetter(AssemblyDefinition assembly, TypeDefinition td, Getter getter)
         {
             var change = false;
             foreach (var md in td.Methods)
@@ -206,7 +206,7 @@ namespace JFramework.Editor
                 if (md.Parameters.Count != 1)
                     continue;
 
-                if (!md.Parameters[0].ParameterType.Is<MemoryReader>())
+                if (!md.Parameters[0].ParameterType.Is<MemoryGetter>())
                     continue;
 
                 if (md.ReturnType.Is(typeof(void)))
@@ -218,7 +218,7 @@ namespace JFramework.Editor
                 if (md.HasGenericParameters)
                     continue;
 
-                reader.Register(md.ReturnType, assembly.MainModule.ImportReference(md));
+                getter.Register(md.ReturnType, assembly.MainModule.ImportReference(md));
                 change = true;
             }
 
@@ -229,24 +229,24 @@ namespace JFramework.Editor
         /// 加载读写流的信息
         /// </summary>
         /// <param name="module"></param>
-        /// <param name="writer"></param>
-        /// <param name="reader"></param>
+        /// <param name="setter"></param>
+        /// <param name="getter"></param>
         /// <param name="td"></param>
         /// <param name="failed"></param>
         /// <returns></returns>
-        private static bool ProcessMessage(ModuleDefinition module, Writer writer, Reader reader, TypeDefinition td, ref bool failed)
+        private static bool ProcessMessage(ModuleDefinition module, Setter setter, Getter getter, TypeDefinition td, ref bool failed)
         {
             var change = false;
             if (!td.IsAbstract && !td.IsInterface && td.IsImplement<IMessage>())
             {
-                reader.GetFunction(module.ImportReference(td), ref failed);
-                writer.GetFunction(module.ImportReference(td), ref failed);
+                getter.GetFunction(module.ImportReference(td), ref failed);
+                setter.GetFunction(module.ImportReference(td), ref failed);
                 change = true;
             }
 
             foreach (var nested in td.NestedTypes)
             {
-                change |= ProcessMessage(module, writer, reader, nested, ref failed);
+                change |= ProcessMessage(module, setter, getter, nested, ref failed);
             }
 
             return change;

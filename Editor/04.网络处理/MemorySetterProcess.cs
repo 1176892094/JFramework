@@ -19,7 +19,7 @@ using Object = UnityEngine.Object;
 
 namespace JFramework.Editor
 {
-    internal class Writer
+    internal class Setter
     {
         private readonly Dictionary<TypeReference, MethodReference> methods = new Dictionary<TypeReference, MethodReference>(new Comparer());
         private readonly Module module;
@@ -27,7 +27,7 @@ namespace JFramework.Editor
         private readonly TypeDefinition generate;
         private readonly AssemblyDefinition assembly;
 
-        public Writer(AssemblyDefinition assembly, Module module, TypeDefinition generate, Logger logger)
+        public Setter(AssemblyDefinition assembly, Module module, TypeDefinition generate, Logger logger)
         {
             this.logger = logger;
             this.module = module;
@@ -62,7 +62,7 @@ namespace JFramework.Editor
                     return null;
                 }
 
-                return AddCollection(tr, tr.GetElementType(), nameof(Net.Extensions.WriteArray), ref failed);
+                return AddCollection(tr, tr.GetElementType(), nameof(Net.Extensions.SetArray), ref failed);
             }
 
             var td = tr.Resolve();
@@ -92,7 +92,7 @@ namespace JFramework.Editor
             {
                 var genericInstance = (GenericInstanceType)tr;
                 var elementType = genericInstance.GenericArguments[0];
-                return AddCollection(tr, elementType, nameof(Net.Extensions.WriteList), ref failed);
+                return AddCollection(tr, elementType, nameof(Net.Extensions.SetList), ref failed);
             }
 
             if (tr.IsDerivedFrom<NetworkBehaviour>() || tr.Is<NetworkBehaviour>())
@@ -155,7 +155,7 @@ namespace JFramework.Editor
         {
             var genericInstance = (GenericInstanceType)tr;
             var elementType = genericInstance.GenericArguments[0];
-            return AddCollection(tr, elementType, nameof(Net.Extensions.WriteArraySegment), ref failed);
+            return AddCollection(tr, elementType, nameof(Net.Extensions.SetArraySegment), ref failed);
         }
 
         private MethodDefinition AddCollection(TypeReference tr, TypeReference element, string name, ref bool failed)
@@ -217,7 +217,7 @@ namespace JFramework.Editor
         private MethodDefinition AddMethod(TypeReference tr)
         {
             var md = new MethodDefinition($"Write{Service.Hash.Id(tr.FullName)}", Const.RAW_ATTRS, module.Import(typeof(void)));
-            md.Parameters.Add(new ParameterDefinition("writer", ParameterAttributes.None, module.Import<MemoryWriter>()));
+            md.Parameters.Add(new ParameterDefinition("setter", ParameterAttributes.None, module.Import<MemorySetter>()));
             md.Parameters.Add(new ParameterDefinition("value", ParameterAttributes.None, tr));
             md.Body.InitLocals = true;
             Register(tr, md);
@@ -260,13 +260,13 @@ namespace JFramework.Editor
             return true;
         }
 
-        internal void InitializeWriters(ILProcessor worker)
+        internal void InitializeSetters(ILProcessor worker)
         {
             var main = assembly.MainModule;
-            var reader = main.ImportReference(typeof(Writer<>));
+            var getter = main.ImportReference(typeof(Setter<>));
             var func = main.ImportReference(typeof(Action<,>));
-            var tr = main.ImportReference(typeof(MemoryWriter));
-            var fr = main.ImportReference(typeof(Writer<>).GetField(nameof(Writer<object>.write)));
+            var tr = main.ImportReference(typeof(MemorySetter));
+            var fr = main.ImportReference(typeof(Setter<>).GetField(nameof(Setter<object>.setter)));
             var mr = main.ImportReference(typeof(Action<,>).GetConstructors()[0]);
             foreach (var (type, method) in methods)
             {
@@ -274,7 +274,7 @@ namespace JFramework.Editor
                 worker.Emit(OpCodes.Ldftn, method);
                 var instance = func.MakeGenericInstanceType(tr, type);
                 worker.Emit(OpCodes.Newobj, mr.MakeHostInstanceGeneric(assembly.MainModule, instance));
-                instance = reader.MakeGenericInstanceType(type);
+                instance = getter.MakeGenericInstanceType(type);
                 worker.Emit(OpCodes.Stsfld, fr.SpecializeField(assembly.MainModule, instance));
             }
         }

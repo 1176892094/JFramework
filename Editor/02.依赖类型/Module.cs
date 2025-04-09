@@ -152,12 +152,12 @@ namespace JFramework.Editor
         /// <summary>
         /// NetworkWriter.Pop
         /// </summary>
-        public readonly MethodReference PopWriterRef;
+        public readonly MethodReference PopSetterRef;
 
         /// <summary>
         /// NetworkWriter.Push
         /// </summary>
-        public readonly MethodReference PushWriterRef;
+        public readonly MethodReference PushSetterRef;
 
         /// <summary>
         /// Type.GetTypeFromHandle
@@ -210,7 +210,7 @@ namespace JFramework.Editor
             NetworkServerActiveRef = Resolve.GetMethod(NetworkServerType, assembly, logger, "get_isActive", ref failed);
 
             var StreamExtensionType = Import(typeof(Net.Extensions));
-            ReadNetworkBehaviourGeneric = Resolve.GetMethod(StreamExtensionType, assembly, logger, method => method.Name == nameof(Net.Extensions.ReadNetworkBehaviour) && method.HasGenericParameters, ref failed);
+            ReadNetworkBehaviourGeneric = Resolve.GetMethod(StreamExtensionType, assembly, logger, method => method.Name == nameof(Net.Extensions.GetNetworkBehaviour) && method.HasGenericParameters, ref failed);
 
             var NetworkBehaviourType = Import<NetworkBehaviour>();
             NetworkBehaviourDirtyRef = Resolve.GetProperty(NetworkBehaviourType, assembly, "syncVarDirty");
@@ -249,9 +249,9 @@ namespace JFramework.Editor
             var Type = Import(typeof(Type));
             getTypeFromHandleRef = Resolve.GetMethod(Type, assembly, logger, "GetTypeFromHandle", ref failed);
 
-            var NetworkWriterType = Import(typeof(MemoryWriter));
-            PopWriterRef = Resolve.GetMethod(NetworkWriterType, assembly, logger, "Pop", ref failed);
-            PushWriterRef = Resolve.GetMethod(NetworkWriterType, assembly, logger, "Push", ref failed);
+            var NetworkWriterType = Import(typeof(MemorySetter));
+            PopSetterRef = Resolve.GetMethod(NetworkWriterType, assembly, logger, "Pop", ref failed);
+            PushSetterRef = Resolve.GetMethod(NetworkWriterType, assembly, logger, "Push", ref failed);
 
             if (Resolve.IsEditor(assembly))
             {

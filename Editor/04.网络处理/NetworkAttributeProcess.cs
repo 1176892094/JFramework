@@ -28,14 +28,14 @@ namespace JFramework.Editor
         /// ClientRpc方法
         /// </summary>
         /// <param name="module"></param>
-        /// <param name="readers"></param>
+        /// <param name="getters"></param>
         /// <param name="logger"></param>
         /// <param name="td"></param>
         /// <param name="md"></param>
         /// <param name="func"></param>
         /// <param name="failed"></param>
         /// <returns></returns>
-        public static MethodDefinition ProcessClientRpc(Module module, Reader readers, Logger logger, TypeDefinition td, MethodDefinition md, MethodDefinition func, ref bool failed)
+        public static MethodDefinition ProcessClientRpc(Module module, Getter getters, Logger logger, TypeDefinition td, MethodDefinition md, MethodDefinition func, ref bool failed)
         {
             var rpcName = Process.GenerateMethodName(Const.INV_METHOD, md);
             var rpc = new MethodDefinition(rpcName, Const.RPC_ATTRS, module.Import(typeof(void)));
@@ -46,7 +46,7 @@ namespace JFramework.Editor
             worker.Emit(OpCodes.Ldarg_0);
             worker.Emit(OpCodes.Castclass, td);
 
-            if (!ReadArguments(md, readers, logger, worker, InvokeMode.ClientRpc, ref failed))
+            if (!ReadArguments(md, getters, logger, worker, InvokeMode.ClientRpc, ref failed))
             {
                 return null;
             }
@@ -62,22 +62,22 @@ namespace JFramework.Editor
         /// ClientRpc方法体
         /// </summary>
         /// <param name="module"></param>
-        /// <param name="writers"></param>
+        /// <param name="setters"></param>
         /// <param name="logger"></param>
         /// <param name="td"></param>
         /// <param name="md"></param>
         /// <param name="ca"></param>
         /// <param name="failed"></param>
         /// <returns></returns>
-        public static MethodDefinition ProcessClientRpcInvoke(Module module, Writer writers, Logger logger, TypeDefinition td,
+        public static MethodDefinition ProcessClientRpcInvoke(Module module, Setter setters, Logger logger, TypeDefinition td,
             MethodDefinition md, CustomAttribute ca, ref bool failed)
         {
             var rpc = BaseInvokeMethod(logger, td, md, ref failed);
             var worker = md.Body.GetILProcessor();
             NetworkBehaviourProcess.WriteInitLocals(worker, module);
-            NetworkBehaviourProcess.WritePopWriter(worker, module);
+            NetworkBehaviourProcess.WritePopSetter(worker, module);
 
-            if (!WriteArguments(worker, writers, logger, md, InvokeMode.ClientRpc, ref failed))
+            if (!WriteArguments(worker, setters, logger, md, InvokeMode.ClientRpc, ref failed))
             {
                 return null;
             }
@@ -88,7 +88,7 @@ namespace JFramework.Editor
             worker.Emit(OpCodes.Ldloc_0);
             worker.Emit(OpCodes.Ldc_I4, ca.GetField<int>());
             worker.Emit(OpCodes.Callvirt, module.sendClientRpcInternal);
-            NetworkBehaviourProcess.WritePushWriter(worker, module);
+            NetworkBehaviourProcess.WritePushSetter(worker, module);
             worker.Emit(OpCodes.Ret);
             return rpc;
         }
@@ -97,14 +97,14 @@ namespace JFramework.Editor
         /// ServerRpc方法
         /// </summary>
         /// <param name="module"></param>
-        /// <param name="readers"></param>
+        /// <param name="getters"></param>
         /// <param name="logger"></param>
         /// <param name="td"></param>
         /// <param name="md"></param>
         /// <param name="func"></param>
         /// <param name="failed"></param>
         /// <returns></returns>
-        public static MethodDefinition ProcessServerRpc(Module module, Reader readers, Logger logger, TypeDefinition td,
+        public static MethodDefinition ProcessServerRpc(Module module, Getter getters, Logger logger, TypeDefinition td,
             MethodDefinition md, MethodDefinition func, ref bool failed)
         {
             var rpcName = Process.GenerateMethodName(Const.INV_METHOD, md);
@@ -116,7 +116,7 @@ namespace JFramework.Editor
             worker.Emit(OpCodes.Ldarg_0);
             worker.Emit(OpCodes.Castclass, td);
 
-            if (!ReadArguments(md, readers, logger, worker, InvokeMode.ServerRpc, ref failed))
+            if (!ReadArguments(md, getters, logger, worker, InvokeMode.ServerRpc, ref failed))
             {
                 return null;
             }
@@ -140,22 +140,22 @@ namespace JFramework.Editor
         /// ServerRpc方法体
         /// </summary>
         /// <param name="module"></param>
-        /// <param name="writers"></param>
+        /// <param name="setters"></param>
         /// <param name="logger"></param>
         /// <param name="td"></param>
         /// <param name="md"></param>
         /// <param name="ca"></param>
         /// <param name="failed"></param>
         /// <returns></returns>
-        public static MethodDefinition ProcessServerRpcInvoke(Module module, Writer writers, Logger logger, TypeDefinition td,
+        public static MethodDefinition ProcessServerRpcInvoke(Module module, Setter setters, Logger logger, TypeDefinition td,
             MethodDefinition md, CustomAttribute ca, ref bool failed)
         {
             var rpc = BaseInvokeMethod(logger, td, md, ref failed);
             var worker = md.Body.GetILProcessor();
             NetworkBehaviourProcess.WriteInitLocals(worker, module);
-            NetworkBehaviourProcess.WritePopWriter(worker, module);
+            NetworkBehaviourProcess.WritePopSetter(worker, module);
 
-            if (!WriteArguments(worker, writers, logger, md, InvokeMode.ServerRpc, ref failed))
+            if (!WriteArguments(worker, setters, logger, md, InvokeMode.ServerRpc, ref failed))
             {
                 return null;
             }
@@ -166,7 +166,7 @@ namespace JFramework.Editor
             worker.Emit(OpCodes.Ldloc_0);
             worker.Emit(OpCodes.Ldc_I4, ca.GetField<int>());
             worker.Emit(OpCodes.Call, module.sendServerRpcInternal);
-            NetworkBehaviourProcess.WritePushWriter(worker, module);
+            NetworkBehaviourProcess.WritePushSetter(worker, module);
             worker.Emit(OpCodes.Ret);
 
             return rpc;
@@ -176,14 +176,14 @@ namespace JFramework.Editor
         /// TargetRpc方法
         /// </summary>
         /// <param name="module"></param>
-        /// <param name="readers"></param>
+        /// <param name="getters"></param>
         /// <param name="logger"></param>
         /// <param name="td"></param>
         /// <param name="md"></param>
         /// <param name="func"></param>
         /// <param name="failed"></param>
         /// <returns></returns>
-        public static MethodDefinition ProcessTargetRpc(Module module, Reader readers, Logger logger, TypeDefinition td,
+        public static MethodDefinition ProcessTargetRpc(Module module, Getter getters, Logger logger, TypeDefinition td,
             MethodDefinition md, MethodDefinition func, ref bool failed)
         {
             var rpcName = Process.GenerateMethodName(Const.INV_METHOD, md);
@@ -200,7 +200,7 @@ namespace JFramework.Editor
                 worker.Emit(OpCodes.Ldnull);
             }
 
-            if (!ReadArguments(md, readers, logger, worker, InvokeMode.TargetRpc, ref failed))
+            if (!ReadArguments(md, getters, logger, worker, InvokeMode.TargetRpc, ref failed))
             {
                 return null;
             }
@@ -216,22 +216,22 @@ namespace JFramework.Editor
         /// TargetRpc方法体
         /// </summary>
         /// <param name="module"></param>
-        /// <param name="writers"></param>
+        /// <param name="setters"></param>
         /// <param name="logger"></param>
         /// <param name="td"></param>
         /// <param name="md"></param>
         /// <param name="ca"></param>
         /// <param name="failed"></param>
         /// <returns></returns>
-        public static MethodDefinition ProcessTargetRpcInvoke(Module module, Writer writers, Logger logger, TypeDefinition td,
+        public static MethodDefinition ProcessTargetRpcInvoke(Module module, Setter setters, Logger logger, TypeDefinition td,
             MethodDefinition md, CustomAttribute ca, ref bool failed)
         {
             var rpc = BaseInvokeMethod(logger, td, md, ref failed);
             var worker = md.Body.GetILProcessor();
             NetworkBehaviourProcess.WriteInitLocals(worker, module);
-            NetworkBehaviourProcess.WritePopWriter(worker, module);
+            NetworkBehaviourProcess.WritePopSetter(worker, module);
 
-            if (!WriteArguments(worker, writers, logger, md, InvokeMode.TargetRpc, ref failed))
+            if (!WriteArguments(worker, setters, logger, md, InvokeMode.TargetRpc, ref failed))
             {
                 return null;
             }
@@ -243,7 +243,7 @@ namespace JFramework.Editor
             worker.Emit(OpCodes.Ldloc_0);
             worker.Emit(OpCodes.Ldc_I4, ca.GetField<int>());
             worker.Emit(OpCodes.Callvirt, module.sendTargetRpcInternal);
-            NetworkBehaviourProcess.WritePushWriter(worker, module);
+            NetworkBehaviourProcess.WritePushSetter(worker, module);
             worker.Emit(OpCodes.Ret);
             return rpc;
         }
@@ -252,13 +252,13 @@ namespace JFramework.Editor
         /// 写入参数
         /// </summary>
         /// <param name="worker"></param>
-        /// <param name="writers"></param>
+        /// <param name="setters"></param>
         /// <param name="logger"></param>
         /// <param name="method"></param>
         /// <param name="mode"></param>
         /// <param name="failed"></param>
         /// <returns></returns>
-        private static bool WriteArguments(ILProcessor worker, Writer writers, Logger logger, MethodDefinition method, InvokeMode mode,
+        private static bool WriteArguments(ILProcessor worker, Setter setters, Logger logger, MethodDefinition method, InvokeMode mode,
             ref bool failed)
         {
             var skipFirst = mode == InvokeMode.TargetRpc && HasNetworkClient(method);
@@ -277,8 +277,8 @@ namespace JFramework.Editor
                     continue;
                 }
 
-                var writer = writers.GetFunction(pd.ParameterType, ref failed);
-                if (writer == null)
+                var setter = setters.GetFunction(pd.ParameterType, ref failed);
+                if (setter == null)
                 {
                     logger.Error($"{method.Name} 有无效的参数 {pd}。不支持类型 {pd.ParameterType}。", method);
                     failed = true;
@@ -287,7 +287,7 @@ namespace JFramework.Editor
 
                 worker.Emit(OpCodes.Ldloc_0);
                 worker.Emit(OpCodes.Ldarg, argument);
-                worker.Emit(OpCodes.Call, writer);
+                worker.Emit(OpCodes.Call, setter);
                 argument += 1;
             }
 
@@ -298,13 +298,13 @@ namespace JFramework.Editor
         /// 读取参数
         /// </summary>
         /// <param name="method"></param>
-        /// <param name="readers"></param>
+        /// <param name="getters"></param>
         /// <param name="logger"></param>
         /// <param name="worker"></param>
         /// <param name="mode"></param>
         /// <param name="failed"></param>
         /// <returns></returns>
-        private static bool ReadArguments(MethodDefinition method, Reader readers, Logger logger, ILProcessor worker, InvokeMode mode,
+        private static bool ReadArguments(MethodDefinition method, Getter getters, Logger logger, ILProcessor worker, InvokeMode mode,
             ref bool failed)
         {
             var skipFirst = mode == InvokeMode.TargetRpc && HasNetworkClient(method);
@@ -323,9 +323,9 @@ namespace JFramework.Editor
                     continue;
                 }
 
-                var reader = readers.GetFunction(pd.ParameterType, ref failed);
+                var getter = getters.GetFunction(pd.ParameterType, ref failed);
 
-                if (reader == null)
+                if (getter == null)
                 {
                     logger.Error($"{method.Name} 有无效的参数 {pd}。不支持类型 {pd.ParameterType}。", method);
                     failed = true;
@@ -333,7 +333,7 @@ namespace JFramework.Editor
                 }
 
                 worker.Emit(OpCodes.Ldarg_1);
-                worker.Emit(OpCodes.Call, reader);
+                worker.Emit(OpCodes.Call, getter);
 
                 if (pd.ParameterType.Is<float>())
                 {

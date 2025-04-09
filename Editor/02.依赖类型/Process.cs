@@ -21,8 +21,8 @@ namespace JFramework.Editor
     {
         private bool failed;
         private Module module;
-        private Writer writer;
-        private Reader reader;
+        private Setter setter;
+        private Getter getter;
         private SyncVarAccess access;
         private TypeDefinition process;
         private AssemblyDefinition assembly;
@@ -52,9 +52,9 @@ namespace JFramework.Editor
                 access = new SyncVarAccess();
                 module = new Module(assembly, logger, ref failed);
                 process = new TypeDefinition(Const.GEN_TYPE, Const.GEN_NAME, Const.GEN_ATTRS, module.Import<object>());
-                writer = new Writer(assembly, module, process, logger);
-                reader = new Reader(assembly, module, process, logger);
-                change = RuntimeAttribute.Process(assembly, resolver, logger, writer, reader, ref failed);
+                setter = new Setter(assembly, module, process, logger);
+                getter = new Getter(assembly, module, process, logger);
+                change = RuntimeAttribute.Process(assembly, resolver, logger, setter, getter, ref failed);
                 
                 var mainModule = assembly.MainModule;
                 
@@ -68,7 +68,7 @@ namespace JFramework.Editor
                 {
                     SyncVarReplace.Process(mainModule, access);
                     mainModule.Types.Add(process);
-                    RuntimeAttribute.RuntimeInitializeOnLoad(assembly, module, writer, reader, process);
+                    RuntimeAttribute.RuntimeInitializeOnLoad(assembly, module, setter, getter, process);
                 }
 
                 return true;
@@ -123,7 +123,7 @@ namespace JFramework.Editor
             bool changed = false;
             foreach (TypeDefinition behaviour in behaviours)
             {
-                changed |= new NetworkBehaviourProcess(assembly, access, module, writer, reader, logger, behaviour).Process(ref failed);
+                changed |= new NetworkBehaviourProcess(assembly, access, module, setter, getter, logger, behaviour).Process(ref failed);
             }
 
             return changed;

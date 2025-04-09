@@ -19,7 +19,7 @@ using Object = UnityEngine.Object;
 
 namespace JFramework.Editor
 {
-    internal class Reader
+    internal class Getter
     {
         private readonly Dictionary<TypeReference, MethodReference> methods = new Dictionary<TypeReference, MethodReference>(new Comparer());
         private readonly Module module;
@@ -27,7 +27,7 @@ namespace JFramework.Editor
         private readonly TypeDefinition generate;
         private readonly AssemblyDefinition assembly;
 
-        public Reader(AssemblyDefinition assembly, Module module, TypeDefinition generate, Logger logger)
+        public Getter(AssemblyDefinition assembly, Module module, TypeDefinition generate, Logger logger)
         {
             this.logger = logger;
             this.module = module;
@@ -63,7 +63,7 @@ namespace JFramework.Editor
                     return null;
                 }
 
-                return AddCollection(tr, tr.GetElementType(), nameof(Net.Extensions.ReadArray), ref failed);
+                return AddCollection(tr, tr.GetElementType(), nameof(Net.Extensions.GetArray), ref failed);
             }
 
             var td = tr.Resolve();
@@ -95,7 +95,7 @@ namespace JFramework.Editor
             {
                 var genericInstance = (GenericInstanceType)tr;
                 var elementType = genericInstance.GenericArguments[0];
-                return AddCollection(tr, elementType, nameof(Net.Extensions.ReadList), ref failed);
+                return AddCollection(tr, elementType, nameof(Net.Extensions.GetList), ref failed);
             }
 
             if (tr.IsDerivedFrom<NetworkBehaviour>() || tr.Is<NetworkBehaviour>())
@@ -252,7 +252,7 @@ namespace JFramework.Editor
         private MethodDefinition AddMethod(TypeReference tr)
         {
             var md = new MethodDefinition($"Read{Service.Hash.Id(tr.FullName)}", Const.RAW_ATTRS, tr);
-            md.Parameters.Add(new ParameterDefinition("reader", ParameterAttributes.None, module.Import<MemoryReader>()));
+            md.Parameters.Add(new ParameterDefinition("getter", ParameterAttributes.None, module.Import<MemoryGetter>()));
             md.Body.InitLocals = true;
             Register(tr, md);
             generate.Methods.Add(md);
@@ -291,13 +291,13 @@ namespace JFramework.Editor
             }
         }
 
-        internal void InitializeReaders(ILProcessor worker)
+        internal void InitializeGetters(ILProcessor worker)
         {
             var main = assembly.MainModule;
-            var reader = main.ImportReference(typeof(Reader<>));
+            var getter = main.ImportReference(typeof(Getter<>));
             var func = main.ImportReference(typeof(Func<,>));
-            var tr = main.ImportReference(typeof(MemoryReader));
-            var fr = main.ImportReference(typeof(Reader<>).GetField(nameof(Reader<object>.read)));
+            var tr = main.ImportReference(typeof(MemoryGetter));
+            var fr = main.ImportReference(typeof(Getter<>).GetField(nameof(Getter<object>.getter)));
             var mr = main.ImportReference(typeof(Func<,>).GetConstructors()[0]);
             foreach (var (type, method) in methods)
             {
@@ -305,7 +305,7 @@ namespace JFramework.Editor
                 worker.Emit(OpCodes.Ldftn, method);
                 var instance = func.MakeGenericInstanceType(tr, type);
                 worker.Emit(OpCodes.Newobj, mr.MakeHostInstanceGeneric(assembly.MainModule, instance));
-                instance = reader.MakeGenericInstanceType(type);
+                instance = getter.MakeGenericInstanceType(type);
                 worker.Emit(OpCodes.Stsfld, fr.SpecializeField(assembly.MainModule, instance));
             }
         }
