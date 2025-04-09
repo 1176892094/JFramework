@@ -1,0 +1,16 @@
+{
+    "name": "JFramework.Run",
+    "rootNamespace": "",
+    "references": [
+        "JFramework"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": false,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
