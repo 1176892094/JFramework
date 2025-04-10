@@ -11,6 +11,7 @@
 
 using System;
 using System.IO;
+using System.Linq;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
 using Unity.CompilationPipeline.Common.ILPostProcessing;
@@ -20,32 +21,23 @@ namespace JFramework.Editor
     [Serializable]
     internal class NetworkProcessor : ILPostProcessor
     {
-        private readonly Log logger = new Log();
-
         public override ILPostProcessor GetInstance() => this;
 
-        public override bool WillProcess(ICompiledAssembly compiledAssembly)
+        public override bool WillProcess(ICompiledAssembly assembly)
         {
-            return compiledAssembly.Name == Const.ASSEMBLY || FindAssembly(compiledAssembly);
+            return assembly.Name == Const.ASSEMBLY || FindReference(assembly);
         }
 
-        private static bool FindAssembly(ICompiledAssembly compiledAssembly)
+        private static bool FindReference(ICompiledAssembly assembly)
         {
-            foreach (var path in compiledAssembly.References)
-            {
-                if (Path.GetFileNameWithoutExtension(path) == Const.ASSEMBLY)
-                {
-                    return true;
-                }
-            }
-
-            return false;
+            return assembly.References.Any(reference => Path.GetFileNameWithoutExtension(reference) == Const.ASSEMBLY);
         }
 
-        public override ILPostProcessResult Process(ICompiledAssembly compiledAssembly)
+        public override ILPostProcessResult Process(ICompiledAssembly assembly)
         {
-            using var ar = new AssemblyResolver(compiledAssembly, logger);
-            using var ss = new MemoryStream(compiledAssembly.InMemoryAssembly.PdbData);
+            var log = new LogPostProcessor();
+            using var ar = new AssemblyResolver(assembly, log);
+            using var ss = new MemoryStream(assembly.InMemoryAssembly.PdbData);
             var rp = new ReaderParameters
             {
                 SymbolStream = ss,
@@ -54,14 +46,14 @@ namespace JFramework.Editor
                 ReflectionImporterProvider = new ReflectionProvider(),
                 ReadingMode = ReadingMode.Immediate
             };
-            var pd = compiledAssembly.InMemoryAssembly.PeData;
+            var pd = assembly.InMemoryAssembly.PeData;
             using var ms = new MemoryStream(pd);
             using var ad = AssemblyDefinition.ReadAssembly(ms, rp);
             ar.SetAssemblyDefinitionForCompiledAssembly(ad);
-            var process = new Process(logger);
+            var process = new Process(log);
             if (!process.Execute(ad, ar, out var change) || !change)
             {
-                return new ILPostProcessResult(compiledAssembly.InMemoryAssembly, logger.logs);
+                return new ILPostProcessResult(assembly.InMemoryAssembly, log.logs);
             }
 
             var mm = ad.MainModule;
@@ -70,11 +62,11 @@ namespace JFramework.Editor
                 if (nr.Name == ad.Name.Name)
                 {
                     AssemblyNameReference an = null;
-                    foreach (var assembly in mm.AssemblyReferences)
+                    foreach (var reference in mm.AssemblyReferences)
                     {
-                        if (assembly.Name == ad.Name.Name)
+                        if (reference.Name == ad.Name.Name)
                         {
-                            an = assembly;
+                            an = reference;
                             break;
                         }
                     }
@@ -96,7 +88,7 @@ namespace JFramework.Editor
 
 
             ad.Write(pe, wp);
-            return new ILPostProcessResult(new InMemoryAssembly(pe.ToArray(), pdb.ToArray()), logger.logs);
+            return new ILPostProcessResult(new InMemoryAssembly(pe.ToArray(), pdb.ToArray()), log.logs);
         }
     }
 }

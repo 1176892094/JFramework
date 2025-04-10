@@ -24,7 +24,7 @@ namespace JFramework.Editor
     /// <summary>
     /// 网络代码注入日志
     /// </summary>
-    internal class Log : Logger
+    internal class LogPostProcessor : Logger
     {
         /// <summary>
         /// 日志列表
@@ -36,7 +36,7 @@ namespace JFramework.Editor
         /// </summary>
         /// <param name="message">日志信息</param>
         /// <param name="member">成员参数</param>
-        public void Warn(string message, MemberReference member)
+        public void Warn(string message, MemberReference member = null)
         {
             Info(message, member, DiagnosticType.Warning);
         }
@@ -46,7 +46,7 @@ namespace JFramework.Editor
         /// </summary>
         /// <param name="message">日志信息</param>
         /// <param name="member">成员参数</param>
-        public void Error(string message, MemberReference member)
+        public void Error(string message, MemberReference member = null)
         {
             Info(message, member, DiagnosticType.Error);
         }

@@ -14,50 +14,41 @@ using Mono.Cecil;
 
 namespace JFramework.Editor
 {
-    /// <summary>
-    /// 反射导入器提供程序
-    /// </summary>
     internal class ReflectionProvider : IReflectionImporterProvider
     {
-        public IReflectionImporter GetReflectionImporter(ModuleDefinition module) => new ReflectionImporter(module);
+        public IReflectionImporter GetReflectionImporter(ModuleDefinition definition)
+        {
+            return new ReflectionImporter(definition);
+        }
     }
-
-    /// <summary>
-    /// 默认的反射导入器
-    /// </summary>
+    
     internal class ReflectionImporter : DefaultReflectionImporter
     {
-        private const string SystemPrivateCoreLib = "System.Private.CoreLib";
-        private readonly AssemblyNameReference fixedCoreLib;
+        private readonly AssemblyNameReference assemblyName;
 
         public ReflectionImporter(ModuleDefinition module) : base(module)
         {
-            AssemblyNameReference first = null;
+            AssemblyNameReference assemblyData = null;
             foreach (var assembly in module.AssemblyReferences)
             {
-                if (Equals(assembly.Name))
+                if (assembly.Name is "mscorlib" or "netstandard" or "System.Private.CoreLib")
                 {
-                    first = assembly;
+                    assemblyData = assembly;
                     break;
                 }
             }
 
-            fixedCoreLib = first;
+            assemblyName = assemblyData;
         }
 
         public override AssemblyNameReference ImportReference(AssemblyName name)
         {
-            if (name.Name == SystemPrivateCoreLib && fixedCoreLib != null)
+            if (assemblyName != null && name.Name == "System.Private.CoreLib")
             {
-                return fixedCoreLib;
+                return assemblyName;
             }
 
             return base.ImportReference(name);
-        }
-
-        private static bool Equals(string name)
-        {
-            return name is "mscorlib" or "netstandard" or SystemPrivateCoreLib;
         }
     }
 }

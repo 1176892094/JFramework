@@ -10,7 +10,6 @@
 // *********************************************************************************
 
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading;
@@ -21,18 +20,16 @@ namespace JFramework.Editor
 {
     internal sealed class AssemblyResolver : IAssemblyResolver
     {
-        private readonly ConcurrentDictionary<string, AssemblyDefinition> assemblyCache = new();
-        private readonly ConcurrentDictionary<string, string> fileNameCache = new();
-        private readonly string[] assemblyReferences;
-        private readonly ICompiledAssembly compiledAssembly;
+        private readonly Dictionary<string, AssemblyDefinition> definitions = new Dictionary<string, AssemblyDefinition>();
+        private readonly Dictionary<string, string> assemblies = new Dictionary<string, string>();
+        private readonly ICompiledAssembly assembly;
         private readonly Logger logger;
-        private AssemblyDefinition selfAssembly;
+        private AssemblyDefinition definition;
 
-        public AssemblyResolver(ICompiledAssembly compiledAssembly, Logger logger)
+        public AssemblyResolver(ICompiledAssembly assembly, Logger logger)
         {
-            this.compiledAssembly = compiledAssembly;
-            assemblyReferences = compiledAssembly.References;
             this.logger = logger;
+            this.assembly = assembly;
         }
 
         public void Dispose()
@@ -40,76 +37,70 @@ namespace JFramework.Editor
             GC.SuppressFinalize(this);
         }
 
-        public AssemblyDefinition Resolve(AssemblyNameReference name)
+        public AssemblyDefinition Resolve(AssemblyNameReference assembly)
         {
-            return Resolve(name, new ReaderParameters(ReadingMode.Deferred));
+            return Resolve(assembly, new ReaderParameters(ReadingMode.Deferred));
         }
 
-        public AssemblyDefinition Resolve(AssemblyNameReference name, ReaderParameters parameters)
+        public AssemblyDefinition Resolve(AssemblyNameReference assembly, ReaderParameters parameters)
         {
-            if (name.Name == compiledAssembly.Name)
+            if (this.assembly.Name == assembly.Name)
             {
-                return selfAssembly;
+                return definition;
             }
 
-            if (!fileNameCache.TryGetValue(name.Name, out var fileName))
+            if (!assemblies.TryGetValue(assembly.Name, out var reference))
             {
-                fileName = FindFile(name.Name);
-                fileNameCache.TryAdd(name.Name, fileName);
+                reference = LoadData(assembly.Name);
+                assemblies.TryAdd(assembly.Name, reference);
             }
 
-            if (fileName == null)
+            if (reference == null)
             {
-                logger.Warn($"无法找到文件: {name}");
+                logger.Warn("无法找到文件:" + assembly);
                 return null;
             }
 
-            var lastWriteTime = File.GetLastWriteTime(fileName);
-            var cacheKey = fileName + lastWriteTime;
-            if (assemblyCache.TryGetValue(cacheKey, out var result))
+            var writeTime = reference + File.GetLastWriteTime(reference);
+            if (!definitions.TryGetValue(writeTime, out var result))
             {
-                return result;
+                parameters.AssemblyResolver = this;
+                var stream = Restart(reference, TimeSpan.FromSeconds(1));
+
+                var fileName = reference + ".pdb";
+                if (File.Exists(fileName))
+                {
+                    parameters.SymbolStream = Restart(fileName, TimeSpan.FromSeconds(1));
+                }
+
+                var assemblyDefinition = AssemblyDefinition.ReadAssembly(stream, parameters);
+                definitions.TryAdd(writeTime, assemblyDefinition);
+                return assemblyDefinition;
             }
 
-            parameters.AssemblyResolver = this;
-            var ms = MemoryStreamFor(fileName);
-
-            var pdb = fileName + ".pdb";
-            if (File.Exists(pdb))
-            {
-                parameters.SymbolStream = MemoryStreamFor(pdb);
-            }
-
-            var assemblyDefinition = AssemblyDefinition.ReadAssembly(ms, parameters);
-            assemblyCache.TryAdd(cacheKey, assemblyDefinition);
-            return assemblyDefinition;
+            return result;
         }
 
-        private string FindFile(string name)
+        private string LoadData(string name)
         {
-            foreach (var r in assemblyReferences)
+            foreach (var reference in assembly.References)
             {
-                if (Path.GetFileNameWithoutExtension(r) == name)
+                if (Path.GetFileNameWithoutExtension(reference) == name)
                 {
-                    return r;
+                    return reference;
                 }
             }
 
-            var dllName = name + ".dll";
-
-            var set = new HashSet<string>();
-            foreach (var s in assemblyReferences)
+            var caches = new HashSet<string>();
+            foreach (var reference in assembly.References)
             {
-                var parentDir = Path.GetDirectoryName(s);
-                if (set.Add(parentDir))
+                var filePath = Path.GetDirectoryName(reference);
+                if (filePath != null && caches.Add(filePath))
                 {
-                    if (parentDir != null)
+                    var fileName = Path.Combine(filePath, name + ".dll");
+                    if (File.Exists(fileName))
                     {
-                        var candidate = Path.Combine(parentDir, dllName);
-                        if (File.Exists(candidate))
-                        {
-                            return candidate;
-                        }
+                        return fileName;
                     }
                 }
             }
@@ -117,47 +108,38 @@ namespace JFramework.Editor
             return null;
         }
 
-        private static MemoryStream MemoryStreamFor(string fileName)
+        private static MemoryStream Restart(string fileName, TimeSpan waitTime, int retryCount = 10)
         {
-            return Retry(10, TimeSpan.FromSeconds(1), () =>
+            try
             {
-                byte[] byteArray;
-                using (var fs = new FileStream(fileName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
+                byte[] bytes;
+                using (var stream = new FileStream(fileName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
                 {
-                    byteArray = new byte[fs.Length];
-                    var readLength = fs.Read(byteArray, 0, (int)fs.Length);
-                    if (readLength != fs.Length)
+                    bytes = new byte[stream.Length];
+                    var count = stream.Read(bytes, 0, (int)stream.Length);
+                    if (count != stream.Length)
                     {
                         throw new InvalidOperationException("文件读取长度不完整。");
                     }
                 }
 
-                return new MemoryStream(byteArray);
-            });
-        }
-
-        private static MemoryStream Retry(int retryCount, TimeSpan waitTime, Func<MemoryStream> func)
-        {
-            try
-            {
-                return func();
+                return new MemoryStream(bytes);
             }
-            catch (IOException)
+            catch (IOException e)
             {
                 if (retryCount == 0)
                 {
-                    throw;
+                    throw new Exception(e.ToString());
                 }
 
-                Console.WriteLine($"捕获IO异常，尝试{retryCount}更多次。");
                 Thread.Sleep(waitTime);
-                return Retry(retryCount - 1, waitTime, func);
+                return Restart(fileName, waitTime, --retryCount);
             }
         }
 
-        public void SetAssemblyDefinitionForCompiledAssembly(AssemblyDefinition assemblyDefinition)
+        public void SetAssemblyDefinitionForCompiledAssembly(AssemblyDefinition definition)
         {
-            selfAssembly = assemblyDefinition;
+            this.definition = definition;
         }
     }
 }
