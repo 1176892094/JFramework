@@ -10,17 +10,29 @@
 // // *********************************************************************************
 
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using UnityEditor;
 using UnityEditor.Callbacks;
 using UnityEngine;
 using UnityEngine.Windows;
 using Debug = UnityEngine.Debug;
+#if ODIN_INSPECTOR
+using Sirenix.OdinInspector.Editor;
+using Sirenix.Utilities;
+using Sirenix.Utilities.Editor;
+#endif
+
 
 namespace JFramework
 {
-    internal static partial class EditorSetting
+    internal partial class EditorSetting
+#if ODIN_INSPECTOR
+        : OdinMenuEditorWindow
+#endif
     {
+        public static readonly Dictionary<Type, ScriptableObject> windows = new Dictionary<Type, ScriptableObject>();
+
         private static bool AssetLoadKey
         {
             get => EditorPrefs.GetBool(nameof(AssetLoadKey), false);
@@ -36,11 +48,27 @@ namespace JFramework
         [MenuItem("Tools/JFramework/框架配置窗口 _F1", priority = 2)]
         public static void ShowWindow()
         {
-            // var window = EditorWindow.GetWindow<GlobalSetting.EditorWindow>(nameof(GlobalSetting));
-            // window.position = new Rect(400, 300, 800, 600);
-            // window.Show();
+#if ODIN_INSPECTOR
+            var window = GetWindow<EditorSetting>();
+            window.position = GUIHelper.GetEditorWindowRect().AlignCenter(800, 600);
+            window.Show();
+#endif
         }
+#if ODIN_INSPECTOR
+        protected override OdinMenuTree BuildMenuTree()
+        {
+            var menuTree = new OdinMenuTree
+            {
+                { nameof(GlobalSetting), GlobalSetting.Instance, EditorIcons.UnityFolderIcon }
+            };
+            foreach (var window in windows)
+            {
+                menuTree.Add(window.Key.Name, window.Value, EditorIcons.UnityFolderIcon);
+            }
 
+            return menuTree;
+        }
+#endif
         [MenuItem("Tools/JFramework/转化表格数据", priority = 5)]
         private static async void ExcelToScripts()
         {

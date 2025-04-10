@@ -20,7 +20,7 @@ using ItemTable = System.Collections.Generic.Dictionary<int, JFramework.Common.I
 using NameTable = System.Collections.Generic.Dictionary<string, JFramework.Common.IData>;
 using AgentData = System.Collections.Generic.Dictionary<System.Type, JFramework.Common.IAgent>;
 
-namespace JFramework
+namespace JFramework.Common
 {
     public class GlobalManager : MonoBehaviour
     {

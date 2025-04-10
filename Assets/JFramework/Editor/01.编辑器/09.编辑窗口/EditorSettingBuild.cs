@@ -21,7 +21,7 @@ using UnityEngine;
 
 namespace JFramework
 {
-    internal static partial class EditorSetting
+    internal partial class EditorSetting
     {
         [MenuItem("Tools/JFramework/构建 AB 资源", priority = 3)]
         private static async void BuildAsset()

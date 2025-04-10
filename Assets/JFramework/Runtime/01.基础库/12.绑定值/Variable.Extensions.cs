@@ -11,7 +11,7 @@
 
 using System.Runtime.CompilerServices;
 
-namespace JFramework.Common
+namespace JFramework
 {
     public static class Extensions
     {

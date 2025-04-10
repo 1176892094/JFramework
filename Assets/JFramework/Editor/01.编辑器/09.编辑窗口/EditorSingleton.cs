@@ -19,10 +19,6 @@ namespace JFramework
     {
         private static T instance;
 
-        private static string fileName => typeof(T).Name;
-
-        private static string filePath => Service.Text.Format("{0}/{1}.asset", GlobalSetting.EditorPath, fileName);
-
         public static T Instance
         {
             get
@@ -32,7 +28,8 @@ namespace JFramework
                     return instance;
                 }
 
-                instance = AssetDatabase.LoadAssetAtPath<T>(filePath);
+                var asset = Service.Text.Format("{0}/{1}.asset", GlobalSetting.EditorPath, typeof(T).Name);
+                instance = AssetDatabase.LoadAssetAtPath<T>(asset);
                 if (instance != null)
                 {
                     return instance;
@@ -44,10 +41,15 @@ namespace JFramework
                 }
 
                 instance = CreateInstance<T>();
-                AssetDatabase.CreateAsset(instance, filePath);
+                AssetDatabase.CreateAsset(instance, asset);
                 AssetDatabase.Refresh();
                 return instance;
             }
+        }
+
+        protected static void AddWindow()
+        {
+            EditorSetting.windows[typeof(T)] = Instance;
         }
     }
 }

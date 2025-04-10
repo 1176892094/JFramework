@@ -15,7 +15,7 @@ using UnityEngine;
 
 namespace JFramework
 {
-    internal static partial class EditorSetting
+    internal partial class EditorSetting
     {
         [MenuItem("Tools/JFramework/更新 AB 资源", priority = 4)]
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
