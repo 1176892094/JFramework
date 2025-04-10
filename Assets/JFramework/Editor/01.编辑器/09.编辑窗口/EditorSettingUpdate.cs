@@ -31,7 +31,7 @@ namespace JFramework
             }
 
             GlobalSetting.Instance.sceneAssets.Clear();
-            var folderPaths = AssetDatabase.GetSubFolders(GlobalSetting.Instance.assetCachedPath);
+            var folderPaths = AssetDatabase.GetSubFolders(GlobalSetting.Instance.assetSourcePath);
             foreach (var folderPath in folderPaths)
             {
                 if (string.IsNullOrEmpty(folderPath))

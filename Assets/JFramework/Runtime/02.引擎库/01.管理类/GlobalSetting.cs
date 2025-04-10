@@ -12,8 +12,10 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using JFramework.Common;
 using UnityEngine;
+using UnityEngine.Serialization;
 using UnityEngine.UI;
 using Object = UnityEngine.Object;
 #if UNITY_EDITOR
@@ -44,7 +46,7 @@ namespace JFramework
 
         public string assetRemotePath = "http://192.168.0.3:8000/AssetBundles";
 
-        public string assetCachedPath = "Assets/Template";
+        public string assetSourcePath = "Assets/Template";
 
         public static GlobalSetting Instance
         {
@@ -88,15 +90,11 @@ namespace JFramework
 
         [HideInInspector] public List<Object> ignoreAssets = new List<Object>();
 
-#if UNITY_EDITOR && ODIN_INSPECTOR
-        [Sirenix.OdinInspector.ShowInInspector]
-#endif
-        public static string assemblyPath => Service.Text.Format("{0}/{1}.asmdef", ScriptPath, assemblyName);
-
         public static TextAsset[] templateData => Resources.LoadAll<TextAsset>(nameof(GlobalSetting));
 
 #if UNITY_EDITOR && ODIN_INSPECTOR
         [Sirenix.OdinInspector.ShowInInspector]
+        [Sirenix.OdinInspector.OnValueChanged("UpdateSceneSetting")]
 #endif
         private static BuildMode BuildPath
         {
@@ -124,15 +122,20 @@ namespace JFramework
 #if UNITY_EDITOR && ODIN_INSPECTOR
         [Sirenix.OdinInspector.ShowInInspector]
 #endif
-        public static string remotePackPath => BuildPath == BuildMode.BuildPath ? Instance.assetBuildPath : Application.streamingAssetsPath;
+        public static string assemblyPath => Service.Text.Format("{0}/{1}.asmdef", ScriptPath, assemblyName);
+
 #if UNITY_EDITOR && ODIN_INSPECTOR
         [Sirenix.OdinInspector.ShowInInspector]
 #endif
-        public static string remoteAssetPath => Path.Combine(remotePackPath, Instance.assetPlatform.ToString());
+        public static string remoteBuildPath => BuildPath == BuildMode.BuildPath ? Instance.assetBuildPath : Application.streamingAssetsPath;
 #if UNITY_EDITOR && ODIN_INSPECTOR
         [Sirenix.OdinInspector.ShowInInspector]
 #endif
-        public static string remoteAssetPack => Service.Text.Format("{0}/{1}.json", remoteAssetPath, Instance.assetLoadName);
+        public static string remoteAssetPath => Path.Combine(remoteBuildPath, Instance.assetPlatform.ToString());
+#if UNITY_EDITOR && ODIN_INSPECTOR
+        [Sirenix.OdinInspector.ShowInInspector]
+#endif
+        public static string remoteAssetData => Service.Text.Format("{0}/{1}.json", remoteAssetPath, Instance.assetLoadName);
 
         public static string GetEnumPath(string name) => Service.Text.Format("{0}/01.枚举类/{1}.cs", ScriptPath, name);
 
@@ -140,11 +143,32 @@ namespace JFramework
 
         public static string GetDataPath(string name) => Service.Text.Format("{0}/03.数据表/{1}DataTable.cs", ScriptPath, name);
 
-        public static string GetAssetPath(string name) => Service.Text.Format("{0}/DataTable/{1}DataTable.asset", Instance.assetCachedPath, name);
+        public static string GetAssetPath(string name) => Service.Text.Format("{0}/DataTable/{1}DataTable.asset", Instance.assetSourcePath, name);
 
         public static string GetDataName(string name) => Service.Text.Format("JFramework.Table.{0}Data,{1}", name, assemblyName);
 
         public static string GetTableName(string name) => Service.Text.Format("JFramework.Table.{0}DataTable", name);
+
+        private static void UpdateSceneSetting()
+        {
+            var assets = EditorBuildSettings.scenes.Select(scene => scene.path).ToList();
+            foreach (var scenePath in Instance.sceneAssets)
+            {
+                if (assets.Contains(scenePath))
+                {
+                    if (Instance.assetLoadMode == AssetMode.Simulate) continue;
+                    var scenes = EditorBuildSettings.scenes.Where(scene => scene.path != scenePath);
+                    EditorBuildSettings.scenes = scenes.ToArray();
+                }
+                else
+                {
+                    if (Instance.assetLoadMode == AssetMode.Authentic) continue;
+                    var scenes = EditorBuildSettings.scenes.ToList();
+                    scenes.Add(new EditorBuildSettingsScene(scenePath, true));
+                    EditorBuildSettings.scenes = scenes.ToArray();
+                }
+            }
+        }
 #endif
         public static string GetScenePath(string assetName) => Service.Text.Format("Scenes/{0}", assetName);
 
@@ -190,11 +214,12 @@ namespace JFramework
             scaler.referenceResolution = new Vector2(1920, 1080);
             scaler.referencePixelsPerUnit = 64;
             DontDestroyOnLoad(canvas);
-            var manager = new GameObject(nameof(EntityManager)).AddComponent<GlobalManager>();
+            var manager = new GameObject(nameof(PoolManager)).AddComponent<GlobalManager>();
             manager.canvas = canvas;
             manager.canvas.renderMode = RenderMode.ScreenSpaceCamera;
         }
 
+        
         [Serializable]
         private struct Name
         {

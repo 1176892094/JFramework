@@ -33,10 +33,10 @@ namespace JFramework
             var elapseTime = EditorApplication.timeSinceStartup;
 
             var fileHash = new HashSet<string>();
-            var isExists = File.Exists(GlobalSetting.remoteAssetPack);
+            var isExists = File.Exists(GlobalSetting.remoteAssetData);
             if (isExists)
             {
-                var readJson = await File.ReadAllTextAsync(GlobalSetting.remoteAssetPack);
+                var readJson = await File.ReadAllTextAsync(GlobalSetting.remoteAssetData);
                 fileHash = JsonManager.FromJson<List<PackData>>(readJson).Select(data => data.code).ToHashSet();
             }
 
@@ -66,7 +66,7 @@ namespace JFramework
             }
 
             var saveJson = JsonManager.ToJson(filePacks);
-            await File.WriteAllTextAsync(GlobalSetting.remoteAssetPack, saveJson);
+            await File.WriteAllTextAsync(GlobalSetting.remoteAssetData, saveJson);
             elapseTime = EditorApplication.timeSinceStartup - elapseTime;
             Debug.Log(Service.Text.Format("加密 AssetBundle 完成。耗时:<color=#00FF00> {0:F} </color>秒", elapseTime));
             AssetDatabase.Refresh();
@@ -84,27 +84,6 @@ namespace JFramework
             }
 
             return builder.ToString();
-        }
-
-        private static void UpdateSceneSetting(AssetMode assetPackMode)
-        {
-            var assets = EditorBuildSettings.scenes.Select(scene => scene.path).ToList();
-            foreach (var scenePath in GlobalSetting.Instance.sceneAssets)
-            {
-                if (assets.Contains(scenePath))
-                {
-                    if (assetPackMode == AssetMode.Simulate) continue;
-                    var scenes = EditorBuildSettings.scenes.Where(scene => scene.path != scenePath);
-                    EditorBuildSettings.scenes = scenes.ToArray();
-                }
-                else
-                {
-                    if (assetPackMode == AssetMode.Authentic) continue;
-                    var scenes = EditorBuildSettings.scenes.ToList();
-                    scenes.Add(new EditorBuildSettingsScene(scenePath, true));
-                    EditorBuildSettings.scenes = scenes.ToArray();
-                }
-            }
         }
     }
 }
