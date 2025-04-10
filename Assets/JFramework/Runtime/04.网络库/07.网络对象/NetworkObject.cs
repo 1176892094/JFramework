@@ -77,9 +77,9 @@ namespace JFramework.Net
             var assetData = assetType.GetMethod("Validate", Service.Find.Static);
             if (assetData != null)
             {
-                var assetPair = (KeyValuePair<string, ulong>)assetData.Invoke(null, new object[] { assetId, sceneId, gameObject });
-                assetId = assetPair.Key;
-                sceneId = assetPair.Value;
+                var assetPair = ((string, ulong))assetData.Invoke(null, new object[] { assetId, sceneId, gameObject });
+                assetId = assetPair.Item1;
+                sceneId = assetPair.Item2;
             }
         }
 

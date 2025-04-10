@@ -21,7 +21,7 @@ namespace JFramework
     {
         private static readonly Dictionary<ulong, GameObject> caches = new Dictionary<ulong, GameObject>();
 
-        private static KeyValuePair<string, ulong> Validate(string assetId, ulong sceneId, GameObject assetData)
+        private static (string, ulong) Validate(string assetId, ulong sceneId, GameObject assetData)
         {
             var gameObject = assetData.gameObject;
             if (PrefabUtility.IsPartOfPrefabAsset(gameObject))
@@ -47,7 +47,7 @@ namespace JFramework
                 sceneId = AssignSceneId(assetData, sceneId);
             }
 
-            return new KeyValuePair<string, ulong>(assetId, sceneId);
+            return (assetId, sceneId);
         }
 
         private static string AssignAssetPath(string assetName, string assetPath)
