@@ -18,17 +18,10 @@ namespace JFramework.Common
 {
     public static class DataManager
     {
-        [Serializable]
-        private struct Name
-        {
-            public string name;
-        }
-        
         public static async void LoadDataTable()
         {
             if (!GlobalManager.Instance) return;
-            var fileName = Resources.LoadAll<TextAsset>(nameof(GlobalSetting))[0].text;
-            var assembly = Service.Find.Assembly(JsonUtility.FromJson<Name>(fileName).name);
+            var assembly = Service.Find.Assembly(GlobalSetting.assemblyName);
             if (assembly == null)
             {
                 return;

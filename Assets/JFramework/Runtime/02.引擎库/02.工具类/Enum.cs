@@ -25,4 +25,19 @@ namespace JFramework
         Simulate,
         Authentic
     }
+     
+    internal enum BuildMode : byte
+    {
+        StreamingAssets,
+        BuildPath,
+    }
+    
+    public enum UIState : byte
+    {
+        Common = 1 << 0,
+        Freeze = 1 << 1,
+        Stable = 1 << 2,
+        Vertical = 1 << 3,
+        Horizontal = 1 << 4,
+    }
 }

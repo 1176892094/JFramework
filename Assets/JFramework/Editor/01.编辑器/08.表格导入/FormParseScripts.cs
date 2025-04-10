@@ -49,7 +49,7 @@ namespace JFramework
                 }
 
                 var writeAssets = false;
-                dataTables.Add(assemblyPath, assemblyData.Replace("Template", assemblyName));
+                dataTables.Add(GlobalSetting.assemblyPath, GlobalSetting.assemblyData.text);
                 var progress = 0f;
                 foreach (var data in dataTables)
                 {
@@ -139,7 +139,7 @@ namespace JFramework
         private static (string, string) WriteTable(string className, Dictionary<string, string> fields)
         {
             var builder = new StringBuilder(1024);
-            var scriptText = mainData.Replace("Template", className);
+            var scriptText = GlobalSetting.templateData[3].text.Replace("Template", className);
 
             foreach (var field in fields)
             {
@@ -182,13 +182,13 @@ namespace JFramework
             builder.Length -= 1;
             scriptText = scriptText.Replace("//TODO:2", builder.ToString());
             builder.Length = 0;
-            return (MainPath(className), scriptText);
+            return (GlobalSetting.GetDataPath(className), scriptText);
         }
 
         private static (string, string) WriteStruct(string className, string classType)
         {
             var builder = new StringBuilder(1024);
-            var scriptText = itemData.Replace("Template", className);
+            var scriptText = GlobalSetting.templateData[2].text.Replace("Template", className);
 
             var members = classType.Substring(1, classType.IndexOf('}') - 1).Split(',');
             foreach (var member in members)
@@ -212,13 +212,13 @@ namespace JFramework
             builder.Length -= 1;
             scriptText = scriptText.Replace("//TODO:1", builder.ToString());
             builder.Length = 0;
-            return (ItemPath(className), scriptText);
+            return (GlobalSetting.GetItemPath(className), scriptText);
         }
 
         private static (string, string) WriteEnum(string className, IEnumerable<string> members)
         {
             var builder = new StringBuilder(1024);
-            var scriptText = enumData.Replace("Template", className);
+            var scriptText = GlobalSetting.templateData[1].text.Replace("Template", className);
 
             foreach (var member in members)
             {
@@ -237,7 +237,7 @@ namespace JFramework
             builder.Length -= 1;
             scriptText = scriptText.Replace("//TODO:1", builder.ToString());
             builder.Length = 0;
-            return (EnumPath(className), scriptText);
+            return (GlobalSetting.GetEnumPath(className), scriptText);
         }
 
         private static bool WriteScripts(string filePath, string fileData)

@@ -22,13 +22,13 @@ namespace JFramework.Common
         public static async void LoadAssetData()
         {
             if (!GlobalManager.Instance) return;
-            if (GlobalSetting.Instance.assetPackMode == AssetMode.Simulate)
+            if (GlobalSetting.Instance.assetLoadMode == AssetMode.Simulate)
             {
                 EventManager.Invoke(new PackComplete(0, "启动本地资源加载。"));
                 return;
             }
 
-            if (GlobalSetting.Instance.assetPackMode == AssetMode.Authentic)
+            if (GlobalSetting.Instance.assetLoadMode == AssetMode.Authentic)
             {
                 if (!Directory.Exists(GlobalSetting.assetPackPath))
                 {

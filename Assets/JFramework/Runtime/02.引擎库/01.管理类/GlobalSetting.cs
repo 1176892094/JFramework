@@ -9,17 +9,42 @@
 // // # Description: This is an automatically generated comment.
 // // *********************************************************************************
 
+using System;
 using System.Collections.Generic;
 using System.IO;
 using JFramework.Common;
 using UnityEngine;
 using UnityEngine.UI;
+using Object = UnityEngine.Object;
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 
 namespace JFramework
 {
     internal class GlobalSetting : ScriptableObject
     {
         private static GlobalSetting instance;
+
+        public AssetPlatform assetPlatform = AssetPlatform.StandaloneWindows;
+
+        public string smtpServer = "smtp.qq.com";
+
+        public int smtpPort = 587;
+
+        public string smtpUsername = "1176892094@qq.com";
+
+        public string smtpPassword;
+
+        public AssetMode assetLoadMode = AssetMode.Simulate;
+
+        public string assetLoadName = "AssetBundle";
+
+        public string assetBuildPath = "AssetBundles";
+
+        public string assetRemotePath = "http://192.168.0.3:8000/AssetBundles";
+
+        public string assetCachedPath = "Assets/Template";
 
         public static GlobalSetting Instance
         {
@@ -41,46 +66,86 @@ namespace JFramework
                     }
 
                     assetPath = Service.Text.Format("{0}/{1}.asset", assetPath, nameof(GlobalSetting));
-                    UnityEditor.AssetDatabase.CreateAsset(instance, assetPath);
-                    UnityEditor.AssetDatabase.SaveAssets();
+                    AssetDatabase.CreateAsset(instance, assetPath);
+                    AssetDatabase.SaveAssets();
                 }
 #endif
                 return instance;
             }
         }
 
-        public AssetPlatform assetPlatform = AssetPlatform.StandaloneWindows;
+        public static string assetPackData => Service.Text.Format("{0}.json", Instance.assetLoadName);
+        public static string assetPackPath => Service.Text.Format("{0}/{1}", Application.persistentDataPath, Instance.assetBuildPath);
+#if UNITY_EDITOR && ODIN_INSPECTOR
+        [Sirenix.OdinInspector.ShowInInspector]
+#endif
+        public static string assemblyName => JsonUtility.FromJson<Name>(assemblyData.text).name;
 
-        public string smtpServer = "smtp.qq.com";
-
-        public int smtpPort = 587;
-
-        public string smtpUsername = "1176892094@qq.com";
-
-        public string smtpPassword;
-
-        public AssetMode assetPackMode = AssetMode.Simulate;
-
-        public string assetPackName = "AssetPacket";
-
-        public string assetBuildPath = "Assets/StreamingAssets";
-
-        public string assetRemotePath = "http://192.168.0.3:8000/AssetPackets";
-
-        public string assetAssembly = "HotUpdate.Data";
-
-        public string assetCachePath = "Assets/Template";
+        public static TextAsset assemblyData => Resources.Load<TextAsset>(nameof(GlobalSetting));
 
 #if UNITY_EDITOR
         [HideInInspector] public List<string> sceneAssets = new List<string>();
 
         [HideInInspector] public List<Object> ignoreAssets = new List<Object>();
+
+#if UNITY_EDITOR && ODIN_INSPECTOR
+        [Sirenix.OdinInspector.ShowInInspector]
 #endif
+        public static string assemblyPath => Service.Text.Format("{0}/{1}.asmdef", ScriptPath, assemblyName);
 
+        public static TextAsset[] templateData => Resources.LoadAll<TextAsset>(nameof(GlobalSetting));
 
-        public static string assetPackData => Service.Text.Format("{0}.json", Instance.assetPackName);
-        public static string assetPackPath => Service.Text.Format("{0}/{1}", Application.persistentDataPath, Instance.assetBuildPath);
+#if UNITY_EDITOR && ODIN_INSPECTOR
+        [Sirenix.OdinInspector.ShowInInspector]
+#endif
+        private static BuildMode BuildPath
+        {
+            get => (BuildMode)EditorPrefs.GetInt(nameof(BuildPath), (int)BuildMode.StreamingAssets);
+            set => EditorPrefs.SetInt(nameof(BuildPath), (int)value);
+        }
 
+#if UNITY_EDITOR && ODIN_INSPECTOR
+        [Sirenix.OdinInspector.ShowInInspector]
+#endif
+        public static string EditorPath
+        {
+            get => EditorPrefs.GetString(nameof(EditorPath), "Assets/Editor/Resources");
+            set => EditorPrefs.SetString(nameof(EditorPath), value);
+        }
+#if UNITY_EDITOR && ODIN_INSPECTOR
+        [Sirenix.OdinInspector.ShowInInspector]
+#endif
+        public static string ScriptPath
+        {
+            get => EditorPrefs.GetString(nameof(ScriptPath), "Assets/Scripts/DataTable");
+            set => EditorPrefs.SetString(nameof(ScriptPath), value);
+        }
+
+#if UNITY_EDITOR && ODIN_INSPECTOR
+        [Sirenix.OdinInspector.ShowInInspector]
+#endif
+        public static string remotePackPath => BuildPath == BuildMode.BuildPath ? Instance.assetBuildPath : Application.streamingAssetsPath;
+#if UNITY_EDITOR && ODIN_INSPECTOR
+        [Sirenix.OdinInspector.ShowInInspector]
+#endif
+        public static string remoteAssetPath => Path.Combine(remotePackPath, Instance.assetPlatform.ToString());
+#if UNITY_EDITOR && ODIN_INSPECTOR
+        [Sirenix.OdinInspector.ShowInInspector]
+#endif
+        public static string remoteAssetPack => Service.Text.Format("{0}/{1}.json", remoteAssetPath, Instance.assetLoadName);
+
+        public static string GetEnumPath(string name) => Service.Text.Format("{0}/01.枚举类/{1}.cs", ScriptPath, name);
+
+        public static string GetItemPath(string name) => Service.Text.Format("{0}/02.结构体/{1}.cs", ScriptPath, name);
+
+        public static string GetDataPath(string name) => Service.Text.Format("{0}/03.数据表/{1}DataTable.cs", ScriptPath, name);
+
+        public static string GetAssetPath(string name) => Service.Text.Format("{0}/DataTable/{1}DataTable.asset", Instance.assetCachedPath, name);
+
+        public static string GetDataName(string name) => Service.Text.Format("JFramework.Table.{0}Data,{1}", name, assemblyName);
+
+        public static string GetTableName(string name) => Service.Text.Format("JFramework.Table.{0}DataTable", name);
+#endif
         public static string GetScenePath(string assetName) => Service.Text.Format("Scenes/{0}", assetName);
 
         public static string GetAudioPath(string assetName) => Service.Text.Format("Audios/{0}", assetName);
@@ -89,7 +154,7 @@ namespace JFramework
 
         public static string GetTablePath(string assetName) => Service.Text.Format("DataTable/{0}", assetName);
 
-        public static string GetPlatform(string fileName) => Path.Combine(Instance.assetPlatform.ToString(), fileName);
+        private static string GetPlatform(string fileName) => Path.Combine(Instance.assetPlatform.ToString(), fileName);
 
         public static string GetPacketPath(string fileName) => Path.Combine(Instance.assetBuildPath, fileName);
 
@@ -128,6 +193,12 @@ namespace JFramework
             var manager = new GameObject(nameof(EntityManager)).AddComponent<GlobalManager>();
             manager.canvas = canvas;
             manager.canvas.renderMode = RenderMode.ScreenSpaceCamera;
+        }
+
+        [Serializable]
+        private struct Name
+        {
+            public string name;
         }
     }
 }

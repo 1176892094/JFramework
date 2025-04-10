@@ -21,25 +21,13 @@ namespace JFramework
 {
     internal static partial class EditorSetting
     {
-        private static BuildMode BuildPath
-        {
-            get => (BuildMode)EditorPrefs.GetInt(nameof(BuildPath), (int)BuildMode.StreamingAssets);
-            set => EditorPrefs.SetInt(nameof(BuildPath), (int)value);
-        }
-
-        public static string EditorPath
-        {
-            get => EditorPrefs.GetString(nameof(EditorPath), "Assets/Editor/Resources");
-            set => EditorPrefs.SetString(nameof(EditorPath), value);
-        }
-
-        public static bool AssetLoadKey
+        private static bool AssetLoadKey
         {
             get => EditorPrefs.GetBool(nameof(AssetLoadKey), false);
             set => EditorPrefs.SetBool(nameof(AssetLoadKey), value);
         }
 
-        public static string ExcelPathKey
+        private static string ExcelPathKey
         {
             get => EditorPrefs.GetString(nameof(ExcelPathKey), Environment.CurrentDirectory);
             set => EditorPrefs.SetString(nameof(ExcelPathKey), value);

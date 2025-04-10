@@ -23,31 +23,20 @@ namespace JFramework
 {
     internal static partial class EditorSetting
     {
-        private enum BuildMode : byte
-        {
-            StreamingAssets,
-            BuildPath,
-        }
-
-        private static BuildTarget buildTarget => (BuildTarget)GlobalSetting.Instance.assetPlatform;
-        private static string remotePackPath => BuildPath == BuildMode.BuildPath ? GlobalSetting.Instance.assetBuildPath : Application.streamingAssetsPath;
-        private static string remoteAssetPath => Path.Combine(remotePackPath, buildTarget.ToString());
-        private static string remoteAssetPack => Service.Text.Format("{0}/{1}.json", remoteAssetPath, GlobalSetting.Instance.assetPackName);
-        
-
         [MenuItem("Tools/JFramework/构建 AB 资源", priority = 3)]
         private static async void BuildAsset()
         {
             UpdateAsset();
-            var folderPath = Directory.CreateDirectory(remoteAssetPath);
-            BuildPipeline.BuildAssetBundles(remoteAssetPath, BuildAssetBundleOptions.None, buildTarget);
+            var folderPath = Directory.CreateDirectory(GlobalSetting.remoteAssetPath);
+            var buildTarget = (BuildTarget)GlobalSetting.Instance.assetPlatform;
+            BuildPipeline.BuildAssetBundles(GlobalSetting.remoteAssetPath, BuildAssetBundleOptions.None, buildTarget);
             var elapseTime = EditorApplication.timeSinceStartup;
 
             var fileHash = new HashSet<string>();
-            var isExists = File.Exists(remoteAssetPack);
+            var isExists = File.Exists(GlobalSetting.remoteAssetPack);
             if (isExists)
             {
-                var readJson = await File.ReadAllTextAsync(remoteAssetPack);
+                var readJson = await File.ReadAllTextAsync(GlobalSetting.remoteAssetPack);
                 fileHash = JsonManager.FromJson<List<PackData>>(readJson).Select(data => data.code).ToHashSet();
             }
 
@@ -77,7 +66,7 @@ namespace JFramework
             }
 
             var saveJson = JsonManager.ToJson(filePacks);
-            await File.WriteAllTextAsync(remoteAssetPack, saveJson);
+            await File.WriteAllTextAsync(GlobalSetting.remoteAssetPack, saveJson);
             elapseTime = EditorApplication.timeSinceStartup - elapseTime;
             Debug.Log(Service.Text.Format("加密 AssetBundle 完成。耗时:<color=#00FF00> {0:F} </color>秒", elapseTime));
             AssetDatabase.Refresh();
@@ -96,7 +85,7 @@ namespace JFramework
 
             return builder.ToString();
         }
-        
+
         private static void UpdateSceneSetting(AssetMode assetPackMode)
         {
             var assets = EditorBuildSettings.scenes.Select(scene => scene.path).ToList();

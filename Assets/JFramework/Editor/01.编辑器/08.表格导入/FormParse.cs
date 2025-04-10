@@ -9,31 +9,16 @@
 // // # Description: This is an automatically generated comment.
 // // *********************************************************************************
 
-using System;
 using System.IO;
-using UnityEditor;
-using UnityEngine;
+
 
 namespace JFramework
 {
-    [InitializeOnLoad]
     internal static partial class FormManager
     {
-        [Serializable]
-        private struct Name
-        {
-            public string name;
-        }
-        
         private const int NAME_LINE = 1;
         private const int TYPE_LINE = 2;
         private const int DATA_LINE = 3;
-        private static readonly string enumData;
-        private static readonly string itemData;
-        private static readonly string mainData;
-        private static readonly string assemblyName;
-        private static readonly string assemblyPath;
-        private static readonly string assemblyData;
         
         private static readonly string[] Array =
         {
@@ -41,39 +26,6 @@ namespace JFramework
             "Vector2", "Vector3", "Vector4", "Vector2Int", "Vector3Int"
         };
         
-        public static string ScriptPath
-        {
-            get => EditorPrefs.GetString(nameof(ScriptPath), "Assets/Scripts/DataTable");
-            set => EditorPrefs.SetString(nameof(ScriptPath), value);
-        }
-
-        public static string DataTablePath
-        {
-            get => EditorPrefs.GetString(nameof(DataTablePath), "Assets/Template/DataTable");
-            set => EditorPrefs.SetString(nameof(DataTablePath), value);
-        }
-
-        static FormManager()
-        {
-            assemblyData = Resources.LoadAll<TextAsset>(nameof(GlobalSetting))[0].text;
-            assemblyName = JsonUtility.FromJson<Name>(assemblyData).name;
-            assemblyPath = ScriptPath + "/" + assemblyName + ".asmdef";
-            enumData = Resources.LoadAll<TextAsset>(nameof(GlobalSetting))[1].text;
-            itemData = Resources.LoadAll<TextAsset>(nameof(GlobalSetting))[2].text;
-            mainData = Resources.LoadAll<TextAsset>(nameof(GlobalSetting))[3].text;
-        }
-        
-        private static string EnumPath(string name) => ScriptPath + "/01.枚举类/" + name + ".cs";
-
-        private static string ItemPath(string name) => ScriptPath + "/02.结构体/" + name + ".cs";
-
-        private static string MainPath(string name) => ScriptPath + "/03.数据表/" + name + "DataTable.cs";
-
-        private static string AssetPath(string name) => DataTablePath + "/" + name + "DataTable.asset";
-        
-        private static string DataPath(string name) => "JFramework.Table." + name + "Data";
-
-        private static string TablePath(string name) => "JFramework.Table." + name + "DataTable";
         
         private static bool IsBasic(string assetType)
         {

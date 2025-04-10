@@ -21,7 +21,7 @@ namespace JFramework
 
         private static string fileName => typeof(T).Name;
 
-        private static string filePath => EditorSetting.EditorPath + "/" + fileName + ".asset";
+        private static string filePath => Service.Text.Format("{0}/{1}.asset", GlobalSetting.EditorPath, fileName);
 
         public static T Instance
         {
@@ -38,9 +38,9 @@ namespace JFramework
                     return instance;
                 }
 
-                if (!Directory.Exists(EditorSetting.EditorPath))
+                if (!Directory.Exists(GlobalSetting.EditorPath))
                 {
-                    Directory.CreateDirectory(EditorSetting.EditorPath);
+                    Directory.CreateDirectory(GlobalSetting.EditorPath);
                 }
 
                 instance = CreateInstance<T>();

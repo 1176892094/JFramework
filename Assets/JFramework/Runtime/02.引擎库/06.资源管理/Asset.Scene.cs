@@ -51,7 +51,7 @@ namespace JFramework.Common
 
         private static async Task<string> LoadSceneAsset(string assetPath)
         {
-            if (GlobalSetting.Instance.assetPackMode == AssetMode.Authentic)
+            if (GlobalSetting.Instance.assetLoadMode == AssetMode.Authentic)
             {
                 var assetPair = await LoadAssetPair(assetPath);
                 var assetPack = await LoadAssetPack(assetPair.Key);
