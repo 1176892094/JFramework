@@ -45,14 +45,6 @@ namespace JFramework.Common
                 {
                     GlobalManager.serverPacks.Add(assetPack.name, assetPack);
                 }
-
-                var sizes = new int[assetPacks.Count];
-                for (var i = 0; i < sizes.Length; i++)
-                {
-                    sizes[i] = assetPacks[i].size;
-                }
-
-                EventManager.Invoke(new PackAwake(sizes));
             }
             else
             {
@@ -72,7 +64,7 @@ namespace JFramework.Common
                 }
             }
 
-            var fileNames = new HashSet<string>();
+            var fileNames = new List<string>();
             foreach (var fileName in GlobalManager.serverPacks.Keys)
             {
                 if (GlobalManager.clientPacks.TryGetValue(fileName, out var assetPack))
@@ -90,6 +82,16 @@ namespace JFramework.Common
                 }
             }
 
+            var sizes = new int[fileNames.Count];
+            for (int i = 0; i < fileNames.Count; i++)
+            {
+                if (GlobalManager.serverPacks.TryGetValue(fileNames[i], out var assetPack))
+                {
+                    sizes[i] = assetPack.size;
+                }
+            }
+
+            EventManager.Invoke(new PackAwake(sizes));
             foreach (var clientPack in GlobalManager.clientPacks.Keys)
             {
                 var filePath = GlobalSetting.GetPacketPath(clientPack);
@@ -109,7 +111,7 @@ namespace JFramework.Common
             EventManager.Invoke(new PackComplete(1, status ? "更新完成!" : "更新失败!"));
         }
 
-        private static async Task<bool> LoadPacketRequest(HashSet<string> fileNames)
+        private static async Task<bool> LoadPacketRequest(List<string> fileNames)
         {
             var packNames = new HashSet<string>(fileNames);
             for (var i = 0; i < 5; i++)

@@ -38,6 +38,9 @@ namespace JFramework
 
         public string smtpPassword;
 
+#if UNITY_EDITOR && ODIN_INSPECTOR
+        [Sirenix.OdinInspector.OnValueChanged("UpdateSceneSetting")]
+#endif
         public AssetMode assetLoadMode = AssetMode.Simulate;
 
         public string assetLoadName = "AssetBundle";
@@ -78,6 +81,7 @@ namespace JFramework
 
         public static string assetPackData => Service.Text.Format("{0}.json", Instance.assetLoadName);
         public static string assetPackPath => Service.Text.Format("{0}/{1}", Application.persistentDataPath, Instance.assetBuildPath);
+        
 #if UNITY_EDITOR && ODIN_INSPECTOR
         [Sirenix.OdinInspector.ShowInInspector]
 #endif
@@ -88,13 +92,15 @@ namespace JFramework
 #if UNITY_EDITOR
         [HideInInspector] public List<string> sceneAssets = new List<string>();
 
-        [HideInInspector] public List<Object> ignoreAssets = new List<Object>();
+#if UNITY_EDITOR && ODIN_INSPECTOR
+        [Sirenix.OdinInspector.PropertyOrder(1)]
+#endif
+        public List<Object> ignoreAssets = new List<Object>();
 
         public static TextAsset[] templateData => Resources.LoadAll<TextAsset>(nameof(GlobalSetting));
 
 #if UNITY_EDITOR && ODIN_INSPECTOR
         [Sirenix.OdinInspector.ShowInInspector]
-        [Sirenix.OdinInspector.OnValueChanged("UpdateSceneSetting")]
 #endif
         private static BuildMode BuildPath
         {
@@ -180,7 +186,7 @@ namespace JFramework
 
         private static string GetPlatform(string fileName) => Path.Combine(Instance.assetPlatform.ToString(), fileName);
 
-        public static string GetPacketPath(string fileName) => Path.Combine(Instance.assetBuildPath, fileName);
+        public static string GetPacketPath(string fileName) => Path.Combine(assetPackPath, fileName);
 
         public static string GetServerPath(string fileName) => Path.Combine(Instance.assetRemotePath, GetPlatform(fileName));
 
@@ -219,7 +225,7 @@ namespace JFramework
             manager.canvas.renderMode = RenderMode.ScreenSpaceCamera;
         }
 
-        
+
         [Serializable]
         private struct Name
         {
