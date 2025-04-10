@@ -98,11 +98,11 @@ namespace JFramework
 #if UNITY_EDITOR && ODIN_INSPECTOR
         [Sirenix.OdinInspector.ShowInInspector]
 #endif
-        internal static readonly Dictionary<int, RectTransform> panelLayer = new Dictionary<int, RectTransform>();
+        internal static readonly Dictionary<int, RectTransform> layerData = new Dictionary<int, RectTransform>();
 #if UNITY_EDITOR && ODIN_INSPECTOR
         [Sirenix.OdinInspector.ShowInInspector]
 #endif
-        internal static readonly Dictionary<string, HashSet<UIPanel>> panelGroup = new Dictionary<string, HashSet<UIPanel>>();
+        internal static readonly Dictionary<string, HashSet<UIPanel>> groupData = new Dictionary<string, HashSet<UIPanel>>();
 
         private void Awake()
         {

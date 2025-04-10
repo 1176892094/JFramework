@@ -17,27 +17,51 @@ namespace JFramework
     public static partial class Extensions
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void Sub<TOwner, T>(this Attribute<TOwner, T> attribute, T key, float value) where TOwner : Component
+        public static float GetFloat<TOwner, T>(this Attribute<TOwner, T> attribute, T key) where TOwner : Component
         {
-            attribute.SetFloat(key, attribute.GetFloat(key) - value);
+            return attribute.Get(key);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void Add<TOwner, T>(this Attribute<TOwner, T> attribute, T key, float value) where TOwner : Component
+        public static void SetFloat<TOwner, T>(this Attribute<TOwner, T> attribute, T key, float value) where TOwner : Component
+        {
+            attribute.Set(key, value);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void AddFloat<TOwner, T>(this Attribute<TOwner, T> attribute, T key, float value) where TOwner : Component
         {
             attribute.SetFloat(key, attribute.GetFloat(key) + value);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void Sub<TOwner, T>(this Attribute<TOwner, T> attribute, T key, int value) where TOwner : Component
+        public static void SubFloat<TOwner, T>(this Attribute<TOwner, T> attribute, T key, float value) where TOwner : Component
         {
-            attribute.SetInt(key, attribute.GetInt(key) - value);
+            attribute.SetFloat(key, attribute.GetFloat(key) - value);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void Add<TOwner, T>(this Attribute<TOwner, T> attribute, T key, int value) where TOwner : Component
+        public static int GetInt<TOwner, T>(this Attribute<TOwner, T> attribute, T key) where TOwner : Component
         {
-            attribute.SetInt(key, attribute.GetInt(key) + value);
+            return (int)attribute.Get(key);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void SetInt<TOwner, T>(this Attribute<TOwner, T> attribute, T key, float value) where TOwner : Component
+        {
+            attribute.Set(key, (int)value);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void AddInt<TOwner, T>(this Attribute<TOwner, T> attribute, T key, float value) where TOwner : Component
+        {
+            attribute.SetInt(key, attribute.GetInt(key) + (int)value);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void SubInt<TOwner, T>(this Attribute<TOwner, T> attribute, T key, float value) where TOwner : Component
+        {
+            attribute.SetInt(key, attribute.GetInt(key) - (int)value);
         }
     }
 }

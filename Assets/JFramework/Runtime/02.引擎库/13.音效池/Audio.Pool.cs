@@ -39,33 +39,33 @@ namespace JFramework.Common
             public AudioSource Dequeue()
             {
                 dequeue++;
-                AudioSource assetData;
+                AudioSource item;
                 if (unused.Count > 0)
                 {
-                    assetData = unused.Dequeue();
-                    if (assetData != null)
+                    item = unused.Dequeue();
+                    if (item != null)
                     {
-                        cached.Add(assetData);
-                        return assetData;
+                        cached.Add(item);
+                        return item;
                     }
 
                     enqueue++;
-                    cached.Remove(assetData);
+                    cached.Remove(item);
                 }
 
-                assetData = new GameObject(path).AddComponent<AudioSource>();
-                Object.DontDestroyOnLoad(assetData.gameObject);
-                assetData.name = path;
-                cached.Add(assetData);
-                return assetData;
+                item = new GameObject(path).AddComponent<AudioSource>();
+                Object.DontDestroyOnLoad(item.gameObject);
+                item.name = path;
+                cached.Add(item);
+                return item;
             }
 
-            public void Enqueue(AudioSource assetData)
+            public void Enqueue(AudioSource item)
             {
-                if (cached.Remove(assetData))
+                if (cached.Remove(item))
                 {
                     enqueue++;
-                    unused.Enqueue(assetData);
+                    unused.Enqueue(item);
                 }
             }
 

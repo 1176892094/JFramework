@@ -17,7 +17,7 @@ namespace JFramework.Common
 {
     internal static class AgentManager
     {
-        internal static void Register<T>(Component owner, Type agentType)
+        internal static void Register<T>(Component owner, Type type)
         {
             if (!GlobalManager.Instance) return;
             if (!GlobalManager.agentData.TryGetValue(owner, out var agents))
@@ -26,9 +26,9 @@ namespace JFramework.Common
                 GlobalManager.agentData.Add(owner, agents);
             }
 
-            var agentData = HeapManager.Dequeue<IAgent>(agentType);
-            agents[typeof(T)] = agentData;
-            agentData.OnShow(owner);
+            var item = HeapManager.Dequeue<IAgent>(type);
+            agents[typeof(T)] = item;
+            item.OnShow(owner);
         }
 
         internal static IAgent Find<T>(Component owner)
@@ -82,10 +82,10 @@ namespace JFramework.Common
 
         internal static void Dispose()
         {
-            var agentCaches = new List<Component>(GlobalManager.agentData.Keys);
-            foreach (var cache in agentCaches)
+            var items = new List<Component>(GlobalManager.agentData.Keys);
+            foreach (var item in items)
             {
-                if (GlobalManager.agentData.TryGetValue(cache, out var agents))
+                if (GlobalManager.agentData.TryGetValue(item, out var agents))
                 {
                     foreach (var agent in agents.Values)
                     {
@@ -94,7 +94,7 @@ namespace JFramework.Common
                     }
 
                     agents.Clear();
-                    GlobalManager.agentData.Remove(cache);
+                    GlobalManager.agentData.Remove(item);
                 }
             }
 

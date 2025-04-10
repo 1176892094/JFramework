@@ -14,6 +14,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
+using JFramework.Common;
 using UnityEditor;
 using UnityEngine;
 
@@ -138,7 +139,7 @@ namespace JFramework
 
         private static (string, string) WriteTable(string className, Dictionary<string, string> fields)
         {
-            var builder = new StringBuilder(1024);
+            var builder = HeapManager.Dequeue<StringBuilder>();
             var scriptText = GlobalSetting.templateData[3].text.Replace("Template", className);
 
             foreach (var field in fields)
@@ -182,12 +183,13 @@ namespace JFramework
             builder.Length -= 1;
             scriptText = scriptText.Replace("//TODO:2", builder.ToString());
             builder.Length = 0;
+            HeapManager.Enqueue(builder);
             return (GlobalSetting.GetDataPath(className), scriptText);
         }
 
         private static (string, string) WriteStruct(string className, string classType)
         {
-            var builder = new StringBuilder(1024);
+            var builder = HeapManager.Dequeue<StringBuilder>();
             var scriptText = GlobalSetting.templateData[2].text.Replace("Template", className);
 
             var members = classType.Substring(1, classType.IndexOf('}') - 1).Split(',');
@@ -212,12 +214,13 @@ namespace JFramework
             builder.Length -= 1;
             scriptText = scriptText.Replace("//TODO:1", builder.ToString());
             builder.Length = 0;
+            HeapManager.Enqueue(builder);
             return (GlobalSetting.GetItemPath(className), scriptText);
         }
 
         private static (string, string) WriteEnum(string className, IEnumerable<string> members)
         {
-            var builder = new StringBuilder(1024);
+            var builder = HeapManager.Dequeue<StringBuilder>();
             var scriptText = GlobalSetting.templateData[1].text.Replace("Template", className);
 
             foreach (var member in members)
@@ -237,6 +240,7 @@ namespace JFramework
             builder.Length -= 1;
             scriptText = scriptText.Replace("//TODO:1", builder.ToString());
             builder.Length = 0;
+            HeapManager.Enqueue(builder);
             return (GlobalSetting.GetEnumPath(className), scriptText);
         }
 

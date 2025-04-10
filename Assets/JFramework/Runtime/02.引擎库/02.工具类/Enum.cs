@@ -40,4 +40,15 @@ namespace JFramework
         Vertical = 1 << 3,
         Horizontal = 1 << 4,
     }
+    
+    public enum UILayer : byte
+    {
+        Lowest,
+        Low,
+        Lower,
+        Middle,
+        Higher,
+        High,
+        Highest,
+    }
 }

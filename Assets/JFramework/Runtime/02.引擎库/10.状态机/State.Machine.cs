@@ -25,10 +25,10 @@ namespace JFramework
         {
             base.OnHide();
             var copies = new List<IState>(states.Values);
-            foreach (var stateData in copies)
+            foreach (var item in copies)
             {
-                stateData.OnHide();
-                HeapManager.Enqueue(stateData, stateData.GetType());
+                item.OnHide();
+                HeapManager.Enqueue(item, item.GetType());
             }
 
             states.Clear();
@@ -40,11 +40,11 @@ namespace JFramework
             state?.OnUpdate();
         }
         
-        public void AddState<T>(Type stateType)
+        public void AddState<T>(Type type)
         {
-            var stateData = HeapManager.Dequeue<IState>(stateType);
-            states[typeof(T)] = stateData;
-            stateData.OnShow(owner);
+            var item = HeapManager.Dequeue<IState>(type);
+            states[typeof(T)] = item;
+            item.OnShow(owner);
         }
 
         public void ChangeState<T>()
@@ -56,11 +56,11 @@ namespace JFramework
 
         public void RemoveState<T>()
         {
-            if (states.TryGetValue(typeof(T), out var stateData))
+            if (states.TryGetValue(typeof(T), out var item))
             {
-                stateData.OnHide();
+                item.OnHide();
                 states.Remove(typeof(T));
-                HeapManager.Enqueue(stateData, stateData.GetType());
+                HeapManager.Enqueue(item, item.GetType());
             }
         }
     }

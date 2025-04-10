@@ -20,47 +20,7 @@ namespace JFramework
     {
         private readonly Dictionary<T, Variable<float>> attributes = new Dictionary<T, Variable<float>>();
 
-        public int GetInt(T key)
-        {
-            if (!attributes.ContainsKey(key))
-            {
-                attributes.Add(key, 0);
-            }
-
-            return (int)attributes[key].Value;
-        }
-
-        public void SetInt(T key, int value)
-        {
-            if (!attributes.ContainsKey(key))
-            {
-                attributes.Add(key, 0);
-            }
-
-            attributes[key] = value;
-        }
-
-        public bool GetBool(T key)
-        {
-            if (!attributes.ContainsKey(key))
-            {
-                attributes.Add(key, 0);
-            }
-
-            return attributes[key].Value > 0;
-        }
-
-        public void SetBool(T key, bool value)
-        {
-            if (!attributes.ContainsKey(key))
-            {
-                attributes.Add(key, 0);
-            }
-
-            attributes[key] = value ? 1 : 0;
-        }
-
-        public float GetFloat(T key)
+        internal float Get(T key)
         {
             if (!attributes.ContainsKey(key))
             {
@@ -70,7 +30,7 @@ namespace JFramework
             return attributes[key].Value;
         }
 
-        public void SetFloat(T key, float value)
+        internal void Set(T key, float value)
         {
             if (!attributes.ContainsKey(key))
             {

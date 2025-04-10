@@ -42,46 +42,46 @@ namespace JFramework.Common
             }
         }
 
-        public static async void PlayMain(string assetName, Action<AudioSource> assetAction = null)
+        public static async void PlayMain(string name, Action<AudioSource> action = null)
         {
             if (!GlobalManager.Instance) return;
-            var audioSource = GlobalManager.Instance.sounds;
-            audioSource.clip = await AssetManager.Load<AudioClip>(GlobalSetting.GetAudioPath(assetName));
-            audioSource.loop = true;
-            audioSource.volume = musicValue;
-            assetAction?.Invoke(audioSource);
-            audioSource.Play();
+            var source = GlobalManager.Instance.sounds;
+            source.clip = await AssetManager.Load<AudioClip>(GlobalSetting.GetAudioPath(name));
+            source.loop = true;
+            source.volume = musicValue;
+            action?.Invoke(source);
+            source.Play();
         }
 
-        public static async void PlayLoop(string assetName, Action<AudioSource> assetAction = null)
+        public static async void PlayLoop(string name, Action<AudioSource> action = null)
         {
             if (!GlobalManager.Instance) return;
-            var assetPath = GlobalSetting.GetAudioPath(assetName);
-            var assetData = LoadPool(assetPath).Dequeue();
-            GlobalManager.audioData.Add(assetData);
-            assetData.transform.SetParent(null);
-            assetData.gameObject.SetActive(true);
-            assetData.clip = await AssetManager.Load<AudioClip>(assetPath);
-            assetData.loop = true;
-            assetData.volume = audioValue;
-            assetAction?.Invoke(assetData);
-            assetData.Play();
+            var target = GlobalSetting.GetAudioPath(name);
+            var source = LoadPool(target).Dequeue();
+            GlobalManager.audioData.Add(source);
+            source.transform.SetParent(null);
+            source.gameObject.SetActive(true);
+            source.clip = await AssetManager.Load<AudioClip>(target);
+            source.loop = true;
+            source.volume = audioValue;
+            action?.Invoke(source);
+            source.Play();
         }
 
-        public static async void PlayOnce(string assetName, Action<AudioSource> assetAction = null)
+        public static async void PlayOnce(string name, Action<AudioSource> action = null)
         {
             if (!GlobalManager.Instance) return;
-            var assetPath = GlobalSetting.GetAudioPath(assetName);
-            var assetData = LoadPool(assetPath).Dequeue();
-            GlobalManager.audioData.Add(assetData);
-            assetData.transform.SetParent(null);
-            assetData.gameObject.SetActive(true);
-            assetData.clip = await AssetManager.Load<AudioClip>(assetPath);
-            assetData.loop = false;
-            assetData.volume = audioValue;
-            assetAction?.Invoke(assetData);
-            assetData.Play();
-            assetData.Wait(assetData.clip.length).OnComplete(() => StopLoop(assetData));
+            var target = GlobalSetting.GetAudioPath(name);
+            var source = LoadPool(target).Dequeue();
+            GlobalManager.audioData.Add(source);
+            source.transform.SetParent(null);
+            source.gameObject.SetActive(true);
+            source.clip = await AssetManager.Load<AudioClip>(target);
+            source.loop = false;
+            source.volume = audioValue;
+            action?.Invoke(source);
+            source.Play();
+            source.Wait(source.clip.length).OnComplete(() => StopLoop(source));
         }
 
         public static void StopMain(bool pause = true)
@@ -97,24 +97,24 @@ namespace JFramework.Common
             }
         }
 
-        public static void StopLoop(AudioSource assetData)
+        public static void StopLoop(AudioSource source)
         {
             if (!GlobalManager.Instance) return;
-            if (!GlobalManager.poolGroup.TryGetValue(assetData.name, out var parent))
+            if (!GlobalManager.poolGroup.TryGetValue(source.name, out var pool))
             {
-                parent = new GameObject(Service.Text.Format("Pool - {0}", assetData.name));
-                parent.transform.SetParent(GlobalManager.Instance.transform);
-                GlobalManager.poolGroup.Add(assetData.name, parent);
+                pool = new GameObject(Service.Text.Format("Pool - {0}", source.name));
+                pool.transform.SetParent(GlobalManager.Instance.transform);
+                GlobalManager.poolGroup.Add(source.name, pool);
             }
 
-            assetData.Stop();
-            assetData.gameObject.SetActive(false);
-            assetData.transform.SetParent(parent.transform);
-            GlobalManager.audioData.Remove(assetData);
-            LoadPool(assetData.name).Enqueue(assetData);
+            source.Stop();
+            source.gameObject.SetActive(false);
+            source.transform.SetParent(pool.transform);
+            GlobalManager.audioData.Remove(source);
+            LoadPool(source.name).Enqueue(source);
         }
 
-        private static AudioPool LoadPool(string assetPath)
+        private static AudioPool LoadPool(string path)
         {
             if (GlobalManager.settings == null)
             {
@@ -122,14 +122,14 @@ namespace JFramework.Common
                 JsonManager.Load(GlobalManager.settings, nameof(AudioManager));
             }
 
-            if (GlobalManager.poolData.TryGetValue(assetPath, out var poolData))
+            if (GlobalManager.poolData.TryGetValue(path, out var pool))
             {
-                return (AudioPool)poolData;
+                return (AudioPool)pool;
             }
 
-            poolData = new AudioPool(typeof(AudioSource), assetPath);
-            GlobalManager.poolData.Add(assetPath, poolData);
-            return (AudioPool)poolData;
+            pool = new AudioPool(typeof(AudioSource), path);
+            GlobalManager.poolData.Add(path, pool);
+            return (AudioPool)pool;
         }
 
         internal static void Dispose()

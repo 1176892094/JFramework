@@ -17,9 +17,9 @@ namespace JFramework
 {
     public static partial class Extensions
     {
-        public static void Show<T>(this Component current, Type agentType)
+        public static void Show<T>(this Component current, Type type)
         {
-            AgentManager.Register<T>(current, agentType);
+            AgentManager.Register<T>(current, type);
         }
 
         public static T Find<T>(this Component current) where T : IAgent

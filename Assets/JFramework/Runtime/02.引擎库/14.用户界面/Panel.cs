@@ -19,23 +19,23 @@ namespace JFramework.Common
 {
     public static partial class UIManager
     {
-        private static async Task<UIPanel> Load(string assetPath, Type assetType)
+        private static async Task<UIPanel> Load(string path, Type type)
         {
-            var obj = await AssetManager.Load<GameObject>(assetPath);
-            var component = obj.GetComponent(assetType);
-            if (component == null)
+            var data = await AssetManager.Load<GameObject>(path);
+            var item = data.GetComponent(type);
+            if (item == null)
             {
-                component = obj.AddComponent(assetType);
+                item = data.AddComponent(type);
             }
 
-            obj.name = assetPath;
-            var panel = (UIPanel)component;
-            GlobalManager.panelData.Add(assetType, panel);
+            data.name = path;
+            var panel = (UIPanel)item;
+            GlobalManager.panelData.Add(type, panel);
             Surface(panel.transform, panel.layer);
             return panel;
         }
 
-        public static async void Show<T>(Action<T> assetAction = null) where T : UIPanel
+        public static async void Show<T>(Action<T> action = null) where T : UIPanel
         {
             if (!GlobalManager.Instance) return;
             var assetPath = GlobalSetting.GetPanelPath(typeof(T).Name);
@@ -50,7 +50,7 @@ namespace JFramework.Common
                 panel.Show();
             }
 
-            assetAction?.Invoke((T)panel);
+            action?.Invoke((T)panel);
         }
 
         public static void Hide<T>() where T : UIPanel
@@ -87,13 +87,13 @@ namespace JFramework.Common
             }
         }
 
-        public static async void Show(Type assetType, Action<UIPanel> assetAction = null)
+        public static async void Show(Type type, Action<UIPanel> action = null)
         {
             if (!GlobalManager.Instance) return;
-            var assetPath = GlobalSetting.GetPanelPath(assetType.Name);
-            if (!GlobalManager.panelData.TryGetValue(assetType, out var panel))
+            var path = GlobalSetting.GetPanelPath(type.Name);
+            if (!GlobalManager.panelData.TryGetValue(type, out var panel))
             {
-                panel = await Load(assetPath, assetType);
+                panel = await Load(path, type);
                 panel.Show();
             }
 
@@ -102,13 +102,13 @@ namespace JFramework.Common
                 panel.Show();
             }
 
-            assetAction?.Invoke(panel);
+            action?.Invoke(panel);
         }
 
-        public static void Hide(Type assetType)
+        public static void Hide(Type type)
         {
             if (!GlobalManager.Instance) return;
-            if (GlobalManager.panelData.TryGetValue(assetType, out var panel))
+            if (GlobalManager.panelData.TryGetValue(type, out var panel))
             {
                 if (panel.gameObject.activeInHierarchy)
                 {
@@ -117,10 +117,10 @@ namespace JFramework.Common
             }
         }
 
-        public static UIPanel Find(Type assetType)
+        public static UIPanel Find(Type type)
         {
             if (!GlobalManager.Instance) return null;
-            if (GlobalManager.panelData.TryGetValue(assetType, out var panel))
+            if (GlobalManager.panelData.TryGetValue(type, out var panel))
             {
                 return panel;
             }
@@ -128,62 +128,62 @@ namespace JFramework.Common
             return null;
         }
 
-        public static void Destroy(Type assetType)
+        public static void Destroy(Type type)
         {
             if (!GlobalManager.Instance) return;
-            if (GlobalManager.panelData.TryGetValue(assetType, out var panel))
+            if (GlobalManager.panelData.TryGetValue(type, out var panel))
             {
                 panel.Hide();
-                GlobalManager.panelData.Remove(assetType);
+                GlobalManager.panelData.Remove(type);
                 Object.Destroy(panel.gameObject);
             }
         }
 
         public static void Clear()
         {
-            var panelData = new List<Type>(GlobalManager.panelData.Keys);
-            foreach (var assetType in panelData)
+            var types = new List<Type>(GlobalManager.panelData.Keys);
+            foreach (var type in types)
             {
-                if (GlobalManager.panelData.TryGetValue(assetType, out var panel))
+                if (GlobalManager.panelData.TryGetValue(type, out var panel))
                 {
                     if (panel.state != UIState.Stable)
                     {
                         panel.Hide();
-                        GlobalManager.panelData.Remove(assetType);
+                        GlobalManager.panelData.Remove(type);
                         Object.Destroy(panel.gameObject);
                     }
                 }
             }
         }
 
-        public static void Surface(Transform panel, int layer)
+        public static void Surface(Transform panel, UILayer layer)
         {
             if (!GlobalManager.Instance) return;
-            if (!GlobalManager.panelLayer.TryGetValue(layer, out var parent))
+            if (!GlobalManager.layerData.TryGetValue((int)layer, out var pool))
             {
                 var name = Service.Text.Format("Pool - Canvas/Layer-{0}", layer);
-                var child = new GameObject(name, typeof(RectTransform));
-                child.transform.SetParent(GlobalManager.Instance.canvas.transform);
-                child.gameObject.layer = LayerMask.NameToLayer("UI");
-                parent = child.GetComponent<RectTransform>();
-                parent.anchorMin = Vector2.zero;
-                parent.anchorMax = Vector2.one;
-                parent.offsetMin = Vector2.zero;
-                parent.offsetMax = Vector2.zero;
-                parent.localScale = Vector3.one;
-                parent.localPosition = Vector3.zero;
-                GlobalManager.panelLayer.Add(layer, parent);
-                parent.SetSiblingIndex(layer);
+                var item = new GameObject(name, typeof(RectTransform));
+                item.transform.SetParent(GlobalManager.Instance.canvas.transform);
+                item.gameObject.layer = LayerMask.NameToLayer("UI");
+                pool = item.GetComponent<RectTransform>();
+                pool.anchorMin = Vector2.zero;
+                pool.anchorMax = Vector2.one;
+                pool.offsetMin = Vector2.zero;
+                pool.offsetMax = Vector2.zero;
+                pool.localScale = Vector3.one;
+                pool.localPosition = Vector3.zero;
+                GlobalManager.layerData.Add((int)layer, pool);
             }
 
-            var transform = (RectTransform)panel;
-            transform.SetParent(parent);
-            transform.anchorMin = Vector2.zero;
-            transform.anchorMax = Vector2.one;
-            transform.offsetMin = Vector2.zero;
-            transform.offsetMax = Vector2.zero;
-            transform.localScale = Vector3.one;
-            transform.localPosition = Vector3.zero;
+            pool.SetSiblingIndex((int)layer);
+            var rect = (RectTransform)panel;
+            rect.SetParent(pool);
+            rect.anchorMin = Vector2.zero;
+            rect.anchorMax = Vector2.one;
+            rect.offsetMin = Vector2.zero;
+            rect.offsetMax = Vector2.zero;
+            rect.localScale = Vector3.one;
+            rect.localPosition = Vector3.zero;
         }
     }
 }

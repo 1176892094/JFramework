@@ -18,13 +18,13 @@ namespace JFramework.Common
         public static void Listen(string group, UIPanel panel)
         {
             if (!GlobalManager.Instance) return;
-            if (!GlobalManager.panelGroup.TryGetValue(group, out var panelGroup))
+            if (!GlobalManager.groupData.TryGetValue(group, out var panels))
             {
-                panelGroup = new HashSet<UIPanel>();
-                GlobalManager.panelGroup.Add(group, panelGroup);
+                panels = new HashSet<UIPanel>();
+                GlobalManager.groupData.Add(group, panels);
             }
 
-            if (panelGroup.Add(panel))
+            if (panels.Add(panel))
             {
                 panel.groups.Add(group);
             }
@@ -33,13 +33,13 @@ namespace JFramework.Common
         public static void Remove(string group, UIPanel panel)
         {
             if (!GlobalManager.Instance) return;
-            if (!GlobalManager.panelGroup.TryGetValue(group, out var panelGroup))
+            if (!GlobalManager.groupData.TryGetValue(group, out var panels))
             {
-                panelGroup = new HashSet<UIPanel>();
-                GlobalManager.panelGroup.Add(group, panelGroup);
+                panels = new HashSet<UIPanel>();
+                GlobalManager.groupData.Add(group, panels);
             }
 
-            if (panelGroup.Remove(panel))
+            if (panels.Remove(panel))
             {
                 panel.groups.Remove(group);
             }
@@ -48,9 +48,9 @@ namespace JFramework.Common
         public static void Show(string group)
         {
             if (!GlobalManager.Instance) return;
-            if (GlobalManager.panelGroup.TryGetValue(group, out var panelGroup))
+            if (GlobalManager.groupData.TryGetValue(group, out var panels))
             {
-                foreach (var panel in panelGroup)
+                foreach (var panel in panels)
                 {
                     if (!panel.gameObject.activeInHierarchy)
                     {
@@ -63,9 +63,9 @@ namespace JFramework.Common
         public static void Hide(string group)
         {
             if (!GlobalManager.Instance) return;
-            if (GlobalManager.panelGroup.TryGetValue(group, out var panelGroup))
+            if (GlobalManager.groupData.TryGetValue(group, out var panels))
             {
-                foreach (var panel in panelGroup)
+                foreach (var panel in panels)
                 {
                     if (panel.gameObject.activeInHierarchy)
                     {
@@ -79,12 +79,12 @@ namespace JFramework.Common
         {
             foreach (var group in panel.groups)
             {
-                if (!GlobalManager.panelGroup.TryGetValue(group, out var panelGroup))
+                if (!GlobalManager.groupData.TryGetValue(group, out var panels))
                 {
                     continue;
                 }
 
-                foreach (var other in panelGroup)
+                foreach (var other in panels)
                 {
                     if (panel != other && other.gameObject.activeInHierarchy)
                     {
@@ -97,18 +97,18 @@ namespace JFramework.Common
 
         internal static void Dispose()
         {
-            var panelGroup = new List<string>(GlobalManager.panelGroup.Keys);
-            foreach (var group in panelGroup)
+            var groups = new List<string>(GlobalManager.groupData.Keys);
+            foreach (var group in groups)
             {
-                if (GlobalManager.panelGroup.TryGetValue(group, out var panel))
+                if (GlobalManager.groupData.TryGetValue(group, out var panel))
                 {
                     panel.Clear();
                 }
             }
 
             GlobalManager.panelData.Clear();
-            GlobalManager.panelGroup.Clear();
-            GlobalManager.panelLayer.Clear();
+            GlobalManager.groupData.Clear();
+            GlobalManager.layerData.Clear();
         }
     }
 }

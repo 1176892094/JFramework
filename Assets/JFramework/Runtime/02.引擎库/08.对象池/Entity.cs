@@ -18,74 +18,72 @@ namespace JFramework.Common
 {
     public static partial class PoolManager
     {
-        public static async Task<GameObject> Show(string assetPath)
+        public static async Task<GameObject> Show(string path)
         {
             if (!GlobalManager.Instance) return null;
-            var assetData = await LoadPool(assetPath).Dequeue();
+            var assetData = await LoadPool(path).Dequeue();
             assetData.transform.SetParent(null);
             assetData.SetActive(true);
             return assetData;
         }
 
-        public static async void Show(string assetPath, Action<GameObject> assetAction)
+        public static async void Show(string path, Action<GameObject> action)
         {
             if (!GlobalManager.Instance) return;
-            var assetData = await LoadPool(assetPath).Dequeue();
+            var assetData = await LoadPool(path).Dequeue();
             assetData.transform.SetParent(null);
             assetData.SetActive(true);
-            assetAction.Invoke(assetData);
+            action.Invoke(assetData);
         }
 
-        public static bool Hide(GameObject assetData)
+        public static bool Hide(GameObject item)
         {
             if (!GlobalManager.Instance) return false;
-            if (!GlobalManager.poolGroup.TryGetValue(assetData.name, out var parent))
+            if (!GlobalManager.poolGroup.TryGetValue(item.name, out var pool))
             {
-                parent = new GameObject(Service.Text.Format("Pool - {0}", assetData.name));
-                parent.transform.SetParent(GlobalManager.Instance.transform);
-                GlobalManager.poolGroup.Add(assetData.name, parent);
+                pool = new GameObject(Service.Text.Format("Pool - {0}", item.name));
+                pool.transform.SetParent(GlobalManager.Instance.transform);
+                GlobalManager.poolGroup.Add(item.name, pool);
             }
 
-            assetData.SetActive(false);
-            assetData.transform.SetParent(parent.transform);
-            return LoadPool(assetData.name).Enqueue(assetData);
+            item.SetActive(false);
+            item.transform.SetParent(pool.transform);
+            return LoadPool(item.name).Enqueue(item);
         }
 
-        private static EntityPool LoadPool(string assetPath)
+        private static EntityPool LoadPool(string path)
         {
-            if (GlobalManager.poolData.TryGetValue(assetPath, out var poolData))
+            if (GlobalManager.poolData.TryGetValue(path, out var pool))
             {
-                return (EntityPool)poolData;
+                return (EntityPool)pool;
             }
 
-            poolData = new EntityPool(typeof(GameObject), assetPath);
-            GlobalManager.poolData.Add(assetPath, poolData);
-            return (EntityPool)poolData;
+            pool = new EntityPool(typeof(GameObject), path);
+            GlobalManager.poolData.Add(path, pool);
+            return (EntityPool)pool;
         }
 
         internal static Reference[] Reference()
         {
             var index = 0;
-            var results = new Reference[GlobalManager.poolData.Count];
+            var items = new Reference[GlobalManager.poolData.Count];
             foreach (var value in GlobalManager.poolData.Values)
             {
-                var assetType = value.type;
-                var assetPath = value.path;
-                results[index++] = new Reference(assetType, assetPath, value.acquire, value.release, value.dequeue, value.enqueue);
+                items[index++] = new Reference(value.type, value.path, value.acquire, value.release, value.dequeue, value.enqueue);
             }
 
-            return results;
+            return items;
         }
 
         internal static void Dispose()
         {
-            var poolCaches = new List<string>(GlobalManager.poolData.Keys);
-            foreach (var cache in poolCaches)
+            var paths = new List<string>(GlobalManager.poolData.Keys);
+            foreach (var path in paths)
             {
-                if (GlobalManager.poolData.TryGetValue(cache, out var poolData))
+                if (GlobalManager.poolData.TryGetValue(path, out var pool))
                 {
-                    poolData.Dispose();
-                    GlobalManager.poolData.Remove(cache);
+                    pool.Dispose();
+                    GlobalManager.poolData.Remove(path);
                 }
             }
 

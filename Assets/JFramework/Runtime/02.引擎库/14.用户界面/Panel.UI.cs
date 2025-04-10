@@ -16,9 +16,9 @@ namespace JFramework
 {
     public abstract class UIPanel : MonoBehaviour
     {
+        public UILayer layer = UILayer.Low;
+        
         public UIState state = UIState.Common;
-
-        [Range(0, 9)] public int layer = 1 << 0;
         
         public List<string> groups = new List<string>();
 
