@@ -29,7 +29,10 @@ namespace JFramework
         }
 
         [InitializeOnLoadMethod]
-        private static void Enable() => instance ??= new Importer();
+        private static void Enable()
+        {
+            instance ??= new Importer();
+        }
 
         private static void OnGUI(string guid, Rect rect)
         {

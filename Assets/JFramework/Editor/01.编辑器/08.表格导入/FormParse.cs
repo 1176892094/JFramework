@@ -24,12 +24,10 @@ namespace JFramework
         {
             public string name;
         }
-
-        private const string GlobalSetting = nameof(GlobalSetting);
+        
         private const int NAME_LINE = 1;
         private const int TYPE_LINE = 2;
         private const int DATA_LINE = 3;
-        private static bool odinInspector;
         private static readonly string enumData;
         private static readonly string itemData;
         private static readonly string mainData;
@@ -57,12 +55,12 @@ namespace JFramework
 
         static FormManager()
         {
-            assemblyData = Resources.LoadAll<TextAsset>(GlobalSetting)[0].text;
+            assemblyData = Resources.LoadAll<TextAsset>(nameof(GlobalSetting))[0].text;
             assemblyName = JsonUtility.FromJson<Name>(assemblyData).name;
             assemblyPath = ScriptPath + "/" + assemblyName + ".asmdef";
-            enumData = Resources.LoadAll<TextAsset>(GlobalSetting)[1].text;
-            itemData = Resources.LoadAll<TextAsset>(GlobalSetting)[2].text;
-            mainData = Resources.LoadAll<TextAsset>(GlobalSetting)[3].text;
+            enumData = Resources.LoadAll<TextAsset>(nameof(GlobalSetting))[1].text;
+            itemData = Resources.LoadAll<TextAsset>(nameof(GlobalSetting))[2].text;
+            mainData = Resources.LoadAll<TextAsset>(nameof(GlobalSetting))[3].text;
         }
         
         private static string EnumPath(string name) => ScriptPath + "/01.枚举类/" + name + ".cs";

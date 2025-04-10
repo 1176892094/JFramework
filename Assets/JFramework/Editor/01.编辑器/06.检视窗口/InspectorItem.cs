@@ -29,7 +29,10 @@ namespace JFramework
         }
 
         [InitializeOnLoadMethod]
-        private static void Enable() => instance ??= new InspectorItem();
+        private static void Enable()
+        {
+            instance ??= new InspectorItem();
+        }
 
         protected override void InitInspector(EditorWindow window, VisualElement parent, VisualElement element)
         {

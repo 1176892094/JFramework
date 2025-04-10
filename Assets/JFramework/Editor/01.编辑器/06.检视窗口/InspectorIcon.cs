@@ -31,8 +31,11 @@ namespace JFramework
         }
     
         [InitializeOnLoadMethod]
-        private static void Enable() => instance ??= new InspectorIcon();
-    
+        private static void Enable()
+        {
+            instance ??= new InspectorIcon();
+        }
+
         protected override void InitInspector(EditorWindow window, VisualElement parent, VisualElement element)
         {
             if (parent[0].name == "JFramework Window")

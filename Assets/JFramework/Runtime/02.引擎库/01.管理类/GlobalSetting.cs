@@ -77,6 +77,7 @@ namespace JFramework
         [HideInInspector] public List<Object> ignoreAssets = new List<Object>();
 #endif
 
+
         public static string assetPackData => Service.Text.Format("{0}.json", Instance.assetPackName);
         public static string assetPackPath => Service.Text.Format("{0}/{1}", Application.persistentDataPath, Instance.assetBuildPath);
 
@@ -95,7 +96,7 @@ namespace JFramework
         public static string GetServerPath(string fileName) => Path.Combine(Instance.assetRemotePath, GetPlatform(fileName));
 
         public static string GetClientPath(string fileName) => Path.Combine(Application.streamingAssetsPath, GetPlatform(fileName));
-        
+
         public MailData MailData(string mailBody)
         {
             return new MailData

@@ -21,7 +21,7 @@ using UnityEngine.UIElements;
 
 namespace JFramework
 {
-    internal class Toolbar
+    internal sealed class Toolbar
     {
         private static Toolbar instance;
         private static List<string> scenes;
@@ -36,7 +36,7 @@ namespace JFramework
         [InitializeOnLoadMethod]
         private static void Enable() => instance ??= new Toolbar();
 
-        public static void OnInitialized()
+        private static void OnInitialized()
         {
             foreach (var obj in Resources.FindObjectsOfTypeAll(Reflection.toolbar))
             {

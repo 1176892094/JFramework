@@ -153,19 +153,16 @@ namespace JFramework
                 index = field.Value.LastIndexOf(':');
                 var fieldType = index < 0 ? field.Value : field.Value.Substring(0, index);
                 var fieldData = char.ToLower(fieldName[0]) + fieldName.Substring(1);
-                if (odinInspector)
-                {
-                    builder.AppendFormat("#if ODIN_INSPECTOR && UNITY_EDITOR\n");
-                    builder.AppendFormat("\t\t[Sirenix.OdinInspector.ShowInInspector]\n");
-                    builder.AppendFormat("#endif\n");
-                    builder.AppendFormat("\t\tpublic {0} {1} => {2}.Parse<{0}>();\n", fieldType, fieldName, fieldData);
-                    builder.AppendFormat("\t\t[HideInInspector, SerializeField] private byte[] {0};\n", fieldData);
-                }
-                else
-                {
-                    builder.AppendFormat("\t\tpublic {0} {1} => {2}.Parse<{0}>();\n", fieldType, fieldName, fieldData);
-                    builder.AppendFormat("\t\t[SerializeField] private byte[] {0};\n", fieldData);
-                }
+#if ODIN_INSPECTOR
+                builder.AppendFormat("#if ODIN_INSPECTOR && UNITY_EDITOR\n");
+                builder.AppendFormat("\t\t[Sirenix.OdinInspector.ShowInInspector]\n");
+                builder.AppendFormat("#endif\n");
+                builder.AppendFormat("\t\tpublic {0} {1} => {2}.Parse<{0}>();\n", fieldType, fieldName, fieldData);
+                builder.AppendFormat("\t\t[HideInInspector, SerializeField] private byte[] {0};\n", fieldData);
+#else
+                builder.AppendFormat("\t\tpublic {0} {1} => {2}.Parse<{0}>();\n", fieldType, fieldName, fieldData);
+                builder.AppendFormat("\t\t[SerializeField] private byte[] {0};\n", fieldData);
+#endif
             }
 
             scriptText = scriptText.Replace("//TODO:1", builder.ToString());
@@ -200,19 +197,16 @@ namespace JFramework
                 var fieldName = member.Substring(index + 1);
                 var fieldType = member.Substring(0, index);
                 var fieldData = char.ToLower(fieldName[0]) + fieldName.Substring(1);
-                if (odinInspector)
-                {
-                    builder.AppendFormat("#if ODIN_INSPECTOR && UNITY_EDITOR\n");
-                    builder.AppendFormat("\t\t[Sirenix.OdinInspector.ShowInInspector]\n");
-                    builder.AppendFormat("#endif\n");
-                    builder.AppendFormat("\t\tpublic {0} {1} => {2}.Parse<{0}>();\n", fieldType, fieldName, fieldData);
-                    builder.AppendFormat("\t\t[HideInInspector, SerializeField] private byte[] {0};\n", fieldData);
-                }
-                else
-                {
-                    builder.AppendFormat("\t\tpublic {0} {1} => {2}.Parse<{0}>();\n", fieldType, fieldName, fieldData);
-                    builder.AppendFormat("\t\t[SerializeField] private byte[] {0};\n", fieldData);
-                }
+#if ODIN_INSPECTOR
+                builder.AppendFormat("#if ODIN_INSPECTOR && UNITY_EDITOR\n");
+                builder.AppendFormat("\t\t[Sirenix.OdinInspector.ShowInInspector]\n");
+                builder.AppendFormat("#endif\n");
+                builder.AppendFormat("\t\tpublic {0} {1} => {2}.Parse<{0}>();\n", fieldType, fieldName, fieldData);
+                builder.AppendFormat("\t\t[HideInInspector, SerializeField] private byte[] {0};\n", fieldData);
+#else
+                builder.AppendFormat("\t\tpublic {0} {1} => {2}.Parse<{0}>();\n", fieldType, fieldName, fieldData);
+                builder.AppendFormat("\t\t[SerializeField] private byte[] {0};\n", fieldData);
+#endif
             }
 
             builder.Length -= 1;
