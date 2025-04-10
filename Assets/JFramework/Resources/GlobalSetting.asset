@@ -60,7 +60,7 @@ MonoBehaviour:
   assetLoadName: AssetBundle
   assetBuildPath: AssetBundles
   assetRemotePath: http://192.168.0.3:8000/AssetBundles
-  assetCachedPath: Assets/Template
+  assetSourcePath: Assets/Template
   sceneAssets: []
   ignoreAssets: []
 --- !u!49 &3450331790412130364
