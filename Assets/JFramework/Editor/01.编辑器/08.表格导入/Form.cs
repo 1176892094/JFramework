@@ -18,7 +18,7 @@ namespace JFramework
 {
     internal static partial class FormManager
     {
-        private static List<KeyValuePair<string, string[,]>> LoadDataTable(string filePath)
+        private static List<(string, string[,])> LoadDataTable(string filePath)
         {
             var fileType = Path.GetExtension(filePath);
             var fileName = Path.GetFileNameWithoutExtension(filePath);
@@ -32,12 +32,12 @@ namespace JFramework
                 using var archive = new ZipArchive(stream, ZipArchiveMode.Read);
                 var sheetName = LoadSheetName(LoadDocument(archive, "xl/workbook.xml"));
                 var sharedString = LoadSharedString(LoadDocument(archive, "xl/sharedStrings.xml"));
-                var dataTable = new List<KeyValuePair<string, string[,]>>();
+                var dataTable = new List<(string, string[,])>();
                 for (var i = 0; i < sheetName.Count; i++)
                 {
                     var sheet = Service.Text.Format("xl/worksheets/sheet{0}.xml", i + 1);
                     var worksheet = GetWorksheet(LoadDocument(archive, sheet), sharedString);
-                    dataTable.Add(new KeyValuePair<string, string[,]>(sheetName[i], worksheet));
+                    dataTable.Add((sheetName[i], worksheet));
                 }
 
                 return dataTable;

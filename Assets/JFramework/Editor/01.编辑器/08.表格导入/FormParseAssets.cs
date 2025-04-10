@@ -75,8 +75,8 @@ namespace JFramework
             var dataTable = new Dictionary<string, List<string[]>>();
             foreach (var excelData in excelFile)
             {
-                var sheetName = excelData.Key;
-                var sheetData = excelData.Value;
+                var sheetName = excelData.Item1;
+                var sheetData = excelData.Item2;
                 var row = sheetData.GetLength(1);
                 var column = sheetData.GetLength(0);
                 var columns = new List<int>(column);
