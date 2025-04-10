@@ -62,7 +62,7 @@ namespace JFramework
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static MemoryGetter Pop(ArraySegment<byte> segment)
         {
-            var getter = PoolManager.Dequeue<MemoryGetter>();
+            var getter = HeapManager.Dequeue<MemoryGetter>();
             getter.Reset(segment);
             return getter;
         }
@@ -70,7 +70,7 @@ namespace JFramework
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void Push(MemoryGetter getter)
         {
-            PoolManager.Enqueue(getter);
+            HeapManager.Enqueue(getter);
         }
 
         public override string ToString()
@@ -80,7 +80,7 @@ namespace JFramework
         
         void IDisposable.Dispose()
         {
-            PoolManager.Enqueue(this);
+            HeapManager.Enqueue(this);
         }
         
         public byte[] GetBytes(byte[] bytes, int count)

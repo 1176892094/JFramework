@@ -23,14 +23,14 @@ namespace JFramework.Common
             private readonly HashSet<AudioSource> cached = new HashSet<AudioSource>();
             private readonly Queue<AudioSource> unused = new Queue<AudioSource>();
 
-            public AudioPool(string assetPath, Type assetType)
+            public AudioPool(Type type, string path)
             {
-                this.assetPath = assetPath;
-                this.assetType = assetType;
+                this.type = type;
+                this.path = path;
             }
 
-            public Type assetType { get; private set; }
-            public string assetPath { get; private set; }
+            public Type type { get; }
+            public string path { get; }
             public int acquire => cached.Count;
             public int release => unused.Count;
             public int dequeue { get; private set; }
@@ -53,9 +53,9 @@ namespace JFramework.Common
                     cached.Remove(assetData);
                 }
 
-                assetData = new GameObject(assetPath).AddComponent<AudioSource>();
+                assetData = new GameObject(path).AddComponent<AudioSource>();
                 Object.DontDestroyOnLoad(assetData.gameObject);
-                assetData.name = assetPath;
+                assetData.name = path;
                 cached.Add(assetData);
                 return assetData;
             }

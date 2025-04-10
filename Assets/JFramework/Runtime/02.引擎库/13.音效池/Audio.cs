@@ -127,7 +127,7 @@ namespace JFramework.Common
                 return (AudioPool)poolData;
             }
 
-            poolData = new AudioPool(assetPath, typeof(AudioSource));
+            poolData = new AudioPool(typeof(AudioSource), assetPath);
             GlobalManager.poolData.Add(assetPath, poolData);
             return (AudioPool)poolData;
         }

@@ -67,7 +67,7 @@ namespace JFramework
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static MemorySetter Pop()
         {
-            var setter = PoolManager.Dequeue<MemorySetter>();
+            var setter = HeapManager.Dequeue<MemorySetter>();
             setter.Reset();
             return setter;
         }
@@ -75,7 +75,7 @@ namespace JFramework
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void Push(MemorySetter setter)
         {
-            PoolManager.Enqueue(setter);
+            HeapManager.Enqueue(setter);
         }
 
         public override string ToString()
@@ -85,7 +85,7 @@ namespace JFramework
         
         void IDisposable.Dispose()
         {
-            PoolManager.Enqueue(this);
+            HeapManager.Enqueue(this);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

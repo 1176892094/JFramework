@@ -17,21 +17,21 @@ using Object = UnityEngine.Object;
 
 namespace JFramework.Common
 {
-    public static partial class EntityManager
+    public static partial class PoolManager
     {
         private class EntityPool : IPool
         {
             private readonly HashSet<GameObject> cached = new HashSet<GameObject>();
             private readonly Queue<GameObject> unused = new Queue<GameObject>();
 
-            public EntityPool(string assetPath, Type assetType)
+            public EntityPool(Type type, string path)
             {
-                this.assetPath = assetPath;
-                this.assetType = assetType;
+                this.type = type;
+                this.path = path;
             }
 
-            public Type assetType { get; private set; }
-            public string assetPath { get; private set; }
+            public Type type { get; }
+            public string path { get; }
             public int acquire => cached.Count;
             public int release => unused.Count;
             public int dequeue { get; private set; }
@@ -54,9 +54,9 @@ namespace JFramework.Common
                     cached.Remove(assetData);
                 }
 
-                assetData = await AssetManager.Load<GameObject>(assetPath);
+                assetData = await AssetManager.Load<GameObject>(path);
                 Object.DontDestroyOnLoad(assetData);
-                assetData.name = assetPath;
+                assetData.name = path;
                 cached.Add(assetData);
                 return assetData;
             }

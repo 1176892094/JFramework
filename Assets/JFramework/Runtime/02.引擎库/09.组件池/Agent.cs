@@ -26,7 +26,7 @@ namespace JFramework.Common
                 GlobalManager.agentData.Add(owner, agents);
             }
 
-            var agentData = PoolManager.Dequeue<IAgent>(agentType);
+            var agentData = HeapManager.Dequeue<IAgent>(agentType);
             agents[typeof(T)] = agentData;
             agentData.OnShow(owner);
         }
@@ -59,7 +59,7 @@ namespace JFramework.Common
             {
                 agent.OnHide();
                 agents.Remove(typeof(T));
-                PoolManager.Enqueue(agent, agent.GetType());
+                HeapManager.Enqueue(agent, agent.GetType());
             }
 
             if (agents.Count == 0)
@@ -90,7 +90,7 @@ namespace JFramework.Common
                     foreach (var agent in agents.Values)
                     {
                         agent.OnHide();
-                        PoolManager.Enqueue(agent, agent.GetType());
+                        HeapManager.Enqueue(agent, agent.GetType());
                     }
 
                     agents.Clear();

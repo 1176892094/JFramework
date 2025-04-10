@@ -16,7 +16,7 @@ using UnityEngine;
 
 namespace JFramework.Common
 {
-    public static partial class EntityManager
+    public static partial class PoolManager
     {
         public static async Task<GameObject> Show(string assetPath)
         {
@@ -58,7 +58,7 @@ namespace JFramework.Common
                 return (EntityPool)poolData;
             }
 
-            poolData = new EntityPool(assetPath, typeof(GameObject));
+            poolData = new EntityPool(typeof(GameObject), assetPath);
             GlobalManager.poolData.Add(assetPath, poolData);
             return (EntityPool)poolData;
         }
@@ -69,8 +69,8 @@ namespace JFramework.Common
             var results = new Reference[GlobalManager.poolData.Count];
             foreach (var value in GlobalManager.poolData.Values)
             {
-                var assetType = value.assetType;
-                var assetPath = value.assetPath;
+                var assetType = value.type;
+                var assetPath = value.path;
                 results[index++] = new Reference(assetType, assetPath, value.acquire, value.release, value.dequeue, value.enqueue);
             }
 

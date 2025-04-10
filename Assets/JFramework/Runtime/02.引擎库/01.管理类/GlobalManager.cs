@@ -128,13 +128,13 @@ namespace JFramework
             UIManager.Dispose();
             PackManager.Dispose();
             DataManager.Dispose();
-            EventManager.Dispose();
+            PoolManager.Dispose();
             AudioManager.Dispose();
             AssetManager.Dispose();
             AgentManager.Dispose();
             TimerManager.Dispose();
-            EntityManager.Dispose();
-            PoolManager.Dispose();
+            EventManager.Dispose();
+            HeapManager.Dispose();
             GC.Collect();
         }
     }

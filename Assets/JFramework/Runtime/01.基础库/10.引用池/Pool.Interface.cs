@@ -15,8 +15,8 @@ namespace JFramework.Common
 {
     internal interface IPool : IDisposable
     {
-        public Type assetType { get; }
-        public string assetPath { get; }
+        public Type type { get; }
+        public string path { get; }
         public int acquire { get; }
         public int release { get; }
         public int dequeue { get; }

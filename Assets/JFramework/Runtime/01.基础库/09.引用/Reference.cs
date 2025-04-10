@@ -4,17 +4,17 @@ namespace JFramework
 {
     internal struct Reference
     {
-        public Type assetType { get; }
-        public string assetPath { get; }
-        public int acquire { get; }
-        public int release { get; }
-        public int dequeue { get; }
-        public int enqueue { get; }
+        public Type type;
+        public string path;
+        public int acquire;
+        public int release;
+        public int dequeue;
+        public int enqueue;
 
-        public Reference(Type assetType, string assetPath, int acquire, int release, int dequeue, int enqueue)
+        public Reference(Type type, string path, int acquire, int release, int dequeue, int enqueue)
         {
-            this.assetType = assetType;
-            this.assetPath = assetPath;
+            this.type = type;
+            this.path = path;
             this.acquire = acquire;
             this.release = release;
             this.dequeue = dequeue;

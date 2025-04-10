@@ -13,7 +13,7 @@ namespace JFramework.Common
 {
     public struct PackAwake : IEvent
     {
-        public int[] sizes { get; private set; }
+        public readonly int[] sizes;
 
         public PackAwake(int[] sizes)
         {
@@ -23,8 +23,8 @@ namespace JFramework.Common
 
     public struct PackUpdate : IEvent
     {
-        public string name { get; private set; }
-        public float progress { get; private set; }
+        public readonly string name;
+        public readonly float progress;
 
         public PackUpdate(string name, float progress)
         {
@@ -35,8 +35,8 @@ namespace JFramework.Common
 
     public struct PackComplete : IEvent
     {
-        public int status { get; private set; }
-        public string message { get; private set; }
+        public readonly int status;
+        public readonly string message;
 
         public PackComplete(int status, string message)
         {
@@ -47,7 +47,7 @@ namespace JFramework.Common
 
     public struct AssetAwake : IEvent
     {
-        public string[] names { get; private set; }
+        public readonly string[] names;
 
         public AssetAwake(string[] names)
         {
@@ -57,7 +57,7 @@ namespace JFramework.Common
 
     public struct AssetUpdate : IEvent
     {
-        public string name { get; private set; }
+        public readonly string name;
 
         public AssetUpdate(string name)
         {
@@ -71,7 +71,7 @@ namespace JFramework.Common
 
     public struct SceneAwake : IEvent
     {
-        public string name { get; private set; }
+        public readonly string name;
 
         public SceneAwake(string name)
         {
@@ -81,7 +81,7 @@ namespace JFramework.Common
 
     public struct SceneUpdate : IEvent
     {
-        public float progress { get; private set; }
+        public readonly float progress;
 
         public SceneUpdate(float progress)
         {
@@ -95,7 +95,7 @@ namespace JFramework.Common
 
     public struct DataAwake : IEvent
     {
-        public string[] names { get; private set; }
+        public readonly string[] names;
 
         public DataAwake(string[] names)
         {
@@ -105,7 +105,7 @@ namespace JFramework.Common
 
     public struct DataUpdate : IEvent
     {
-        public string name { get; private set; }
+        public readonly string name;
 
         public DataUpdate(string name)
         {

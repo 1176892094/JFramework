@@ -18,16 +18,16 @@ namespace JFramework.Common
     public partial class DebugManager
     {
         private readonly Dictionary<string, List<Reference>> poolData = new Dictionary<string, List<Reference>>();
-        private PoolMode windowOption = PoolMode.Pool;
+        private PoolMode windowOption = PoolMode.Heap;
 
 
         private void ReferenceWindow()
         {
             GUILayout.BeginHorizontal();
-            GUI.contentColor = windowOption == PoolMode.Pool ? Color.white : Color.gray;
-            if (GUILayout.Button("Pool", GUILayout.Height(30)))
+            GUI.contentColor = windowOption == PoolMode.Heap ? Color.white : Color.gray;
+            if (GUILayout.Button("Heap", GUILayout.Height(30)))
             {
-                windowOption = PoolMode.Pool;
+                windowOption = PoolMode.Heap;
             }
 
             GUI.contentColor = windowOption == PoolMode.Event ? Color.white : Color.gray;
@@ -36,24 +36,24 @@ namespace JFramework.Common
                 windowOption = PoolMode.Event;
             }
 
-            GUI.contentColor = windowOption == PoolMode.Entity ? Color.white : Color.gray;
-            if (GUILayout.Button("Entity", GUILayout.Height(30)))
+            GUI.contentColor = windowOption == PoolMode.Pool ? Color.white : Color.gray;
+            if (GUILayout.Button("Pool", GUILayout.Height(30)))
             {
-                windowOption = PoolMode.Entity;
+                windowOption = PoolMode.Pool;
             }
 
             GUI.contentColor = Color.white;
             GUILayout.EndHorizontal();
             switch (windowOption)
             {
-                case PoolMode.Pool:
-                    Draw(PoolManager.Reference(), "引用池", "未使用\t使用中\t使用次数\t释放次数");
+                case PoolMode.Heap:
+                    Draw(HeapManager.Reference(), "引用池", "未使用\t使用中\t使用次数\t释放次数");
                     break;
                 case PoolMode.Event:
                     Draw(EventManager.Reference(), "事件池", "触发数\t事件数\t添加次数\t移除次数");
                     break;
-                case PoolMode.Entity:
-                    Draw(EntityManager.Reference(), "对象池", "未激活\t激活中\t出队次数\t入队次数");
+                case PoolMode.Pool:
+                    Draw(PoolManager.Reference(), "对象池", "未激活\t激活中\t出队次数\t入队次数");
                     break;
             }
         }
@@ -63,7 +63,7 @@ namespace JFramework.Common
             poolData.Clear();
             foreach (var reference in references)
             {
-                var assemblyName = Service.Text.Format("{0} - {1}", reference.assetType.Assembly.GetName().Name, message);
+                var assemblyName = Service.Text.Format("{0} - {1}", reference.type.Assembly.GetName().Name, message);
                 if (!poolData.TryGetValue(assemblyName, out var results))
                 {
                     results = new List<Reference>();
@@ -83,10 +83,10 @@ namespace JFramework.Common
                 GUILayout.Label(poolPair.Key, GUILayout.Height(20));
                 foreach (var data in poolPair.Value)
                 {
-                    var assetName = data.assetType.Name;
-                    if (!string.IsNullOrEmpty(data.assetPath))
+                    var assetName = data.type.Name;
+                    if (!string.IsNullOrEmpty(data.path))
                     {
-                        assetName = Service.Text.Format("{0} - {1}", data.assetType.Name, data.assetPath);
+                        assetName = Service.Text.Format("{0} - {1}", data.type.Name, data.path);
                     }
 
                     GUILayout.Label(assetName, GUILayout.Height(20));
@@ -111,14 +111,14 @@ namespace JFramework.Common
 
         private static int Comparison(Reference origin, Reference target)
         {
-            return string.Compare(origin.assetType.Name, target.assetType.Name, StringComparison.Ordinal);
+            return string.Compare(origin.type.Name, target.type.Name, StringComparison.Ordinal);
         }
 
         private enum PoolMode
         {
-            Pool,
+            Heap,
             Event,
-            Entity,
+            Pool,
         }
     }
 }

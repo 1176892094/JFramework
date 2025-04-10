@@ -43,7 +43,27 @@ namespace JFramework
 
         public static string Color(this string result, string format)
         {
-            return Service.Text.Format("<color=#{0}>{1}</color>", format, result);
+            switch (format)
+            {
+                case "R": //红
+                    return Service.Text.Format("<color=#FF0000>{0}</color>", result);
+                case "G": //绿
+                    return Service.Text.Format("<color=#00FF00>{0}</color>", result);
+                case "B": //蓝
+                    return Service.Text.Format("<color=#0000FF>{0}</color>", result);
+                case "Y": //黄
+                    return Service.Text.Format("<color=#FFFF00>{0}</color>", result);
+                case "O": //橙
+                    return Service.Text.Format("<color=#FFAA00>{0}</color>", result);
+                case "S": //青
+                    return Service.Text.Format("<color=#00FFFF>{0}</color>", result);
+                case "P": //紫
+                    return Service.Text.Format("<color=#FFAAFF>{0}</color>", result);
+                case "W": //白
+                    return Service.Text.Format("<color=#FFFFFF>{0}</color>", result);
+                default:
+                    return Service.Text.Format("<color=#{0}>{1}</color>", format, result);
+            }
         }
 
         public static T ToEnum<T>(this string result) where T : struct, Enum
@@ -81,6 +101,5 @@ namespace JFramework
 
             return enumFlags[Service.Random.Next(enumFlags.Count)];
         }
-        
     }
 }

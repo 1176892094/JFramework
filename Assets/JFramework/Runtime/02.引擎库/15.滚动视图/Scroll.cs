@@ -53,7 +53,7 @@ namespace JFramework
                     if (grid != null)
                     {
                         grid.Dispose();
-                        EntityManager.Hide(grid.gameObject);
+                        PoolManager.Hide(grid.gameObject);
                     }
                 }
             }
@@ -128,7 +128,7 @@ namespace JFramework
                         if (grid != null)
                         {
                             grid.Dispose();
-                            EntityManager.Hide(grid.gameObject);
+                            PoolManager.Hide(grid.gameObject);
                         }
 
                         grids.Remove(i);
@@ -142,7 +142,7 @@ namespace JFramework
                         if (grid != null)
                         {
                             grid.Dispose();
-                            EntityManager.Hide(grid.gameObject);
+                            PoolManager.Hide(grid.gameObject);
                         }
 
                         grids.Remove(i);
@@ -171,7 +171,7 @@ namespace JFramework
                         posY = -(index % row) * assetRect.height - assetRect.height / 2;
                     }
 
-                    EntityManager.Show(assetPath, obj =>
+                    PoolManager.Show(assetPath, obj =>
                     {
                         var grid = obj.GetComponent<TGrid>();
                         if (grid == null)
@@ -187,7 +187,7 @@ namespace JFramework
                         if (!grids.ContainsKey(index))
                         {
                             grid.Dispose();
-                            EntityManager.Hide(grid.gameObject);
+                            PoolManager.Hide(grid.gameObject);
                             return;
                         }
 

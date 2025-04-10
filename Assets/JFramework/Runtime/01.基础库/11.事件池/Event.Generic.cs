@@ -17,17 +17,18 @@ namespace JFramework.Common
     public static partial class EventManager
     {
         [Serializable]
-        private class Event<T> : IPool where T : struct, IEvent
+        private class EventPool<T> : IPool where T : struct, IEvent
         {
             private readonly HashSet<IEvent<T>> cached = new HashSet<IEvent<T>>();
-
-            public Event(Type assetType)
+            private event Action<T> OnExecute;
+            
+            public EventPool(Type type)
             {
-                this.assetType = assetType;
+                this.type = type;
             }
 
-            public Type assetType { get; private set; }
-            public string assetPath { get; private set; }
+            public Type type { get; private set; }
+            public string path { get; private set; }
             public int acquire => cached.Count;
             public int release { get; private set; }
             public int dequeue { get; private set; }
@@ -38,8 +39,6 @@ namespace JFramework.Common
                 cached.Clear();
                 OnExecute = null;
             }
-
-            private event Action<T> OnExecute;
 
             public void Listen(IEvent<T> @object)
             {

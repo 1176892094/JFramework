@@ -14,7 +14,7 @@ using System.Collections.Generic;
 
 namespace JFramework.Common
 {
-    public static partial class PoolManager
+    public static partial class HeapManager
     {
         private static readonly Dictionary<Type, IPool> poolData = new Dictionary<Type, IPool>();
 
@@ -23,56 +23,54 @@ namespace JFramework.Common
             return LoadPool<T>(typeof(T)).Dequeue();
         }
 
-        public static T Dequeue<T>(Type heapType)
+        public static T Dequeue<T>(Type type)
         {
-            return LoadPool<T>(heapType).Dequeue();
+            return LoadPool<T>(type).Dequeue();
         }
 
-        public static void Enqueue<T>(T heapData)
+        public static void Enqueue<T>(T item)
         {
-            LoadPool<T>(typeof(T)).Enqueue(heapData);
+            LoadPool<T>(typeof(T)).Enqueue(item);
         }
 
-        public static void Enqueue<T>(T heapData, Type heapType)
+        public static void Enqueue<T>(T item, Type type)
         {
-            LoadPool<T>(heapType).Enqueue(heapData);
+            LoadPool<T>(type).Enqueue(item);
         }
 
-        private static Pool<T> LoadPool<T>(Type heapType)
+        private static HeapPool<T> LoadPool<T>(Type type)
         {
-            if (poolData.TryGetValue(heapType, out var pool))
+            if (poolData.TryGetValue(type, out var item))
             {
-                return (Pool<T>)pool;
+                return (HeapPool<T>)item;
             }
 
-            pool = new Pool<T>(heapType);
-            poolData.Add(heapType, pool);
-            return (Pool<T>)pool;
+            item = new HeapPool<T>(type);
+            poolData.Add(type, item);
+            return (HeapPool<T>)item;
         }
 
         internal static Reference[] Reference()
         {
             var index = 0;
-            var results = new Reference[poolData.Count];
+            var items = new Reference[poolData.Count];
             foreach (var value in poolData.Values)
             {
-                var assetType = value.assetType;
-                var assetPath = value.assetPath;
-                results[index++] = new Reference(assetType, assetPath, value.acquire, value.release, value.dequeue, value.enqueue);
+                items[index++] = new Reference(value.type, value.path, value.acquire, value.release, value.dequeue, value.enqueue);
             }
 
-            return results;
+            return items;
         }
 
         internal static void Dispose()
         {
-            var poolCaches = new List<Type>(poolData.Keys);
-            foreach (var cache in poolCaches)
+            var types = new List<Type>(poolData.Keys);
+            foreach (var type in types)
             {
-                if (poolData.TryGetValue(cache, out var pool))
+                if (poolData.TryGetValue(type, out var item))
                 {
-                    pool.Dispose();
-                    poolData.Remove(cache);
+                    item.Dispose();
+                    poolData.Remove(type);
                 }
             }
 

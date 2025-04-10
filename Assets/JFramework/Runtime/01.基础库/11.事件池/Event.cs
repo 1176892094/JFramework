@@ -18,31 +18,31 @@ namespace JFramework.Common
     {
         private static readonly Dictionary<Type, IPool> poolData = new Dictionary<Type, IPool>();
 
-        public static void Listen<T>(IEvent<T> objectData) where T : struct, IEvent
+        public static void Listen<T>(IEvent<T> data) where T : struct, IEvent
         {
-            LoadPool<T>().Listen(objectData);
+            LoadPool<T>().Listen(data);
         }
 
-        public static void Remove<T>(IEvent<T> objectData) where T : struct, IEvent
+        public static void Remove<T>(IEvent<T> data) where T : struct, IEvent
         {
-            LoadPool<T>().Remove(objectData);
+            LoadPool<T>().Remove(data);
+        }
+        
+        public static void Invoke<T>(T data) where T : struct, IEvent
+        {
+            LoadPool<T>().Invoke(data);
         }
 
-        public static void Invoke<T>(T objectData) where T : struct, IEvent
-        {
-            LoadPool<T>().Invoke(objectData);
-        }
-
-        private static Event<T> LoadPool<T>() where T : struct, IEvent
+        private static EventPool<T> LoadPool<T>() where T : struct, IEvent
         {
             if (poolData.TryGetValue(typeof(T), out var pool))
             {
-                return (Event<T>)pool;
+                return (EventPool<T>)pool;
             }
 
-            pool = new Event<T>(typeof(T));
+            pool = new EventPool<T>(typeof(T));
             poolData.Add(typeof(T), pool);
-            return (Event<T>)pool;
+            return (EventPool<T>)pool;
         }
 
         internal static Reference[] Reference()
@@ -51,9 +51,7 @@ namespace JFramework.Common
             var results = new Reference[poolData.Count];
             foreach (var value in poolData.Values)
             {
-                var assetType = value.assetType;
-                var assetPath = value.assetPath;
-                results[index++] = new Reference(assetType, assetPath, value.acquire, value.release, value.dequeue, value.enqueue);
+                results[index++] = new Reference(value.type, value.path, value.acquire, value.release, value.dequeue, value.enqueue);
             }
 
             return results;

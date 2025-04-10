@@ -66,7 +66,7 @@ namespace JFramework
                     }
 
                     var elapsedTime = EditorApplication.timeSinceStartup - sinceTime;
-                    Debug.Log(Service.Text.Format("自动生成脚本完成。耗时: {0}秒", elapsedTime.ToString("F").Color("00FF00")));
+                    Debug.Log(Service.Text.Format("自动生成脚本完成。耗时: {0}秒", elapsedTime.ToString("F").Color("G")));
                 }
                 finally
                 {
@@ -89,7 +89,7 @@ namespace JFramework
                     await FormManager.WriteAssets(ExcelPathKey);
                     UpdateAsset();
                     var elapsedTime = EditorApplication.timeSinceStartup - sinceTime;
-                    Debug.Log(Service.Text.Format("自动生成资源完成。耗时: {0}秒", elapsedTime.ToString("F").Color("00FF00")));
+                    Debug.Log(Service.Text.Format("自动生成资源完成。耗时: {0}秒", elapsedTime.ToString("F").Color("G")));
                 }
                 finally
                 {

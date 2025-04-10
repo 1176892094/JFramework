@@ -26,7 +26,7 @@ namespace JFramework.Common
         public static T Load<T>(Component entity, float duration) where T : class, ITimer
         {
             if (!GlobalManager.Instance) return null;
-            var timerData = PoolManager.Dequeue<T>();
+            var timerData = HeapManager.Dequeue<T>();
             timerData.Start(entity, duration, OnComplete);
             GlobalManager.timerData.Add(timerData);
             return timerData;
@@ -35,7 +35,7 @@ namespace JFramework.Common
             {
                 GlobalManager.timerData.Remove(timerData);
                 timerData.Dispose();
-                PoolManager.Enqueue(timerData, typeof(T));
+                HeapManager.Enqueue(timerData, typeof(T));
             }
         }
 

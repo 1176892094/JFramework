@@ -343,7 +343,7 @@ namespace JFramework.Net
 
                 if (@object.assetId.Equals(@object.name, StringComparison.OrdinalIgnoreCase))
                 {
-                    EntityManager.Hide(@object.gameObject);
+                    PoolManager.Hide(@object.gameObject);
                     @object.Reset();
                     return;
                 }
@@ -432,7 +432,7 @@ namespace JFramework.Net
                     GameObject prefab;
                     if (message.isPool)
                     {
-                        prefab = await EntityManager.Show(message.assetId);
+                        prefab = await PoolManager.Show(message.assetId);
                     }
                     else
                     {

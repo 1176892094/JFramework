@@ -61,12 +61,12 @@ namespace JFramework
 
         public static Segment Dequeue()
         {
-            return PoolManager.Dequeue<Segment>();
+            return HeapManager.Dequeue<Segment>();
         }
 
         public static void Enqueue(Segment segment)
         {
-            PoolManager.Enqueue(segment);
+            HeapManager.Enqueue(segment);
         }
     }
 }

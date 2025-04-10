@@ -14,21 +14,21 @@ using System.Collections.Generic;
 
 namespace JFramework.Common
 {
-    public static partial class PoolManager
+    public static partial class HeapManager
     {
         [Serializable]
-        private class Pool<T> : IPool
+        private class HeapPool<T> : IPool
         {
             private readonly HashSet<T> cached = new HashSet<T>();
             private readonly Queue<T> unused = new Queue<T>();
 
-            public Pool(Type assetType)
+            public HeapPool(Type type)
             {
-                this.assetType = assetType;
+                this.type = type;
             }
 
-            public Type assetType { get; private set; }
-            public string assetPath { get; private set; }
+            public Type type { get; private set; }
+            public string path { get; private set; }
             public int acquire => cached.Count;
             public int release => unused.Count;
             public int dequeue { get; private set; }
@@ -42,33 +42,33 @@ namespace JFramework.Common
 
             public T Dequeue()
             {
-                T assetData;
+                T item;
                 lock (unused)
                 {
                     dequeue++;
                     if (unused.Count > 0)
                     {
-                        assetData = unused.Dequeue();
+                        item = unused.Dequeue();
                     }
                     else
                     {
-                        assetData = (T)Activator.CreateInstance(assetType);
+                        item = (T)Activator.CreateInstance(type);
                     }
 
-                    cached.Add(assetData);
+                    cached.Add(item);
                 }
 
-                return assetData;
+                return item;
             }
 
-            public void Enqueue(T assetData)
+            public void Enqueue(T item)
             {
                 lock (unused)
                 {
-                    if (cached.Remove(assetData))
+                    if (cached.Remove(item))
                     {
                         enqueue++;
-                        unused.Enqueue(assetData);
+                        unused.Enqueue(item);
                     }
                 }
             }
