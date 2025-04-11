@@ -123,8 +123,8 @@ namespace JFramework.Common
 
         private void OnDestroy()
         {
-            Instance = null;
             manifest = null;
+            Instance = null;
             UIManager.Dispose();
             PackManager.Dispose();
             DataManager.Dispose();

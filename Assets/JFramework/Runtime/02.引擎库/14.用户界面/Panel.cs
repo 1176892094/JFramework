@@ -159,9 +159,10 @@ namespace JFramework.Common
         public static void Surface(Transform panel, UILayer layer)
         {
             if (!GlobalManager.Instance) return;
-            if (!GlobalManager.layerData.TryGetValue((int)layer, out var pool))
+            var index = (int)layer;
+            if (!GlobalManager.layerData.TryGetValue(index, out var pool))
             {
-                var name = Service.Text.Format("Pool - Canvas/Layer-{0}", layer);
+                var name = Service.Text.Format("Pool - Canvas/Layer-{0}", index);
                 var item = new GameObject(name, typeof(RectTransform));
                 item.transform.SetParent(GlobalManager.Instance.canvas.transform);
                 item.gameObject.layer = LayerMask.NameToLayer("UI");
@@ -172,10 +173,10 @@ namespace JFramework.Common
                 pool.offsetMax = Vector2.zero;
                 pool.localScale = Vector3.one;
                 pool.localPosition = Vector3.zero;
-                GlobalManager.layerData.Add((int)layer, pool);
+                GlobalManager.layerData.Add(index, pool);
             }
 
-            pool.SetSiblingIndex((int)layer);
+            pool.SetSiblingIndex(index);
             var rect = (RectTransform)panel;
             rect.SetParent(pool);
             rect.anchorMin = Vector2.zero;

@@ -219,7 +219,7 @@ namespace JFramework
             scaler.referenceResolution = new Vector2(1920, 1080);
             scaler.referencePixelsPerUnit = 64;
             DontDestroyOnLoad(canvas);
-            var manager = new GameObject(nameof(HeapManager)).AddComponent<GlobalManager>();
+            var manager = new GameObject(nameof(PoolManager)).AddComponent<GlobalManager>();
             manager.canvas = canvas;
             manager.canvas.renderMode = RenderMode.ScreenSpaceCamera;
         }
