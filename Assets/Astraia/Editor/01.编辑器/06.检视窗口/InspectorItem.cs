@@ -1,5 +1,5 @@
 // // *********************************************************************************
-// // # Project: JFramework
+// // # Project: Astraia
 // // # Unity: 6000.3.5f1
 // // # Author: 云谷千羽
 // // # Version: 1.0.0
@@ -14,7 +14,7 @@ using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-namespace JFramework
+namespace Astraia
 {
     internal sealed class InspectorItem : Inspector
     {
@@ -36,7 +36,7 @@ namespace JFramework
 
         protected override void InitInspector(EditorWindow window, VisualElement parent, VisualElement element)
         {
-            if (element.parent[0].name == "JFramework Settings")
+            if (element.parent[0].name == "Astraia Settings")
             {
                 element.parent.RemoveAt(0);
             }
@@ -54,7 +54,7 @@ namespace JFramework
         {
             var element = new VisualElement
             {
-                name = "JFramework Settings",
+                name = "Astraia Settings",
             };
             InitTitle(element);
             InitTools(element);
@@ -103,11 +103,11 @@ namespace JFramework
             foreach (var submenu in Unsupported.GetSubmenus("Tools"))
             {
                 var index = submenu.LastIndexOf('/');
-                if (submenu.Contains("JFramework"))
+                if (submenu.Contains("Astraia"))
                 {
                     if (element == null)
                     {
-                        SetLabel(parent, "JFramework");
+                        SetLabel(parent, "Astraia");
                         element = SetElement(parent);
                     }
 

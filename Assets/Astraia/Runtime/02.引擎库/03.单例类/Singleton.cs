@@ -1,5 +1,5 @@
 // *********************************************************************************
-// # Project: JFramework
+// # Project: Astraia
 // # Unity: 6000.3.5f1
 // # Author: 云谷千羽
 // # Version: 1.0.0
@@ -9,10 +9,10 @@
 // # Description: This is an automatically generated comment.
 // *********************************************************************************
 
-using JFramework.Common;
+using Astraia.Common;
 using UnityEngine;
 
-namespace JFramework
+namespace Astraia
 {
     public abstract class Singleton<T> : MonoBehaviour where T : Singleton<T>
     {

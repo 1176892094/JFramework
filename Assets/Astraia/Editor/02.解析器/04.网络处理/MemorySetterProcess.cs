@@ -11,13 +11,13 @@
 
 using System;
 using System.Collections.Generic;
-using JFramework.Net;
+using Astraia.Net;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
-namespace JFramework.Editor
+namespace Astraia.Editor
 {
     internal class Setter
     {

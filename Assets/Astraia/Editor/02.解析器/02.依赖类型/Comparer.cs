@@ -12,7 +12,7 @@
 using System.Collections.Generic;
 using Mono.Cecil;
 
-namespace JFramework.Editor
+namespace Astraia.Editor
 {
     internal class Comparer : IEqualityComparer<TypeReference>
     {

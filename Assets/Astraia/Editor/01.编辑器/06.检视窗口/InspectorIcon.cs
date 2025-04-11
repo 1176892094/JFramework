@@ -1,5 +1,5 @@
 // // *********************************************************************************
-// // # Project: JFramework
+// // # Project: Astraia
 // // # Unity: 6000.3.5f1
 // // # Author: 云谷千羽
 // // # Version: 1.0.0
@@ -16,7 +16,7 @@ using UnityEngine;
 using UnityEngine.UIElements;
 using Object = UnityEngine.Object;
 
-namespace JFramework
+namespace Astraia
 {
     internal sealed class InspectorIcon : Inspector
     {
@@ -38,7 +38,7 @@ namespace JFramework
 
         protected override void InitInspector(EditorWindow window, VisualElement parent, VisualElement element)
         {
-            if (parent[0].name == "JFramework Window")
+            if (parent[0].name == "Astraia Window")
             {
                 parent.RemoveAt(0);
             }
@@ -63,7 +63,7 @@ namespace JFramework
             contents.Clear();
             parent.Insert(0, new IMGUIContainer(OnGUIHandler)
             {
-                name = "JFramework Window",
+                name = "Astraia Window",
                 style =
                 {
                     height = 20f,

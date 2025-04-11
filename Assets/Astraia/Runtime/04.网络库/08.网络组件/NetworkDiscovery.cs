@@ -1,10 +1,10 @@
 using System;
 using System.Net;
 using System.Net.Sockets;
-using JFramework.Common;
+using Astraia.Common;
 using UnityEngine;
 
-namespace JFramework.Net
+namespace Astraia.Net
 {
     public class NetworkDiscovery : MonoBehaviour
     {

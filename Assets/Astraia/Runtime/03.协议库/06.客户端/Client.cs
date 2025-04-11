@@ -1,5 +1,5 @@
 // *********************************************************************************
-// # Project: JFramework
+// # Project: Astraia
 // # Unity: 6000.3.5f1
 // # Author: 云谷千羽
 // # Version: 1.0.0
@@ -13,7 +13,7 @@ using System;
 using System.Net;
 using System.Net.Sockets;
 
-namespace JFramework
+namespace Astraia
 {
     internal sealed class Client : Agent
     {

@@ -9,11 +9,11 @@
 // # Description: This is an automatically generated comment.
 // *********************************************************************************
 
-using JFramework.Net;
+using Astraia.Net;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
 
-namespace JFramework.Editor
+namespace Astraia.Editor
 {
     internal enum InvokeMode : byte
     {

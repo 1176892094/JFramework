@@ -1,5 +1,5 @@
 // *********************************************************************************
-// # Project: JFramework
+// # Project: Astraia
 // # Unity: 6000.3.5f1
 // # Author: 云谷千羽
 // # Version: 1.0.0
@@ -11,19 +11,19 @@
 
 using Mono.Cecil;
 
-namespace JFramework.Editor
+namespace Astraia.Editor
 {
     internal static class Const
     {
         /// <summary>
         /// 程序集名称
         /// </summary>
-        public const string ASSEMBLY = "JFramework.Net";
+        public const string ASSEMBLY = "Astraia.Net";
 
         /// <summary>
         /// 命名空间
         /// </summary>
-        public const string GEN_TYPE = "JFramework.Net";
+        public const string GEN_TYPE = "Astraia.Net";
 
         /// <summary>
         /// 生成脚本名称

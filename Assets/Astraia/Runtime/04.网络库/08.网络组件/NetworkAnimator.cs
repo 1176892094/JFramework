@@ -2,7 +2,7 @@ using System;
 using System.Linq;
 using UnityEngine;
 
-namespace JFramework.Net
+namespace Astraia.Net
 {
     public class NetworkAnimator : NetworkBehaviour
     {

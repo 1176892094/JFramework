@@ -1,5 +1,5 @@
 // // *********************************************************************************
-// // # Project: JFramework
+// // # Project: Astraia
 // // # Unity: 6000.3.5f1
 // // # Author: 云谷千羽
 // // # Version: 1.0.0
@@ -12,15 +12,15 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using JFramework.Common;
+using Astraia.Common;
 using UnityEngine;
 using AssetData = System.Collections.Generic.KeyValuePair<string, string>;
-using EnumTable = System.Collections.Generic.Dictionary<System.Enum, JFramework.Common.IData>;
-using ItemTable = System.Collections.Generic.Dictionary<int, JFramework.Common.IData>;
-using NameTable = System.Collections.Generic.Dictionary<string, JFramework.Common.IData>;
-using AgentData = System.Collections.Generic.Dictionary<System.Type, JFramework.Common.IAgent>;
+using EnumTable = System.Collections.Generic.Dictionary<System.Enum, Astraia.Common.IData>;
+using ItemTable = System.Collections.Generic.Dictionary<int, Astraia.Common.IData>;
+using NameTable = System.Collections.Generic.Dictionary<string, Astraia.Common.IData>;
+using AgentData = System.Collections.Generic.Dictionary<System.Type, Astraia.Common.IAgent>;
 
-namespace JFramework.Common
+namespace Astraia.Common
 {
     public class GlobalManager : MonoBehaviour
     {

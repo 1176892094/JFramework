@@ -11,12 +11,12 @@
 
 using System.Linq;
 using System.Runtime.CompilerServices;
-using JFramework.Common;
+using Astraia.Common;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
 using UnityEngine;
 
-namespace JFramework.Editor
+namespace Astraia.Editor
 {
     internal static class RuntimeAttribute
     {
@@ -124,7 +124,7 @@ namespace JFramework.Editor
             }
             else
             {
-                logger.Error("注册程序集 JFramework.Net.dll 失败");
+                logger.Error("注册程序集 Astraia.Net.dll 失败");
             }
         }
 

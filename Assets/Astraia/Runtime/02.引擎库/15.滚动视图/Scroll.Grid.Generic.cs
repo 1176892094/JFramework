@@ -1,5 +1,5 @@
 // *********************************************************************************
-// # Project: JFramework
+// # Project: Astraia
 // # Unity: 6000.3.5f1
 // # Author: 云谷千羽
 // # Version: 1.0.0
@@ -9,7 +9,7 @@
 // # Description: This is an automatically generated comment.
 // *********************************************************************************
 
-namespace JFramework.Common
+namespace Astraia.Common
 {
     public interface IGrid<TItem> : IGrid
     {

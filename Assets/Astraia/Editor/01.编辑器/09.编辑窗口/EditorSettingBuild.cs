@@ -1,5 +1,5 @@
 // // *********************************************************************************
-// // # Project: JFramework
+// // # Project: Astraia
 // // # Unity: 6000.3.5f1
 // // # Author: 云谷千羽
 // // # Version: 1.0.0
@@ -15,15 +15,15 @@ using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
-using JFramework.Common;
+using Astraia.Common;
 using UnityEditor;
 using UnityEngine;
 
-namespace JFramework
+namespace Astraia
 {
     internal partial class EditorSetting
     {
-        [MenuItem("Tools/JFramework/构建 AB 资源", priority = 3)]
+        [MenuItem("Tools/Astraia/构建 AB 资源", priority = 3)]
         private static async void BuildAsset()
         {
             UpdateAsset();

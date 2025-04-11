@@ -1,5 +1,5 @@
 // // *********************************************************************************
-// // # Project: JFramework
+// // # Project: Astraia
 // // # Unity: 6000.3.5f1
 // // # Author: 云谷千羽
 // // # Version: 1.0.0
@@ -15,7 +15,7 @@ using System.Threading.Tasks;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
-namespace JFramework.Common
+namespace Astraia.Common
 {
     public static partial class AssetManager
     {

@@ -1,5 +1,5 @@
 // // *********************************************************************************
-// // # Project: JFramework
+// // # Project: Astraia
 // // # Unity: 6000.3.5f1
 // // # Author: 云谷千羽
 // // # Version: 1.0.0
@@ -13,7 +13,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using JFramework.Common;
+using Astraia.Common;
 using UnityEngine;
 using UnityEngine.UI;
 using Object = UnityEngine.Object;
@@ -21,7 +21,7 @@ using Object = UnityEngine.Object;
 using UnityEditor;
 #endif
 
-namespace JFramework
+namespace Astraia
 {
     internal class GlobalSetting : ScriptableObject
     {
@@ -150,9 +150,9 @@ namespace JFramework
 
         public static string GetAssetPath(string name) => Service.Text.Format("{0}/DataTable/{1}DataTable.asset", Instance.assetSourcePath, name);
 
-        public static string GetDataName(string name) => Service.Text.Format("JFramework.Table.{0}Data,{1}", name, assemblyName);
+        public static string GetDataName(string name) => Service.Text.Format("Astraia.Table.{0}Data,{1}", name, assemblyName);
 
-        public static string GetTableName(string name) => Service.Text.Format("JFramework.Table.{0}DataTable", name);
+        public static string GetTableName(string name) => Service.Text.Format("Astraia.Table.{0}DataTable", name);
 
         private static void UpdateSceneSetting()
         {
@@ -197,11 +197,11 @@ namespace JFramework
             {
                 smtpServer = smtpServer,
                 smtpPort = smtpPort,
-                senderName = "JFramework",
+                senderName = "Astraia",
                 senderAddress = smtpUsername,
                 senderPassword = smtpPassword,
                 targetAddress = smtpUsername,
-                mailName = "来自《JFramework》的调试日志:",
+                mailName = "来自《Astraia》的调试日志:",
                 mailBody = mailBody
             };
         }

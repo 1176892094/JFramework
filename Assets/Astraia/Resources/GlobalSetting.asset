@@ -8,11 +8,11 @@ TextAsset:
   m_PrefabAsset: {fileID: 0}
   m_Name: Template3
   m_Script: "// *********************************************************************************\n//
-    # Project: JFramework\n// # Unity: 6000.3.5f1\n// # Author: \u4E91\u8C37\u5343\u7FBD\n//
+    # Project: Astraia\n// # Unity: 6000.3.5f1\n// # Author: \u4E91\u8C37\u5343\u7FBD\n//
     # Version: 1.0.0\n// # History: 2024-09-08 02:09:18\n// # Recently: 2024-12-22
     20:12:28\n// # Copyright: 2024, \u4E91\u8C37\u5343\u7FBD\n// # Description: This
     is an automatically generated comment.\n// *********************************************************************************\n\nusing
-    System;\nusing UnityEngine;\n\nnamespace JFramework.Table\n{\n    [Serializable]\n   
+    System;\nusing UnityEngine;\n\nnamespace Astraia.Table\n{\n    [Serializable]\n   
     public struct Template\n    {\n//TODO:1\n    }\n}"
 --- !u!49 &-2960232863454612892
 TextAsset:
@@ -22,7 +22,7 @@ TextAsset:
   m_PrefabAsset: {fileID: 0}
   m_Name: Template1
   m_Script: "{\n  \"name\": \"HotUpdate.Data\",\n  \"rootNamespace\": \"\",\n  \"references\":
-    [\n    \"JFramework.Run\"\n  ],\n  \"includePlatforms\": [],\n  \"excludePlatforms\":
+    [\n    \"Astraia.Run\"\n  ],\n  \"includePlatforms\": [],\n  \"excludePlatforms\":
     [],\n  \"allowUnsafeCode\": false,\n  \"overrideReferences\": false,\n  \"precompiledReferences\":
     [],\n  \"autoReferenced\": false,\n  \"defineConstraints\": [],\n  \"versionDefines\":
     [],\n  \"noEngineReferences\": false\n}"
@@ -34,11 +34,11 @@ TextAsset:
   m_PrefabAsset: {fileID: 0}
   m_Name: Template2
   m_Script: "// *********************************************************************************\n//
-    # Project: JFramework\n// # Unity: 6000.3.5f1\n// # Author: \u4E91\u8C37\u5343\u7FBD\n//
+    # Project: Astraia\n// # Unity: 6000.3.5f1\n// # Author: \u4E91\u8C37\u5343\u7FBD\n//
     # Version: 1.0.0\n// # History: 2024-09-08 02:09:18\n// # Recently: 2024-12-22
     20:12:28\n// # Copyright: 2024, \u4E91\u8C37\u5343\u7FBD\n// # Description: This
     is an automatically generated comment.\n// *********************************************************************************\n\nnamespace
-    JFramework.Table\n{\n    public enum Template\n    {\n//TODO:1\n    }\n}"
+    Astraia.Table\n{\n    public enum Template\n    {\n//TODO:1\n    }\n}"
 --- !u!114 &11400000
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -81,12 +81,12 @@ TextAsset:
   m_PrefabAsset: {fileID: 0}
   m_Name: Template4
   m_Script: "// *********************************************************************************\n//
-    # Project: JFramework\n// # Unity: 6000.3.5f1\n// # Author: \u4E91\u8C37\u5343\u7FBD\n//
+    # Project: Astraia\n// # Unity: 6000.3.5f1\n// # Author: \u4E91\u8C37\u5343\u7FBD\n//
     # Version: 1.0.0\n// # History: 2024-09-08 02:09:18\n// # Recently: 2024-12-22
     20:12:28\n// # Copyright: 2024, \u4E91\u8C37\u5343\u7FBD\n// # Description: This
     is an automatically generated comment.\n// *********************************************************************************\n\nusing
-    System;\nusing System.Text;\nusing UnityEngine;\nusing JFramework.Common;\n\nnamespace
-    JFramework.Table\n{\n    internal class TemplateDataTable : DataTable<TemplateData>
+    System;\nusing System.Text;\nusing UnityEngine;\nusing Astraia.Common;\n\nnamespace
+    Astraia.Table\n{\n    internal class TemplateDataTable : DataTable<TemplateData>
     { }\n    \n    [Serializable]\n    public struct TemplateData : IData\n    {\n//TODO:1\n       
     public void Create(string[] sheet, int column)\n        {\n#if UNITY_EDITOR\n//TODO:2\n#endif\n       
     }\n    }\n}"

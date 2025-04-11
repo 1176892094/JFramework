@@ -1,5 +1,5 @@
 // *********************************************************************************
-// # Project: JFramework
+// # Project: Astraia
 // # Unity: 6000.3.5f1
 // # Author: 云谷千羽
 // # Version: 1.0.0
@@ -12,10 +12,10 @@
 using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
-using JFramework.Common;
+using Astraia.Common;
 using UnityEngine;
 
-namespace JFramework.Net
+namespace Astraia.Net
 {
     public sealed partial class NetworkObject : MonoBehaviour
     {
@@ -73,7 +73,7 @@ namespace JFramework.Net
 
         private void OnValidate()
         {
-            var assetType = Service.Find.Type("JFramework.NetworkSetter, Unity.JFramework.CodeGen");
+            var assetType = Service.Find.Type("Astraia.NetworkSetter, Unity.Astraia.CodeGen");
             var assetData = assetType.GetMethod("Validate", Service.Find.Static);
             if (assetData != null)
             {

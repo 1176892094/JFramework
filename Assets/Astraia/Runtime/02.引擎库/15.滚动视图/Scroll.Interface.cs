@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace JFramework.Common
+namespace Astraia.Common
 {
     public interface IScroll<TItem> : IAgent
     {

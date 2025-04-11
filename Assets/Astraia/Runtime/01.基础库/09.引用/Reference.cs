@@ -1,6 +1,6 @@
 using System;
 
-namespace JFramework
+namespace Astraia
 {
     internal struct Reference
     {

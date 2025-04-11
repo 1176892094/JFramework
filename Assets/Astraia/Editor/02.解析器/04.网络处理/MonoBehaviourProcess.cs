@@ -9,10 +9,10 @@
 // # Description: This is an automatically generated comment.
 // *********************************************************************************
 
-using JFramework.Net;
+using Astraia.Net;
 using Mono.Cecil;
 
-namespace JFramework.Editor
+namespace Astraia.Editor
 {
     internal static class MonoBehaviourProcess
     {

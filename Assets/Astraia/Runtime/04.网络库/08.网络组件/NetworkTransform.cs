@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace JFramework.Net
+namespace Astraia.Net
 {
     public class NetworkTransform : NetworkBehaviour
     {

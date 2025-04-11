@@ -11,12 +11,12 @@
 
 using System;
 using System.Collections.Generic;
-using JFramework.Net;
+using Astraia.Net;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
 using UnityEngine;
 
-namespace JFramework.Editor
+namespace Astraia.Editor
 {
     using FieldDefinitionPair = KeyValuePair<List<FieldDefinition>, Dictionary<FieldDefinition, FieldDefinition>>;
 

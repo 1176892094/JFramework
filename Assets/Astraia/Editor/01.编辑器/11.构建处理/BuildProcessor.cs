@@ -1,5 +1,5 @@
 // // *********************************************************************************
-// // # Project: JFramework
+// // # Project: Astraia
 // // # Unity: 6000.3.5f1
 // // # Author: 云谷千羽
 // // # Version: 1.0.0
@@ -12,7 +12,7 @@
 using UnityEditor.Build;
 using UnityEditor.Build.Reporting;
 
-namespace JFramework
+namespace Astraia
 {
     public class BuildProcessor : IPreprocessBuildWithReport, IPostprocessBuildWithReport
     {

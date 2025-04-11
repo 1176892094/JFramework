@@ -12,7 +12,7 @@
 using Mono.Cecil;
 using Mono.Cecil.Cil;
 
-namespace JFramework.Editor
+namespace Astraia.Editor
 {
     internal static class SyncVarReplace
     {

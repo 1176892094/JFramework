@@ -1,5 +1,5 @@
 // // *********************************************************************************
-// // # Project: JFramework
+// // # Project: Astraia
 // // # Unity: 6000.3.5f1
 // // # Author: 云谷千羽
 // // # Version: 1.0.0
@@ -24,7 +24,7 @@ using Sirenix.Utilities.Editor;
 #endif
 
 
-namespace JFramework
+namespace Astraia
 {
     internal partial class EditorSetting
 #if ODIN_INSPECTOR
@@ -45,7 +45,7 @@ namespace JFramework
             set => EditorPrefs.SetString(nameof(ExcelPathKey), value);
         }
 
-        [MenuItem("Tools/JFramework/框架配置窗口 _F1", priority = 2)]
+        [MenuItem("Tools/Astraia/框架配置窗口 _F1", priority = 2)]
         public static void ShowWindow()
         {
 #if ODIN_INSPECTOR
@@ -69,7 +69,7 @@ namespace JFramework
             return menuTree;
         }
 #endif
-        [MenuItem("Tools/JFramework/转化表格数据", priority = 5)]
+        [MenuItem("Tools/Astraia/转化表格数据", priority = 5)]
         private static async void ExcelToScripts()
         {
             var folderPath = ExcelPathKey;
@@ -127,11 +127,11 @@ namespace JFramework
             }
         }
 
-        [MenuItem("Tools/JFramework/项目工程路径", priority = 6)]
+        [MenuItem("Tools/Astraia/项目工程路径", priority = 6)]
         private static void ProjectDirectories() => Process.Start(Environment.CurrentDirectory);
 
 
-        [MenuItem("Tools/JFramework/程序集编译路径", priority = 7)]
+        [MenuItem("Tools/Astraia/程序集编译路径", priority = 7)]
         private static void AssemblyDefinitionPath()
         {
             if (!Directory.Exists(Environment.CurrentDirectory + "/Library/ScriptAssemblies"))
@@ -143,10 +143,10 @@ namespace JFramework
             Process.Start(Environment.CurrentDirectory + "/Library/ScriptAssemblies");
         }
 
-        [MenuItem("Tools/JFramework/持久化存储路径", priority = 8)]
+        [MenuItem("Tools/Astraia/持久化存储路径", priority = 8)]
         private static void PersistentDataPath() => Process.Start(Application.persistentDataPath);
 
-        [MenuItem("Tools/JFramework/流动资源路径", priority = 9)]
+        [MenuItem("Tools/Astraia/流动资源路径", priority = 9)]
         private static void StreamingAssetPath()
         {
             if (!Directory.Exists(Application.streamingAssetsPath))
