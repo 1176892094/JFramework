@@ -235,5 +235,16 @@ namespace Astraia.Net
 
             setter.SetString(value.ToString());
         }
+        
+        public static void SetType(this MemorySetter setter, Type value)
+        {
+            if (value == null)
+            {
+                setter.SetString(null);
+                return;
+            }
+
+            setter.SetString(value.FullName);
+        }
     }
 }
