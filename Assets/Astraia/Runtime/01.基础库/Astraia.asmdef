@@ -1,18 +1,14 @@
 {
-    "name": "JFramework.Net",
+    "name": "Astraia",
     "rootNamespace": "",
-    "references": [
-        "JFramework",
-        "JFramework.Kcp",
-        "JFramework.Run"
-    ],
+    "references": [],
     "includePlatforms": [],
     "excludePlatforms": [],
-    "allowUnsafeCode": false,
+    "allowUnsafeCode": true,
     "overrideReferences": false,
     "precompiledReferences": [],
     "autoReferenced": false,
     "defineConstraints": [],
     "versionDefines": [],
-    "noEngineReferences": false
+    "noEngineReferences": true
 }

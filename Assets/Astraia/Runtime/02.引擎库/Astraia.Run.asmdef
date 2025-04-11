@@ -1,8 +1,8 @@
 {
-    "name": "JFramework.Run",
+    "name": "Astraia.Run",
     "rootNamespace": "",
     "references": [
-        "JFramework"
+        "GUID:aa053e14409e744ee99695800f09a6fb"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

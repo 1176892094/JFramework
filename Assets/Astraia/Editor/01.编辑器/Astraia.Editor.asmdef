@@ -1,10 +1,13 @@
 {
-    "name": "JFramework.Kcp",
+    "name": "Astraia.Editor",
     "rootNamespace": "",
     "references": [
-        "JFramework"
+        "GUID:aa053e14409e744ee99695800f09a6fb",
+        "GUID:d7b5476ac52be4da88cfdfdc8b8c889a"
     ],
-    "includePlatforms": [],
+    "includePlatforms": [
+        "Editor"
+    ],
     "excludePlatforms": [],
     "allowUnsafeCode": false,
     "overrideReferences": false,
@@ -12,5 +15,5 @@
     "autoReferenced": false,
     "defineConstraints": [],
     "versionDefines": [],
-    "noEngineReferences": true
+    "noEngineReferences": false
 }

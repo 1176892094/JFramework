@@ -1,10 +1,12 @@
 {
-    "name": "JFramework",
+    "name": "Astraia.Kcp",
     "rootNamespace": "",
-    "references": [],
+    "references": [
+        "GUID:aa053e14409e744ee99695800f09a6fb"
+    ],
     "includePlatforms": [],
     "excludePlatforms": [],
-    "allowUnsafeCode": true,
+    "allowUnsafeCode": false,
     "overrideReferences": false,
     "precompiledReferences": [],
     "autoReferenced": false,

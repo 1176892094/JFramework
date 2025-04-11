@@ -1,9 +1,9 @@
 {
-    "name": "Unity.JFramework.CodeGen",
+    "name": "Unity.Astraia.CodeGen",
     "rootNamespace": "",
     "references": [
-        "JFramework",
-        "JFramework.Net"
+        "GUID:aa053e14409e744ee99695800f09a6fb",
+        "GUID:25698154d24f0428fa172324a8fd83d9"
     ],
     "includePlatforms": [
         "Editor"

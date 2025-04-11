@@ -24,9 +24,9 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyCopyright("Copyright ©  2025")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
-[assembly: InternalsVisibleTo("JFramework.Net")]
-[assembly: InternalsVisibleTo("JFramework.Log")]
-[assembly: InternalsVisibleTo("JFramework.Editor")]
+[assembly: InternalsVisibleTo("Astraia.Net")]
+[assembly: InternalsVisibleTo("Astraia.Log")]
+[assembly: InternalsVisibleTo("Astraia.Editor")]
 
 // Setting ComVisible to false makes the types in this assembly not visible 
 // to COM components.  If you need to access a type in this assembly from 
