@@ -22,7 +22,7 @@ TextAsset:
   m_PrefabAsset: {fileID: 0}
   m_Name: Template1
   m_Script: "{\n  \"name\": \"HotUpdate.Data\",\n  \"rootNamespace\": \"\",\n  \"references\":
-    [\n    \"Astraia.Run\"\n  ],\n  \"includePlatforms\": [],\n  \"excludePlatforms\":
+    [\n    \"GUID:d7b5476ac52be4da88cfdfdc8b8c889a\"\n  ],\n  \"includePlatforms\": [],\n  \"excludePlatforms\":
     [],\n  \"allowUnsafeCode\": false,\n  \"overrideReferences\": false,\n  \"precompiledReferences\":
     [],\n  \"autoReferenced\": false,\n  \"defineConstraints\": [],\n  \"versionDefines\":
     [],\n  \"noEngineReferences\": false\n}"
