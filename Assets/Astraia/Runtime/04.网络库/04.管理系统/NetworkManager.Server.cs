@@ -423,14 +423,13 @@ namespace Astraia.Net
                 using MemorySetter setter = MemorySetter.Pop(), observer = MemorySetter.Pop();
                 var isOwner = @object.connection == client;
                 var transform = @object.transform;
-
                 ArraySegment<byte> segment = default;
                 if (@object.entities.Length != 0)
                 {
                     @object.ServerSerialize(true, setter, observer);
                     segment = isOwner ? setter : observer;
                 }
-
+              
                 var message = new SpawnMessage
                 {
                     isOwner = isOwner,

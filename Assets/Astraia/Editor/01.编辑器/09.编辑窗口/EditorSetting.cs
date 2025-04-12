@@ -57,15 +57,18 @@ namespace Astraia
 #if ODIN_INSPECTOR
         protected override OdinMenuTree BuildMenuTree()
         {
-            var menuTree = new OdinMenuTree
-            {
-                { nameof(GlobalSetting), GlobalSetting.Instance, EditorIcons.UnityFolderIcon }
-            };
+            var menuTree = new OdinMenuTree();
             foreach (var window in windows)
             {
                 menuTree.Add(window.Key.Name, window.Value, EditorIcons.UnityFolderIcon);
             }
 
+            menuTree.SortMenuItemsByName();
+            var menuItem = new OdinMenuItem(menuTree, nameof(GlobalSetting), GlobalSetting.Instance)
+            {
+                Icon = EditorIcons.UnityFolderIcon
+            };
+            menuTree.MenuItems.Insert(0, menuItem);
             return menuTree;
         }
 #endif

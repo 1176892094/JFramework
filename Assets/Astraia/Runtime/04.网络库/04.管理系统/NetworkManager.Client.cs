@@ -421,6 +421,7 @@ namespace Astraia.Net
         {
             private static async void SpawnObject(SpawnMessage message)
             {
+                Debug.LogWarning(message.assetId);
                 if (spawns.TryGetValue(message.objectId, out var @object))
                 {
                     Spawn(message, @object);

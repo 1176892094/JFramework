@@ -10,21 +10,24 @@
 // *********************************************************************************
 
 using System;
-using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using Astraia.Common;
 using UnityEngine;
+#if UNITY_EDITOR
+using UnityEditor;
+using UnityEditor.SceneManagement;
+#endif
 
 namespace Astraia.Net
 {
     public sealed partial class NetworkObject : MonoBehaviour
     {
         [SerializeField] internal EntityMode entityMode;
-        
+
         [SerializeField] internal uint objectId;
-        
+
         [SerializeField] internal ulong sceneId;
-        
+
         [SerializeField] internal string assetId;
 
         private int frameCount;
@@ -71,17 +74,88 @@ namespace Astraia.Net
             entityState = EntityState.None;
         }
 
+#if UNITY_EDITOR
         private void OnValidate()
         {
-            var assetType = Service.Find.Type("Astraia.NetworkSetter, Unity.Astraia.CodeGen");
-            var assetData = assetType.GetMethod("Validate", Service.Find.Static);
-            if (assetData != null)
+            if (PrefabUtility.IsPartOfPrefabAsset(gameObject))
             {
-                var assetPair = ((string, ulong))assetData.Invoke(null, new object[] { assetId, sceneId, gameObject });
-                assetId = assetPair.Item1;
-                sceneId = assetPair.Item2;
+                sceneId = 0;
+                AssignAssetId(AssetDatabase.GetAssetPath(gameObject));
+            }
+            else if (PrefabStageUtility.GetCurrentPrefabStage() != null)
+            {
+                if (PrefabStageUtility.GetPrefabStage(gameObject) != null)
+                {
+                    sceneId = 0;
+                    AssignAssetId(PrefabStageUtility.GetPrefabStage(gameObject).assetPath);
+                }
+            }
+            else if (IsSceneWithParent(out var prefab))
+            {
+                AssignSceneId();
+                AssignAssetId(AssetDatabase.GetAssetPath(prefab));
+            }
+            else
+            {
+                AssignSceneId();
             }
         }
+
+        private void AssignAssetId(string assetPath)
+        {
+            if (!string.IsNullOrWhiteSpace(assetPath))
+            {
+                var importer = AssetImporter.GetAtPath(assetPath);
+                if (importer != null)
+                {
+                    var asset = importer.assetBundleName;
+                    assetId = char.ToUpper(asset[0]) + asset.Substring(1) + "/" + name;
+                }
+            }
+        }
+
+        private bool IsSceneWithParent(out GameObject prefab)
+        {
+            prefab = null;
+            if (!PrefabUtility.IsPartOfPrefabInstance(gameObject))
+            {
+                return false;
+            }
+
+            prefab = PrefabUtility.GetCorrespondingObjectFromSource(gameObject);
+            if (prefab != null)
+            {
+                return true;
+            }
+
+            Debug.LogError(Service.Text.Format("找不到场景对象的预制父物体。对象名称: {0}", name));
+            return false;
+        }
+
+        private void AssignSceneId()
+        {
+            if (Application.isPlaying) return;
+            var duplicate = GlobalManager.objectData.TryGetValue(sceneId, out var @object) && @object != null && @object != gameObject;
+            if (sceneId == 0 || duplicate)
+            {
+                sceneId = 0;
+                if (BuildPipeline.isBuildingPlayer)
+                {
+                    throw new InvalidOperationException("请保存场景后，再进行构建。");
+                }
+
+                Undo.RecordObject(gameObject, "Assigned AssetId");
+                var random = Service.Hash.Id();
+                duplicate = GlobalManager.objectData.TryGetValue(random, out @object) && @object != null && @object != gameObject;
+                if (!duplicate)
+                {
+                    sceneId = random;
+                }
+            }
+
+            GlobalManager.objectData[sceneId] = gameObject;
+        }
+#endif
 
         private void OnDestroy()
         {
@@ -251,7 +325,7 @@ namespace Astraia.Net
                 }
             }
         }
-        
+
         internal void OnNotifyAuthority()
         {
             if ((entityState & EntityState.Authority) == 0 && (entityMode & EntityMode.Owner) != 0)

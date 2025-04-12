@@ -46,7 +46,7 @@ namespace Astraia
                 return instance;
             }
         }
-
+        
         protected static void AddWindow()
         {
             EditorSetting.windows[typeof(T)] = Instance;

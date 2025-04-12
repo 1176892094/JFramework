@@ -103,6 +103,11 @@ namespace Astraia.Common
         [Sirenix.OdinInspector.ShowInInspector]
 #endif
         internal static readonly Dictionary<string, HashSet<UIPanel>> groupData = new Dictionary<string, HashSet<UIPanel>>();
+#if UNITY_EDITOR && ODIN_INSPECTOR
+        [Sirenix.OdinInspector.ShowInInspector]
+#endif
+        internal static readonly Dictionary<ulong, GameObject> objectData = new Dictionary<ulong, GameObject>();
+
 
         private void Awake()
         {

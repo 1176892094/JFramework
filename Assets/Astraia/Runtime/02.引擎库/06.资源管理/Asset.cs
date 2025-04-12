@@ -111,7 +111,7 @@ namespace Astraia.Common
 
                 GlobalManager.assetData.Add(assetPath, assetData);
             }
-
+            
             var platform = await LoadAssetPack(GlobalSetting.Instance.assetPlatform.ToString());
             GlobalManager.manifest ??= platform.LoadAsset<AssetBundleManifest>(nameof(AssetBundleManifest));
 
@@ -157,7 +157,7 @@ namespace Astraia.Common
                 GlobalManager.assetTask.Remove(assetPath);
             }
         }
-        
+
         private static Object LoadByAssetPack(string assetPath, Type assetType, AssetBundle assetPack)
         {
             if (assetPack == null) return null;
@@ -165,13 +165,13 @@ namespace Astraia.Common
             return request.asset is GameObject ? Object.Instantiate(request.asset) : request.asset;
         }
 
-        private static  Object LoadByResources(string assetPath, Type assetType)
+        private static Object LoadByResources(string assetPath, Type assetType)
         {
             var request = Resources.Load(assetPath, assetType);
             return request is GameObject ? Object.Instantiate(request) : request;
         }
 
-        private static  Object LoadBySimulates(string assetPath, Type assetType)
+        private static Object LoadBySimulates(string assetPath, Type assetType)
         {
 #if UNITY_EDITOR
             if (!GlobalManager.assetPath.TryGetValue(assetPath, out var assetData)) return null;
