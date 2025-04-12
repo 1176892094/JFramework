@@ -19,7 +19,8 @@ namespace Astraia
     {
         protected void SelectionChanged()
         {
-            foreach (var obj in Resources.FindObjectsOfTypeAll(Reflection.inspector))
+            var objects = Resources.FindObjectsOfTypeAll(Reflection.inspector);
+            foreach (var obj in objects)
             {
                 if (obj is EditorWindow window)
                 {

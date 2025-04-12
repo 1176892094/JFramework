@@ -23,7 +23,7 @@ namespace Astraia
 
         private InspectorItem()
         {
-            EditorManager.OnInitialized += OnInitialized;
+            EditorApplication.delayCall += OnInitialized;
             EditorManager.OnWindowMaximized += OnWindowMaximized;
             Selection.selectionChanged += SelectionChanged;
         }

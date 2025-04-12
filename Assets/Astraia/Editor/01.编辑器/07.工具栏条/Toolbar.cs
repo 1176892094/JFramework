@@ -29,7 +29,7 @@ namespace Astraia
 
         private Toolbar()
         {
-            EditorManager.OnInitialized += OnInitialized;
+            EditorApplication.delayCall += OnInitialized;
             EditorSceneManager.sceneOpened += OnSceneOpened;
         }
 

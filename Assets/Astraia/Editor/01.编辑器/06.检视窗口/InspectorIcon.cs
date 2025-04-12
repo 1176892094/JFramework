@@ -73,7 +73,14 @@ namespace Astraia
     
             void OnGUIHandler()
             {
-                if (element.childCount < 2 || editors.Length < 2)
+                if (element.childCount < 1)
+                {
+                    return;
+                }
+
+                var elements = Reflection.GetEditors(element[0]);
+
+                if (elements == null || editors.Length < 2)
                 {
                     return;
                 }
