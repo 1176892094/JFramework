@@ -21,7 +21,7 @@ namespace Astraia
 
             public static uint Id()
             {
-                Random.NextBytes(buffer);
+                Random.Next(buffer);
                 return BitConverter.ToUInt32(buffer, 0);
             }
 

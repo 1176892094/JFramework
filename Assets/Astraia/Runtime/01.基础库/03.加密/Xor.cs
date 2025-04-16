@@ -23,7 +23,7 @@ namespace Astraia
             public static unsafe byte[] Encrypt(byte[] data)
             {
                 var key = new byte[LENGTH];
-                Random.NextBytes(key);
+                Random.Next(key);
 
                 using var ms = new MemoryStream();
                 ms.Write(key, 0, key.Length);
