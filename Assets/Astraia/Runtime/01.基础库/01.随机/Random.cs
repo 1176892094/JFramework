@@ -15,10 +15,10 @@ namespace Astraia
 {
     public static partial class Service
     {
-        public static class Random
+        public static partial class Random
         {
-            private static readonly System.Random random = new System.Random(Environment.TickCount);
-            
+            private static readonly XoshiroImpl random = new XoshiroImpl();
+
             public static int Next(int max)
             {
                 return random.Next(max);
@@ -44,7 +44,7 @@ namespace Astraia
                 return random.NextDouble();
             }
 
-            public static void Next(byte[] bytes)
+            public static void Next(Span<byte> bytes)
             {
                 random.NextBytes(bytes);
             }

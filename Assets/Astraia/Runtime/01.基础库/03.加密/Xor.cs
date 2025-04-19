@@ -10,7 +10,7 @@
 // // *********************************************************************************
 
 using System;
-using System.IO;
+using System.Buffers;
 
 namespace Astraia
 {
@@ -18,61 +18,66 @@ namespace Astraia
     {
         public static class Xor
         {
+            private const int STACKALLOC_SIZE = 256 * 1024;
             private const int LENGTH = 16;
 
-            public static unsafe byte[] Encrypt(byte[] data)
+            public static unsafe byte[] Encrypt(ReadOnlySpan<byte> data)
             {
-                var key = new byte[LENGTH];
+                Span<byte> key = new byte[LENGTH];
                 Random.Next(key);
 
-                using var ms = new MemoryStream();
-                ms.Write(key, 0, key.Length);
+                byte[] buffer = null;
 
-                var buffer = new byte[1024];
-
-                fixed (byte* pData = data, pKey = key, pBuffer = buffer)
+                byte[] result;
+                try
                 {
-                    for (var i = 0; i < data.Length; i += buffer.Length)
-                    {
-                        var length = Math.Min(buffer.Length, data.Length - i);
+                    var length = data.Length + LENGTH;
 
-                        for (var j = 0; j < length; j++)
-                        {
-                            pBuffer[j] = (byte)(pData[i + j] ^ pKey[(i + j) % key.Length]);
-                        }
+                    var ms = length > STACKALLOC_SIZE ? buffer = ArrayPool<byte>.Shared.Rent(length) : stackalloc byte[length];
+                    key.CopyTo(ms);
 
-                        ms.Write(buffer, 0, length);
-                    }
+                    var destination = ms.Slice(LENGTH);
+                    for (var i = 0; i < data.Length; ++i)
+                        destination[i] = (byte)(data[i] ^ key[i % key.Length]);
+
+                    result = ms.ToArray();
                 }
-                
-                return ms.ToArray();
+                finally
+                {
+                    if (buffer != null)
+                        ArrayPool<byte>.Shared.Return(buffer);
+                }
+
+                return result;
             }
 
-            public static unsafe byte[] Decrypt(byte[] data)
+            public static unsafe byte[] Decrypt(ReadOnlySpan<byte> data)
             {
-                var key = new byte[LENGTH];
-                Buffer.BlockCopy(data, 0, key, 0, key.Length);
+                Span<byte> key = stackalloc byte[LENGTH];
+                data.Slice(0, key.Length).CopyTo(key);
 
-                using var ms = new MemoryStream();
+                byte[] buffer = null;
 
-                var buffer = new byte[1024];
-                
-                fixed (byte* pData = data, pKey = key, pBuffer = buffer)
+                byte[] result;
+
+                try
                 {
-                    for (var i = LENGTH; i < data.Length; i += buffer.Length)
-                    {
-                        var length = Math.Min(buffer.Length, data.Length - i);
+                    var length = data.Length - LENGTH;
+                    var ms = length > STACKALLOC_SIZE ? buffer = ArrayPool<byte>.Shared.Rent(length) : stackalloc byte[length];
 
-                        for (var j = 0; j < length; j++)
-                        {
-                            pBuffer[j] = (byte)(pData[i + j] ^ pKey[(i + j - LENGTH) % key.Length]);
-                        }
+                    data = data.Slice(LENGTH);
+                    for (var i = 0; i < data.Length; ++i)
+                        ms[i] = (byte)(data[i] ^ key[i % key.Length]);
 
-                        ms.Write(buffer, 0, length);
-                    }
+                    result = ms.ToArray();
+                }
+                finally
+                {
+                    if (buffer != null)
+                        ArrayPool<byte>.Shared.Return(buffer);
                 }
 
-                return ms.ToArray();
+                return result;
             }
         }
     }

@@ -29,7 +29,7 @@ namespace Astraia
                     stream.Write(bytes, 0, bytes.Length);
                 }
 
-                return Convert.ToBase64String(buffer.ToArray());
+                return Convert.ToBase64String(buffer.GetBuffer(), 0, (int)buffer.Length);
             }
 
             public static string Decompress(string data)
