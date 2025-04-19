@@ -109,7 +109,10 @@ namespace Astraia.Net
                 if (importer != null)
                 {
                     var asset = importer.assetBundleName;
-                    assetId = char.ToUpper(asset[0]) + asset.Substring(1) + "/" + name;
+                    if (!string.IsNullOrEmpty(importer.assetBundleName))
+                    {
+                        assetId = char.ToUpper(asset[0]) + asset.Substring(1) + "/" + name;
+                    }
                 }
             }
         }
